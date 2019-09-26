@@ -1,4 +1,4 @@
-import { Subject } from 'rxjs';
+import { ReplaySubject } from 'rxjs';
 export declare class MainStateService {
     private custom;
     private default;
@@ -8,7 +8,7 @@ export declare class MainStateService {
     updateCustom: (key: string, newValue: any) => void;
     has: (key: string) => boolean;
     hasCustom: (key: string) => boolean;
-    addCustom(key: string, stream$: Subject<any>): void;
+    addCustom(key: string, stream$: ReplaySubject<any>): void;
     private _update;
     private _get;
 }

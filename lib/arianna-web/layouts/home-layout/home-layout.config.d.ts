@@ -4,10 +4,13 @@ import * as DS from '../../data-sources';
 import * as EH from '../../event-handlers';
 export declare const AwHomeLayoutConfig: {
     layoutId: string;
-    widgets: {
+    widgets: ({
+        id: string;
+        hasStaticData?: undefined;
+    } | {
         id: string;
         hasStaticData: boolean;
-    }[];
+    })[];
     layoutDS: typeof AwHomeLayoutDS;
     layoutEH: typeof AwHomeLayoutEH;
     widgetsDataSources: typeof DS;

@@ -3,16 +3,15 @@ export declare class MainLayoutDS extends LayoutDataSource {
     protected configuration: any;
     protected mainState: any;
     protected router: any;
-    protected mainStateMap: {
-        widgetId: string;
-        streamKey: string;
-    }[];
+    protected titleService: any;
     options: any;
-    onInit({ configuration, mainState, router, options }: {
+    pageTitle: string;
+    onInit({ configuration, mainState, router, options, titleService }: {
         configuration: any;
         mainState: any;
         router: any;
         options: any;
+        titleService: any;
     }): void;
     onNavigate(payload: any): void;
 }
