@@ -4,7 +4,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK } from '@n7-frontend/components';
 import { ReplaySubject, empty, Subject, of } from 'rxjs';
 import { map, catchError, takeUntil, tap } from 'rxjs/operators';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { LayoutBuilder, LayoutDataSource, EventHandler, DataSource } from '@n7-frontend/core';
 
@@ -263,6 +263,33 @@ const ApolloProviderConfig = {
       }
     `
     },
+    'getTree': {
+        queryName: 'getTreeOfItems',
+        queryBody: `
+    {
+      getTreeOfItems(treeId: "patrimonioId" ) {
+        id
+        label
+        icon
+        branches {
+          label
+          id
+          icon   
+          branches {
+            label
+            id
+            icon  
+            branches {
+              label
+              id
+              icon          
+            }        
+          }       
+        }
+      }
+    }
+    `
+    },
     'globalFilter': {
         queryName: 'globalFilter',
         queryBody: `{
@@ -313,6 +340,33 @@ const ApolloProviderConfig = {
         }
       }
     }`
+    },
+    'getItemDetails': {
+        queryName: 'getItemDetails',
+        queryBody: `{
+        getItemDetails(__PARAMS__){
+            title
+            text
+            subTitle
+            image
+            fields {
+              id
+              label
+              fields {
+                id
+                key
+                value
+              }
+            }
+            item {
+              id
+            }
+            breadcrumbs {
+              label
+              link
+            }
+          }
+      }`
     }
 };
 
@@ -2304,6 +2358,163 @@ class AwHomeItemTagsWrapperDS extends DataSource {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+class AwTreeDS extends DataSource {
+    /**
+     * @return {?}
+     */
+    toggleNav() {
+    }
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        return data;
+    }
+    /**
+     * @param {?} data
+     * @param {?} parents
+     * @param {?} id
+     * @return {?}
+     */
+    updateTree(data, parents, id) {
+        if (!data) {
+            data = this.output;
+        }
+        data.items.forEach((/**
+         * @param {?} it
+         * @return {?}
+         */
+        (it) => {
+            if (it['_meta'] == id) {
+                if (it['classes'] == "is-expanded") {
+                    it['classes'] = "is-collapsed";
+                }
+                else {
+                    it['classes'] = "is-expanded";
+                }
+            }
+            else if (parents.indexOf(it['_meta']) >= 0) {
+                it['classes'] = "is-expanded";
+            }
+            if (typeof it['items'] != "undefined" && it['items'].length > 0) {
+                this.updateTree(it, parents, id);
+            }
+        }));
+        this.update(data);
+    }
+    /**
+     * @param {?} id
+     * @param {?} data
+     * @return {?}
+     */
+    selectTreeItem(id, data) {
+        if (!data) {
+            data = this.output;
+        }
+        data.items.forEach((/**
+         * @param {?} it
+         * @return {?}
+         */
+        (it) => {
+            if (it['_meta'] == id) {
+                it['classes'] = it['classes'] + " is-active";
+                this.currentItem = it;
+            }
+            else {
+                /** @type {?} */
+                let classes = it['classes'];
+                it['classes'] = classes.replace("is-active", "");
+            }
+            if (typeof it['items'] != "undefined" && it['items'].length > 0) {
+                this.selectTreeItem(id, it);
+            }
+        }));
+        this.update(data);
+    }
+    /**
+     * @return {?}
+     */
+    toggleSidebar() {
+        /** @type {?} */
+        let sidebarData = this.output;
+        if (sidebarData.classes == "is-expanded") {
+            sidebarData.classes = "is-collapsed";
+        }
+        else {
+            sidebarData.classes = "is-expanded";
+        }
+        this.update(sidebarData);
+    }
+}
+if (false) {
+    /** @type {?} */
+    AwTreeDS.prototype.currentItem;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwSidebarHeaderDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        return data;
+    }
+    /**
+     * @return {?}
+     */
+    toggleSidebar() {
+        /** @type {?} */
+        let sidebarData = this.output;
+        if (sidebarData.classes == "is-expanded") {
+            sidebarData.classes = "is-collapsed";
+        }
+        else {
+            sidebarData.classes = "is-expanded";
+        }
+        this.update(sidebarData);
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwSchedaBreadcrumbsDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        return data;
+    }
+    /**
+     * @return {?}
+     */
+    toggleSidebar() {
+        /** @type {?} */
+        let sidebarData = this.output;
+        if (sidebarData.classes == "is-expanded") {
+            sidebarData.classes = "is-collapsed";
+        }
+        else {
+            sidebarData.classes = "is-expanded";
+        }
+        this.update(sidebarData);
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 
 var DS$1 = /*#__PURE__*/Object.freeze({
     AwHeroDS: AwHeroDS,
@@ -2312,29 +2523,11 @@ var DS$1 = /*#__PURE__*/Object.freeze({
     AwHomeBubbleChartDS: AwHomeBubbleChartDS,
     AwHomeFacetsWrapperDS: AwHomeFacetsWrapperDS,
     AwHomeItemPreviewWrapperDS: AwHomeItemPreviewWrapperDS,
-    AwHomeItemTagsWrapperDS: AwHomeItemTagsWrapperDS
+    AwHomeItemTagsWrapperDS: AwHomeItemTagsWrapperDS,
+    AwTreeDS: AwTreeDS,
+    AwSidebarHeaderDS: AwSidebarHeaderDS,
+    AwSchedaBreadcrumbsDS: AwSchedaBreadcrumbsDS
 });
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwTableEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        /*
-        this.innerEvents$.subscribe(event => {
-          
-        });
-    
-        this.outerEvents$.subscribe(event => {
-          
-        });
-        */
-    }
-}
 
 /**
  * @fileoverview added by tsickle
@@ -2364,39 +2557,6 @@ class AwHeroEH extends EventHandler {
         /* this.outerEvents$.subscribe(event => {
         
         }); */
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwHomeHeroPatrimonioEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                case 'aw-home-hero-patrimonio.click':
-                    this.emitGlobal('navigate', {
-                        handler: 'router',
-                        path: ['aw/patrimonio']
-                    });
-                    break;
-                default:
-                    break;
-            }
-        }));
-        /*
-        this.outerEvents$.subscribe(event => {
-          
-        });
-        */
     }
 }
 
@@ -2476,6 +2636,39 @@ class AwHomeFacetsWrapperEH extends EventHandler {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+class AwHomeHeroPatrimonioEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-home-hero-patrimonio.click':
+                    this.emitGlobal('navigate', {
+                        handler: 'router',
+                        path: ['aw/patrimonio']
+                    });
+                    break;
+                default:
+                    break;
+            }
+        }));
+        /*
+        this.outerEvents$.subscribe(event => {
+          
+        });
+        */
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 class AwHomeItemPreviewWrapperEH extends EventHandler {
     /**
      * @return {?}
@@ -2521,15 +2714,133 @@ class AwHomeItemTagsWrapperEH extends EventHandler {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+class AwSchedaSidebarEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            if (type == 'aw-sidebar-header.click') {
+                this.dataSource.toggleSidebar();
+                this.emitOuter(type, payload);
+            }
+        }));
+        /* this.outerEvents$.subscribe(event => {
+        
+        }); */
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwSidebarHeaderEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            console.log(type);
+            if (type == 'aw-sidebar-header.click') {
+                this.dataSource.toggleSidebar();
+                this.emitOuter('click', payload);
+            }
+        }));
+        /* this.outerEvents$.subscribe(event => {
+        
+        }); */
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwTreeEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            if (payload && typeof payload.source != "undefined") {
+                switch (payload.source) {
+                    case 'toggle':
+                        this.dataSource.updateTree(null, payload.parents, payload.id);
+                        break;
+                    case 'ToggleMenuItem': this.dataSource.updateTree(null, payload.parents, payload.id); //no break, I want to execute also the following instruction
+                    case 'menuItem':
+                        this.dataSource.selectTreeItem(payload.id);
+                        this.emitOuter('click', payload.id);
+                        break;
+                }
+            }
+        }));
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            if (type == 'aw-sidebar-header.click') {
+                this.dataSource.toggleSidebar();
+            }
+            else if (type == 'aw-scheda-layout.selectItem') {
+                this.dataSource.selectTreeItem(payload);
+                this.dataSource.updateTree(null, this.dataSource.currentItem.payload.parents, payload);
+            }
+        }));
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwTableEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        /*
+        this.innerEvents$.subscribe(event => {
+          
+        });
+    
+        this.outerEvents$.subscribe(event => {
+          
+        });
+        */
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 
 var EH$1 = /*#__PURE__*/Object.freeze({
-    AwTableEH: AwTableEH,
     AwHeroEH: AwHeroEH,
-    AwHomeHeroPatrimonioEH: AwHomeHeroPatrimonioEH,
     AwHomeBubbleChartEH: AwHomeBubbleChartEH,
     AwHomeFacetsWrapperEH: AwHomeFacetsWrapperEH,
+    AwHomeHeroPatrimonioEH: AwHomeHeroPatrimonioEH,
     AwHomeItemPreviewWrapperEH: AwHomeItemPreviewWrapperEH,
-    AwHomeItemTagsWrapperEH: AwHomeItemTagsWrapperEH
+    AwHomeItemTagsWrapperEH: AwHomeItemTagsWrapperEH,
+    AwSchedaSidebarEH: AwSchedaSidebarEH,
+    AwSidebarHeaderEH: AwSidebarHeaderEH,
+    AwTreeEH: AwTreeEH,
+    AwTableEH: AwTableEH
 });
 
 /**
@@ -2885,22 +3196,226 @@ class AwPatrimonioLayoutDS extends LayoutDataSource {
      * @param {?} __0
      * @return {?}
      */
-    onInit({ configuration, mainState, router, options, titleService }) {
+    onInit({ configuration, mainState, router, options, titleService, communication }) {
         this.configuration = configuration;
         this.mainState = mainState;
         this.router = router;
         this.titleService = titleService;
+        this.communication = communication;
         this.options = options;
-        /*
-        * For an example of header update, or mainState update, check
-        * main-layout.ds.ts
-        */
+        this.sidebarCollapsed = false;
+    }
+    /**
+     * @param {?} id
+     * @return {?}
+     */
+    getNavigation(id) {
+        return this.communication.request$('getTree', {
+            onError: (/**
+             * @param {?} error
+             * @return {?}
+             */
+            (error) => console.log(error)),
+            params: { treeId: id }
+        });
+    }
+    /**
+     * @param {?} data
+     * @return {?}
+     */
+    updateNavigation(data) {
+        /** @type {?} */
+        let treeObj = {
+            items: []
+        };
+        data['branches'].forEach((/**
+         * @param {?} item
+         * @return {?}
+         */
+        item => {
+            treeObj['items'].push(this.parseTree(item, false, []));
+        }));
+        /** @type {?} */
+        let header = {
+            iconLeft: 'n7-icon-tree-icon',
+            text: data['label'],
+            iconRight: 'n7-icon-angle-left',
+            classes: 'is-expanded',
+            payload: 'header'
+        };
+        this.one('aw-tree').update(treeObj);
+        this.one('aw-sidebar-header').update(header);
+        this.one('aw-scheda-breadcrumbs').update(null);
+    }
+    /**
+     * @param {?} id
+     * @return {?}
+     */
+    loadItem(id) {
+        if (id) {
+            return this.communication.request$('getItemDetails', {
+                onError: (/**
+                 * @param {?} error
+                 * @return {?}
+                 */
+                (error) => console.log(error)),
+                params: { itemId: id }
+            });
+        }
+        else {
+            /* TODO: valori statici, da prendere da config */
+            this.pageTitle = 'Collezione d\'Arte';
+            this.hasBreadcrumb = false;
+            this.contentParts = [
+                {
+                    type: "text",
+                    title: 'Collezione d\'Arte',
+                    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi gravida sagittis pulvinar. Etiam iaculis maximus metus, id tincidunt libero auctor et. Proin tempus turpis vel erat ultrices, id vestibulum ante cursus. Vestibulum lobortis, ante at eleifend consequat, massa libero bibendum justo, id fermentum magna odio ac nulla. Cras aliquet scelerisque malesuada. Mauris congue fermentum tristique. Nulla imperdiet accumsan dui, tristique lobortis metus eleifend non. Donec quis odio massa. Cras sit amet sem eu turpis molestie blandit vitae sed nibh. Pellentesque ornare enim nisl, et efficitur ante elementum a. Ut nec ex finibus, congue libero feugiat, aliquam ante. Cras sem neque, pellentesque eget mi at, auctor vulputate tellus. Sed aliquam mi a tortor ultricies interdum. Etiam tincidunt nunc commodo nulla porttitor semper. Etiam porta lacinia libero a mattis. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+                },
+                {
+                    type: "text",
+                    title: 'Centro Archivi',
+                    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi gravida sagittis pulvinar. Etiam iaculis maximus metus, id tincidunt libero auctor et. Proin tempus turpis vel erat ultrices, id vestibulum ante cursus. Vestibulum lobortis, ante at eleifend consequat, massa libero bibendum justo, id fermentum magna odio ac nulla. Cras aliquet scelerisque malesuada. Mauris congue fermentum tristique. Nulla imperdiet accumsan dui, tristique lobortis metus eleifend non. Donec quis odio massa. Cras sit amet sem eu turpis molestie blandit vitae sed nibh. Pellentesque ornare enim nisl, et efficitur ante elementum a. Ut nec ex finibus, congue libero feugiat, aliquam ante. Cras sem neque, pellentesque eget mi at, auctor vulputate tellus. Sed aliquam mi a tortor ultricies interdum. Etiam tincidunt nunc commodo nulla porttitor semper. Etiam porta lacinia libero a mattis. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+                }
+            ];
+        }
+    }
+    /**
+     * @param {?} response
+     * @return {?}
+     */
+    loadContent(response) {
+        this.hasBreadcrumb = true;
+        if (response) {
+            this.contentParts = [];
+            if (response.image) {
+                this.contentParts.push({
+                    image: response.image,
+                    type: 'image'
+                });
+            }
+            this.contentParts.push({
+                title: response.title,
+                content: response.text,
+                type: 'text'
+            });
+            /** @type {?} */
+            let breadcrumbs = {
+                items: []
+            };
+            if (response.fields) {
+                response.fields.forEach((/**
+                 * @param {?} field
+                 * @return {?}
+                 */
+                field => {
+                    this.contentParts.push({
+                        title: field.label,
+                        content: response.text,
+                        type: 'metaGroup',
+                        fields: field.fields
+                    });
+                }));
+            }
+            response.breadcrumbs.forEach((/**
+             * @param {?} element
+             * @return {?}
+             */
+            element => {
+                breadcrumbs.items.push({
+                    label: element.label,
+                    payload: element.link
+                });
+            }));
+            this.one('aw-scheda-breadcrumbs').update(breadcrumbs);
+        }
+    }
+    /**
+     * @private
+     * @param {?} data
+     * @param {?} toggle
+     * @param {?} parents
+     * @return {?}
+     */
+    parseTree(data, toggle, parents) {
+        /** @type {?} */
+        var currParents = [...parents];
+        /** @type {?} */
+        let treeItem = {};
+        Object.keys(data).forEach((/**
+         * @param {?} key
+         * @return {?}
+         */
+        key => {
+            if (toggle) {
+                treeItem['toggle'] = {
+                    icon: 'n7-icon-angle-right',
+                    payload: {
+                        source: "toggle",
+                        id: data['id'],
+                        parents: currParents,
+                    }
+                };
+            }
+            if (key != "branches") {
+                switch (key) {
+                    case "label":
+                        treeItem['text'] = data[key];
+                        break;
+                    case "icon":
+                        if (toggle) {
+                            treeItem['toggle']['icon'] = data[key];
+                        }
+                        break;
+                    case "id":
+                        treeItem['_meta'] = data[key];
+                        treeItem['payload'] = {
+                            source: "menuItem",
+                            id: data['id']
+                        };
+                        break;
+                    default:
+                        data[key];
+                        break;
+                }
+                treeItem['classes'] = 'is-collapsed';
+            }
+            else if (data['branches'] != null) {
+                currParents.push(data['id']);
+                /*Handle cases with menu item with children but without toggle*/
+                if (!toggle) {
+                    treeItem['payload']['source'] = "ToggleMenuItem";
+                    treeItem['payload']['parents'] = currParents;
+                }
+                treeItem['items'] = [];
+                data[key].forEach((/**
+                 * @param {?} item
+                 * @return {?}
+                 */
+                item => {
+                    treeItem['items'].push(this.parseTree(item, true, currParents));
+                }));
+            }
+        }));
+        return treeItem;
+    }
+    /**
+     * @return {?}
+     */
+    collapseSidebar() {
+        this.sidebarCollapsed = !this.sidebarCollapsed;
+        console.log(this.sidebarCollapsed);
     }
 }
 if (false) {
     /**
      * If you are not using these variables (from your-layout.ts),
      * remove them from here too.
+     * @type {?}
+     * @private
+     */
+    AwPatrimonioLayoutDS.prototype.communication;
+    /**
      * @type {?}
      * @protected
      */
@@ -2924,6 +3439,14 @@ if (false) {
     AwPatrimonioLayoutDS.prototype.options;
     /** @type {?} */
     AwPatrimonioLayoutDS.prototype.pageTitle;
+    /** @type {?} */
+    AwPatrimonioLayoutDS.prototype.hasBreadcrumb;
+    /** @type {?} */
+    AwPatrimonioLayoutDS.prototype.contentParts;
+    /** @type {?} */
+    AwPatrimonioLayoutDS.prototype.tree;
+    /** @type {?} */
+    AwPatrimonioLayoutDS.prototype.sidebarCollapsed;
 }
 
 /**
@@ -2945,14 +3468,82 @@ class AwPatrimonioLayoutEH extends EventHandler {
          */
         ({ type, payload }) => {
             switch (type) {
-                case 'aw-patrimonio-layout.init':
+                case 'aw-scheda-layout.init':
                     this.dataSource.onInit(payload);
+                    this.configuration = payload.configuration;
+                    this.route = payload.route;
+                    /** @type {?} */
+                    let paramId = this.route.snapshot.params.id || "";
+                    this.listenRoute();
+                    this.loadNavigation(paramId);
                     break;
-                case 'aw-patrimonio-layout.destroy':
+                case 'aw-scheda-layout.destroy':
                     this.destroyed$.next();
                     break;
                 default:
                     break;
+            }
+        }));
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-tree.click':
+                    if (payload) {
+                        this.emitGlobal('navigate', { path: [this.configuration.get("paths").schedaBasePath + payload], handler: 'router' });
+                    }
+                    break;
+                case "aw-sidebar-header.click":
+                    this.dataSource.collapseSidebar();
+                    break;
+            }
+        }));
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    listenRoute() {
+        this.route.paramMap.subscribe((/**
+         * @param {?} params
+         * @return {?}
+         */
+        params => {
+            if (params.get('id')) {
+                this.dataSource.loadItem(params.get('id')).subscribe((/**
+                 * @param {?} response
+                 * @return {?}
+                 */
+                (response) => {
+                    if (response) {
+                        this.emitGlobal('navigate', { path: [this.configuration.get("paths").schedaBasePath + response.item.id], handler: 'router' });
+                        this.dataSource.loadContent(response);
+                    }
+                }));
+            }
+            else {
+                this.dataSource.loadItem();
+            }
+        }));
+    }
+    /**
+     * @private
+     * @param {?} selectedItem
+     * @return {?}
+     */
+    loadNavigation(selectedItem) {
+        this.dataSource.getNavigation('patrimonio').subscribe((/**
+         * @param {?} response
+         * @return {?}
+         */
+        (response) => {
+            if (response) {
+                this.dataSource.updateNavigation(response, selectedItem);
+            }
+            if (selectedItem) {
+                this.emitOuter('selectItem', selectedItem);
             }
         }));
     }
@@ -2963,6 +3554,16 @@ if (false) {
      * @private
      */
     AwPatrimonioLayoutEH.prototype.destroyed$;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwPatrimonioLayoutEH.prototype.configuration;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwPatrimonioLayoutEH.prototype.route;
 }
 
 /**
@@ -2971,13 +3572,15 @@ if (false) {
  */
 /** @type {?} */
 const AwPatrimonioLayoutConfig = {
-    layoutId: 'n7-new-layout',
+    layoutId: 'aw-scheda-layout',
     /**
      * Array of components you want to use
      * in this leyout
      */
     widgets: [
-    // { id: 'header' },
+        { id: 'aw-sidebar-header' },
+        { id: 'aw-tree' },
+        { id: 'aw-scheda-breadcrumbs' }
     ],
     layoutDS: AwPatrimonioLayoutDS,
     layoutEH: AwPatrimonioLayoutEH,
@@ -2992,21 +3595,25 @@ const AwPatrimonioLayoutConfig = {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-class AwPatrimonioLayoutComponent extends AbstractLayout {
+class AwSchedaLayoutComponent extends AbstractLayout {
     /**
      * @param {?} router
+     * @param {?} route
      * @param {?} configuration
      * @param {?} layoutsConfiguration
      * @param {?} mainState
      * @param {?} titleService
+     * @param {?} communication
      */
-    constructor(router, configuration, layoutsConfiguration, mainState, titleService) {
+    constructor(router, route, configuration, layoutsConfiguration, mainState, titleService, communication) {
         super(layoutsConfiguration.get('AwPatrimonioLayoutConfig') || AwPatrimonioLayoutConfig);
         this.router = router;
+        this.route = route;
         this.configuration = configuration;
         this.layoutsConfiguration = layoutsConfiguration;
         this.mainState = mainState;
         this.titleService = titleService;
+        this.communication = communication;
     }
     /**
      * Optional variables that can be accessed from the layout's logic.
@@ -3020,7 +3627,9 @@ class AwPatrimonioLayoutComponent extends AbstractLayout {
             configuration: this.configuration,
             mainState: this.mainState,
             router: this.router,
+            route: this.route,
             titleService: this.titleService,
+            communication: this.communication,
             options: this.config.options || {},
         };
     }
@@ -3037,46 +3646,58 @@ class AwPatrimonioLayoutComponent extends AbstractLayout {
         this.onDestroy();
     }
 }
-AwPatrimonioLayoutComponent.decorators = [
+AwSchedaLayoutComponent.decorators = [
     { type: Component, args: [{
-                selector: 'aw-patrimonio-layout',
-                template: "<div class=\"aw-patrimonio-layout\" id=\"patrimonio-layout\">\n    Layout patrimonio!\n</div>"
+                selector: 'aw-scheda-layout',
+                template: "<div class=\"aw-scheda-layout n7-grid-2\" id=\"scheda-layout\">\n    <div> <!--Left sidebar -->\n        <n7-sidebar-header\n            [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\" \n            [emit]=\"lb.widgets['aw-sidebar-header'].emit\"\n        ></n7-sidebar-header>\n        <n7-tree\n            [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-tree'].emit\"            \n            [hidden]=\"lb.dataSource.sidebarCollapsed\"\n        ></n7-tree>\n    </div> <!--end Left sidebar -->\n    <div>  <!--Right sidebar --> \n        <n7-breadcrumbs\n            *ngIf=\"lb.dataSource.hasBreadcrumb\"\n            [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\" \n            [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\"\n        ></n7-breadcrumbs>\n        <div *ngFor=\"let part of lb.dataSource.contentParts\">\n            <div *ngIf=\"part.type == 'image'\">\n                <div \n                [ngStyle]=\"{\n                    'background-image': 'url(' + part.image + ')',\n                    'width': '100%',\n                    'height': '200px'\n                    }\">            \n                \n                \n                </div>               \n            </div>\n\n            <div>\n                <h1>{{ part.title }}</h1>\n                <div class=\"n7-grid-2\">\n                    <div [innerHTML]=\"part.content\" >\n                                      \n                    </div>                \n                </div>\n            </div> \n            <div *ngIf=\"part.type == 'metaGroup'\">\n                <div *ngFor=\"let meta of part.fields\">\n                    <strong>{{meta.key}}: </strong><span>{{meta.value}}</span>\n                </div>  \n        </div>\n    </div>  <!--end Right sidebar -->\n</div>\n"
             }] }
 ];
 /** @nocollapse */
-AwPatrimonioLayoutComponent.ctorParameters = () => [
+AwSchedaLayoutComponent.ctorParameters = () => [
     { type: Router },
+    { type: ActivatedRoute },
     { type: ConfigurationService },
     { type: LayoutsConfigurationService },
     { type: MainStateService },
-    { type: Title }
+    { type: Title },
+    { type: CommunicationService }
 ];
 if (false) {
     /**
      * @type {?}
      * @private
      */
-    AwPatrimonioLayoutComponent.prototype.router;
+    AwSchedaLayoutComponent.prototype.router;
     /**
      * @type {?}
      * @private
      */
-    AwPatrimonioLayoutComponent.prototype.configuration;
+    AwSchedaLayoutComponent.prototype.route;
     /**
      * @type {?}
      * @private
      */
-    AwPatrimonioLayoutComponent.prototype.layoutsConfiguration;
+    AwSchedaLayoutComponent.prototype.configuration;
     /**
      * @type {?}
      * @private
      */
-    AwPatrimonioLayoutComponent.prototype.mainState;
+    AwSchedaLayoutComponent.prototype.layoutsConfiguration;
     /**
      * @type {?}
      * @private
      */
-    AwPatrimonioLayoutComponent.prototype.titleService;
+    AwSchedaLayoutComponent.prototype.mainState;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaLayoutComponent.prototype.titleService;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaLayoutComponent.prototype.communication;
 }
 
 /**
@@ -3088,7 +3709,7 @@ const COMPONENTS$1 = [
     AwHomeLayoutComponent,
     AwAboutLayoutComponent,
     AwWorksLayoutComponent,
-    AwPatrimonioLayoutComponent,
+    AwSchedaLayoutComponent,
 ];
 class N7BoilerplateAriannaWebModule {
 }
@@ -3149,5 +3770,5 @@ N7BoilerplateLibModule.decorators = [
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAboutLayoutComponent, AwAboutLayoutConfig, AwAboutLayoutDS, AwAboutLayoutEH, AwHeroDS, AwHeroEH, AwHomeBubbleChartDS, AwHomeBubbleChartEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemPreviewWrapperDS, AwHomeItemPreviewWrapperEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwPatrimonioLayoutComponent, AwPatrimonioLayoutConfig, AwPatrimonioLayoutDS, AwPatrimonioLayoutEH, AwTableDS, AwTableEH, AwWorksLayoutComponent, AwWorksLayoutConfig, AwWorksLayoutDS, AwWorksLayoutEH, BreadcrumbsDS, BreadcrumbsEH, CommunicationService, ConfigurationService, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SubnavDS, SubnavEH, CommunicationService as ɵa, MainStateService as ɵb };
+export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAboutLayoutComponent, AwAboutLayoutConfig, AwAboutLayoutDS, AwAboutLayoutEH, AwHeroDS, AwHeroEH, AwHomeBubbleChartDS, AwHomeBubbleChartEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemPreviewWrapperDS, AwHomeItemPreviewWrapperEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwPatrimonioLayoutConfig, AwPatrimonioLayoutDS, AwPatrimonioLayoutEH, AwSchedaBreadcrumbsDS, AwSchedaLayoutComponent, AwSchedaSidebarEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, AwWorksLayoutComponent, AwWorksLayoutConfig, AwWorksLayoutDS, AwWorksLayoutEH, BreadcrumbsDS, BreadcrumbsEH, CommunicationService, ConfigurationService, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SubnavDS, SubnavEH, CommunicationService as ɵa, MainStateService as ɵb };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

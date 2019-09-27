@@ -467,9 +467,17 @@
             queryName: 'getLastPosts',
             queryBody: "\n      {\n        getLastPosts(__PARAMS__) {\n          id\n          title\n        }\n      }\n    "
         },
+        'getTree': {
+            queryName: 'getTreeOfItems',
+            queryBody: "\n    {\n      getTreeOfItems(treeId: \"patrimonioId\" ) {\n        id\n        label\n        icon\n        branches {\n          label\n          id\n          icon   \n          branches {\n            label\n            id\n            icon  \n            branches {\n              label\n              id\n              icon          \n            }        \n          }       \n        }\n      }\n    }\n    "
+        },
         'globalFilter': {
             queryName: 'globalFilter',
             queryBody: "{\n      globalFilter(__PARAMS__){\n        entitiesData {\n          countData {\n            type {\n              id\n              label\n              color\n              icon\n            }\n            count\n          }\n          entitiesCountData {\n            entity {\n              id\n              label\n              typeOfEntity {\n                id\n              }\n            }\n            count\n          }\n        }\n        itemsPagination {\n          totalCount\n          items {\n            item {\n              id\n              label\n              info {\n                key\n                value\n              }\n            }\n            thumbnail\n            relatedTOEData {\n              type {\n                id\n                label\n                icon\n                color\n              }\n              count\n            }\n          }\n        }\n      }\n    }"
+        },
+        'getItemDetails': {
+            queryName: 'getItemDetails',
+            queryBody: "{\n        getItemDetails(__PARAMS__){\n            title\n            text\n            subTitle\n            image\n            fields {\n              id\n              label\n              fields {\n                id\n                key\n                value\n              }\n            }\n            item {\n              id\n            }\n            breadcrumbs {\n              label\n              link\n            }\n          }\n      }"
         }
     };
 
@@ -2769,6 +2777,218 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
+    var AwTreeDS = /** @class */ (function (_super) {
+        __extends(AwTreeDS, _super);
+        function AwTreeDS() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        AwTreeDS.prototype.toggleNav = /**
+         * @return {?}
+         */
+        function () {
+        };
+        /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        AwTreeDS.prototype.transform = /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        function (data) {
+            return data;
+        };
+        /**
+         * @param {?} data
+         * @param {?} parents
+         * @param {?} id
+         * @return {?}
+         */
+        AwTreeDS.prototype.updateTree = /**
+         * @param {?} data
+         * @param {?} parents
+         * @param {?} id
+         * @return {?}
+         */
+        function (data, parents, id) {
+            var _this = this;
+            if (!data) {
+                data = this.output;
+            }
+            data.items.forEach((/**
+             * @param {?} it
+             * @return {?}
+             */
+            function (it) {
+                if (it['_meta'] == id) {
+                    if (it['classes'] == "is-expanded") {
+                        it['classes'] = "is-collapsed";
+                    }
+                    else {
+                        it['classes'] = "is-expanded";
+                    }
+                }
+                else if (parents.indexOf(it['_meta']) >= 0) {
+                    it['classes'] = "is-expanded";
+                }
+                if (typeof it['items'] != "undefined" && it['items'].length > 0) {
+                    _this.updateTree(it, parents, id);
+                }
+            }));
+            this.update(data);
+        };
+        /**
+         * @param {?} id
+         * @param {?} data
+         * @return {?}
+         */
+        AwTreeDS.prototype.selectTreeItem = /**
+         * @param {?} id
+         * @param {?} data
+         * @return {?}
+         */
+        function (id, data) {
+            var _this = this;
+            if (!data) {
+                data = this.output;
+            }
+            data.items.forEach((/**
+             * @param {?} it
+             * @return {?}
+             */
+            function (it) {
+                if (it['_meta'] == id) {
+                    it['classes'] = it['classes'] + " is-active";
+                    _this.currentItem = it;
+                }
+                else {
+                    /** @type {?} */
+                    var classes = it['classes'];
+                    it['classes'] = classes.replace("is-active", "");
+                }
+                if (typeof it['items'] != "undefined" && it['items'].length > 0) {
+                    _this.selectTreeItem(id, it);
+                }
+            }));
+            this.update(data);
+        };
+        /**
+         * @return {?}
+         */
+        AwTreeDS.prototype.toggleSidebar = /**
+         * @return {?}
+         */
+        function () {
+            /** @type {?} */
+            var sidebarData = this.output;
+            if (sidebarData.classes == "is-expanded") {
+                sidebarData.classes = "is-collapsed";
+            }
+            else {
+                sidebarData.classes = "is-expanded";
+            }
+            this.update(sidebarData);
+        };
+        return AwTreeDS;
+    }(core$1.DataSource));
+    if (false) {
+        /** @type {?} */
+        AwTreeDS.prototype.currentItem;
+    }
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var AwSidebarHeaderDS = /** @class */ (function (_super) {
+        __extends(AwSidebarHeaderDS, _super);
+        function AwSidebarHeaderDS() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        AwSidebarHeaderDS.prototype.transform = /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        function (data) {
+            return data;
+        };
+        /**
+         * @return {?}
+         */
+        AwSidebarHeaderDS.prototype.toggleSidebar = /**
+         * @return {?}
+         */
+        function () {
+            /** @type {?} */
+            var sidebarData = this.output;
+            if (sidebarData.classes == "is-expanded") {
+                sidebarData.classes = "is-collapsed";
+            }
+            else {
+                sidebarData.classes = "is-expanded";
+            }
+            this.update(sidebarData);
+        };
+        return AwSidebarHeaderDS;
+    }(core$1.DataSource));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var AwSchedaBreadcrumbsDS = /** @class */ (function (_super) {
+        __extends(AwSchedaBreadcrumbsDS, _super);
+        function AwSchedaBreadcrumbsDS() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        AwSchedaBreadcrumbsDS.prototype.transform = /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        function (data) {
+            return data;
+        };
+        /**
+         * @return {?}
+         */
+        AwSchedaBreadcrumbsDS.prototype.toggleSidebar = /**
+         * @return {?}
+         */
+        function () {
+            /** @type {?} */
+            var sidebarData = this.output;
+            if (sidebarData.classes == "is-expanded") {
+                sidebarData.classes = "is-collapsed";
+            }
+            else {
+                sidebarData.classes = "is-expanded";
+            }
+            this.update(sidebarData);
+        };
+        return AwSchedaBreadcrumbsDS;
+    }(core$1.DataSource));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
 
     var DS$1 = /*#__PURE__*/Object.freeze({
         AwHeroDS: AwHeroDS,
@@ -2777,37 +2997,11 @@
         AwHomeBubbleChartDS: AwHomeBubbleChartDS,
         AwHomeFacetsWrapperDS: AwHomeFacetsWrapperDS,
         AwHomeItemPreviewWrapperDS: AwHomeItemPreviewWrapperDS,
-        AwHomeItemTagsWrapperDS: AwHomeItemTagsWrapperDS
+        AwHomeItemTagsWrapperDS: AwHomeItemTagsWrapperDS,
+        AwTreeDS: AwTreeDS,
+        AwSidebarHeaderDS: AwSidebarHeaderDS,
+        AwSchedaBreadcrumbsDS: AwSchedaBreadcrumbsDS
     });
-
-    /**
-     * @fileoverview added by tsickle
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-    var AwTableEH = /** @class */ (function (_super) {
-        __extends(AwTableEH, _super);
-        function AwTableEH() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        /**
-         * @return {?}
-         */
-        AwTableEH.prototype.listen = /**
-         * @return {?}
-         */
-        function () {
-            /*
-            this.innerEvents$.subscribe(event => {
-              
-            });
-        
-            this.outerEvents$.subscribe(event => {
-              
-            });
-            */
-        };
-        return AwTableEH;
-    }(core$1.EventHandler));
 
     /**
      * @fileoverview added by tsickle
@@ -2848,49 +3042,6 @@
             }); */
         };
         return AwHeroEH;
-    }(core$1.EventHandler));
-
-    /**
-     * @fileoverview added by tsickle
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-    var AwHomeHeroPatrimonioEH = /** @class */ (function (_super) {
-        __extends(AwHomeHeroPatrimonioEH, _super);
-        function AwHomeHeroPatrimonioEH() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        /**
-         * @return {?}
-         */
-        AwHomeHeroPatrimonioEH.prototype.listen = /**
-         * @return {?}
-         */
-        function () {
-            var _this = this;
-            this.innerEvents$.subscribe((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            function (_a) {
-                var type = _a.type, payload = _a.payload;
-                switch (type) {
-                    case 'aw-home-hero-patrimonio.click':
-                        _this.emitGlobal('navigate', {
-                            handler: 'router',
-                            path: ['aw/patrimonio']
-                        });
-                        break;
-                    default:
-                        break;
-                }
-            }));
-            /*
-            this.outerEvents$.subscribe(event => {
-              
-            });
-            */
-        };
-        return AwHomeHeroPatrimonioEH;
     }(core$1.EventHandler));
 
     /**
@@ -2988,6 +3139,49 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
+    var AwHomeHeroPatrimonioEH = /** @class */ (function (_super) {
+        __extends(AwHomeHeroPatrimonioEH, _super);
+        function AwHomeHeroPatrimonioEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        AwHomeHeroPatrimonioEH.prototype.listen = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.innerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case 'aw-home-hero-patrimonio.click':
+                        _this.emitGlobal('navigate', {
+                            handler: 'router',
+                            path: ['aw/patrimonio']
+                        });
+                        break;
+                    default:
+                        break;
+                }
+            }));
+            /*
+            this.outerEvents$.subscribe(event => {
+              
+            });
+            */
+        };
+        return AwHomeHeroPatrimonioEH;
+    }(core$1.EventHandler));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
     var AwHomeItemPreviewWrapperEH = /** @class */ (function (_super) {
         __extends(AwHomeItemPreviewWrapperEH, _super);
         function AwHomeItemPreviewWrapperEH() {
@@ -3050,15 +3244,172 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
+    var AwSchedaSidebarEH = /** @class */ (function (_super) {
+        __extends(AwSchedaSidebarEH, _super);
+        function AwSchedaSidebarEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        AwSchedaSidebarEH.prototype.listen = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.innerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                if (type == 'aw-sidebar-header.click') {
+                    _this.dataSource.toggleSidebar();
+                    _this.emitOuter(type, payload);
+                }
+            }));
+            /* this.outerEvents$.subscribe(event => {
+            
+            }); */
+        };
+        return AwSchedaSidebarEH;
+    }(core$1.EventHandler));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var AwSidebarHeaderEH = /** @class */ (function (_super) {
+        __extends(AwSidebarHeaderEH, _super);
+        function AwSidebarHeaderEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        AwSidebarHeaderEH.prototype.listen = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.innerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                console.log(type);
+                if (type == 'aw-sidebar-header.click') {
+                    _this.dataSource.toggleSidebar();
+                    _this.emitOuter('click', payload);
+                }
+            }));
+            /* this.outerEvents$.subscribe(event => {
+            
+            }); */
+        };
+        return AwSidebarHeaderEH;
+    }(core$1.EventHandler));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var AwTreeEH = /** @class */ (function (_super) {
+        __extends(AwTreeEH, _super);
+        function AwTreeEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        AwTreeEH.prototype.listen = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.innerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                if (payload && typeof payload.source != "undefined") {
+                    switch (payload.source) {
+                        case 'toggle':
+                            _this.dataSource.updateTree(null, payload.parents, payload.id);
+                            break;
+                        case 'ToggleMenuItem': _this.dataSource.updateTree(null, payload.parents, payload.id); //no break, I want to execute also the following instruction
+                        case 'menuItem':
+                            _this.dataSource.selectTreeItem(payload.id);
+                            _this.emitOuter('click', payload.id);
+                            break;
+                    }
+                }
+            }));
+            this.outerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                if (type == 'aw-sidebar-header.click') {
+                    _this.dataSource.toggleSidebar();
+                }
+                else if (type == 'aw-scheda-layout.selectItem') {
+                    _this.dataSource.selectTreeItem(payload);
+                    _this.dataSource.updateTree(null, _this.dataSource.currentItem.payload.parents, payload);
+                }
+            }));
+        };
+        return AwTreeEH;
+    }(core$1.EventHandler));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var AwTableEH = /** @class */ (function (_super) {
+        __extends(AwTableEH, _super);
+        function AwTableEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        AwTableEH.prototype.listen = /**
+         * @return {?}
+         */
+        function () {
+            /*
+            this.innerEvents$.subscribe(event => {
+              
+            });
+        
+            this.outerEvents$.subscribe(event => {
+              
+            });
+            */
+        };
+        return AwTableEH;
+    }(core$1.EventHandler));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
 
     var EH$1 = /*#__PURE__*/Object.freeze({
-        AwTableEH: AwTableEH,
         AwHeroEH: AwHeroEH,
-        AwHomeHeroPatrimonioEH: AwHomeHeroPatrimonioEH,
         AwHomeBubbleChartEH: AwHomeBubbleChartEH,
         AwHomeFacetsWrapperEH: AwHomeFacetsWrapperEH,
+        AwHomeHeroPatrimonioEH: AwHomeHeroPatrimonioEH,
         AwHomeItemPreviewWrapperEH: AwHomeItemPreviewWrapperEH,
-        AwHomeItemTagsWrapperEH: AwHomeItemTagsWrapperEH
+        AwHomeItemTagsWrapperEH: AwHomeItemTagsWrapperEH,
+        AwSchedaSidebarEH: AwSchedaSidebarEH,
+        AwSidebarHeaderEH: AwSidebarHeaderEH,
+        AwTreeEH: AwTreeEH,
+        AwTableEH: AwTableEH
     });
 
     /**
@@ -3493,16 +3844,244 @@
          * @return {?}
          */
         function (_a) {
-            var configuration = _a.configuration, mainState = _a.mainState, router = _a.router, options = _a.options, titleService = _a.titleService;
+            var configuration = _a.configuration, mainState = _a.mainState, router = _a.router, options = _a.options, titleService = _a.titleService, communication = _a.communication;
             this.configuration = configuration;
             this.mainState = mainState;
             this.router = router;
             this.titleService = titleService;
+            this.communication = communication;
             this.options = options;
-            /*
-            * For an example of header update, or mainState update, check
-            * main-layout.ds.ts
-            */
+            this.sidebarCollapsed = false;
+        };
+        /**
+         * @param {?} id
+         * @return {?}
+         */
+        AwPatrimonioLayoutDS.prototype.getNavigation = /**
+         * @param {?} id
+         * @return {?}
+         */
+        function (id) {
+            return this.communication.request$('getTree', {
+                onError: (/**
+                 * @param {?} error
+                 * @return {?}
+                 */
+                function (error) { return console.log(error); }),
+                params: { treeId: id }
+            });
+        };
+        /**
+         * @param {?} data
+         * @return {?}
+         */
+        AwPatrimonioLayoutDS.prototype.updateNavigation = /**
+         * @param {?} data
+         * @return {?}
+         */
+        function (data) {
+            var _this = this;
+            /** @type {?} */
+            var treeObj = {
+                items: []
+            };
+            data['branches'].forEach((/**
+             * @param {?} item
+             * @return {?}
+             */
+            function (item) {
+                treeObj['items'].push(_this.parseTree(item, false, []));
+            }));
+            /** @type {?} */
+            var header = {
+                iconLeft: 'n7-icon-tree-icon',
+                text: data['label'],
+                iconRight: 'n7-icon-angle-left',
+                classes: 'is-expanded',
+                payload: 'header'
+            };
+            this.one('aw-tree').update(treeObj);
+            this.one('aw-sidebar-header').update(header);
+            this.one('aw-scheda-breadcrumbs').update(null);
+        };
+        /**
+         * @param {?} id
+         * @return {?}
+         */
+        AwPatrimonioLayoutDS.prototype.loadItem = /**
+         * @param {?} id
+         * @return {?}
+         */
+        function (id) {
+            if (id) {
+                return this.communication.request$('getItemDetails', {
+                    onError: (/**
+                     * @param {?} error
+                     * @return {?}
+                     */
+                    function (error) { return console.log(error); }),
+                    params: { itemId: id }
+                });
+            }
+            else {
+                /* TODO: valori statici, da prendere da config */
+                this.pageTitle = 'Collezione d\'Arte';
+                this.hasBreadcrumb = false;
+                this.contentParts = [
+                    {
+                        type: "text",
+                        title: 'Collezione d\'Arte',
+                        content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi gravida sagittis pulvinar. Etiam iaculis maximus metus, id tincidunt libero auctor et. Proin tempus turpis vel erat ultrices, id vestibulum ante cursus. Vestibulum lobortis, ante at eleifend consequat, massa libero bibendum justo, id fermentum magna odio ac nulla. Cras aliquet scelerisque malesuada. Mauris congue fermentum tristique. Nulla imperdiet accumsan dui, tristique lobortis metus eleifend non. Donec quis odio massa. Cras sit amet sem eu turpis molestie blandit vitae sed nibh. Pellentesque ornare enim nisl, et efficitur ante elementum a. Ut nec ex finibus, congue libero feugiat, aliquam ante. Cras sem neque, pellentesque eget mi at, auctor vulputate tellus. Sed aliquam mi a tortor ultricies interdum. Etiam tincidunt nunc commodo nulla porttitor semper. Etiam porta lacinia libero a mattis. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+                    },
+                    {
+                        type: "text",
+                        title: 'Centro Archivi',
+                        content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi gravida sagittis pulvinar. Etiam iaculis maximus metus, id tincidunt libero auctor et. Proin tempus turpis vel erat ultrices, id vestibulum ante cursus. Vestibulum lobortis, ante at eleifend consequat, massa libero bibendum justo, id fermentum magna odio ac nulla. Cras aliquet scelerisque malesuada. Mauris congue fermentum tristique. Nulla imperdiet accumsan dui, tristique lobortis metus eleifend non. Donec quis odio massa. Cras sit amet sem eu turpis molestie blandit vitae sed nibh. Pellentesque ornare enim nisl, et efficitur ante elementum a. Ut nec ex finibus, congue libero feugiat, aliquam ante. Cras sem neque, pellentesque eget mi at, auctor vulputate tellus. Sed aliquam mi a tortor ultricies interdum. Etiam tincidunt nunc commodo nulla porttitor semper. Etiam porta lacinia libero a mattis. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+                    }
+                ];
+            }
+        };
+        /**
+         * @param {?} response
+         * @return {?}
+         */
+        AwPatrimonioLayoutDS.prototype.loadContent = /**
+         * @param {?} response
+         * @return {?}
+         */
+        function (response) {
+            var _this = this;
+            this.hasBreadcrumb = true;
+            if (response) {
+                this.contentParts = [];
+                if (response.image) {
+                    this.contentParts.push({
+                        image: response.image,
+                        type: 'image'
+                    });
+                }
+                this.contentParts.push({
+                    title: response.title,
+                    content: response.text,
+                    type: 'text'
+                });
+                /** @type {?} */
+                var breadcrumbs_1 = {
+                    items: []
+                };
+                if (response.fields) {
+                    response.fields.forEach((/**
+                     * @param {?} field
+                     * @return {?}
+                     */
+                    function (field) {
+                        _this.contentParts.push({
+                            title: field.label,
+                            content: response.text,
+                            type: 'metaGroup',
+                            fields: field.fields
+                        });
+                    }));
+                }
+                response.breadcrumbs.forEach((/**
+                 * @param {?} element
+                 * @return {?}
+                 */
+                function (element) {
+                    breadcrumbs_1.items.push({
+                        label: element.label,
+                        payload: element.link
+                    });
+                }));
+                this.one('aw-scheda-breadcrumbs').update(breadcrumbs_1);
+            }
+        };
+        /**
+         * @private
+         * @param {?} data
+         * @param {?} toggle
+         * @param {?} parents
+         * @return {?}
+         */
+        AwPatrimonioLayoutDS.prototype.parseTree = /**
+         * @private
+         * @param {?} data
+         * @param {?} toggle
+         * @param {?} parents
+         * @return {?}
+         */
+        function (data, toggle, parents) {
+            var _this = this;
+            /** @type {?} */
+            var currParents = __spread(parents);
+            /** @type {?} */
+            var treeItem = {};
+            Object.keys(data).forEach((/**
+             * @param {?} key
+             * @return {?}
+             */
+            function (key) {
+                if (toggle) {
+                    treeItem['toggle'] = {
+                        icon: 'n7-icon-angle-right',
+                        payload: {
+                            source: "toggle",
+                            id: data['id'],
+                            parents: currParents,
+                        }
+                    };
+                }
+                if (key != "branches") {
+                    switch (key) {
+                        case "label":
+                            treeItem['text'] = data[key];
+                            break;
+                        case "icon":
+                            if (toggle) {
+                                treeItem['toggle']['icon'] = data[key];
+                            }
+                            break;
+                        case "id":
+                            treeItem['_meta'] = data[key];
+                            treeItem['payload'] = {
+                                source: "menuItem",
+                                id: data['id']
+                            };
+                            break;
+                        default:
+                            data[key];
+                            break;
+                    }
+                    treeItem['classes'] = 'is-collapsed';
+                }
+                else if (data['branches'] != null) {
+                    currParents.push(data['id']);
+                    /*Handle cases with menu item with children but without toggle*/
+                    if (!toggle) {
+                        treeItem['payload']['source'] = "ToggleMenuItem";
+                        treeItem['payload']['parents'] = currParents;
+                    }
+                    treeItem['items'] = [];
+                    data[key].forEach((/**
+                     * @param {?} item
+                     * @return {?}
+                     */
+                    function (item) {
+                        treeItem['items'].push(_this.parseTree(item, true, currParents));
+                    }));
+                }
+            }));
+            return treeItem;
+        };
+        /**
+         * @return {?}
+         */
+        AwPatrimonioLayoutDS.prototype.collapseSidebar = /**
+         * @return {?}
+         */
+        function () {
+            this.sidebarCollapsed = !this.sidebarCollapsed;
+            console.log(this.sidebarCollapsed);
         };
         return AwPatrimonioLayoutDS;
     }(core$1.LayoutDataSource));
@@ -3510,6 +4089,11 @@
         /**
          * If you are not using these variables (from your-layout.ts),
          * remove them from here too.
+         * @type {?}
+         * @private
+         */
+        AwPatrimonioLayoutDS.prototype.communication;
+        /**
          * @type {?}
          * @protected
          */
@@ -3533,6 +4117,14 @@
         AwPatrimonioLayoutDS.prototype.options;
         /** @type {?} */
         AwPatrimonioLayoutDS.prototype.pageTitle;
+        /** @type {?} */
+        AwPatrimonioLayoutDS.prototype.hasBreadcrumb;
+        /** @type {?} */
+        AwPatrimonioLayoutDS.prototype.contentParts;
+        /** @type {?} */
+        AwPatrimonioLayoutDS.prototype.tree;
+        /** @type {?} */
+        AwPatrimonioLayoutDS.prototype.sidebarCollapsed;
     }
 
     /**
@@ -3561,14 +4153,94 @@
             function (_a) {
                 var type = _a.type, payload = _a.payload;
                 switch (type) {
-                    case 'aw-patrimonio-layout.init':
+                    case 'aw-scheda-layout.init':
                         _this.dataSource.onInit(payload);
+                        _this.configuration = payload.configuration;
+                        _this.route = payload.route;
+                        /** @type {?} */
+                        var paramId = _this.route.snapshot.params.id || "";
+                        _this.listenRoute();
+                        _this.loadNavigation(paramId);
                         break;
-                    case 'aw-patrimonio-layout.destroy':
+                    case 'aw-scheda-layout.destroy':
                         _this.destroyed$.next();
                         break;
                     default:
                         break;
+                }
+            }));
+            this.outerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case 'aw-tree.click':
+                        if (payload) {
+                            _this.emitGlobal('navigate', { path: [_this.configuration.get("paths").schedaBasePath + payload], handler: 'router' });
+                        }
+                        break;
+                    case "aw-sidebar-header.click":
+                        _this.dataSource.collapseSidebar();
+                        break;
+                }
+            }));
+        };
+        /**
+         * @private
+         * @return {?}
+         */
+        AwPatrimonioLayoutEH.prototype.listenRoute = /**
+         * @private
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.route.paramMap.subscribe((/**
+             * @param {?} params
+             * @return {?}
+             */
+            function (params) {
+                if (params.get('id')) {
+                    _this.dataSource.loadItem(params.get('id')).subscribe((/**
+                     * @param {?} response
+                     * @return {?}
+                     */
+                    function (response) {
+                        if (response) {
+                            _this.emitGlobal('navigate', { path: [_this.configuration.get("paths").schedaBasePath + response.item.id], handler: 'router' });
+                            _this.dataSource.loadContent(response);
+                        }
+                    }));
+                }
+                else {
+                    _this.dataSource.loadItem();
+                }
+            }));
+        };
+        /**
+         * @private
+         * @param {?} selectedItem
+         * @return {?}
+         */
+        AwPatrimonioLayoutEH.prototype.loadNavigation = /**
+         * @private
+         * @param {?} selectedItem
+         * @return {?}
+         */
+        function (selectedItem) {
+            var _this = this;
+            this.dataSource.getNavigation('patrimonio').subscribe((/**
+             * @param {?} response
+             * @return {?}
+             */
+            function (response) {
+                if (response) {
+                    _this.dataSource.updateNavigation(response, selectedItem);
+                }
+                if (selectedItem) {
+                    _this.emitOuter('selectItem', selectedItem);
                 }
             }));
         };
@@ -3580,6 +4252,16 @@
          * @private
          */
         AwPatrimonioLayoutEH.prototype.destroyed$;
+        /**
+         * @type {?}
+         * @private
+         */
+        AwPatrimonioLayoutEH.prototype.configuration;
+        /**
+         * @type {?}
+         * @private
+         */
+        AwPatrimonioLayoutEH.prototype.route;
     }
 
     /**
@@ -3588,13 +4270,15 @@
      */
     /** @type {?} */
     var AwPatrimonioLayoutConfig = {
-        layoutId: 'n7-new-layout',
+        layoutId: 'aw-scheda-layout',
         /**
          * Array of components you want to use
          * in this leyout
          */
         widgets: [
-        // { id: 'header' },
+            { id: 'aw-sidebar-header' },
+            { id: 'aw-tree' },
+            { id: 'aw-scheda-breadcrumbs' }
         ],
         layoutDS: AwPatrimonioLayoutDS,
         layoutEH: AwPatrimonioLayoutEH,
@@ -3609,15 +4293,17 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
-    var AwPatrimonioLayoutComponent = /** @class */ (function (_super) {
-        __extends(AwPatrimonioLayoutComponent, _super);
-        function AwPatrimonioLayoutComponent(router, configuration, layoutsConfiguration, mainState, titleService) {
+    var AwSchedaLayoutComponent = /** @class */ (function (_super) {
+        __extends(AwSchedaLayoutComponent, _super);
+        function AwSchedaLayoutComponent(router, route, configuration, layoutsConfiguration, mainState, titleService, communication) {
             var _this = _super.call(this, layoutsConfiguration.get('AwPatrimonioLayoutConfig') || AwPatrimonioLayoutConfig) || this;
             _this.router = router;
+            _this.route = route;
             _this.configuration = configuration;
             _this.layoutsConfiguration = layoutsConfiguration;
             _this.mainState = mainState;
             _this.titleService = titleService;
+            _this.communication = communication;
             return _this;
         }
         /**
@@ -3632,7 +4318,7 @@
          * @protected
          * @return {?}
          */
-        AwPatrimonioLayoutComponent.prototype.initPayload = /**
+        AwSchedaLayoutComponent.prototype.initPayload = /**
          * Optional variables that can be accessed from the layout's logic.
          * If removed, they must also be removed from the layout's DataSource file,
          * and from this file imports.
@@ -3644,14 +4330,16 @@
                 configuration: this.configuration,
                 mainState: this.mainState,
                 router: this.router,
+                route: this.route,
                 titleService: this.titleService,
+                communication: this.communication,
                 options: this.config.options || {},
             };
         };
         /**
          * @return {?}
          */
-        AwPatrimonioLayoutComponent.prototype.ngOnInit = /**
+        AwSchedaLayoutComponent.prototype.ngOnInit = /**
          * @return {?}
          */
         function () {
@@ -3660,54 +4348,66 @@
         /**
          * @return {?}
          */
-        AwPatrimonioLayoutComponent.prototype.ngOnDestroy = /**
+        AwSchedaLayoutComponent.prototype.ngOnDestroy = /**
          * @return {?}
          */
         function () {
             this.onDestroy();
         };
-        AwPatrimonioLayoutComponent.decorators = [
+        AwSchedaLayoutComponent.decorators = [
             { type: core.Component, args: [{
-                        selector: 'aw-patrimonio-layout',
-                        template: "<div class=\"aw-patrimonio-layout\" id=\"patrimonio-layout\">\n    Layout patrimonio!\n</div>"
+                        selector: 'aw-scheda-layout',
+                        template: "<div class=\"aw-scheda-layout n7-grid-2\" id=\"scheda-layout\">\n    <div> <!--Left sidebar -->\n        <n7-sidebar-header\n            [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\" \n            [emit]=\"lb.widgets['aw-sidebar-header'].emit\"\n        ></n7-sidebar-header>\n        <n7-tree\n            [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-tree'].emit\"            \n            [hidden]=\"lb.dataSource.sidebarCollapsed\"\n        ></n7-tree>\n    </div> <!--end Left sidebar -->\n    <div>  <!--Right sidebar --> \n        <n7-breadcrumbs\n            *ngIf=\"lb.dataSource.hasBreadcrumb\"\n            [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\" \n            [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\"\n        ></n7-breadcrumbs>\n        <div *ngFor=\"let part of lb.dataSource.contentParts\">\n            <div *ngIf=\"part.type == 'image'\">\n                <div \n                [ngStyle]=\"{\n                    'background-image': 'url(' + part.image + ')',\n                    'width': '100%',\n                    'height': '200px'\n                    }\">            \n                \n                \n                </div>               \n            </div>\n\n            <div>\n                <h1>{{ part.title }}</h1>\n                <div class=\"n7-grid-2\">\n                    <div [innerHTML]=\"part.content\" >\n                                      \n                    </div>                \n                </div>\n            </div> \n            <div *ngIf=\"part.type == 'metaGroup'\">\n                <div *ngFor=\"let meta of part.fields\">\n                    <strong>{{meta.key}}: </strong><span>{{meta.value}}</span>\n                </div>  \n        </div>\n    </div>  <!--end Right sidebar -->\n</div>\n"
                     }] }
         ];
         /** @nocollapse */
-        AwPatrimonioLayoutComponent.ctorParameters = function () { return [
+        AwSchedaLayoutComponent.ctorParameters = function () { return [
             { type: router.Router },
+            { type: router.ActivatedRoute },
             { type: ConfigurationService },
             { type: LayoutsConfigurationService },
             { type: MainStateService },
-            { type: platformBrowser.Title }
+            { type: platformBrowser.Title },
+            { type: CommunicationService }
         ]; };
-        return AwPatrimonioLayoutComponent;
+        return AwSchedaLayoutComponent;
     }(AbstractLayout));
     if (false) {
         /**
          * @type {?}
          * @private
          */
-        AwPatrimonioLayoutComponent.prototype.router;
+        AwSchedaLayoutComponent.prototype.router;
         /**
          * @type {?}
          * @private
          */
-        AwPatrimonioLayoutComponent.prototype.configuration;
+        AwSchedaLayoutComponent.prototype.route;
         /**
          * @type {?}
          * @private
          */
-        AwPatrimonioLayoutComponent.prototype.layoutsConfiguration;
+        AwSchedaLayoutComponent.prototype.configuration;
         /**
          * @type {?}
          * @private
          */
-        AwPatrimonioLayoutComponent.prototype.mainState;
+        AwSchedaLayoutComponent.prototype.layoutsConfiguration;
         /**
          * @type {?}
          * @private
          */
-        AwPatrimonioLayoutComponent.prototype.titleService;
+        AwSchedaLayoutComponent.prototype.mainState;
+        /**
+         * @type {?}
+         * @private
+         */
+        AwSchedaLayoutComponent.prototype.titleService;
+        /**
+         * @type {?}
+         * @private
+         */
+        AwSchedaLayoutComponent.prototype.communication;
     }
 
     /**
@@ -3719,7 +4419,7 @@
         AwHomeLayoutComponent,
         AwAboutLayoutComponent,
         AwWorksLayoutComponent,
-        AwPatrimonioLayoutComponent,
+        AwSchedaLayoutComponent,
     ];
     var N7BoilerplateAriannaWebModule = /** @class */ (function () {
         function N7BoilerplateAriannaWebModule() {
@@ -3784,12 +4484,18 @@
     exports.AwHomeLayoutConfig = AwHomeLayoutConfig;
     exports.AwHomeLayoutDS = AwHomeLayoutDS;
     exports.AwHomeLayoutEH = AwHomeLayoutEH;
-    exports.AwPatrimonioLayoutComponent = AwPatrimonioLayoutComponent;
     exports.AwPatrimonioLayoutConfig = AwPatrimonioLayoutConfig;
     exports.AwPatrimonioLayoutDS = AwPatrimonioLayoutDS;
     exports.AwPatrimonioLayoutEH = AwPatrimonioLayoutEH;
+    exports.AwSchedaBreadcrumbsDS = AwSchedaBreadcrumbsDS;
+    exports.AwSchedaLayoutComponent = AwSchedaLayoutComponent;
+    exports.AwSchedaSidebarEH = AwSchedaSidebarEH;
+    exports.AwSidebarHeaderDS = AwSidebarHeaderDS;
+    exports.AwSidebarHeaderEH = AwSidebarHeaderEH;
     exports.AwTableDS = AwTableDS;
     exports.AwTableEH = AwTableEH;
+    exports.AwTreeDS = AwTreeDS;
+    exports.AwTreeEH = AwTreeEH;
     exports.AwWorksLayoutComponent = AwWorksLayoutComponent;
     exports.AwWorksLayoutConfig = AwWorksLayoutConfig;
     exports.AwWorksLayoutDS = AwWorksLayoutDS;
