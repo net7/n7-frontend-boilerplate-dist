@@ -6,8 +6,11 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     private facetData;
     private facetInputs;
     private allBubbles;
-    selectedBubbleIds: any[];
+    selectedBubbles: any[];
     numOfItemsStr: string;
+    private _bubbleChart;
+    private maxBubblesSelectable;
+    private entityBubbleIdMap;
     onInit({ communication, mainState }: {
         communication: any;
         mainState: any;
@@ -15,12 +18,14 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     renderPreviewsFromApolloQuery(response: any): void;
     onBubbleSelected(payload: any): void;
     onBubbleDeselected(payload: any): void;
-    private updateItemPreviews;
-    renderBubblesFromApolloQuery(response: any): void;
+    private updateBubblesAndItemPreviews;
+    setAllBubblesFromApolloQuery(response: any, reset?: boolean): void;
+    filterBubblesBasedOnFacetsEnabled(): any[];
     handleFacetSearchChange(change: any): void;
     handleFacetSearchEnter(enter: any): void;
     handleFacetHeaderClick(facetId: any): void;
     renderItemTags(): void;
+    onTagClicked(payload: any): void;
     private _getSubnav;
     private _getBreadcrumbs;
 }

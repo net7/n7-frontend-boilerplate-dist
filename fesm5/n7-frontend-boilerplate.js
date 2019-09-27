@@ -896,32 +896,7 @@ var HeaderDS = /** @class */ (function (_super) {
      * @return {?}
      */
     function (data) {
-        console.log('header', data);
-        if (!data)
-            return;
-        delete data.actions;
-        return __assign({}, data, { logo: {
-                image: "https://i.imgur.com/kTND3Do.png",
-                payload: "aw/home"
-            }, nav: {
-                items: [
-                    { text: 'Home', payload: 'aw/home', icon: 'n7-icon-home' },
-                    { text: 'Patrimonio', payload: 'aw/patrimonio', icon: 'n7-icon-tree-icon' },
-                    { text: 'Galleria', payload: 'aw/galleria', icon: 'n7-icon-th' },
-                    { text: 'Ricerca', payload: 'aw/ricerca', icon: 'n7-icon-search' },
-                    { text: 'Utenti', payload: 'aw/utenti', icon: 'n7-icon-facebook' },
-                ]
-            }, user: {
-                img: 'https://placeimg.com/150/150/any/people',
-                name: 'Giorgio Spinosa'
-            }, menuToggle: {
-                open: {
-                    payload: 'mobile-open'
-                },
-                close: {
-                    payload: 'mobile-close'
-                }
-            } });
+        return data;
     };
     return HeaderDS;
 }(DataSource));
@@ -1501,8 +1476,12 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
         _this.facetData = null;
         _this.facetInputs = {};
         _this.allBubbles = null;
-        _this.selectedBubbleIds = [];
+        _this.selectedBubbles = [];
         _this.numOfItemsStr = null;
+        //public _updateBubbles: any = null;
+        _this._bubbleChart = null;
+        _this.maxBubblesSelectable = 3;
+        _this.entityBubbleIdMap = {};
         return _this;
     }
     /**
@@ -1530,7 +1509,6 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
          * @return {?}
          */
         function (response) {
-            console.log('apollo-response', { response: response });
             _this.facetData = [];
             response.entitiesData.forEach((/**
              * @param {?} ent
@@ -1540,7 +1518,7 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
                 _this.facetData.push(__assign({}, (ent.countData), { enabled: true }));
             }));
             _this.one('aw-home-facets-wrapper').update(_this.facetData);
-            _this.renderBubblesFromApolloQuery(response);
+            _this.setAllBubblesFromApolloQuery(response);
             _this.renderPreviewsFromApolloQuery(response);
         }));
         // update streams
@@ -1569,8 +1547,14 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
                 numOfItems -= 1000;
                 numOfThousand += 1;
             }
+            /** @type {?} */
+            var numOfItemsTmpStr = numOfItems + '';
+            if (numOfItems < 10)
+                numOfItemsTmpStr = '00' + numOfItems;
+            else if (numOfItems < 100)
+                numOfItemsTmpStr = '0' + numOfItems;
             if (numOfThousand > 0)
-                this.numOfItemsStr = numOfThousand + '.' + numOfItems;
+                this.numOfItemsStr = numOfThousand + '.' + numOfItemsTmpStr;
             else
                 this.numOfItemsStr = numOfItems + '';
         }
@@ -1588,11 +1572,16 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
      * @return {?}
      */
     function (payload) {
-        if (payload && payload.id) {
-            if (!this.selectedBubbleIds.includes(payload.id))
-                this.selectedBubbleIds.push(payload.id);
+        if (payload && payload.bubble) {
+            if (!this.selectedBubbles.includes(payload.bubble)) {
+                if (this.selectedBubbles.length < this.maxBubblesSelectable) {
+                    this.selectedBubbles.push(payload.bubble);
+                    //payload.bubble.hasCloseIcon=true;
+                    //if(this._updateBubbles) this._updateBubbles();
+                    this.updateBubblesAndItemPreviews();
+                }
+            }
         }
-        this.updateItemPreviews();
     };
     /**
      * @param {?} payload
@@ -1603,58 +1592,72 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
      * @return {?}
      */
     function (payload) {
-        if (payload && payload.id)
-            this.selectedBubbleIds = this.selectedBubbleIds.filter((/**
+        if (payload && payload.bubble) {
+            this.selectedBubbles = this.selectedBubbles.filter((/**
              * @param {?} b
              * @return {?}
              */
-            function (b) {
-                return (b !== payload.id);
-            }));
-        this.updateItemPreviews();
+            function (b) { return b.id !== payload.bubble.id; }));
+            if (payload.bubble.hasCloseIcon) {
+                payload.bubble.hasCloseIcon = false;
+                //if(this._updateBubbles) this._updateBubbles();
+                this.updateBubblesAndItemPreviews();
+            }
+        }
     };
     /**
      * @private
      * @return {?}
      */
-    AwHomeLayoutDS.prototype.updateItemPreviews = /**
+    AwHomeLayoutDS.prototype.updateBubblesAndItemPreviews = /**
      * @private
      * @return {?}
      */
     function () {
         var _this = this;
+        /** @type {?} */
+        var selectedEntitiesIds = [];
+        if (this.entityBubbleIdMap)
+            this.selectedBubbles.forEach((/**
+             * @param {?} sB
+             * @return {?}
+             */
+            function (sB) {
+                /** @type {?} */
+                var entityId = _this.entityBubbleIdMap[sB.id];
+                if (entityId)
+                    selectedEntitiesIds.push(entityId);
+            }));
         this.communication.request$('globalFilter', {
             onError: (/**
              * @param {?} error
              * @return {?}
              */
             function (error) { return console.log(error); }),
-            params: { selectedEntitiesIds: this.selectedBubbleIds,
+            params: { selectedEntitiesIds: selectedEntitiesIds,
                 itemsPagination: { offset: 0, limit: 4 } },
         }).subscribe((/**
          * @param {?} response
          * @return {?}
          */
         function (response) {
-            // the facets should be handled by the layout
-            // (otherwise they would always return as enabled)
-            //this.facetData = [];
-            //response.entitiesData.forEach( (ent) => {
-            //  this.facetData.push({...(ent.countData), enabled:true});
-            //});
             _this.renderPreviewsFromApolloQuery(response);
             _this.renderItemTags();
+            _this.setAllBubblesFromApolloQuery(response, true);
         }));
     };
     /**
      * @param {?} response
+     * @param {?=} reset
      * @return {?}
      */
-    AwHomeLayoutDS.prototype.renderBubblesFromApolloQuery = /**
+    AwHomeLayoutDS.prototype.setAllBubblesFromApolloQuery = /**
      * @param {?} response
+     * @param {?=} reset
      * @return {?}
      */
-    function (response) {
+    function (response, reset) {
+        var _this = this;
         if (!response || !response.entitiesData)
             return;
         this.allBubbles = [];
@@ -1665,19 +1668,65 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
                 this.allBubbles.push(__assign({}, currentToE.entitiesCountData[j], { color: currentToE.countData.type.color }));
             }
         }
-        this.allBubbles.map((/**
+        this.entityBubbleIdMap = {};
+        this.allBubbles.forEach((/**
          * @param {?} bubble
          * @return {?}
          */
         function (bubble) {
-            // d3/svg doesn't allow '-' or strings starting with a number as ids
-            bubble.entity.id = 'B_' + bubble.entity.id.replace(/-/g, '_');
+            // d3/svg doesn't allow '-' as part of the ids
+            // or strings starting with a number as ids
+            bubble.id = 'B_' + bubble.entity.id.replace(/-/g, '_');
+            _this.entityBubbleIdMap[bubble.id] = bubble.entity.id;
             return bubble;
+        }));
+        this.allBubbles.forEach((/**
+         * @param {?} bubble
+         * @return {?}
+         */
+        function (bubble) {
+            bubble.selected = false;
+            for (var i = 0; i < _this.selectedBubbles.length; i++) {
+                if (_this.selectedBubbles[i].id === bubble.id)
+                    bubble.selected = true;
+            }
         }));
         this.one('aw-home-bubble-chart').update({
             width: window.innerWidth / 1.8,
-            bubbles: this.allBubbles
+            bubbles: this.filterBubblesBasedOnFacetsEnabled(),
+            reset: (reset ? reset : false),
+            //setUpdateReference: (ref) => this._updateBubbles = ref,
+            setBubbleChart: (/**
+             * @param {?} bubbleCref
+             * @return {?}
+             */
+            function (bubbleCref) { return _this._bubbleChart = bubbleCref; })
         });
+    };
+    /**
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.filterBubblesBasedOnFacetsEnabled = /**
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        /** @type {?} */
+        var result = this.allBubbles.filter((/**
+         * @param {?} bubble
+         * @return {?}
+         */
+        function (bubble) {
+            for (var i = 0; i < _this.facetData.length; i++) {
+                if (bubble.entity.typeOfEntity.id === _this.facetData[i].type.id)
+                    if (!_this.facetData[i].enabled) {
+                        return false;
+                    }
+            }
+            return true;
+        }));
+        console.log({ filterBubbles: result });
+        return result;
     };
     /**
      * @param {?} change
@@ -1762,15 +1811,15 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
             }));
             if (disableFacetsIds_1) {
                 /** @type {?} */
-                var filteredSelectedBubbleIds = this.selectedBubbleIds.filter((/**
-                 * @param {?} bId
+                var filteredSelectedBubbles = this.selectedBubbles.filter((/**
+                 * @param {?} bubble
                  * @return {?}
                  */
-                function (bId) {
+                function (bubble) {
                     /** @type {?} */
                     var typeOfEntity = "";
                     for (var i = 0; i < _this.allBubbles.length; i++) {
-                        if (_this.allBubbles[i].entity.id === bId) {
+                        if (_this.allBubbles[i].id === bubble.id) {
                             typeOfEntity = _this.allBubbles[i].entity.typeOfEntity.id;
                             break;
                         }
@@ -1779,39 +1828,31 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
                         return false;
                     return true;
                 }));
-                if (filteredSelectedBubbleIds.length != this.selectedBubbleIds.length) {
-                    this.selectedBubbleIds = filteredSelectedBubbleIds;
-                    this.updateItemPreviews();
+                if (filteredSelectedBubbles.length != this.selectedBubbles.length) {
+                    this.selectedBubbles = filteredSelectedBubbles;
+                    this.updateBubblesAndItemPreviews();
                 }
                 ;
             }
-            /** @type {?} */
-            var currentBubbles = this.allBubbles.filter((/**
-             * @param {?} bubble
-             * @return {?}
-             */
-            function (bubble) {
-                for (var i = 0; i < _this.facetData.length; i++) {
-                    if (bubble.entity.typeOfEntity.id === _this.facetData[i].type.id)
-                        if (!_this.facetData[i].enabled) {
-                            return false;
-                        }
-                }
-                return true;
-            }));
-            currentBubbles.forEach((/**
+            this.allBubbles.forEach((/**
              * @param {?} bubble
              * @return {?}
              */
             function (bubble) {
                 bubble.selected = false;
-                if (_this.selectedBubbleIds.includes(bubble.entity.id)) {
-                    bubble.selected = true;
+                for (var i = 0; i < _this.selectedBubbles.length; i++) {
+                    if (_this.selectedBubbles[i].id === bubble.id)
+                        bubble.selected = true;
                 }
             }));
             this.one('aw-home-bubble-chart').update({
                 width: window.innerWidth / 1.8,
-                bubbles: currentBubbles,
+                bubbles: this.filterBubblesBasedOnFacetsEnabled(),
+                setBubbleChart: (/**
+                 * @param {?} bubbleCref
+                 * @return {?}
+                 */
+                function (bubbleCref) { return _this._bubbleChart = bubbleCref; }),
                 reset: true
             });
         }
@@ -1826,22 +1867,53 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
         var _this = this;
         /** @type {?} */
         var tagsData = [];
-        this.selectedBubbleIds.forEach((/**
-         * @param {?} sBid
+        this.selectedBubbles.forEach((/**
+         * @param {?} sBubble
          * @return {?}
          */
-        function (sBid) {
+        function (sBubble) {
             /** @type {?} */
             var label = '';
             for (var i = 0; i < _this.allBubbles.length; i++) {
-                if (_this.allBubbles[i].entity.id === sBid) {
+                if (_this.allBubbles[i].id === sBubble.id) {
                     label = _this.allBubbles[i].entity.label;
                     break;
                 }
             }
-            tagsData.push({ label: label });
+            tagsData.push({ label: label, icon: "n7-icon-close", payload: sBubble.id, classes: "tag-" + _this.allBubbles[i].entity.typeOfEntity.id });
         }));
         this.one('aw-home-item-tags-wrapper').update(tagsData);
+    };
+    /**
+     * @param {?} payload
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.onTagClicked = /**
+     * @param {?} payload
+     * @return {?}
+     */
+    function (payload) {
+        if (!payload)
+            return;
+        /** @type {?} */
+        var bubbleId = payload;
+        if (this._bubbleChart) {
+            this._bubbleChart.selectAll("g").each((/**
+             * @param {?} b
+             * @return {?}
+             */
+            function (b) {
+                if (b.id === bubbleId)
+                    b.hasCloseIcon = false;
+            }));
+        }
+        this.selectedBubbles = this.selectedBubbles.filter((/**
+         * @param {?} b
+         * @return {?}
+         */
+        function (b) { return b.id !== payload; }));
+        //if(this._updateBubbles) this._updateBubbles();
+        this.updateBubblesAndItemPreviews();
     };
     /**
      * @private
@@ -1926,9 +1998,24 @@ if (false) {
      */
     AwHomeLayoutDS.prototype.allBubbles;
     /** @type {?} */
-    AwHomeLayoutDS.prototype.selectedBubbleIds;
+    AwHomeLayoutDS.prototype.selectedBubbles;
     /** @type {?} */
     AwHomeLayoutDS.prototype.numOfItemsStr;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype._bubbleChart;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.maxBubblesSelectable;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.entityBubbleIdMap;
 }
 
 /**
@@ -1989,9 +2076,20 @@ var AwHomeLayoutEH = /** @class */ (function (_super) {
                     break;
                 case 'aw-home-bubble-chart.click':
                     if (payload.source === 'bubble')
-                        _this.dataSource.onBubbleSelected(payload.bubblePayload);
+                        _this.dataSource.onBubbleSelected({ bubblePayload: payload.bubblePayload, bubble: payload.bubble });
                     else if (payload.source === 'close')
-                        _this.dataSource.onBubbleDeselected(payload.bubblePayload);
+                        _this.dataSource.onBubbleDeselected({ bubblePayload: payload.bubblePayload, bubble: payload.bubble });
+                    break;
+                case 'aw-home-bubble-chart.mouse_enter':
+                    console.log('bubble mouse enter', payload);
+                    // TODO: implemente behaviour
+                    break;
+                case 'aw-home-bubble-chart.mouse_leave':
+                    console.log('bubble mouse leave', payload);
+                    // TODO: implemente behaviour
+                    break;
+                case 'aw-home-item-tags-wrapper.click':
+                    _this.dataSource.onTagClicked(payload);
                     break;
                 default:
                     break;
@@ -2044,7 +2142,7 @@ var AwHeroDS = /** @class */ (function (_super) {
         console.log({ data: data });
         /** @type {?} */
         var HERO_DATA = {
-            title: "Arte, architettura e fotografia nel XXII secolo",
+            title: "Arte, architettura e fotografia nel XXI secolo",
             text: "Consulta il patrimonio completo del polo nazionale per l\'arte e l\'architettura contemporanee.",
             button: {
                 text: "CERCA",
@@ -2129,7 +2227,10 @@ var AwHomeHeroPatrimonioDS = /** @class */ (function (_super) {
 var AwHomeBubbleChartDS = /** @class */ (function (_super) {
     __extends(AwHomeBubbleChartDS, _super);
     function AwHomeBubbleChartDS() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.thresholdShowTitle = 50;
+        _this.thresholdShowValue = 60;
+        return _this;
     }
     /**
      * @protected
@@ -2142,12 +2243,19 @@ var AwHomeBubbleChartDS = /** @class */ (function (_super) {
      * @return {?}
      */
     function (data) {
+        var _this = this;
         if (!data)
             return null;
         /** @type {?} */
-        var cWidth = (data.width ? data.width : 1000);
+        var bubbleCointainer = document.getElementById("bubble-chart-container");
+        /** @type {?} */
+        var cWidth = bubbleCointainer.offsetWidth;
+        // TODO: think of a good way to pass/compute cHeight
         /** @type {?} */
         var cHeight = 700;
+        // bubbleCointainer.offsetHeight
+        /** @type {?} */
+        var containerSize = cWidth * cHeight;
         /** @type {?} */
         var bubblesData = {
             containerId: "bubbleChartContainer",
@@ -2157,20 +2265,56 @@ var AwHomeBubbleChartDS = /** @class */ (function (_super) {
             maxBubblesSelected: 3
         };
         bubblesData['bubblesData'] = [];
+        /** @type {?} */
+        var maxBubbleCount = -1;
+        /** @type {?} */
+        var minBubbleCount = -1;
+        /** @type {?} */
+        var numOfBubbles = 0;
+        /** @type {?} */
+        var totalCount = 0;
+        /** @type {?} */
+        var numOfSelectedBubbles = 0;
+        data.bubbles.forEach((/**
+         * @param {?} bubble
+         * @return {?}
+         */
+        function (bubble) {
+            if (maxBubbleCount < bubble.count)
+                maxBubbleCount = bubble.count;
+            if (minBubbleCount < 0 || minBubbleCount > bubble.count)
+                minBubbleCount = bubble.count;
+            numOfBubbles++;
+            totalCount += bubble.count;
+            if (bubble.selected)
+                numOfSelectedBubbles++;
+        }));
+        console.log({ containerSize: Math.log(containerSize), numOfBubbles: numOfBubbles, minBubbleCount: minBubbleCount, maxBubbleCount: maxBubbleCount, totalCount: totalCount, numOfSelectedBubbles: numOfSelectedBubbles });
         data.bubbles.forEach((/**
          * @param {?} bubble
          * @return {?}
          */
         function (bubble) {
             /** @type {?} */
-            var bId = bubble.entity.id;
+            var bId = bubble.id;
+            //let bubblePercentage = ( bubble.count - (minBubbleCount/3) )/( (maxBubbleCount*3) - (minBubbleCount/3) );
+            //let bubbleRadius = 2*( ((containerSize/(numOfBubbles*(totalCount/600)))*bubblePercentage)/( Math.pow(numOfSelectedBubbles+1,1.8)) );
+            /** @type {?} */
+            var bubblePercentage = (bubble.count - (minBubbleCount / 3)) / ((maxBubbleCount * 3) - (minBubbleCount / 3));
+            /** @type {?} */
+            var bubbleRadius = (Math.log(containerSize) / 10) * (bubblePercentage * 3) * (70 - Math.sqrt(numOfBubbles));
             /** @type {?} */
             var bubbleData = {
-                id: bubble.entity.id,
+                id: bId,
                 texts: [
                     {
                         id: bId + "_label0",
-                        label: bubble.entity.label,
+                        label: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        function (d) { if (d.radius < _this.thresholdShowTitle)
+                            return null; return bubble.entity.label; }),
                         x_function: (/**
                          * @param {?} d
                          * @return {?}
@@ -2180,7 +2324,13 @@ var AwHomeBubbleChartDS = /** @class */ (function (_super) {
                          * @param {?} d
                          * @return {?}
                          */
-                        function (d) { return d.y - (d.radius / 9); }),
+                        function (d) {
+                            /** @type {?} */
+                            var mNum = (d.radius / 9);
+                            if (d.radius < _this.thresholdShowValue)
+                                mNum = 0;
+                            return d.y - mNum;
+                        }),
                         "user_select": "none",
                         fontSize_function: (/**
                          * @param {?} d
@@ -2192,7 +2342,12 @@ var AwHomeBubbleChartDS = /** @class */ (function (_super) {
                     },
                     {
                         id: bId + "_label1",
-                        label: bubble.count,
+                        label: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        function (d) { if (d.radius < _this.thresholdShowValue)
+                            return null; return bubble.count; }),
                         x_function: (/**
                          * @param {?} d
                          * @return {?}
@@ -2215,14 +2370,12 @@ var AwHomeBubbleChartDS = /** @class */ (function (_super) {
                 ],
                 x: cWidth / 2 + 50,
                 y: cHeight / 2 + 50,
-                "radius": bubble.count / 55,
+                "radius": bubbleRadius,
                 color: bubble.color,
-                hasCloseIcon: false,
+                hasCloseIcon: (bubble.selected ? bubble.selected : false),
                 payload: {
                     id: bId
                 },
-                selectable: true,
-                selected: (bubble.selected ? bubble.selected : false)
             };
             bubblesData['bubblesData'].push(bubbleData);
         }));
@@ -2237,10 +2390,26 @@ var AwHomeBubbleChartDS = /** @class */ (function (_super) {
         };
         if (data.reset)
             bubblesData['reset'] = data.reset;
+        if (data.setUpdateReference)
+            bubblesData['setUpdateReference'] = data.setUpdateReference;
+        if (data.setBubbleChart)
+            bubblesData['setBubbleChart'] = data.setBubbleChart;
         return bubblesData;
     };
     return AwHomeBubbleChartDS;
 }(DataSource));
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeBubbleChartDS.prototype.thresholdShowTitle;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeBubbleChartDS.prototype.thresholdShowValue;
+}
 
 /**
  * @fileoverview added by tsickle
@@ -2271,13 +2440,17 @@ var AwHomeFacetsWrapperDS = /** @class */ (function (_super) {
          * @return {?}
          */
         function (facet) {
+            /**
+             * For each facet on back-end, push a header-component
+             * and a facet-component (search input only) to each array.
+             */
             // make array of headers data
             headers.push({
                 iconLeft: facet.type.icon,
                 text: facet.type.label,
                 additionalText: facet.count,
                 iconRight: (facet.enabled ? 'n7-icon-eye' : 'n7-icon-eye-slash'),
-                classes: '',
+                classes: (facet.enabled ? 'prova' : 'is-disabled') + (facet.type.color ? " " + facet.type.color : ''),
                 payload: facet.type.id,
             });
             // make array of inputs data
@@ -2285,6 +2458,8 @@ var AwHomeFacetsWrapperDS = /** @class */ (function (_super) {
                 input: {
                     placeholder: 'Search',
                     icon: 'n7-icon-search',
+                    // disable input if faced header is not enabled
+                    disabled: !facet.enabled,
                     payload: String(facet.type.id) + '-search',
                 }
             });
@@ -2552,6 +2727,12 @@ var AwHomeBubbleChartEH = /** @class */ (function (_super) {
                 case 'aw-home-bubble-chart.click':
                     _this.emitOuter('click', event.payload);
                     break;
+                case 'aw-home-bubble-chart.mouse_enter':
+                    _this.emitOuter('mouse_enter', event.payload);
+                    break;
+                case 'aw-home-bubble-chart.mouse_leave':
+                    _this.emitOuter('mouse_leave', event.payload);
+                    break;
                 default:
                     break;
             }
@@ -2652,8 +2833,20 @@ var AwHomeItemTagsWrapperEH = /** @class */ (function (_super) {
      * @return {?}
      */
     function () {
-        // this.innerEvents$.subscribe( e => {
-        // });
+        var _this = this;
+        this.innerEvents$.subscribe((/**
+         * @param {?} event
+         * @return {?}
+         */
+        function (event) {
+            switch (event.type) {
+                case "aw-home-item-tags-wrapper.click":
+                    _this.emitOuter('click', event.payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
         /* this.outerEvents$.subscribe(event => {
         
         }); */
@@ -2838,7 +3031,7 @@ var AwHomeLayoutComponent = /** @class */ (function (_super) {
     AwHomeLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-home-layout',
-                    template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero\n            [data]=\"lb.widgets['aw-hero'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n    \n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper\"\n         [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbleIds.length>0 }\">\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                  *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header\n                    [data]=\"widgetData.header\"\n                    [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet\n                    [data]=\"widgetData.input\"\n                    [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div class=\"aw-home__bubble-chart\">\n            <n7-bubble-chart\n                [data]=\"lb.widgets['aw-home-bubble-chart'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-home-bubble-chart'].emit\">\n            </n7-bubble-chart>\n        </div>\n\n        <ng-container *ngIf=\"lb.dataSource.selectedBubbleIds.length>0\">\n            <div class=\"aw-home__results-wrapper\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\"> <h1>{{ lb.dataSource.numOfItemsStr }} <span>Oggetti culturali</span></h1></div>\n                    <h3>Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                            <n7-tag\n                                [data]=\"widgetData\"\n                                [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                            </n7-tag>\n                            <br>\n                    </ng-container>\n                <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-preview-wrapper'].ds.out$ | async;\">\n                    <n7-item-preview\n                        [data]=\"widgetData\"\n                        [emit]=\"lb.widgets['aw-home-item-preview-wrapper'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero\n            [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\" \n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n</div>"
+                    template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero\n            [data]=\"lb.widgets['aw-hero'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n    \n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper\"\n         [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length>0 }\">\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                  *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header\n                    [data]=\"widgetData.header\"\n                    [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet\n                    [data]=\"widgetData.input\"\n                    [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div id=\"bubble-chart-container\">\n            <n7-bubble-chart\n            [data]=\"lb.widgets['aw-home-bubble-chart'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-bubble-chart'].emit\">\n            </n7-bubble-chart>\n        </div>\n        <ng-container *ngIf=\"lb.dataSource.selectedBubbles.length>0\">\n            <div [ngStyle]=\"{ 'display': 'flex' , 'flex-direction': 'column' }\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\"> <h1>{{ lb.dataSource.numOfItemsStr }} <span>Oggetti culturali</span></h1></div>\n                    <h3>Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                            <n7-tag\n                                [data]=\"widgetData\"\n                                [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                            </n7-tag>\n                            <br>\n                    </ng-container>\n                <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-preview-wrapper'].ds.out$ | async;\">\n                    <n7-item-preview\n                        [data]=\"widgetData\"\n                        [emit]=\"lb.widgets['aw-home-item-preview-wrapper'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero\n            [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\" \n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n</div>"
                 }] }
     ];
     /** @nocollapse */
