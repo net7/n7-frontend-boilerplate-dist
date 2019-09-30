@@ -2,6 +2,7 @@ import { LayoutDataSource } from '@n7-frontend/core';
 export declare class AwHomeLayoutDS extends LayoutDataSource {
     private communication;
     private mainState;
+    private configuration;
     test: string;
     private facetData;
     private facetInputs;
@@ -11,9 +12,10 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     private _bubbleChart;
     private maxBubblesSelectable;
     private entityBubbleIdMap;
-    onInit({ communication, mainState }: {
+    onInit({ communication, mainState, configuration }: {
         communication: any;
         mainState: any;
+        configuration: any;
     }): void;
     renderPreviewsFromApolloQuery(response: any): void;
     onBubbleSelected(payload: any): void;

@@ -473,7 +473,7 @@
         },
         'globalFilter': {
             queryName: 'globalFilter',
-            queryBody: "{\n      globalFilter(__PARAMS__){\n        entitiesData {\n          countData {\n            type {\n              id\n              label\n              color\n              icon\n            }\n            count\n          }\n          entitiesCountData {\n            entity {\n              id\n              label\n              typeOfEntity {\n                id\n              }\n            }\n            count\n          }\n        }\n        itemsPagination {\n          totalCount\n          items {\n            item {\n              id\n              label\n              info {\n                key\n                value\n              }\n            }\n            thumbnail\n            relatedTOEData {\n              type {\n                id\n                label\n                icon\n                color\n              }\n              count\n            }\n          }\n        }\n      }\n    }"
+            queryBody: "{\n      globalFilter(__PARAMS__){\n        entitiesData {\n          countData {\n            type {\n              id\n              label\n              configKey\n            }\n            count\n          }\n          entitiesCountData {\n            entity {\n              id\n              label\n              typeOfEntity {\n                id\n              }\n            }\n            count\n          }\n        }\n        itemsPagination {\n          totalCount\n          items {\n            item {\n              id\n              label\n              info {\n                key\n                value\n              }\n            }\n            thumbnail\n            relatedTOEData {\n              type {\n                id\n                label\n                configKey\n              }\n              count\n            }\n          }\n        }\n      }\n    }"
         },
         'getItemDetails': {
             queryName: 'getItemDetails',
@@ -1678,7 +1678,6 @@
             _this.allBubbles = null;
             _this.selectedBubbles = [];
             _this.numOfItemsStr = null;
-            //public _updateBubbles: any = null;
             _this._bubbleChart = null;
             _this.maxBubblesSelectable = 3;
             _this.entityBubbleIdMap = {};
@@ -1694,16 +1693,17 @@
          */
         function (_a) {
             var _this = this;
-            var communication = _a.communication, mainState = _a.mainState;
+            var communication = _a.communication, mainState = _a.mainState, configuration = _a.configuration;
             this.communication = communication;
             this.mainState = mainState;
+            this.configuration = configuration;
             this.one('aw-hero').update({});
             this.communication.request$('globalFilter', {
                 onError: (/**
                  * @param {?} error
                  * @return {?}
                  */
-                function (error) { return console.log(error); }),
+                function (error) { return console.error(error); }),
             }).subscribe((/**
              * @param {?} response
              * @return {?}
@@ -1715,7 +1715,10 @@
                  * @return {?}
                  */
                 function (ent) {
-                    _this.facetData.push(__assign({}, (ent.countData), { enabled: true }));
+                    /** @type {?} */
+                    var teoConfigData = _this.configuration.get("config-keys")[ent.countData.type.configKey];
+                    if (teoConfigData)
+                        _this.facetData.push(__assign({}, (ent.countData), { enabled: true, icon: teoConfigData.icon, label: teoConfigData.label }));
                 }));
                 _this.one('aw-home-facets-wrapper').update(_this.facetData);
                 _this.setAllBubblesFromApolloQuery(response);
@@ -1724,8 +1727,6 @@
             // update streams
             this.mainState.update('headTitle', 'Arianna Web > Home');
             this.mainState.update('pageTitle', 'Arianna Web: Home Layout');
-            // this.mainState.update('subnav', this._getSubnav());
-            // this.mainState.update('breadcrumbs', this._getBreadcrumbs());
         };
         /**
          * @param {?} response
@@ -1776,8 +1777,6 @@
                 if (!this.selectedBubbles.includes(payload.bubble)) {
                     if (this.selectedBubbles.length < this.maxBubblesSelectable) {
                         this.selectedBubbles.push(payload.bubble);
-                        //payload.bubble.hasCloseIcon=true;
-                        //if(this._updateBubbles) this._updateBubbles();
                         this.updateBubblesAndItemPreviews();
                     }
                 }
@@ -1800,7 +1799,6 @@
                 function (b) { return b.id !== payload.bubble.id; }));
                 if (payload.bubble.hasCloseIcon) {
                     payload.bubble.hasCloseIcon = false;
-                    //if(this._updateBubbles) this._updateBubbles();
                     this.updateBubblesAndItemPreviews();
                 }
             }
@@ -1833,9 +1831,11 @@
                  * @param {?} error
                  * @return {?}
                  */
-                function (error) { return console.log(error); }),
-                params: { selectedEntitiesIds: selectedEntitiesIds,
-                    itemsPagination: { offset: 0, limit: 4 } },
+                function (error) { return console.error(error); }),
+                params: {
+                    selectedEntitiesIds: selectedEntitiesIds,
+                    itemsPagination: { offset: 0, limit: 4 }
+                },
             }).subscribe((/**
              * @param {?} response
              * @return {?}
@@ -1865,7 +1865,7 @@
                 /** @type {?} */
                 var currentToE = response.entitiesData[i];
                 for (var j = 0; j < currentToE.entitiesCountData.length; j++) {
-                    this.allBubbles.push(__assign({}, currentToE.entitiesCountData[j], { color: currentToE.countData.type.color }));
+                    this.allBubbles.push(__assign({}, currentToE.entitiesCountData[j], { color: this.configuration.get("config-keys")[currentToE.countData.type.configKey]['color']['hex'] }));
                 }
             }
             this.entityBubbleIdMap = {};
@@ -1874,8 +1874,8 @@
              * @return {?}
              */
             function (bubble) {
-                // d3/svg doesn't allow '-' as part of the ids
-                // or strings starting with a number as ids
+                // d3/svg does not allow Number as beginning of ID.
+                // d3/svg does not allow '-' as part of ID.
                 bubble.id = 'B_' + bubble.entity.id.replace(/-/g, '_');
                 _this.entityBubbleIdMap[bubble.id] = bubble.entity.id;
                 return bubble;
@@ -1895,7 +1895,6 @@
                 width: window.innerWidth / 1.8,
                 bubbles: this.filterBubblesBasedOnFacetsEnabled(),
                 reset: (reset ? reset : false),
-                //setUpdateReference: (ref) => this._updateBubbles = ref,
                 setBubbleChart: (/**
                  * @param {?} bubbleCref
                  * @return {?}
@@ -1925,7 +1924,6 @@
                 }
                 return true;
             }));
-            console.log({ filterBubbles: result });
             return result;
         };
         /**
@@ -1943,7 +1941,6 @@
             var value = change.value;
             // store the entered text in facetInputs
             this.facetInputs[payload] = value;
-            console.log('changed: ' + payload + ' with value: ' + value);
         };
         /**
          * @param {?} enter
@@ -1956,10 +1953,9 @@
         function (enter) {
             /** @type {?} */
             var payload = enter.inputPayload;
+            // get the text entered in this input
             /** @type {?} */
             var value = this.facetInputs[payload];
-            // get the text entered in this input
-            console.log('entered: ' + payload + ' with value: ' + value);
         };
         /**
          * @param {?} facetId
@@ -2112,7 +2108,6 @@
              * @return {?}
              */
             function (b) { return b.id !== payload; }));
-            //if(this._updateBubbles) this._updateBubbles();
             this.updateBubblesAndItemPreviews();
         };
         /**
@@ -2180,6 +2175,11 @@
          * @private
          */
         AwHomeLayoutDS.prototype.mainState;
+        /**
+         * @type {?}
+         * @private
+         */
+        AwHomeLayoutDS.prototype.configuration;
         /** @type {?} */
         AwHomeLayoutDS.prototype.test;
         /**
@@ -2263,8 +2263,11 @@
                 switch (type) {
                     case 'aw-hero.change':
                         var inputPayload = payload.inputPayload, value = payload.value;
-                        // do something
+                        // TODO: do something
                         break;
+                    /**
+                     * Facets Event Handlers
+                     */
                     case 'aw-home-facets-wrapper.click':
                         _this.dataSource.handleFacetHeaderClick(payload);
                         break;
@@ -2274,6 +2277,15 @@
                     case 'aw-home-facets-wrapper.enter':
                         _this.dataSource.handleFacetSearchEnter(payload);
                         break;
+                    /**
+                     * Bubble Chart Event Handlers
+                     */
+                    case 'aw-home-bubble-chart.mouse_enter':
+                        // TODO: do something
+                        break;
+                    case 'aw-home-bubble-chart.mouse_leave':
+                        // TODO: do something
+                        break;
                     case 'aw-home-bubble-chart.click':
                         if (payload.source === 'bubble')
                             _this.dataSource.onBubbleSelected({ bubblePayload: payload.bubblePayload, bubble: payload.bubble });
@@ -2281,13 +2293,14 @@
                             _this.dataSource.onBubbleDeselected({ bubblePayload: payload.bubblePayload, bubble: payload.bubble });
                         break;
                     case 'aw-home-bubble-chart.mouse_enter':
-                        console.log('bubble mouse enter', payload);
                         // TODO: implemente behaviour
                         break;
                     case 'aw-home-bubble-chart.mouse_leave':
-                        console.log('bubble mouse leave', payload);
                         // TODO: implemente behaviour
                         break;
+                    /**
+                     * Tags & Item Previews Event Handlers
+                     */
                     case 'aw-home-item-tags-wrapper.click':
                         _this.dataSource.onTagClicked(payload);
                         break;
@@ -2295,19 +2308,6 @@
                         break;
                 }
             }));
-            // listen to global events
-            /* EventHandler.globalEvents$.pipe(
-              takeUntil(this.destroyed$)
-            ).subscribe(({type, payload}) => {
-              switch(type){
-                case 'global.navigate':
-                  this.dataSource.onNavigate(payload);
-                  break;
-        
-                default:
-                  break;
-              }
-            }); */
         };
         return AwHomeLayoutEH;
     }(core$1.EventHandler));
@@ -2339,7 +2339,6 @@
          * @return {?}
          */
         function (data) {
-            console.log({ data: data });
             /** @type {?} */
             var HERO_DATA = {
                 title: "Arte, architettura e fotografia nel XXI secolo",
@@ -2489,7 +2488,6 @@
                 if (bubble.selected)
                     numOfSelectedBubbles++;
             }));
-            console.log({ containerSize: Math.log(containerSize), numOfBubbles: numOfBubbles, minBubbleCount: minBubbleCount, maxBubbleCount: maxBubbleCount, totalCount: totalCount, numOfSelectedBubbles: numOfSelectedBubbles });
             data.bubbles.forEach((/**
              * @param {?} bubble
              * @return {?}
@@ -2646,8 +2644,8 @@
                  */
                 // make array of headers data
                 headers.push({
-                    iconLeft: facet.type.icon,
-                    text: facet.type.label,
+                    iconLeft: facet.icon,
+                    text: facet.label,
                     additionalText: facet.count,
                     iconRight: (facet.enabled ? 'n7-icon-eye' : 'n7-icon-eye-slash'),
                     classes: (facet.enabled ? 'prova' : 'is-disabled') + (facet.type.color ? " " + facet.type.color : ''),
@@ -3298,7 +3296,6 @@
              */
             function (_a) {
                 var type = _a.type, payload = _a.payload;
-                console.log(type);
                 if (type == 'aw-sidebar-header.click') {
                     _this.dataSource.toggleSidebar();
                     _this.emitOuter('click', payload);
@@ -3867,7 +3864,7 @@
                  * @param {?} error
                  * @return {?}
                  */
-                function (error) { return console.log(error); }),
+                function (error) { return console.error(error); }),
                 params: { treeId: id }
             });
         };
@@ -3919,7 +3916,7 @@
                      * @param {?} error
                      * @return {?}
                      */
-                    function (error) { return console.log(error); }),
+                    function (error) { return console.error(error); }),
                     params: { itemId: id }
                 });
             }
@@ -4081,7 +4078,6 @@
          */
         function () {
             this.sidebarCollapsed = !this.sidebarCollapsed;
-            console.log(this.sidebarCollapsed);
         };
         return AwPatrimonioLayoutDS;
     }(core$1.LayoutDataSource));

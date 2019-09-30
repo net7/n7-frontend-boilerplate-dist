@@ -299,8 +299,7 @@ const ApolloProviderConfig = {
             type {
               id
               label
-              color
-              icon
+              configKey
             }
             count
           }
@@ -331,8 +330,7 @@ const ApolloProviderConfig = {
               type {
                 id
                 label
-                icon
-                color
+                configKey
               }
               count
             }
@@ -1401,7 +1399,6 @@ class AwHomeLayoutDS extends LayoutDataSource {
         this.allBubbles = null;
         this.selectedBubbles = [];
         this.numOfItemsStr = null;
-        //public _updateBubbles: any = null;
         this._bubbleChart = null;
         this.maxBubblesSelectable = 3;
         this.entityBubbleIdMap = {};
@@ -1410,16 +1407,17 @@ class AwHomeLayoutDS extends LayoutDataSource {
      * @param {?} __0
      * @return {?}
      */
-    onInit({ communication, mainState }) {
+    onInit({ communication, mainState, configuration }) {
         this.communication = communication;
         this.mainState = mainState;
+        this.configuration = configuration;
         this.one('aw-hero').update({});
         this.communication.request$('globalFilter', {
             onError: (/**
              * @param {?} error
              * @return {?}
              */
-            (error) => console.log(error)),
+            (error) => console.error(error)),
         }).subscribe((/**
          * @param {?} response
          * @return {?}
@@ -1431,7 +1429,10 @@ class AwHomeLayoutDS extends LayoutDataSource {
              * @return {?}
              */
             (ent) => {
-                this.facetData.push(Object.assign({}, (ent.countData), { enabled: true }));
+                /** @type {?} */
+                const teoConfigData = this.configuration.get("config-keys")[ent.countData.type.configKey];
+                if (teoConfigData)
+                    this.facetData.push(Object.assign({}, (ent.countData), { enabled: true, icon: teoConfigData.icon, label: teoConfigData.label }));
             }));
             this.one('aw-home-facets-wrapper').update(this.facetData);
             this.setAllBubblesFromApolloQuery(response);
@@ -1440,8 +1441,6 @@ class AwHomeLayoutDS extends LayoutDataSource {
         // update streams
         this.mainState.update('headTitle', 'Arianna Web > Home');
         this.mainState.update('pageTitle', 'Arianna Web: Home Layout');
-        // this.mainState.update('subnav', this._getSubnav());
-        // this.mainState.update('breadcrumbs', this._getBreadcrumbs());
     }
     /**
      * @param {?} response
@@ -1484,8 +1483,6 @@ class AwHomeLayoutDS extends LayoutDataSource {
             if (!this.selectedBubbles.includes(payload.bubble)) {
                 if (this.selectedBubbles.length < this.maxBubblesSelectable) {
                     this.selectedBubbles.push(payload.bubble);
-                    //payload.bubble.hasCloseIcon=true;
-                    //if(this._updateBubbles) this._updateBubbles();
                     this.updateBubblesAndItemPreviews();
                 }
             }
@@ -1504,7 +1501,6 @@ class AwHomeLayoutDS extends LayoutDataSource {
             (b) => b.id !== payload.bubble.id));
             if (payload.bubble.hasCloseIcon) {
                 payload.bubble.hasCloseIcon = false;
-                //if(this._updateBubbles) this._updateBubbles();
                 this.updateBubblesAndItemPreviews();
             }
         }
@@ -1532,9 +1528,11 @@ class AwHomeLayoutDS extends LayoutDataSource {
              * @param {?} error
              * @return {?}
              */
-            (error) => console.log(error)),
-            params: { selectedEntitiesIds,
-                itemsPagination: { offset: 0, limit: 4 } },
+            (error) => console.error(error)),
+            params: {
+                selectedEntitiesIds,
+                itemsPagination: { offset: 0, limit: 4 }
+            },
         }).subscribe((/**
          * @param {?} response
          * @return {?}
@@ -1558,7 +1556,7 @@ class AwHomeLayoutDS extends LayoutDataSource {
             /** @type {?} */
             let currentToE = response.entitiesData[i];
             for (var j = 0; j < currentToE.entitiesCountData.length; j++) {
-                this.allBubbles.push(Object.assign({}, currentToE.entitiesCountData[j], { color: currentToE.countData.type.color }));
+                this.allBubbles.push(Object.assign({}, currentToE.entitiesCountData[j], { color: this.configuration.get("config-keys")[currentToE.countData.type.configKey]['color']['hex'] }));
             }
         }
         this.entityBubbleIdMap = {};
@@ -1567,8 +1565,8 @@ class AwHomeLayoutDS extends LayoutDataSource {
          * @return {?}
          */
         (bubble) => {
-            // d3/svg doesn't allow '-' as part of the ids
-            // or strings starting with a number as ids
+            // d3/svg does not allow Number as beginning of ID.
+            // d3/svg does not allow '-' as part of ID.
             bubble.id = 'B_' + bubble.entity.id.replace(/-/g, '_');
             this.entityBubbleIdMap[bubble.id] = bubble.entity.id;
             return bubble;
@@ -1588,7 +1586,6 @@ class AwHomeLayoutDS extends LayoutDataSource {
             width: window.innerWidth / 1.8,
             bubbles: this.filterBubblesBasedOnFacetsEnabled(),
             reset: (reset ? reset : false),
-            //setUpdateReference: (ref) => this._updateBubbles = ref,
             setBubbleChart: (/**
              * @param {?} bubbleCref
              * @return {?}
@@ -1614,7 +1611,6 @@ class AwHomeLayoutDS extends LayoutDataSource {
             }
             return true;
         }));
-        console.log({ filterBubbles: result });
         return result;
     }
     /**
@@ -1628,7 +1624,6 @@ class AwHomeLayoutDS extends LayoutDataSource {
         var value = change.value;
         // store the entered text in facetInputs
         this.facetInputs[payload] = value;
-        console.log('changed: ' + payload + ' with value: ' + value);
     }
     /**
      * @param {?} enter
@@ -1637,10 +1632,9 @@ class AwHomeLayoutDS extends LayoutDataSource {
     handleFacetSearchEnter(enter) {
         /** @type {?} */
         var payload = enter.inputPayload;
+        // get the text entered in this input
         /** @type {?} */
         var value = this.facetInputs[payload];
-        // get the text entered in this input
-        console.log('entered: ' + payload + ' with value: ' + value);
     }
     /**
      * @param {?} facetId
@@ -1780,7 +1774,6 @@ class AwHomeLayoutDS extends LayoutDataSource {
          * @return {?}
          */
         (b) => b.id !== payload));
-        //if(this._updateBubbles) this._updateBubbles();
         this.updateBubblesAndItemPreviews();
     }
     /**
@@ -1839,6 +1832,11 @@ if (false) {
      * @private
      */
     AwHomeLayoutDS.prototype.mainState;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.configuration;
     /** @type {?} */
     AwHomeLayoutDS.prototype.test;
     /**
@@ -1914,8 +1912,11 @@ class AwHomeLayoutEH extends EventHandler {
             switch (type) {
                 case 'aw-hero.change':
                     const { inputPayload, value } = payload;
-                    // do something
+                    // TODO: do something
                     break;
+                /**
+                 * Facets Event Handlers
+                 */
                 case 'aw-home-facets-wrapper.click':
                     this.dataSource.handleFacetHeaderClick(payload);
                     break;
@@ -1925,6 +1926,15 @@ class AwHomeLayoutEH extends EventHandler {
                 case 'aw-home-facets-wrapper.enter':
                     this.dataSource.handleFacetSearchEnter(payload);
                     break;
+                /**
+                 * Bubble Chart Event Handlers
+                 */
+                case 'aw-home-bubble-chart.mouse_enter':
+                    // TODO: do something
+                    break;
+                case 'aw-home-bubble-chart.mouse_leave':
+                    // TODO: do something
+                    break;
                 case 'aw-home-bubble-chart.click':
                     if (payload.source === 'bubble')
                         this.dataSource.onBubbleSelected({ bubblePayload: payload.bubblePayload, bubble: payload.bubble });
@@ -1932,13 +1942,14 @@ class AwHomeLayoutEH extends EventHandler {
                         this.dataSource.onBubbleDeselected({ bubblePayload: payload.bubblePayload, bubble: payload.bubble });
                     break;
                 case 'aw-home-bubble-chart.mouse_enter':
-                    console.log('bubble mouse enter', payload);
                     // TODO: implemente behaviour
                     break;
                 case 'aw-home-bubble-chart.mouse_leave':
-                    console.log('bubble mouse leave', payload);
                     // TODO: implemente behaviour
                     break;
+                /**
+                 * Tags & Item Previews Event Handlers
+                 */
                 case 'aw-home-item-tags-wrapper.click':
                     this.dataSource.onTagClicked(payload);
                     break;
@@ -1946,19 +1957,6 @@ class AwHomeLayoutEH extends EventHandler {
                     break;
             }
         }));
-        // listen to global events
-        /* EventHandler.globalEvents$.pipe(
-          takeUntil(this.destroyed$)
-        ).subscribe(({type, payload}) => {
-          switch(type){
-            case 'global.navigate':
-              this.dataSource.onNavigate(payload);
-              break;
-    
-            default:
-              break;
-          }
-        }); */
     }
 }
 if (false) {
@@ -1980,7 +1978,6 @@ class AwHeroDS extends DataSource {
      * @return {?}
      */
     transform(data) {
-        console.log({ data });
         /** @type {?} */
         const HERO_DATA = {
             title: "Arte, architettura e fotografia nel XXI secolo",
@@ -2101,7 +2098,6 @@ class AwHomeBubbleChartDS extends DataSource {
             if (bubble.selected)
                 numOfSelectedBubbles++;
         }));
-        console.log({ containerSize: Math.log(containerSize), numOfBubbles, minBubbleCount, maxBubbleCount, totalCount, numOfSelectedBubbles });
         data.bubbles.forEach((/**
          * @param {?} bubble
          * @return {?}
@@ -2248,8 +2244,8 @@ class AwHomeFacetsWrapperDS extends DataSource {
              */
             // make array of headers data
             headers.push({
-                iconLeft: facet.type.icon,
-                text: facet.type.label,
+                iconLeft: facet.icon,
+                text: facet.label,
                 additionalText: facet.count,
                 iconRight: (facet.enabled ? 'n7-icon-eye' : 'n7-icon-eye-slash'),
                 classes: (facet.enabled ? 'prova' : 'is-disabled') + (facet.type.color ? ` ${facet.type.color}` : ''),
@@ -2749,7 +2745,6 @@ class AwSidebarHeaderEH extends EventHandler {
          * @return {?}
          */
         ({ type, payload }) => {
-            console.log(type);
             if (type == 'aw-sidebar-header.click') {
                 this.dataSource.toggleSidebar();
                 this.emitOuter('click', payload);
@@ -3215,7 +3210,7 @@ class AwPatrimonioLayoutDS extends LayoutDataSource {
              * @param {?} error
              * @return {?}
              */
-            (error) => console.log(error)),
+            (error) => console.error(error)),
             params: { treeId: id }
         });
     }
@@ -3258,7 +3253,7 @@ class AwPatrimonioLayoutDS extends LayoutDataSource {
                  * @param {?} error
                  * @return {?}
                  */
-                (error) => console.log(error)),
+                (error) => console.error(error)),
                 params: { itemId: id }
             });
         }
@@ -3404,7 +3399,6 @@ class AwPatrimonioLayoutDS extends LayoutDataSource {
      */
     collapseSidebar() {
         this.sidebarCollapsed = !this.sidebarCollapsed;
-        console.log(this.sidebarCollapsed);
     }
 }
 if (false) {
