@@ -2,8 +2,8 @@ import { LayoutDataSource } from '@n7-frontend/core';
 export declare class AwHomeLayoutDS extends LayoutDataSource {
     private communication;
     private mainState;
+    private tippy;
     private configuration;
-    test: string;
     private facetData;
     private facetInputs;
     private allBubbles;
@@ -12,15 +12,22 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     private _bubbleChart;
     private maxBubblesSelectable;
     private entityBubbleIdMap;
-    onInit({ communication, mainState, configuration }: {
+    private lastWindowWidth;
+    private bubblePopup;
+    currentHoverEntity: any;
+    onInit({ communication, mainState, configuration, tippy }: {
         communication: any;
         mainState: any;
         configuration: any;
+        tippy: any;
     }): void;
+    onBubbleTooltipClick(source: string, payload: any): void;
+    onBubbleMouseEnter(payload: any): void;
     renderPreviewsFromApolloQuery(response: any): void;
-    onBubbleSelected(payload: any): void;
+    onBubbleSelected(bubble: any): void;
     onBubbleDeselected(payload: any): void;
     private updateBubblesAndItemPreviews;
+    private convertEntityIdToBubbleId;
     setAllBubblesFromApolloQuery(response: any, reset?: boolean): void;
     filterBubblesBasedOnFacetsEnabled(): any[];
     handleFacetSearchChange(change: any): void;

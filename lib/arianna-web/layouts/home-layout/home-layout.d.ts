@@ -17,6 +17,7 @@ export declare class AwHomeLayoutComponent extends AbstractLayout implements OnI
         router: Router;
         communication: CommunicationService;
         options: any;
+        tippy: import("tippy.js").Tippy;
     };
     ngOnInit(): void;
     ngOnDestroy(): void;

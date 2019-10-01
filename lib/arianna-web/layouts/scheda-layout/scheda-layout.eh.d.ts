@@ -1,5 +1,5 @@
 import { EventHandler } from '@n7-frontend/core';
-export declare class AwPatrimonioLayoutEH extends EventHandler {
+export declare class AwSchedaLayoutEH extends EventHandler {
     private destroyed$;
     private configuration;
     private route;

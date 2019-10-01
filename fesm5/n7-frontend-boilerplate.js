@@ -2,12 +2,13 @@ import { Injectable, Inject, ɵɵdefineInjectable, ɵɵinject, Component, NgModu
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK } from '@n7-frontend/components';
-import { ReplaySubject, empty, Subject, of } from 'rxjs';
-import { map, catchError, takeUntil, tap } from 'rxjs/operators';
+import { ReplaySubject, empty, Subject, of, fromEvent, interval } from 'rxjs';
+import { map, catchError, takeUntil, tap, debounce } from 'rxjs/operators';
 import { __extends, __assign, __spread } from 'tslib';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { LayoutBuilder, LayoutDataSource, EventHandler, DataSource } from '@n7-frontend/core';
+import tippy from 'tippy.js';
 
 /**
  * @fileoverview added by tsickle
@@ -282,6 +283,10 @@ var ApolloProviderConfig = {
     'globalFilter': {
         queryName: 'globalFilter',
         queryBody: "{\n      globalFilter(__PARAMS__){\n        entitiesData {\n          countData {\n            type {\n              id\n              label\n              configKey\n            }\n            count\n          }\n          entitiesCountData {\n            entity {\n              id\n              label\n              typeOfEntity {\n                id\n              }\n            }\n            count\n          }\n        }\n        itemsPagination {\n          totalCount\n          items {\n            item {\n              id\n              label\n              info {\n                key\n                value\n              }\n            }\n            thumbnail\n            relatedTOEData {\n              type {\n                id\n                label\n                configKey\n              }\n              count\n            }\n          }\n        }\n      }\n    }"
+    },
+    'getEntityDetails': {
+        queryName: 'getEntityDetails',
+        queryBody: "{\n      getEntityDetails(__PARAMS__){\n        overviewTab\n        entity {\n          label\n          id\n        }\n        fieldsTab {\n          id\n          fields {\n            id\n            key\n            value\n          }\n        }\n        entities {\n          entity {\n            id\n            label\n            typeOfEntity {\n              configKey\n            }\n          }\n          count\n        }\n        items {\n          breadcrumbs {\n            link\n            label\n          }\n          item {\n            id\n            label\n          }\n          thumbnail\n          relatedTOEData {\n            type {\n              id\n              configKey\n            }\n            count\n          }\n        }\n      }\n    }\n    "
     },
     'getItemDetails': {
         queryName: 'getItemDetails',
@@ -1477,655 +1482,50 @@ var N7BoilerplateCommonModule = /** @class */ (function () {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-var AwHomeLayoutDS = /** @class */ (function (_super) {
-    __extends(AwHomeLayoutDS, _super);
-    function AwHomeLayoutDS() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.facetData = null;
-        _this.facetInputs = {};
-        _this.allBubbles = null;
-        _this.selectedBubbles = [];
-        _this.numOfItemsStr = null;
-        _this._bubbleChart = null;
-        _this.maxBubblesSelectable = 3;
-        _this.entityBubbleIdMap = {};
-        return _this;
+var AwAboutLayoutDS = /** @class */ (function (_super) {
+    __extends(AwAboutLayoutDS, _super);
+    function AwAboutLayoutDS() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     /**
-     * @param {?} __0
-     * @return {?}
-     */
-    AwHomeLayoutDS.prototype.onInit = /**
-     * @param {?} __0
-     * @return {?}
-     */
-    function (_a) {
-        var _this = this;
-        var communication = _a.communication, mainState = _a.mainState, configuration = _a.configuration;
-        this.communication = communication;
-        this.mainState = mainState;
-        this.configuration = configuration;
-        this.one('aw-hero').update({});
-        this.communication.request$('globalFilter', {
-            onError: (/**
-             * @param {?} error
-             * @return {?}
-             */
-            function (error) { return console.error(error); }),
-        }).subscribe((/**
-         * @param {?} response
-         * @return {?}
-         */
-        function (response) {
-            _this.facetData = [];
-            response.entitiesData.forEach((/**
-             * @param {?} ent
-             * @return {?}
-             */
-            function (ent) {
-                /** @type {?} */
-                var teoConfigData = _this.configuration.get("config-keys")[ent.countData.type.configKey];
-                if (teoConfigData)
-                    _this.facetData.push(__assign({}, (ent.countData), { enabled: true, icon: teoConfigData.icon, label: teoConfigData.label }));
-            }));
-            _this.one('aw-home-facets-wrapper').update(_this.facetData);
-            _this.setAllBubblesFromApolloQuery(response);
-            _this.renderPreviewsFromApolloQuery(response);
-        }));
-        // update streams
-        this.mainState.update('headTitle', 'Arianna Web > Home');
-        this.mainState.update('pageTitle', 'Arianna Web: Home Layout');
-    };
-    /**
-     * @param {?} response
-     * @return {?}
-     */
-    AwHomeLayoutDS.prototype.renderPreviewsFromApolloQuery = /**
-     * @param {?} response
-     * @return {?}
-     */
-    function (response) {
-        if (!response || !response.itemsPagination)
-            return;
-        /** @type {?} */
-        var numOfItems = response.itemsPagination.totalCount;
-        if (numOfItems > 0) {
-            /** @type {?} */
-            var numOfThousand = 0;
-            while (numOfItems > 999) {
-                numOfItems -= 1000;
-                numOfThousand += 1;
-            }
-            /** @type {?} */
-            var numOfItemsTmpStr = numOfItems + '';
-            if (numOfItems < 10)
-                numOfItemsTmpStr = '00' + numOfItems;
-            else if (numOfItems < 100)
-                numOfItemsTmpStr = '0' + numOfItems;
-            if (numOfThousand > 0)
-                this.numOfItemsStr = numOfThousand + '.' + numOfItemsTmpStr;
-            else
-                this.numOfItemsStr = numOfItems + '';
-        }
-        else {
-            this.numOfItemsStr = null;
-        }
-        this.one('aw-home-item-preview-wrapper').update(response.itemsPagination.items);
-    };
-    /**
      * @param {?} payload
      * @return {?}
      */
-    AwHomeLayoutDS.prototype.onBubbleSelected = /**
+    AwAboutLayoutDS.prototype.onInit = /**
      * @param {?} payload
      * @return {?}
      */
     function (payload) {
-        if (payload && payload.bubble) {
-            if (!this.selectedBubbles.includes(payload.bubble)) {
-                if (this.selectedBubbles.length < this.maxBubblesSelectable) {
-                    this.selectedBubbles.push(payload.bubble);
-                    this.updateBubblesAndItemPreviews();
-                }
-            }
-        }
+        // TODO
     };
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
-    AwHomeLayoutDS.prototype.onBubbleDeselected = /**
-     * @param {?} payload
-     * @return {?}
-     */
-    function (payload) {
-        if (payload && payload.bubble) {
-            this.selectedBubbles = this.selectedBubbles.filter((/**
-             * @param {?} b
-             * @return {?}
-             */
-            function (b) { return b.id !== payload.bubble.id; }));
-            if (payload.bubble.hasCloseIcon) {
-                payload.bubble.hasCloseIcon = false;
-                this.updateBubblesAndItemPreviews();
-            }
-        }
-    };
-    /**
-     * @private
-     * @return {?}
-     */
-    AwHomeLayoutDS.prototype.updateBubblesAndItemPreviews = /**
-     * @private
-     * @return {?}
-     */
-    function () {
-        var _this = this;
-        /** @type {?} */
-        var selectedEntitiesIds = [];
-        if (this.entityBubbleIdMap)
-            this.selectedBubbles.forEach((/**
-             * @param {?} sB
-             * @return {?}
-             */
-            function (sB) {
-                /** @type {?} */
-                var entityId = _this.entityBubbleIdMap[sB.id];
-                if (entityId)
-                    selectedEntitiesIds.push(entityId);
-            }));
-        this.communication.request$('globalFilter', {
-            onError: (/**
-             * @param {?} error
-             * @return {?}
-             */
-            function (error) { return console.error(error); }),
-            params: {
-                selectedEntitiesIds: selectedEntitiesIds,
-                itemsPagination: { offset: 0, limit: 4 }
-            },
-        }).subscribe((/**
-         * @param {?} response
-         * @return {?}
-         */
-        function (response) {
-            _this.renderPreviewsFromApolloQuery(response);
-            _this.renderItemTags();
-            _this.setAllBubblesFromApolloQuery(response, true);
-        }));
-    };
-    /**
-     * @param {?} response
-     * @param {?=} reset
-     * @return {?}
-     */
-    AwHomeLayoutDS.prototype.setAllBubblesFromApolloQuery = /**
-     * @param {?} response
-     * @param {?=} reset
-     * @return {?}
-     */
-    function (response, reset) {
-        var _this = this;
-        if (!response || !response.entitiesData)
-            return;
-        this.allBubbles = [];
-        for (var i = 0; i < response.entitiesData.length; i++) {
-            /** @type {?} */
-            var currentToE = response.entitiesData[i];
-            for (var j = 0; j < currentToE.entitiesCountData.length; j++) {
-                this.allBubbles.push(__assign({}, currentToE.entitiesCountData[j], { color: this.configuration.get("config-keys")[currentToE.countData.type.configKey]['color']['hex'] }));
-            }
-        }
-        this.entityBubbleIdMap = {};
-        this.allBubbles.forEach((/**
-         * @param {?} bubble
-         * @return {?}
-         */
-        function (bubble) {
-            // d3/svg does not allow Number as beginning of ID.
-            // d3/svg does not allow '-' as part of ID.
-            bubble.id = 'B_' + bubble.entity.id.replace(/-/g, '_');
-            _this.entityBubbleIdMap[bubble.id] = bubble.entity.id;
-            return bubble;
-        }));
-        this.allBubbles.forEach((/**
-         * @param {?} bubble
-         * @return {?}
-         */
-        function (bubble) {
-            bubble.selected = false;
-            for (var i = 0; i < _this.selectedBubbles.length; i++) {
-                if (_this.selectedBubbles[i].id === bubble.id)
-                    bubble.selected = true;
-            }
-        }));
-        this.one('aw-home-bubble-chart').update({
-            width: window.innerWidth / 1.8,
-            bubbles: this.filterBubblesBasedOnFacetsEnabled(),
-            reset: (reset ? reset : false),
-            setBubbleChart: (/**
-             * @param {?} bubbleCref
-             * @return {?}
-             */
-            function (bubbleCref) { return _this._bubbleChart = bubbleCref; })
-        });
-    };
-    /**
-     * @return {?}
-     */
-    AwHomeLayoutDS.prototype.filterBubblesBasedOnFacetsEnabled = /**
-     * @return {?}
-     */
-    function () {
-        var _this = this;
-        /** @type {?} */
-        var result = this.allBubbles.filter((/**
-         * @param {?} bubble
-         * @return {?}
-         */
-        function (bubble) {
-            for (var i = 0; i < _this.facetData.length; i++) {
-                if (bubble.entity.typeOfEntity.id === _this.facetData[i].type.id)
-                    if (!_this.facetData[i].enabled) {
-                        return false;
-                    }
-            }
-            return true;
-        }));
-        return result;
-    };
-    /**
-     * @param {?} change
-     * @return {?}
-     */
-    AwHomeLayoutDS.prototype.handleFacetSearchChange = /**
-     * @param {?} change
-     * @return {?}
-     */
-    function (change) {
-        /** @type {?} */
-        var payload = change.inputPayload;
-        /** @type {?} */
-        var value = change.value;
-        // store the entered text in facetInputs
-        this.facetInputs[payload] = value;
-    };
-    /**
-     * @param {?} enter
-     * @return {?}
-     */
-    AwHomeLayoutDS.prototype.handleFacetSearchEnter = /**
-     * @param {?} enter
-     * @return {?}
-     */
-    function (enter) {
-        /** @type {?} */
-        var payload = enter.inputPayload;
-        // get the text entered in this input
-        /** @type {?} */
-        var value = this.facetInputs[payload];
-    };
-    /**
-     * @param {?} facetId
-     * @return {?}
-     */
-    AwHomeLayoutDS.prototype.handleFacetHeaderClick = /**
-     * @param {?} facetId
-     * @return {?}
-     */
-    function (facetId) {
-        var _this = this;
-        /** @type {?} */
-        var updateBubbles = false;
-        /** @type {?} */
-        var enabledFacets = this.facetData.filter((/**
-         * @param {?} f
-         * @return {?}
-         */
-        function (f) { return f.enabled; })).length;
-        this.facetData.forEach((/**
-         * @param {?} f
-         * @return {?}
-         */
-        function (f) {
-            if (f.type.id === facetId) {
-                if (f.enabled) {
-                    if (enabledFacets > 1) {
-                        f.enabled = false;
-                        updateBubbles = true;
-                    }
-                }
-                else {
-                    f.enabled = true;
-                    updateBubbles = true;
-                }
-            }
-        }));
-        this.one('aw-home-facets-wrapper').update(this.facetData);
-        if (updateBubbles) {
-            /** @type {?} */
-            var disableFacetsIds_1 = [];
-            this.facetData.forEach((/**
-             * @param {?} fD
-             * @return {?}
-             */
-            function (fD) {
-                if (!fD.enabled)
-                    disableFacetsIds_1.push(fD.type.id);
-            }));
-            if (disableFacetsIds_1) {
-                /** @type {?} */
-                var filteredSelectedBubbles = this.selectedBubbles.filter((/**
-                 * @param {?} bubble
-                 * @return {?}
-                 */
-                function (bubble) {
-                    /** @type {?} */
-                    var typeOfEntity = "";
-                    for (var i = 0; i < _this.allBubbles.length; i++) {
-                        if (_this.allBubbles[i].id === bubble.id) {
-                            typeOfEntity = _this.allBubbles[i].entity.typeOfEntity.id;
-                            break;
-                        }
-                    }
-                    if (disableFacetsIds_1.includes(typeOfEntity))
-                        return false;
-                    return true;
-                }));
-                if (filteredSelectedBubbles.length != this.selectedBubbles.length) {
-                    this.selectedBubbles = filteredSelectedBubbles;
-                    this.updateBubblesAndItemPreviews();
-                }
-                ;
-            }
-            this.allBubbles.forEach((/**
-             * @param {?} bubble
-             * @return {?}
-             */
-            function (bubble) {
-                bubble.selected = false;
-                for (var i = 0; i < _this.selectedBubbles.length; i++) {
-                    if (_this.selectedBubbles[i].id === bubble.id)
-                        bubble.selected = true;
-                }
-            }));
-            this.one('aw-home-bubble-chart').update({
-                width: window.innerWidth / 1.8,
-                bubbles: this.filterBubblesBasedOnFacetsEnabled(),
-                setBubbleChart: (/**
-                 * @param {?} bubbleCref
-                 * @return {?}
-                 */
-                function (bubbleCref) { return _this._bubbleChart = bubbleCref; }),
-                reset: true
-            });
-        }
-    };
-    /**
-     * @return {?}
-     */
-    AwHomeLayoutDS.prototype.renderItemTags = /**
-     * @return {?}
-     */
-    function () {
-        var _this = this;
-        /** @type {?} */
-        var tagsData = [];
-        this.selectedBubbles.forEach((/**
-         * @param {?} sBubble
-         * @return {?}
-         */
-        function (sBubble) {
-            /** @type {?} */
-            var label = '';
-            for (var i = 0; i < _this.allBubbles.length; i++) {
-                if (_this.allBubbles[i].id === sBubble.id) {
-                    label = _this.allBubbles[i].entity.label;
-                    break;
-                }
-            }
-            tagsData.push({ label: label, icon: "n7-icon-close", payload: sBubble.id, classes: "tag-" + _this.allBubbles[i].entity.typeOfEntity.id });
-        }));
-        this.one('aw-home-item-tags-wrapper').update(tagsData);
-    };
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
-    AwHomeLayoutDS.prototype.onTagClicked = /**
-     * @param {?} payload
-     * @return {?}
-     */
-    function (payload) {
-        if (!payload)
-            return;
-        /** @type {?} */
-        var bubbleId = payload;
-        if (this._bubbleChart) {
-            this._bubbleChart.selectAll("g").each((/**
-             * @param {?} b
-             * @return {?}
-             */
-            function (b) {
-                if (b.id === bubbleId)
-                    b.hasCloseIcon = false;
-            }));
-        }
-        this.selectedBubbles = this.selectedBubbles.filter((/**
-         * @param {?} b
-         * @return {?}
-         */
-        function (b) { return b.id !== payload; }));
-        this.updateBubblesAndItemPreviews();
-    };
-    /**
-     * @private
-     * @return {?}
-     */
-    AwHomeLayoutDS.prototype._getSubnav = /**
-     * @private
-     * @return {?}
-     */
-    function () {
-        return ['home', 'results', 'single'].map((/**
-         * @param {?} page
-         * @return {?}
-         */
-        function (page) { return ({
-            text: page.toUpperCase(),
-            payload: {
-                source: 'navigate',
-                handler: 'router',
-                path: ["aw/" + page],
-                id: page
-            },
-            _meta: { id: page }
-        }); }));
-    };
-    /**
-     * @private
-     * @return {?}
-     */
-    AwHomeLayoutDS.prototype._getBreadcrumbs = /**
-     * @private
-     * @return {?}
-     */
-    function () {
-        return {
-            items: [{
-                    label: 'Arianna Web',
-                    payload: {
-                        source: 'navigate',
-                        handler: 'router',
-                        path: ["aw/home"]
-                    }
-                },
-                {
-                    label: 'Home Layout',
-                    payload: {
-                        source: 'navigate',
-                        handler: 'router',
-                        path: ["aw/home"]
-                    }
-                }]
-        };
-    };
-    return AwHomeLayoutDS;
+    return AwAboutLayoutDS;
 }(LayoutDataSource));
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.communication;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.mainState;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.configuration;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.test;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.facetData;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.facetInputs;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.allBubbles;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.selectedBubbles;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.numOfItemsStr;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype._bubbleChart;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.maxBubblesSelectable;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.entityBubbleIdMap;
-}
 
 /**
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-var AwHomeLayoutEH = /** @class */ (function (_super) {
-    __extends(AwHomeLayoutEH, _super);
-    function AwHomeLayoutEH() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.destroyed$ = new Subject();
-        return _this;
+var AwAboutLayoutEH = /** @class */ (function (_super) {
+    __extends(AwAboutLayoutEH, _super);
+    function AwAboutLayoutEH() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     /**
      * @return {?}
      */
-    AwHomeLayoutEH.prototype.listen = /**
+    AwAboutLayoutEH.prototype.listen = /**
      * @return {?}
      */
     function () {
-        var _this = this;
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        function (_a) {
-            var type = _a.type, payload = _a.payload;
-            switch (type) {
-                case 'aw-home-layout.init':
-                    _this.dataSource.onInit(payload);
-                    break;
-                case 'aw-home-layout.destroy':
-                    _this.destroyed$.next();
-                    break;
-                default:
-                    break;
-            }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        function (_a) {
-            var type = _a.type, payload = _a.payload;
-            switch (type) {
-                case 'aw-hero.change':
-                    var inputPayload = payload.inputPayload, value = payload.value;
-                    // TODO: do something
-                    break;
-                /**
-                 * Facets Event Handlers
-                 */
-                case 'aw-home-facets-wrapper.click':
-                    _this.dataSource.handleFacetHeaderClick(payload);
-                    break;
-                case 'aw-home-facets-wrapper.change':
-                    _this.dataSource.handleFacetSearchChange(payload);
-                    break;
-                case 'aw-home-facets-wrapper.enter':
-                    _this.dataSource.handleFacetSearchEnter(payload);
-                    break;
-                /**
-                 * Bubble Chart Event Handlers
-                 */
-                case 'aw-home-bubble-chart.mouse_enter':
-                    // TODO: do something
-                    break;
-                case 'aw-home-bubble-chart.mouse_leave':
-                    // TODO: do something
-                    break;
-                case 'aw-home-bubble-chart.click':
-                    if (payload.source === 'bubble')
-                        _this.dataSource.onBubbleSelected({ bubblePayload: payload.bubblePayload, bubble: payload.bubble });
-                    else if (payload.source === 'close')
-                        _this.dataSource.onBubbleDeselected({ bubblePayload: payload.bubblePayload, bubble: payload.bubble });
-                    break;
-                case 'aw-home-bubble-chart.mouse_enter':
-                    // TODO: implemente behaviour
-                    break;
-                case 'aw-home-bubble-chart.mouse_leave':
-                    // TODO: implemente behaviour
-                    break;
-                /**
-                 * Tags & Item Previews Event Handlers
-                 */
-                case 'aw-home-item-tags-wrapper.click':
-                    _this.dataSource.onTagClicked(payload);
-                    break;
-                default:
-                    break;
-            }
-        }));
+        /* this.innerEvents$.subscribe(({ type, payload }) => {
+          
+        }); */
+        /* this.outerEvents$.subscribe(({ type, payload }) => {
+          
+        }); */
     };
-    return AwHomeLayoutEH;
+    return AwAboutLayoutEH;
 }(EventHandler));
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutEH.prototype.destroyed$;
-}
 
 /**
  * @fileoverview added by tsickle
@@ -2583,6 +1983,34 @@ var AwHomeItemTagsWrapperDS = /** @class */ (function (_super) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+// import { NAV_MOCK } from '@n7-frontend/components';
+var  
+// import { NAV_MOCK } from '@n7-frontend/components';
+AwEntitaNavDS = /** @class */ (function (_super) {
+    __extends(AwEntitaNavDS, _super);
+    function AwEntitaNavDS() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    AwEntitaNavDS.prototype.transform = /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    function (data) {
+        return data;
+    };
+    return AwEntitaNavDS;
+}(DataSource));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 var AwTreeDS = /** @class */ (function (_super) {
     __extends(AwTreeDS, _super);
     function AwTreeDS() {
@@ -2795,6 +2223,31 @@ var AwSchedaBreadcrumbsDS = /** @class */ (function (_super) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+var AwSchedaMetadataDS = /** @class */ (function (_super) {
+    __extends(AwSchedaMetadataDS, _super);
+    function AwSchedaMetadataDS() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    AwSchedaMetadataDS.prototype.transform = /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    function (data) {
+        return data;
+    };
+    return AwSchedaMetadataDS;
+}(DataSource));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 
 var DS$1 = /*#__PURE__*/Object.freeze({
     AwHeroDS: AwHeroDS,
@@ -2804,9 +2257,11 @@ var DS$1 = /*#__PURE__*/Object.freeze({
     AwHomeFacetsWrapperDS: AwHomeFacetsWrapperDS,
     AwHomeItemPreviewWrapperDS: AwHomeItemPreviewWrapperDS,
     AwHomeItemTagsWrapperDS: AwHomeItemTagsWrapperDS,
+    AwEntitaNavDS: AwEntitaNavDS,
     AwTreeDS: AwTreeDS,
     AwSidebarHeaderDS: AwSidebarHeaderDS,
-    AwSchedaBreadcrumbsDS: AwSchedaBreadcrumbsDS
+    AwSchedaBreadcrumbsDS: AwSchedaBreadcrumbsDS,
+    AwSchedaMetadataDS: AwSchedaMetadataDS
 });
 
 /**
@@ -3050,6 +2505,35 @@ var AwHomeItemTagsWrapperEH = /** @class */ (function (_super) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+var AwEntitaNavEH = /** @class */ (function (_super) {
+    __extends(AwEntitaNavEH, _super);
+    function AwEntitaNavEH() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @return {?}
+     */
+    AwEntitaNavEH.prototype.listen = /**
+     * @return {?}
+     */
+    function () {
+        /*
+        this.innerEvents$.subscribe(event => {
+          
+        });
+    
+        this.outerEvents$.subscribe(event => {
+          
+        });
+        */
+    };
+    return AwEntitaNavEH;
+}(EventHandler));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 var AwSchedaSidebarEH = /** @class */ (function (_super) {
     __extends(AwSchedaSidebarEH, _super);
     function AwSchedaSidebarEH() {
@@ -3211,6 +2695,7 @@ var EH$1 = /*#__PURE__*/Object.freeze({
     AwHomeHeroPatrimonioEH: AwHomeHeroPatrimonioEH,
     AwHomeItemPreviewWrapperEH: AwHomeItemPreviewWrapperEH,
     AwHomeItemTagsWrapperEH: AwHomeItemTagsWrapperEH,
+    AwEntitaNavEH: AwEntitaNavEH,
     AwSchedaSidebarEH: AwSchedaSidebarEH,
     AwSidebarHeaderEH: AwSidebarHeaderEH,
     AwTreeEH: AwTreeEH,
@@ -3222,30 +2707,55 @@ var EH$1 = /*#__PURE__*/Object.freeze({
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
-var AwHomeLayoutConfig = {
-    layoutId: 'aw-home-layout',
-    widgets: [{
-            id: 'aw-hero',
-        }, {
-            id: 'aw-home-hero-patrimonio',
-            hasStaticData: true
-        }, {
-            id: 'aw-home-bubble-chart',
-        }, {
-            id: 'aw-home-facets-wrapper',
-        }, {
-            id: 'aw-home-item-tags-wrapper',
-        }, {
-            id: 'aw-home-item-preview-wrapper'
-        }],
-    layoutDS: AwHomeLayoutDS,
-    layoutEH: AwHomeLayoutEH,
+var AwAboutLayoutConfig = {
+    layoutId: 'aw-about-layout',
+    widgets: [],
+    layoutDS: AwAboutLayoutDS,
+    layoutEH: AwAboutLayoutEH,
     widgetsDataSources: DS$1,
     widgetsEventHandlers: EH$1,
-    options: {
+    layoutOptions: {
     // TODO
     }
 };
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var AwAboutLayoutComponent = /** @class */ (function (_super) {
+    __extends(AwAboutLayoutComponent, _super);
+    function AwAboutLayoutComponent() {
+        return _super.call(this, AwAboutLayoutConfig) || this;
+    }
+    /**
+     * @return {?}
+     */
+    AwAboutLayoutComponent.prototype.ngOnInit = /**
+     * @return {?}
+     */
+    function () {
+        this.onInit();
+    };
+    /**
+     * @return {?}
+     */
+    AwAboutLayoutComponent.prototype.ngOnDestroy = /**
+     * @return {?}
+     */
+    function () {
+        this.onDestroy();
+    };
+    AwAboutLayoutComponent.decorators = [
+        { type: Component, args: [{
+                    selector: 'aw-about-layout',
+                    template: "<div class=\"\" *ngIf=\"lb.dataSource\">\n    About page!\n</div>"
+                }] }
+    ];
+    /** @nocollapse */
+    AwAboutLayoutComponent.ctorParameters = function () { return []; };
+    return AwAboutLayoutComponent;
+}(AbstractLayout));
 
 /**
  * @fileoverview added by tsickle
@@ -3331,6 +2841,1325 @@ if (false) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+var AwEntitaLayoutDS = /** @class */ (function (_super) {
+    __extends(AwEntitaLayoutDS, _super);
+    function AwEntitaLayoutDS() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.myResponse = {}; // store response object
+        return _this;
+    }
+    /**
+     * @param {?} __0
+     * @return {?}
+     */
+    AwEntitaLayoutDS.prototype.onInit = /**
+     * @param {?} __0
+     * @return {?}
+     */
+    function (_a) {
+        var configuration = _a.configuration, mainState = _a.mainState, router = _a.router, options = _a.options, titleService = _a.titleService, communication = _a.communication;
+        this.configuration = configuration;
+        this.mainState = mainState;
+        this.router = router;
+        this.titleService = titleService;
+        this.options = options;
+        this.communication = communication;
+        // this.communication.request$('getEntityDetails', {
+        //   onError: (error) => console.log(error),
+        //   params: { entityId: "test" }
+        // }).subscribe((response) => {
+        //   console.log('apollo-response', { response })
+        // });
+    };
+    /**
+     * @param {?} id
+     * @return {?}
+     */
+    AwEntitaLayoutDS.prototype.getNavigation = /**
+     * @param {?} id
+     * @return {?}
+     */
+    function (id) {
+        /**
+         * Requests data from communication provider
+         *
+         * @param id - the id of the item to get
+         * @returns the response of getEntityDetails with entityId === id
+         */
+        return this.communication.request$('getEntityDetails', {
+            onError: (/**
+             * @param {?} error
+             * @return {?}
+             */
+            function (error) { return console.error(error); }),
+            params: { entityId: id }
+        });
+    };
+    /**
+     * @param {?} data
+     * @return {?}
+     */
+    AwEntitaLayoutDS.prototype.updateWidgets = /**
+     * @param {?} data
+     * @return {?}
+     */
+    function (data) {
+        /**
+         * Updates the widgets on this layout, based on route
+         *
+         * @param data - communication reponse object
+         */
+        /**
+         * Updates the widgets on this layout, based on route
+         *
+         * \@param data - communication reponse object
+         * @type {?}
+         */
+        var navigation = { items: [
+                {
+                    text: 'OVERVIEW',
+                    payload: 'overview',
+                },
+                {
+                    text: 'CAMPI',
+                    payload: 'campi',
+                },
+                {
+                    text: 'OGGETTI COLLEGATI',
+                    payload: 'oggetti-collegati',
+                },
+                {
+                    text: 'ENTITA COLLEGATE',
+                    payload: 'entita-collegate',
+                },
+                {
+                    text: 'MAXXI',
+                    payload: 'maxxi',
+                },
+                {
+                    text: 'WIKIPEDIA',
+                    payload: 'wiki',
+                },
+            ],
+            payload: 'entita-nav'
+        };
+        this.one('aw-entita-nav').update(navigation);
+    };
+    /**
+     * @param {?} id
+     * @param {?} tab
+     * @return {?}
+     */
+    AwEntitaLayoutDS.prototype.loadItem = /**
+     * @param {?} id
+     * @param {?} tab
+     * @return {?}
+     */
+    function (id, tab) {
+        /**
+         * Loads the data for the selected nav item, into the adjacent text block.
+         *
+         * @param id - id of item to request
+         * @param tab - selected nav tab
+         */
+        if (id && tab) {
+            this.selectedTab = tab; // store selected tab from url
+            return this.communication.request$('getEntityDetails', {
+                onError: (/**
+                 * @param {?} error
+                 * @return {?}
+                 */
+                function (error) { return console.error(error); }),
+                params: { entityId: id }
+            });
+        }
+        else {
+            this.pageTitle = 'Entità Test';
+        }
+    };
+    /**
+     * @param {?} res
+     * @return {?}
+     */
+    AwEntitaLayoutDS.prototype.loadContent = /**
+     * @param {?} res
+     * @return {?}
+     */
+    function (res) {
+        console.log('loadcontent-response: ', { res: res });
+        this.myResponse = res;
+        this.entityTitle = res.entity.label;
+    };
+    return AwEntitaLayoutDS;
+}(LayoutDataSource));
+if (false) {
+    /**
+     * @type {?}
+     * @protected
+     */
+    AwEntitaLayoutDS.prototype.configuration;
+    /**
+     * @type {?}
+     * @protected
+     */
+    AwEntitaLayoutDS.prototype.mainState;
+    /**
+     * @type {?}
+     * @protected
+     */
+    AwEntitaLayoutDS.prototype.router;
+    /**
+     * @type {?}
+     * @protected
+     */
+    AwEntitaLayoutDS.prototype.titleService;
+    /** @type {?} */
+    AwEntitaLayoutDS.prototype.options;
+    /** @type {?} */
+    AwEntitaLayoutDS.prototype.pageTitle;
+    /** @type {?} */
+    AwEntitaLayoutDS.prototype.myResponse;
+    /** @type {?} */
+    AwEntitaLayoutDS.prototype.entityTitle;
+    /** @type {?} */
+    AwEntitaLayoutDS.prototype.selectedTab;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwEntitaLayoutDS.prototype.communication;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var AwEntitaLayoutEH = /** @class */ (function (_super) {
+    __extends(AwEntitaLayoutEH, _super);
+    function AwEntitaLayoutEH() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.destroyed$ = new Subject();
+        return _this;
+    }
+    /**
+     * @return {?}
+     */
+    AwEntitaLayoutEH.prototype.listen = /**
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                case 'aw-entita-layout.init':
+                    _this.dataSource.onInit(payload);
+                    _this.configuration = payload.configuration;
+                    _this.route = payload.route;
+                    /** @type {?} */
+                    var paramId = _this.route.snapshot.params.id || "";
+                    _this.listenRoute();
+                    _this.loadNavigation(paramId);
+                    break;
+                case 'aw-entita-layout.destroy':
+                    _this.destroyed$.next();
+                    break;
+                default:
+                    break;
+            }
+        }));
+    };
+    /**
+     * @private
+     * @return {?}
+     */
+    AwEntitaLayoutEH.prototype.listenRoute = /**
+     * @private
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        /**
+         * Listens to routing events of this layout.
+         */
+        // get URL parameters with angular's paramMap
+        this.route.paramMap.subscribe((/**
+         * @param {?} params
+         * @return {?}
+         */
+        function (params) {
+            // look for id
+            if (params.get('id')) {
+                // get item from response with id === id and return as promise
+                _this.dataSource.loadItem(params.get('id'), params.get('tab')).subscribe((/**
+                 * @param {?} res
+                 * @return {?}
+                 */
+                function (res) {
+                    if (res) {
+                        _this.dataSource.loadContent(res);
+                    }
+                }));
+            }
+            else {
+                _this.dataSource.loadItem();
+            }
+        }));
+    };
+    /**
+     * @private
+     * @param {?} selectedItem
+     * @return {?}
+     */
+    AwEntitaLayoutEH.prototype.loadNavigation = /**
+     * @private
+     * @param {?} selectedItem
+     * @return {?}
+     */
+    function (selectedItem) {
+        var _this = this;
+        /**
+         * Fetches the content for this page, based on the URL.
+         *
+         * @param selectItem - item to get from the communication provider
+         */
+        this.dataSource.getNavigation('entita').subscribe((/**
+         * @param {?} response
+         * @return {?}
+         */
+        function (response) {
+            if (response) {
+                _this.dataSource.updateWidgets(response);
+            }
+            if (selectedItem) {
+                _this.emitOuter('selectItem', selectedItem);
+            }
+        }));
+    };
+    return AwEntitaLayoutEH;
+}(EventHandler));
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwEntitaLayoutEH.prototype.destroyed$;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwEntitaLayoutEH.prototype.configuration;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwEntitaLayoutEH.prototype.route;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/** @type {?} */
+var AwEntitaLayoutConfig = {
+    layoutId: 'aw-entita-layout',
+    /**
+     * Array of components to use
+     * in this layout
+     */
+    widgets: [
+        // { id: 'header' },
+        { id: 'aw-entita-nav' }
+    ],
+    layoutDS: AwEntitaLayoutDS,
+    layoutEH: AwEntitaLayoutEH,
+    widgetsDataSources: DS$1,
+    widgetsEventHandlers: EH$1,
+    options: {
+    // TODO
+    }
+};
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var AwEntitaLayoutComponent = /** @class */ (function (_super) {
+    __extends(AwEntitaLayoutComponent, _super);
+    function AwEntitaLayoutComponent(router, route, configuration, layoutsConfiguration, communication, mainState, titleService) {
+        var _this = _super.call(this, layoutsConfiguration.get('AwEntitaLayoutConfig') || AwEntitaLayoutConfig) || this;
+        _this.router = router;
+        _this.route = route;
+        _this.configuration = configuration;
+        _this.layoutsConfiguration = layoutsConfiguration;
+        _this.communication = communication;
+        _this.mainState = mainState;
+        _this.titleService = titleService;
+        return _this;
+    }
+    /**
+     * Optional variables that can be accessed from the layout's logic.
+     * If removed, they must also be removed from the layout's DataSource file,
+     * and from this file imports.
+     */
+    /**
+     * Optional variables that can be accessed from the layout's logic.
+     * If removed, they must also be removed from the layout's DataSource file,
+     * and from this file imports.
+     * @protected
+     * @return {?}
+     */
+    AwEntitaLayoutComponent.prototype.initPayload = /**
+     * Optional variables that can be accessed from the layout's logic.
+     * If removed, they must also be removed from the layout's DataSource file,
+     * and from this file imports.
+     * @protected
+     * @return {?}
+     */
+    function () {
+        return {
+            configuration: this.configuration,
+            mainState: this.mainState,
+            router: this.router,
+            route: this.route,
+            titleService: this.titleService,
+            communication: this.communication,
+            options: this.config.options || {},
+        };
+    };
+    /**
+     * @return {?}
+     */
+    AwEntitaLayoutComponent.prototype.ngOnInit = /**
+     * @return {?}
+     */
+    function () {
+        this.onInit();
+    };
+    /**
+     * @return {?}
+     */
+    AwEntitaLayoutComponent.prototype.ngOnDestroy = /**
+     * @return {?}
+     */
+    function () {
+        this.onDestroy();
+    };
+    AwEntitaLayoutComponent.decorators = [
+        { type: Component, args: [{
+                    selector: 'aw-entita-layout',
+                    template: "<div class=\"aw-entita-layout\" *ngIf=\"lb.dataSource\">\n    <h2><span class=\"n7-icon-map-marker-alt\"></span> {{lb.dataSource.entityTitle}}</h2>\n    <n7-nav \n        [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" \n        [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n    </n7-nav>\n    <ng-container [ngSwitch]=\"lb.dataSource.selectedTab\">\n        <ng-container *ngSwitchCase=\"'overview'\">\n            <ng-container *ngTemplateOutlet=\"overview\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'campi'\">\n            <ng-container *ngTemplateOutlet=\"campi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'oggetti'\">\n            <ng-container *ngTemplateOutlet=\"oggetti\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'entita'\">\n            <ng-container *ngTemplateOutlet=\"entita\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'maxxi'\">\n            <ng-container *ngTemplateOutlet=\"maxxi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'wiki'\">\n            <ng-container *ngTemplateOutlet=\"wiki\"></ng-container>\n        </ng-container>\n    </ng-container>\n</div>\n\n<ng-template #overview>\n    <div>\n        {{lb.dataSource.myResponse.overviewTab}}\n    </div>\n</ng-template>\n\n<ng-template #campi>\n    <div>\n        Page campi\n    </div>\n</ng-template>\n\n<ng-template #oggetti>\n    <div>\n        Page oggetti\n    </div>\n</ng-template>\n\n<ng-template #entita>\n    <div>\n        Page entita\n    </div>\n</ng-template>\n\n<ng-template #maxxi>\n    <div>\n        Page maxxi\n    </div>\n</ng-template>\n\n<ng-template #wiki>\n    <div>\n        Page wiki\n    </div>\n</ng-template>\n"
+                }] }
+    ];
+    /** @nocollapse */
+    AwEntitaLayoutComponent.ctorParameters = function () { return [
+        { type: Router },
+        { type: ActivatedRoute },
+        { type: ConfigurationService },
+        { type: LayoutsConfigurationService },
+        { type: CommunicationService },
+        { type: MainStateService },
+        { type: Title }
+    ]; };
+    return AwEntitaLayoutComponent;
+}(AbstractLayout));
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwEntitaLayoutComponent.prototype.router;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwEntitaLayoutComponent.prototype.route;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwEntitaLayoutComponent.prototype.configuration;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwEntitaLayoutComponent.prototype.layoutsConfiguration;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwEntitaLayoutComponent.prototype.communication;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwEntitaLayoutComponent.prototype.mainState;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwEntitaLayoutComponent.prototype.titleService;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/** @type {?} */
+var config = require('src/assets/app-config.json');
+var AwHomeLayoutDS = /** @class */ (function (_super) {
+    __extends(AwHomeLayoutDS, _super);
+    function AwHomeLayoutDS() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.facetData = null;
+        _this.facetInputs = {};
+        _this.allBubbles = null;
+        _this.selectedBubbles = [];
+        _this.numOfItemsStr = null;
+        _this._bubbleChart = null;
+        _this.maxBubblesSelectable = 3;
+        _this.entityBubbleIdMap = {};
+        _this.lastWindowWidth = -1;
+        _this.bubblePopup = null;
+        _this.currentHoverEntity = null;
+        return _this;
+    }
+    /**
+     * @param {?} __0
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.onInit = /**
+     * @param {?} __0
+     * @return {?}
+     */
+    function (_a) {
+        var _this = this;
+        var communication = _a.communication, mainState = _a.mainState, configuration = _a.configuration, tippy = _a.tippy;
+        this.communication = communication;
+        this.tippy = tippy;
+        this.mainState = mainState;
+        this.configuration = configuration;
+        this.one('aw-hero').update({});
+        this.communication.request$('globalFilter', {
+            onError: (/**
+             * @param {?} error
+             * @return {?}
+             */
+            function (error) { return console.error(error); }),
+        }).subscribe((/**
+         * @param {?} response
+         * @return {?}
+         */
+        function (response) {
+            _this.facetData = [];
+            response.entitiesData.forEach((/**
+             * @param {?} ent
+             * @return {?}
+             */
+            function (ent) {
+                /** @type {?} */
+                var teoConfigData = _this.configuration.get("config-keys")[ent.countData.type.configKey];
+                if (teoConfigData)
+                    _this.facetData.push(__assign({}, (ent.countData), { enabled: true, icon: teoConfigData.icon, label: teoConfigData.label }));
+            }));
+            _this.one('aw-home-facets-wrapper').update(_this.facetData);
+            _this.setAllBubblesFromApolloQuery(response);
+            _this.renderPreviewsFromApolloQuery(response);
+        }));
+        // update streams
+        this.mainState.update('headTitle', 'Arianna Web > Home');
+        this.mainState.update('pageTitle', 'Arianna Web: Home Layout');
+        this.lastWindowWidth = window.outerWidth;
+        fromEvent(window, "resize").pipe(debounce((/**
+         * @return {?}
+         */
+        function () { return interval(200); }))).
+            subscribe((/**
+         * @return {?}
+         */
+        function () {
+            // only resets the bubbles if the window's width has changed
+            if (_this.lastWindowWidth != window.outerWidth) {
+                _this.lastWindowWidth = window.outerWidth;
+                _this.updateBubblesAndItemPreviews(true);
+            }
+        }));
+    };
+    /**
+     * @param {?} source
+     * @param {?} payload
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.onBubbleTooltipClick = /**
+     * @param {?} source
+     * @param {?} payload
+     * @return {?}
+     */
+    function (source, payload) {
+        switch (source) {
+            case 'select':
+                if (!payload)
+                    return;
+                /** @type {?} */
+                var bubbleId_1 = this.convertEntityIdToBubbleId(payload.entityId);
+                if (!bubbleId_1)
+                    return;
+                /** @type {?} */
+                var bubble_1 = null;
+                if (this._bubbleChart) {
+                    this._bubbleChart.selectAll("g").each((/**
+                     * @param {?} b
+                     * @return {?}
+                     */
+                    function (b) {
+                        if (b.id === bubbleId_1)
+                            bubble_1 = b;
+                    }));
+                    if (bubble_1)
+                        this.onBubbleSelected(bubble_1);
+                }
+                break;
+            default:
+                break;
+        }
+    };
+    /**
+     * @param {?} payload
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.onBubbleMouseEnter = /**
+     * @param {?} payload
+     * @return {?}
+     */
+    function (payload) {
+        var _this = this;
+        if (!payload || !payload.bubble)
+            return;
+        /** @type {?} */
+        var bubbleId = payload.bubble.id;
+        /** @type {?} */
+        var hoverEntityId = this.entityBubbleIdMap[payload.bubble.id];
+        for (var i = 0; i < this.allBubbles.length; i++) {
+            /** @type {?} */
+            var bubble = this.allBubbles[i];
+            if (bubble.entity.id === hoverEntityId) {
+                this.currentHoverEntity = bubble.entity;
+                this.currentHoverEntity.count = bubble.count;
+                break;
+            }
+        }
+        if (this.bubblePopup) {
+            this.bubblePopup.hide();
+            this.bubblePopup.destroy();
+            this.bubblePopup = null;
+        }
+        setTimeout((/**
+         * @return {?}
+         */
+        function () {
+            /** @type {?} */
+            var template = document.getElementById("bubble-popup-menu");
+            /** @type {?} */
+            var templateClone = template.cloneNode(true);
+            templateClone['style'].display = "inline-block";
+            _this.bubblePopup = _this.tippy("#" + bubbleId, {
+                content: templateClone,
+                trigger: 'manual',
+                interactive: true,
+                arrow: true,
+                theme: 'light-border no-padding',
+                placement: 'top-middle',
+                maxWidth: 500,
+            })[0];
+            setTimeout((/**
+             * @return {?}
+             */
+            function () { if (_this.bubblePopup)
+                _this.bubblePopup.show(); }), 800);
+        }));
+    };
+    /**
+     * @param {?} response
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.renderPreviewsFromApolloQuery = /**
+     * @param {?} response
+     * @return {?}
+     */
+    function (response) {
+        if (!response || !response.itemsPagination)
+            return;
+        /** @type {?} */
+        var numOfItems = response.itemsPagination.totalCount;
+        if (numOfItems > 0) {
+            /** @type {?} */
+            var numOfThousand = 0;
+            while (numOfItems > 999) {
+                numOfItems -= 1000;
+                numOfThousand += 1;
+            }
+            /** @type {?} */
+            var numOfItemsTmpStr = numOfItems + '';
+            if (numOfItems < 10)
+                numOfItemsTmpStr = '00' + numOfItems;
+            else if (numOfItems < 100)
+                numOfItemsTmpStr = '0' + numOfItems;
+            if (numOfThousand > 0)
+                this.numOfItemsStr = numOfThousand + '.' + numOfItemsTmpStr;
+            else
+                this.numOfItemsStr = numOfItems + '';
+        }
+        else {
+            this.numOfItemsStr = null;
+        }
+        this.one('aw-home-item-preview-wrapper').update(response.itemsPagination.items);
+    };
+    /**
+     * @param {?} bubble
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.onBubbleSelected = /**
+     * @param {?} bubble
+     * @return {?}
+     */
+    function (bubble) {
+        if (bubble) {
+            if (!this.selectedBubbles.includes(bubble)) {
+                if (this.selectedBubbles.length < this.maxBubblesSelectable) {
+                    this.selectedBubbles.push(bubble);
+                    this.updateBubblesAndItemPreviews();
+                }
+            }
+        }
+    };
+    /**
+     * @param {?} payload
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.onBubbleDeselected = /**
+     * @param {?} payload
+     * @return {?}
+     */
+    function (payload) {
+        if (payload && payload.bubble) {
+            this.selectedBubbles = this.selectedBubbles.filter((/**
+             * @param {?} b
+             * @return {?}
+             */
+            function (b) { return b.id !== payload.bubble.id; }));
+            if (payload.bubble.hasCloseIcon) {
+                payload.bubble.hasCloseIcon = false;
+                this.updateBubblesAndItemPreviews();
+            }
+        }
+    };
+    /**
+     * @private
+     * @param {?=} onlyBubbles
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.updateBubblesAndItemPreviews = /**
+     * @private
+     * @param {?=} onlyBubbles
+     * @return {?}
+     */
+    function (onlyBubbles) {
+        var _this = this;
+        /** @type {?} */
+        var selectedEntitiesIds = [];
+        if (this.entityBubbleIdMap)
+            this.selectedBubbles.forEach((/**
+             * @param {?} sB
+             * @return {?}
+             */
+            function (sB) {
+                /** @type {?} */
+                var entityId = _this.entityBubbleIdMap[sB.id];
+                if (entityId)
+                    selectedEntitiesIds.push(entityId);
+            }));
+        this.communication.request$('globalFilter', {
+            onError: (/**
+             * @param {?} error
+             * @return {?}
+             */
+            function (error) { return console.error(error); }),
+            params: {
+                selectedEntitiesIds: selectedEntitiesIds,
+                itemsPagination: { offset: 0, limit: 4 }
+            },
+        }).subscribe((/**
+         * @param {?} response
+         * @return {?}
+         */
+        function (response) {
+            if (!onlyBubbles) {
+                _this.renderPreviewsFromApolloQuery(response);
+                _this.renderItemTags();
+            }
+            _this.setAllBubblesFromApolloQuery(response, true);
+        }));
+    };
+    /**
+     * @private
+     * @param {?} entityId
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.convertEntityIdToBubbleId = /**
+     * @private
+     * @param {?} entityId
+     * @return {?}
+     */
+    function (entityId) {
+        if (!entityId)
+            return null;
+        return ('B_' + entityId.replace(/-/g, '_'));
+    };
+    /**
+     * @param {?} response
+     * @param {?=} reset
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.setAllBubblesFromApolloQuery = /**
+     * @param {?} response
+     * @param {?=} reset
+     * @return {?}
+     */
+    function (response, reset) {
+        var _this = this;
+        if (!response || !response.entitiesData)
+            return;
+        this.allBubbles = [];
+        for (var i = 0; i < response.entitiesData.length; i++) {
+            /** @type {?} */
+            var currentToE = response.entitiesData[i];
+            for (var j = 0; j < currentToE.entitiesCountData.length; j++) {
+                this.allBubbles.push(__assign({}, currentToE.entitiesCountData[j], { color: this.configuration.get("config-keys")[currentToE.countData.type.configKey]['color']['hex'] }));
+            }
+        }
+        this.entityBubbleIdMap = {};
+        this.allBubbles.forEach((/**
+         * @param {?} bubble
+         * @return {?}
+         */
+        function (bubble) {
+            // d3/svg does not allow Number as beginning of ID.
+            // d3/svg does not allow '-' as part of ID.
+            bubble.id = _this.convertEntityIdToBubbleId(bubble.entity.id);
+            _this.entityBubbleIdMap[bubble.id] = bubble.entity.id;
+            return bubble;
+        }));
+        this.allBubbles.forEach((/**
+         * @param {?} bubble
+         * @return {?}
+         */
+        function (bubble) {
+            bubble.selected = false;
+            for (var i = 0; i < _this.selectedBubbles.length; i++) {
+                if (_this.selectedBubbles[i].id === bubble.id)
+                    bubble.selected = true;
+            }
+        }));
+        this.one('aw-home-bubble-chart').update({
+            width: window.innerWidth / 1.8,
+            bubbles: this.filterBubblesBasedOnFacetsEnabled(),
+            reset: (reset ? reset : false),
+            setBubbleChart: (/**
+             * @param {?} bubbleCref
+             * @return {?}
+             */
+            function (bubbleCref) { return _this._bubbleChart = bubbleCref; })
+        });
+    };
+    /**
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.filterBubblesBasedOnFacetsEnabled = /**
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        /** @type {?} */
+        var result = this.allBubbles.filter((/**
+         * @param {?} bubble
+         * @return {?}
+         */
+        function (bubble) {
+            for (var i = 0; i < _this.facetData.length; i++) {
+                if (bubble.entity.typeOfEntity.id === _this.facetData[i].type.id)
+                    if (!_this.facetData[i].enabled) {
+                        return false;
+                    }
+            }
+            return true;
+        }));
+        return result;
+    };
+    /**
+     * @param {?} change
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.handleFacetSearchChange = /**
+     * @param {?} change
+     * @return {?}
+     */
+    function (change) {
+        /** @type {?} */
+        var payload = change.inputPayload;
+        /** @type {?} */
+        var value = change.value;
+        // store the entered text in facetInputs
+        this.facetInputs[payload] = value;
+    };
+    /**
+     * @param {?} enter
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.handleFacetSearchEnter = /**
+     * @param {?} enter
+     * @return {?}
+     */
+    function (enter) {
+        /** @type {?} */
+        var payload = enter.inputPayload;
+        // get the text entered in this input
+        /** @type {?} */
+        var value = this.facetInputs[payload];
+    };
+    /**
+     * @param {?} facetId
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.handleFacetHeaderClick = /**
+     * @param {?} facetId
+     * @return {?}
+     */
+    function (facetId) {
+        var _this = this;
+        /** @type {?} */
+        var updateBubbles = false;
+        /** @type {?} */
+        var enabledFacets = this.facetData.filter((/**
+         * @param {?} f
+         * @return {?}
+         */
+        function (f) { return f.enabled; })).length;
+        this.facetData.forEach((/**
+         * @param {?} f
+         * @return {?}
+         */
+        function (f) {
+            if (f.type.id === facetId) {
+                if (f.enabled) {
+                    if (enabledFacets > 1) {
+                        f.enabled = false;
+                        updateBubbles = true;
+                    }
+                }
+                else {
+                    f.enabled = true;
+                    updateBubbles = true;
+                }
+            }
+        }));
+        this.one('aw-home-facets-wrapper').update(this.facetData);
+        if (updateBubbles) {
+            /** @type {?} */
+            var disableFacetsIds_1 = [];
+            this.facetData.forEach((/**
+             * @param {?} fD
+             * @return {?}
+             */
+            function (fD) {
+                if (!fD.enabled)
+                    disableFacetsIds_1.push(fD.type.id);
+            }));
+            if (disableFacetsIds_1) {
+                /** @type {?} */
+                var filteredSelectedBubbles = this.selectedBubbles.filter((/**
+                 * @param {?} bubble
+                 * @return {?}
+                 */
+                function (bubble) {
+                    /** @type {?} */
+                    var typeOfEntity = "";
+                    for (var i = 0; i < _this.allBubbles.length; i++) {
+                        if (_this.allBubbles[i].id === bubble.id) {
+                            typeOfEntity = _this.allBubbles[i].entity.typeOfEntity.id;
+                            break;
+                        }
+                    }
+                    if (disableFacetsIds_1.includes(typeOfEntity))
+                        return false;
+                    return true;
+                }));
+                if (filteredSelectedBubbles.length != this.selectedBubbles.length) {
+                    this.selectedBubbles = filteredSelectedBubbles;
+                }
+                ;
+            }
+            this.allBubbles.forEach((/**
+             * @param {?} bubble
+             * @return {?}
+             */
+            function (bubble) {
+                bubble.selected = false;
+                for (var i = 0; i < _this.selectedBubbles.length; i++) {
+                    if (_this.selectedBubbles[i].id === bubble.id)
+                        bubble.selected = true;
+                }
+            }));
+            this.one('aw-home-bubble-chart').update({
+                width: window.innerWidth / 1.8,
+                bubbles: this.filterBubblesBasedOnFacetsEnabled(),
+                setBubbleChart: (/**
+                 * @param {?} bubbleCref
+                 * @return {?}
+                 */
+                function (bubbleCref) { return _this._bubbleChart = bubbleCref; }),
+                reset: true
+            });
+        }
+    };
+    /**
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.renderItemTags = /**
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        /** @type {?} */
+        var tagsData = [];
+        this.selectedBubbles.forEach((/**
+         * @param {?} sBubble
+         * @return {?}
+         */
+        function (sBubble) {
+            /** @type {?} */
+            var label = '';
+            for (var i = 0; i < _this.allBubbles.length; i++) {
+                if (_this.allBubbles[i].id === sBubble.id) {
+                    label = _this.allBubbles[i].entity.label;
+                    break;
+                }
+            }
+            tagsData.push({ label: label, icon: "n7-icon-close", payload: sBubble.id, classes: "tag-" + _this.allBubbles[i].entity.typeOfEntity.id });
+        }));
+        this.one('aw-home-item-tags-wrapper').update(tagsData);
+    };
+    /**
+     * @param {?} payload
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.onTagClicked = /**
+     * @param {?} payload
+     * @return {?}
+     */
+    function (payload) {
+        if (!payload)
+            return;
+        /** @type {?} */
+        var bubbleId = payload;
+        if (this._bubbleChart) {
+            this._bubbleChart.selectAll("g").each((/**
+             * @param {?} b
+             * @return {?}
+             */
+            function (b) {
+                if (b.id === bubbleId)
+                    b.hasCloseIcon = false;
+            }));
+        }
+        this.selectedBubbles = this.selectedBubbles.filter((/**
+         * @param {?} b
+         * @return {?}
+         */
+        function (b) { return b.id !== payload; }));
+        this.updateBubblesAndItemPreviews();
+    };
+    /**
+     * @private
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype._getSubnav = /**
+     * @private
+     * @return {?}
+     */
+    function () {
+        return ['home', 'results', 'single'].map((/**
+         * @param {?} page
+         * @return {?}
+         */
+        function (page) { return ({
+            text: page.toUpperCase(),
+            payload: {
+                source: 'navigate',
+                handler: 'router',
+                path: ["aw/" + page],
+                id: page
+            },
+            _meta: { id: page }
+        }); }));
+    };
+    /**
+     * @private
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype._getBreadcrumbs = /**
+     * @private
+     * @return {?}
+     */
+    function () {
+        return {
+            items: [{
+                    label: 'Arianna Web',
+                    payload: {
+                        source: 'navigate',
+                        handler: 'router',
+                        path: ["aw/home"]
+                    }
+                },
+                {
+                    label: 'Home Layout',
+                    payload: {
+                        source: 'navigate',
+                        handler: 'router',
+                        path: ["aw/home"]
+                    }
+                }]
+        };
+    };
+    return AwHomeLayoutDS;
+}(LayoutDataSource));
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.communication;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.mainState;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.tippy;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.configuration;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.facetData;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.facetInputs;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.allBubbles;
+    /** @type {?} */
+    AwHomeLayoutDS.prototype.selectedBubbles;
+    /** @type {?} */
+    AwHomeLayoutDS.prototype.numOfItemsStr;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype._bubbleChart;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.maxBubblesSelectable;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.entityBubbleIdMap;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.lastWindowWidth;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.bubblePopup;
+    /** @type {?} */
+    AwHomeLayoutDS.prototype.currentHoverEntity;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var AwHomeLayoutEH = /** @class */ (function (_super) {
+    __extends(AwHomeLayoutEH, _super);
+    function AwHomeLayoutEH() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.destroyed$ = new Subject();
+        return _this;
+    }
+    /**
+     * @return {?}
+     */
+    AwHomeLayoutEH.prototype.listen = /**
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                case 'aw-home-layout.init':
+                    _this.dataSource.onInit(payload);
+                    break;
+                case 'aw-home-layout.destroy':
+                    _this.destroyed$.next();
+                    break;
+                case "aw-home-layout.bubble-tooltip-close-click":
+                    _this.dataSource.onBubbleTooltipClick('close', payload);
+                    break;
+                case "aw-home-layout.bubble-tooltip-goto-click":
+                    if (!payload || !payload.entityId)
+                        return;
+                    _this.emitGlobal('navigate', {
+                        handler: 'router',
+                        path: ["aw/entita/" + payload.entityId + "/overview"]
+                    });
+                    break;
+                case "aw-home-layout.bubble-tooltip-select-click":
+                    _this.dataSource.onBubbleTooltipClick('select', payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                case 'aw-hero.change':
+                    var inputPayload = payload.inputPayload, value = payload.value;
+                    // TODO: do something
+                    break;
+                /**
+                 * Facets Event Handlers
+                 */
+                case 'aw-home-facets-wrapper.click':
+                    _this.dataSource.handleFacetHeaderClick(payload);
+                    break;
+                case 'aw-home-facets-wrapper.change':
+                    _this.dataSource.handleFacetSearchChange(payload);
+                    break;
+                case 'aw-home-facets-wrapper.enter':
+                    _this.dataSource.handleFacetSearchEnter(payload);
+                    break;
+                /**
+                 * Bubble Chart Event Handlers
+                 */
+                case 'aw-home-bubble-chart.mouse_enter':
+                    _this.dataSource.onBubbleMouseEnter({ bubblePayload: payload.bubblePayload, bubble: payload.bubble });
+                    break;
+                case 'aw-home-bubble-chart.mouse_leave':
+                    // TODO: do something
+                    break;
+                case 'aw-home-bubble-chart.click':
+                    if (payload.source === 'bubble') {
+                        if (payload.bubble)
+                            _this.dataSource.onBubbleSelected(payload.bubble);
+                    }
+                    else if (payload.source === 'close')
+                        _this.dataSource.onBubbleDeselected({ bubblePayload: payload.bubblePayload, bubble: payload.bubble });
+                    break;
+                /**
+                 * Tags & Item Previews Event Handlers
+                 */
+                case 'aw-home-item-tags-wrapper.click':
+                    _this.dataSource.onTagClicked(payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
+    };
+    return AwHomeLayoutEH;
+}(EventHandler));
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutEH.prototype.destroyed$;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutEH.prototype.configuration;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutEH.prototype.route;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/** @type {?} */
+var AwHomeLayoutConfig = {
+    layoutId: 'aw-home-layout',
+    widgets: [{
+            id: 'aw-hero',
+        }, {
+            id: 'aw-home-hero-patrimonio',
+            hasStaticData: true
+        }, {
+            id: 'aw-home-bubble-chart',
+        }, {
+            id: 'aw-home-facets-wrapper',
+        }, {
+            id: 'aw-home-item-tags-wrapper',
+        }, {
+            id: 'aw-home-item-preview-wrapper'
+        }],
+    layoutDS: AwHomeLayoutDS,
+    layoutEH: AwHomeLayoutEH,
+    widgetsDataSources: DS$1,
+    widgetsEventHandlers: EH$1,
+    options: {
+    // TODO
+    }
+};
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 var AwHomeLayoutComponent = /** @class */ (function (_super) {
     __extends(AwHomeLayoutComponent, _super);
     function AwHomeLayoutComponent(layoutsConfiguration, router, configuration, communication, mainState) {
@@ -3356,6 +4185,7 @@ var AwHomeLayoutComponent = /** @class */ (function (_super) {
             router: this.router,
             communication: this.communication,
             options: this.config.options || {},
+            tippy: tippy,
         };
     };
     /**
@@ -3379,7 +4209,7 @@ var AwHomeLayoutComponent = /** @class */ (function (_super) {
     AwHomeLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-home-layout',
-                    template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero\n            [data]=\"lb.widgets['aw-hero'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n    \n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper\"\n         [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length>0 }\">\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                  *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header\n                    [data]=\"widgetData.header\"\n                    [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet\n                    [data]=\"widgetData.input\"\n                    [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div id=\"bubble-chart-container\">\n            <n7-bubble-chart\n            [data]=\"lb.widgets['aw-home-bubble-chart'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-bubble-chart'].emit\">\n            </n7-bubble-chart>\n        </div>\n        <ng-container *ngIf=\"lb.dataSource.selectedBubbles.length>0\">\n            <div [ngStyle]=\"{ 'display': 'flex' , 'flex-direction': 'column' }\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\"> <h1>{{ lb.dataSource.numOfItemsStr }} <span>Oggetti culturali</span></h1></div>\n                    <h3>Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                            <n7-tag\n                                [data]=\"widgetData\"\n                                [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                            </n7-tag>\n                            <br>\n                    </ng-container>\n                <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-preview-wrapper'].ds.out$ | async;\">\n                    <n7-item-preview\n                        [data]=\"widgetData\"\n                        [emit]=\"lb.widgets['aw-home-item-preview-wrapper'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero\n            [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\" \n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n</div>"
+                    template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- hidden buttons and div used to implement the bubbles' popups -->\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_closebutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-close-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_gotobutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-goto-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_selectbutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-select-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <div id=\"bubble-popup-menu\" style=\"display: none;\">\n        <h2>{{ ( lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.label : '' ) }}</h2>\n        <span class=\"n7-icon-close\" onclick=\"document.getElementById('bubble-popup-menu_closebutton').click();\"></span>\n        <p>\n                {{ ( lb.dataSource.currentHoverEntity ? '\u00C8 collegato a '+lb.dataSource.currentHoverEntity.count+' entit\u00E0' : '' ) }}\n        </p>\n        <span onclick=\"document.getElementById('bubble-popup-menu_gotobutton').click();\">Vai alla scheda</span> |\n        <span onclick=\"document.getElementById('bubble-popup-menu_selectbutton').click();\">Seleziona</span>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper\" [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length>0 }\">\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div id=\"bubble-chart-container\">\n            <n7-bubble-chart [data]=\"lb.widgets['aw-home-bubble-chart'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-home-bubble-chart'].emit\">\n            </n7-bubble-chart>\n        </div>\n\n        <ng-container *ngIf=\"lb.dataSource.selectedBubbles.length>0\">\n            <div class=\"aw-home__bubble-results\" [ngStyle]=\"{ 'display': 'flex' , 'flex-direction': 'column' }\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\"> <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">{{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span></h1></div>\n\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list\">\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-preview-wrapper'].ds.out$ | async;\">\n                        <n7-item-preview\n                            [data]=\"widgetData\"\n                            [emit]=\"lb.widgets['aw-home-item-preview-wrapper'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n               \n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n</div>"
                 }] }
     ];
     /** @nocollapse */
@@ -3419,64 +4249,478 @@ if (false) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-var AwAboutLayoutDS = /** @class */ (function (_super) {
-    __extends(AwAboutLayoutDS, _super);
-    function AwAboutLayoutDS() {
+var AwSchedaLayoutDS = /** @class */ (function (_super) {
+    __extends(AwSchedaLayoutDS, _super);
+    function AwSchedaLayoutDS() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     /**
-     * @param {?} payload
+    * If you are not using these variables (from your-layout.ts),
+    * remove them from onInit() parameters and inside the function.
+    */
+    /**
+     * If you are not using these variables (from your-layout.ts),
+     * remove them from onInit() parameters and inside the function.
+     * @param {?} __0
      * @return {?}
      */
-    AwAboutLayoutDS.prototype.onInit = /**
-     * @param {?} payload
+    AwSchedaLayoutDS.prototype.onInit = /**
+     * If you are not using these variables (from your-layout.ts),
+     * remove them from onInit() parameters and inside the function.
+     * @param {?} __0
      * @return {?}
      */
-    function (payload) {
-        // TODO
+    function (_a) {
+        var configuration = _a.configuration, mainState = _a.mainState, router = _a.router, options = _a.options, titleService = _a.titleService, communication = _a.communication;
+        this.configuration = configuration;
+        this.mainState = mainState;
+        this.router = router;
+        this.titleService = titleService;
+        this.communication = communication;
+        this.options = options;
+        this.sidebarCollapsed = false;
     };
-    return AwAboutLayoutDS;
+    /**
+     * @param {?} id
+     * @return {?}
+     */
+    AwSchedaLayoutDS.prototype.getNavigation = /**
+     * @param {?} id
+     * @return {?}
+     */
+    function (id) {
+        return this.communication.request$('getTree', {
+            onError: (/**
+             * @param {?} error
+             * @return {?}
+             */
+            function (error) { return console.error(error); }),
+            params: { treeId: id }
+        });
+    };
+    /**
+     * @param {?} data
+     * @return {?}
+     */
+    AwSchedaLayoutDS.prototype.updateNavigation = /**
+     * @param {?} data
+     * @return {?}
+     */
+    function (data) {
+        var _this = this;
+        /** @type {?} */
+        var treeObj = {
+            items: []
+        };
+        data['branches'].forEach((/**
+         * @param {?} item
+         * @return {?}
+         */
+        function (item) {
+            treeObj['items'].push(_this.parseTree(item, false, []));
+        }));
+        /** @type {?} */
+        var header = {
+            iconLeft: 'n7-icon-tree-icon',
+            text: data['label'],
+            iconRight: 'n7-icon-angle-left',
+            classes: 'is-expanded',
+            payload: 'header'
+        };
+        this.one('aw-tree').update(treeObj);
+        this.one('aw-sidebar-header').update(header);
+        this.one('aw-scheda-breadcrumbs').update(null);
+    };
+    /**
+     * @param {?} id
+     * @return {?}
+     */
+    AwSchedaLayoutDS.prototype.loadItem = /**
+     * @param {?} id
+     * @return {?}
+     */
+    function (id) {
+        if (id) {
+            return this.communication.request$('getItemDetails', {
+                onError: (/**
+                 * @param {?} error
+                 * @return {?}
+                 */
+                function (error) { return console.error(error); }),
+                params: { itemId: id }
+            });
+        }
+        else {
+            /* TODO: valori statici, da prendere da config */
+            this.pageTitle = 'Collezione d\'Arte';
+            this.hasBreadcrumb = false;
+            this.contentParts = [
+                {
+                    type: 'text',
+                    title: 'Collezione d\'Arte',
+                    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi gravida sagittis pulvinar. Etiam iaculis maximus metus, id tincidunt libero auctor et. Proin tempus turpis vel erat ultrices, id vestibulum ante cursus. Vestibulum lobortis, ante at eleifend consequat, massa libero bibendum justo, id fermentum magna odio ac nulla. Cras aliquet scelerisque malesuada. Mauris congue fermentum tristique. Nulla imperdiet accumsan dui, tristique lobortis metus eleifend non. Donec quis odio massa. Cras sit amet sem eu turpis molestie blandit vitae sed nibh. Pellentesque ornare enim nisl, et efficitur ante elementum a. Ut nec ex finibus, congue libero feugiat, aliquam ante. Cras sem neque, pellentesque eget mi at, auctor vulputate tellus. Sed aliquam mi a tortor ultricies interdum. Etiam tincidunt nunc commodo nulla porttitor semper. Etiam porta lacinia libero a mattis. Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+                },
+                {
+                    type: 'text',
+                    title: 'Centro Archivi',
+                    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi gravida sagittis pulvinar. Etiam iaculis maximus metus, id tincidunt libero auctor et. Proin tempus turpis vel erat ultrices, id vestibulum ante cursus. Vestibulum lobortis, ante at eleifend consequat, massa libero bibendum justo, id fermentum magna odio ac nulla. Cras aliquet scelerisque malesuada. Mauris congue fermentum tristique. Nulla imperdiet accumsan dui, tristique lobortis metus eleifend non. Donec quis odio massa. Cras sit amet sem eu turpis molestie blandit vitae sed nibh. Pellentesque ornare enim nisl, et efficitur ante elementum a. Ut nec ex finibus, congue libero feugiat, aliquam ante. Cras sem neque, pellentesque eget mi at, auctor vulputate tellus. Sed aliquam mi a tortor ultricies interdum. Etiam tincidunt nunc commodo nulla porttitor semper. Etiam porta lacinia libero a mattis. Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+                }
+            ];
+        }
+    };
+    /**
+     * @param {?} response
+     * @return {?}
+     */
+    AwSchedaLayoutDS.prototype.loadContent = /**
+     * @param {?} response
+     * @return {?}
+     */
+    function (response) {
+        this.hasBreadcrumb = true;
+        if (response) {
+            this.contentParts = [];
+            if (response.image) {
+                this.contentParts.push({
+                    image: response.image,
+                    type: 'image'
+                });
+            }
+            this.contentParts.push({
+                title: response.title,
+                content: response.text,
+                type: 'text'
+            });
+            /** @type {?} */
+            var breadcrumbs_1 = {
+                items: []
+            };
+            /** @type {?} */
+            var group_1 = { group: [] };
+            if (response.fields) {
+                response.fields.forEach((/**
+                 * @param {?} field
+                 * @return {?}
+                 */
+                function (field) {
+                    /** @type {?} */
+                    var items = [];
+                    field.fields.forEach((/**
+                     * @param {?} item
+                     * @return {?}
+                     */
+                    function (item) {
+                        items.push({ label: item.key, value: item.value });
+                    }));
+                    group_1.group.push({
+                        title: field.label,
+                        items: items
+                        //items: field.fields
+                    });
+                }));
+            }
+            this.one('aw-scheda-metadata').update(group_1);
+            response.breadcrumbs.forEach((/**
+             * @param {?} element
+             * @return {?}
+             */
+            function (element) {
+                breadcrumbs_1.items.push({
+                    label: element.label,
+                    payload: element.link
+                });
+            }));
+            this.one('aw-scheda-breadcrumbs').update(breadcrumbs_1);
+        }
+    };
+    /**
+     * @private
+     * @param {?} data
+     * @param {?} toggle
+     * @param {?} parents
+     * @return {?}
+     */
+    AwSchedaLayoutDS.prototype.parseTree = /**
+     * @private
+     * @param {?} data
+     * @param {?} toggle
+     * @param {?} parents
+     * @return {?}
+     */
+    function (data, toggle, parents) {
+        var _this = this;
+        /** @type {?} */
+        var currParents = __spread(parents);
+        /** @type {?} */
+        var treeItem = {};
+        Object.keys(data).forEach((/**
+         * @param {?} key
+         * @return {?}
+         */
+        function (key) {
+            if (toggle) {
+                treeItem['toggle'] = {
+                    icon: 'n7-icon-angle-right',
+                    payload: {
+                        source: "toggle",
+                        id: data['id'],
+                        parents: currParents,
+                    }
+                };
+            }
+            if (key != "branches") {
+                switch (key) {
+                    case "label":
+                        treeItem['text'] = data[key];
+                        break;
+                    case "icon":
+                        if (toggle) {
+                            treeItem['toggle']['icon'] = data[key];
+                        }
+                        break;
+                    case "id":
+                        treeItem['_meta'] = data[key];
+                        treeItem['payload'] = {
+                            source: "menuItem",
+                            id: data['id']
+                        };
+                        break;
+                    default:
+                        data[key];
+                        break;
+                }
+                treeItem['classes'] = 'is-collapsed';
+            }
+            else if (data['branches'] != null) {
+                currParents.push(data['id']);
+                /*Handle cases with menu item with children but without toggle*/
+                if (!toggle) {
+                    treeItem['payload']['source'] = "ToggleMenuItem";
+                    treeItem['payload']['parents'] = currParents;
+                }
+                treeItem['items'] = [];
+                data[key].forEach((/**
+                 * @param {?} item
+                 * @return {?}
+                 */
+                function (item) {
+                    treeItem['items'].push(_this.parseTree(item, true, currParents));
+                }));
+            }
+        }));
+        return treeItem;
+    };
+    /**
+     * @return {?}
+     */
+    AwSchedaLayoutDS.prototype.collapseSidebar = /**
+     * @return {?}
+     */
+    function () {
+        this.sidebarCollapsed = !this.sidebarCollapsed;
+    };
+    return AwSchedaLayoutDS;
 }(LayoutDataSource));
+if (false) {
+    /**
+     * If you are not using these variables (from your-layout.ts),
+     * remove them from here too.
+     * @type {?}
+     * @private
+     */
+    AwSchedaLayoutDS.prototype.communication;
+    /**
+     * @type {?}
+     * @protected
+     */
+    AwSchedaLayoutDS.prototype.configuration;
+    /**
+     * @type {?}
+     * @protected
+     */
+    AwSchedaLayoutDS.prototype.mainState;
+    /**
+     * @type {?}
+     * @protected
+     */
+    AwSchedaLayoutDS.prototype.router;
+    /**
+     * @type {?}
+     * @protected
+     */
+    AwSchedaLayoutDS.prototype.titleService;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.options;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.pageTitle;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.hasBreadcrumb;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.contentParts;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.tree;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.sidebarCollapsed;
+}
 
 /**
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-var AwAboutLayoutEH = /** @class */ (function (_super) {
-    __extends(AwAboutLayoutEH, _super);
-    function AwAboutLayoutEH() {
-        return _super !== null && _super.apply(this, arguments) || this;
+var AwSchedaLayoutEH = /** @class */ (function (_super) {
+    __extends(AwSchedaLayoutEH, _super);
+    function AwSchedaLayoutEH() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.destroyed$ = new Subject();
+        return _this;
     }
     /**
      * @return {?}
      */
-    AwAboutLayoutEH.prototype.listen = /**
+    AwSchedaLayoutEH.prototype.listen = /**
      * @return {?}
      */
     function () {
-        /* this.innerEvents$.subscribe(({ type, payload }) => {
-          
-        }); */
-        /* this.outerEvents$.subscribe(({ type, payload }) => {
-          
-        }); */
+        var _this = this;
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                case 'aw-scheda-layout.init':
+                    _this.dataSource.onInit(payload);
+                    _this.configuration = payload.configuration;
+                    _this.route = payload.route;
+                    /** @type {?} */
+                    var paramId = _this.route.snapshot.params.id || "";
+                    _this.listenRoute();
+                    _this.loadNavigation(paramId);
+                    break;
+                case 'aw-scheda-layout.destroy':
+                    _this.destroyed$.next();
+                    break;
+                default:
+                    break;
+            }
+        }));
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                case 'aw-tree.click':
+                    if (payload) {
+                        _this.emitGlobal('navigate', { path: [_this.configuration.get('paths').schedaBasePath + payload], handler: 'router' });
+                    }
+                    break;
+                case 'aw-sidebar-header.click':
+                    _this.dataSource.collapseSidebar();
+                    break;
+            }
+        }));
     };
-    return AwAboutLayoutEH;
+    /**
+     * @private
+     * @return {?}
+     */
+    AwSchedaLayoutEH.prototype.listenRoute = /**
+     * @private
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        this.route.paramMap.subscribe((/**
+         * @param {?} params
+         * @return {?}
+         */
+        function (params) {
+            if (params.get('id')) {
+                _this.dataSource.loadItem(params.get('id')).subscribe((/**
+                 * @param {?} response
+                 * @return {?}
+                 */
+                function (response) {
+                    if (response) {
+                        _this.dataSource.loadContent(response);
+                    }
+                }));
+            }
+            else {
+                _this.dataSource.loadItem();
+            }
+        }));
+    };
+    /**
+     * @private
+     * @param {?} selectedItem
+     * @return {?}
+     */
+    AwSchedaLayoutEH.prototype.loadNavigation = /**
+     * @private
+     * @param {?} selectedItem
+     * @return {?}
+     */
+    function (selectedItem) {
+        var _this = this;
+        this.dataSource.getNavigation('patrimonio').subscribe((/**
+         * @param {?} response
+         * @return {?}
+         */
+        function (response) {
+            if (response) {
+                _this.dataSource.updateNavigation(response, selectedItem);
+            }
+            if (selectedItem) {
+                _this.emitOuter('selectItem', selectedItem);
+            }
+        }));
+    };
+    return AwSchedaLayoutEH;
 }(EventHandler));
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaLayoutEH.prototype.destroyed$;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaLayoutEH.prototype.configuration;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaLayoutEH.prototype.route;
+}
 
 /**
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
-var AwAboutLayoutConfig = {
-    layoutId: 'aw-about-layout',
-    widgets: [],
-    layoutDS: AwAboutLayoutDS,
-    layoutEH: AwAboutLayoutEH,
+var AwPatrimonioLayoutConfig = {
+    layoutId: 'aw-scheda-layout',
+    /**
+     * Array of components you want to use
+     * in this leyout
+     */
+    widgets: [
+        { id: 'aw-sidebar-header' },
+        { id: 'aw-tree' },
+        { id: 'aw-scheda-breadcrumbs' },
+        { id: 'aw-scheda-metadata' }
+    ],
+    layoutDS: AwSchedaLayoutDS,
+    layoutEH: AwSchedaLayoutEH,
     widgetsDataSources: DS$1,
     widgetsEventHandlers: EH$1,
-    layoutOptions: {
+    options: {
     // TODO
     }
 };
@@ -3485,15 +4729,53 @@ var AwAboutLayoutConfig = {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-var AwAboutLayoutComponent = /** @class */ (function (_super) {
-    __extends(AwAboutLayoutComponent, _super);
-    function AwAboutLayoutComponent() {
-        return _super.call(this, AwAboutLayoutConfig) || this;
+var AwSchedaLayoutComponent = /** @class */ (function (_super) {
+    __extends(AwSchedaLayoutComponent, _super);
+    function AwSchedaLayoutComponent(router, route, configuration, layoutsConfiguration, mainState, titleService, communication) {
+        var _this = _super.call(this, layoutsConfiguration.get('AwPatrimonioLayoutConfig') || AwPatrimonioLayoutConfig) || this;
+        _this.router = router;
+        _this.route = route;
+        _this.configuration = configuration;
+        _this.layoutsConfiguration = layoutsConfiguration;
+        _this.mainState = mainState;
+        _this.titleService = titleService;
+        _this.communication = communication;
+        return _this;
     }
+    /**
+     * Optional variables that can be accessed from the layout's logic.
+     * If removed, they must also be removed from the layout's DataSource file,
+     * and from this file imports.
+     */
+    /**
+     * Optional variables that can be accessed from the layout's logic.
+     * If removed, they must also be removed from the layout's DataSource file,
+     * and from this file imports.
+     * @protected
+     * @return {?}
+     */
+    AwSchedaLayoutComponent.prototype.initPayload = /**
+     * Optional variables that can be accessed from the layout's logic.
+     * If removed, they must also be removed from the layout's DataSource file,
+     * and from this file imports.
+     * @protected
+     * @return {?}
+     */
+    function () {
+        return {
+            configuration: this.configuration,
+            mainState: this.mainState,
+            router: this.router,
+            route: this.route,
+            titleService: this.titleService,
+            communication: this.communication,
+            options: this.config.options || {},
+        };
+    };
     /**
      * @return {?}
      */
-    AwAboutLayoutComponent.prototype.ngOnInit = /**
+    AwSchedaLayoutComponent.prototype.ngOnInit = /**
      * @return {?}
      */
     function () {
@@ -3502,22 +4784,67 @@ var AwAboutLayoutComponent = /** @class */ (function (_super) {
     /**
      * @return {?}
      */
-    AwAboutLayoutComponent.prototype.ngOnDestroy = /**
+    AwSchedaLayoutComponent.prototype.ngOnDestroy = /**
      * @return {?}
      */
     function () {
         this.onDestroy();
     };
-    AwAboutLayoutComponent.decorators = [
+    AwSchedaLayoutComponent.decorators = [
         { type: Component, args: [{
-                    selector: 'aw-about-layout',
-                    template: "<div class=\"\" *ngIf=\"lb.dataSource\">\n    About page!\n</div>"
+                    selector: 'aw-scheda-layout',
+                    template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\n    <div class=\"aw-scheda__content\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree\">\n            <n7-sidebar-header\n                [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"\n            ></n7-sidebar-header>\n            <n7-tree\n                [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-tree'].emit\"\n                [hidden]=\"lb.dataSource.sidebarCollapsed\"\n            ></n7-tree>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper\">\n            <n7-breadcrumbs\n                *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\"\n            ></n7-breadcrumbs>\n            <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                <div *ngIf=\"part.type == 'image'\">\n                    <div\n                    [ngStyle]=\"{\n                        'background-image': 'url(' + part.image + ')',\n                        'width': '100%',\n                        'height': '200px'\n                        }\">\n                    </div>\n                </div>\n\n                <div>\n                    <h1>{{ part.title }}</h1>\n                    <div>\n                        <div [innerHTML]=\"part.content\" >\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <n7-metadata-viewer\n                [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\"\n            >\n            </n7-metadata-viewer>\n        </div>\n    </div>\n</div>\n"
                 }] }
     ];
     /** @nocollapse */
-    AwAboutLayoutComponent.ctorParameters = function () { return []; };
-    return AwAboutLayoutComponent;
+    AwSchedaLayoutComponent.ctorParameters = function () { return [
+        { type: Router },
+        { type: ActivatedRoute },
+        { type: ConfigurationService },
+        { type: LayoutsConfigurationService },
+        { type: MainStateService },
+        { type: Title },
+        { type: CommunicationService }
+    ]; };
+    return AwSchedaLayoutComponent;
 }(AbstractLayout));
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaLayoutComponent.prototype.router;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaLayoutComponent.prototype.route;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaLayoutComponent.prototype.configuration;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaLayoutComponent.prototype.layoutsConfiguration;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaLayoutComponent.prototype.mainState;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaLayoutComponent.prototype.titleService;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaLayoutComponent.prototype.communication;
+}
 
 /**
  * @fileoverview added by tsickle
@@ -3627,603 +4954,13 @@ var AwWorksLayoutComponent = /** @class */ (function (_super) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-var AwPatrimonioLayoutDS = /** @class */ (function (_super) {
-    __extends(AwPatrimonioLayoutDS, _super);
-    function AwPatrimonioLayoutDS() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    /**
-    * If you are not using these variables (from your-layout.ts),
-    * remove them from onInit() parameters and inside the function.
-    */
-    /**
-     * If you are not using these variables (from your-layout.ts),
-     * remove them from onInit() parameters and inside the function.
-     * @param {?} __0
-     * @return {?}
-     */
-    AwPatrimonioLayoutDS.prototype.onInit = /**
-     * If you are not using these variables (from your-layout.ts),
-     * remove them from onInit() parameters and inside the function.
-     * @param {?} __0
-     * @return {?}
-     */
-    function (_a) {
-        var configuration = _a.configuration, mainState = _a.mainState, router = _a.router, options = _a.options, titleService = _a.titleService, communication = _a.communication;
-        this.configuration = configuration;
-        this.mainState = mainState;
-        this.router = router;
-        this.titleService = titleService;
-        this.communication = communication;
-        this.options = options;
-        this.sidebarCollapsed = false;
-    };
-    /**
-     * @param {?} id
-     * @return {?}
-     */
-    AwPatrimonioLayoutDS.prototype.getNavigation = /**
-     * @param {?} id
-     * @return {?}
-     */
-    function (id) {
-        return this.communication.request$('getTree', {
-            onError: (/**
-             * @param {?} error
-             * @return {?}
-             */
-            function (error) { return console.error(error); }),
-            params: { treeId: id }
-        });
-    };
-    /**
-     * @param {?} data
-     * @return {?}
-     */
-    AwPatrimonioLayoutDS.prototype.updateNavigation = /**
-     * @param {?} data
-     * @return {?}
-     */
-    function (data) {
-        var _this = this;
-        /** @type {?} */
-        var treeObj = {
-            items: []
-        };
-        data['branches'].forEach((/**
-         * @param {?} item
-         * @return {?}
-         */
-        function (item) {
-            treeObj['items'].push(_this.parseTree(item, false, []));
-        }));
-        /** @type {?} */
-        var header = {
-            iconLeft: 'n7-icon-tree-icon',
-            text: data['label'],
-            iconRight: 'n7-icon-angle-left',
-            classes: 'is-expanded',
-            payload: 'header'
-        };
-        this.one('aw-tree').update(treeObj);
-        this.one('aw-sidebar-header').update(header);
-        this.one('aw-scheda-breadcrumbs').update(null);
-    };
-    /**
-     * @param {?} id
-     * @return {?}
-     */
-    AwPatrimonioLayoutDS.prototype.loadItem = /**
-     * @param {?} id
-     * @return {?}
-     */
-    function (id) {
-        if (id) {
-            return this.communication.request$('getItemDetails', {
-                onError: (/**
-                 * @param {?} error
-                 * @return {?}
-                 */
-                function (error) { return console.error(error); }),
-                params: { itemId: id }
-            });
-        }
-        else {
-            /* TODO: valori statici, da prendere da config */
-            this.pageTitle = 'Collezione d\'Arte';
-            this.hasBreadcrumb = false;
-            this.contentParts = [
-                {
-                    type: "text",
-                    title: 'Collezione d\'Arte',
-                    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi gravida sagittis pulvinar. Etiam iaculis maximus metus, id tincidunt libero auctor et. Proin tempus turpis vel erat ultrices, id vestibulum ante cursus. Vestibulum lobortis, ante at eleifend consequat, massa libero bibendum justo, id fermentum magna odio ac nulla. Cras aliquet scelerisque malesuada. Mauris congue fermentum tristique. Nulla imperdiet accumsan dui, tristique lobortis metus eleifend non. Donec quis odio massa. Cras sit amet sem eu turpis molestie blandit vitae sed nibh. Pellentesque ornare enim nisl, et efficitur ante elementum a. Ut nec ex finibus, congue libero feugiat, aliquam ante. Cras sem neque, pellentesque eget mi at, auctor vulputate tellus. Sed aliquam mi a tortor ultricies interdum. Etiam tincidunt nunc commodo nulla porttitor semper. Etiam porta lacinia libero a mattis. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-                },
-                {
-                    type: "text",
-                    title: 'Centro Archivi',
-                    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi gravida sagittis pulvinar. Etiam iaculis maximus metus, id tincidunt libero auctor et. Proin tempus turpis vel erat ultrices, id vestibulum ante cursus. Vestibulum lobortis, ante at eleifend consequat, massa libero bibendum justo, id fermentum magna odio ac nulla. Cras aliquet scelerisque malesuada. Mauris congue fermentum tristique. Nulla imperdiet accumsan dui, tristique lobortis metus eleifend non. Donec quis odio massa. Cras sit amet sem eu turpis molestie blandit vitae sed nibh. Pellentesque ornare enim nisl, et efficitur ante elementum a. Ut nec ex finibus, congue libero feugiat, aliquam ante. Cras sem neque, pellentesque eget mi at, auctor vulputate tellus. Sed aliquam mi a tortor ultricies interdum. Etiam tincidunt nunc commodo nulla porttitor semper. Etiam porta lacinia libero a mattis. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-                }
-            ];
-        }
-    };
-    /**
-     * @param {?} response
-     * @return {?}
-     */
-    AwPatrimonioLayoutDS.prototype.loadContent = /**
-     * @param {?} response
-     * @return {?}
-     */
-    function (response) {
-        var _this = this;
-        this.hasBreadcrumb = true;
-        if (response) {
-            this.contentParts = [];
-            if (response.image) {
-                this.contentParts.push({
-                    image: response.image,
-                    type: 'image'
-                });
-            }
-            this.contentParts.push({
-                title: response.title,
-                content: response.text,
-                type: 'text'
-            });
-            /** @type {?} */
-            var breadcrumbs_1 = {
-                items: []
-            };
-            if (response.fields) {
-                response.fields.forEach((/**
-                 * @param {?} field
-                 * @return {?}
-                 */
-                function (field) {
-                    _this.contentParts.push({
-                        title: field.label,
-                        content: response.text,
-                        type: 'metaGroup',
-                        fields: field.fields
-                    });
-                }));
-            }
-            response.breadcrumbs.forEach((/**
-             * @param {?} element
-             * @return {?}
-             */
-            function (element) {
-                breadcrumbs_1.items.push({
-                    label: element.label,
-                    payload: element.link
-                });
-            }));
-            this.one('aw-scheda-breadcrumbs').update(breadcrumbs_1);
-        }
-    };
-    /**
-     * @private
-     * @param {?} data
-     * @param {?} toggle
-     * @param {?} parents
-     * @return {?}
-     */
-    AwPatrimonioLayoutDS.prototype.parseTree = /**
-     * @private
-     * @param {?} data
-     * @param {?} toggle
-     * @param {?} parents
-     * @return {?}
-     */
-    function (data, toggle, parents) {
-        var _this = this;
-        /** @type {?} */
-        var currParents = __spread(parents);
-        /** @type {?} */
-        var treeItem = {};
-        Object.keys(data).forEach((/**
-         * @param {?} key
-         * @return {?}
-         */
-        function (key) {
-            if (toggle) {
-                treeItem['toggle'] = {
-                    icon: 'n7-icon-angle-right',
-                    payload: {
-                        source: "toggle",
-                        id: data['id'],
-                        parents: currParents,
-                    }
-                };
-            }
-            if (key != "branches") {
-                switch (key) {
-                    case "label":
-                        treeItem['text'] = data[key];
-                        break;
-                    case "icon":
-                        if (toggle) {
-                            treeItem['toggle']['icon'] = data[key];
-                        }
-                        break;
-                    case "id":
-                        treeItem['_meta'] = data[key];
-                        treeItem['payload'] = {
-                            source: "menuItem",
-                            id: data['id']
-                        };
-                        break;
-                    default:
-                        data[key];
-                        break;
-                }
-                treeItem['classes'] = 'is-collapsed';
-            }
-            else if (data['branches'] != null) {
-                currParents.push(data['id']);
-                /*Handle cases with menu item with children but without toggle*/
-                if (!toggle) {
-                    treeItem['payload']['source'] = "ToggleMenuItem";
-                    treeItem['payload']['parents'] = currParents;
-                }
-                treeItem['items'] = [];
-                data[key].forEach((/**
-                 * @param {?} item
-                 * @return {?}
-                 */
-                function (item) {
-                    treeItem['items'].push(_this.parseTree(item, true, currParents));
-                }));
-            }
-        }));
-        return treeItem;
-    };
-    /**
-     * @return {?}
-     */
-    AwPatrimonioLayoutDS.prototype.collapseSidebar = /**
-     * @return {?}
-     */
-    function () {
-        this.sidebarCollapsed = !this.sidebarCollapsed;
-    };
-    return AwPatrimonioLayoutDS;
-}(LayoutDataSource));
-if (false) {
-    /**
-     * If you are not using these variables (from your-layout.ts),
-     * remove them from here too.
-     * @type {?}
-     * @private
-     */
-    AwPatrimonioLayoutDS.prototype.communication;
-    /**
-     * @type {?}
-     * @protected
-     */
-    AwPatrimonioLayoutDS.prototype.configuration;
-    /**
-     * @type {?}
-     * @protected
-     */
-    AwPatrimonioLayoutDS.prototype.mainState;
-    /**
-     * @type {?}
-     * @protected
-     */
-    AwPatrimonioLayoutDS.prototype.router;
-    /**
-     * @type {?}
-     * @protected
-     */
-    AwPatrimonioLayoutDS.prototype.titleService;
-    /** @type {?} */
-    AwPatrimonioLayoutDS.prototype.options;
-    /** @type {?} */
-    AwPatrimonioLayoutDS.prototype.pageTitle;
-    /** @type {?} */
-    AwPatrimonioLayoutDS.prototype.hasBreadcrumb;
-    /** @type {?} */
-    AwPatrimonioLayoutDS.prototype.contentParts;
-    /** @type {?} */
-    AwPatrimonioLayoutDS.prototype.tree;
-    /** @type {?} */
-    AwPatrimonioLayoutDS.prototype.sidebarCollapsed;
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-var AwPatrimonioLayoutEH = /** @class */ (function (_super) {
-    __extends(AwPatrimonioLayoutEH, _super);
-    function AwPatrimonioLayoutEH() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.destroyed$ = new Subject();
-        return _this;
-    }
-    /**
-     * @return {?}
-     */
-    AwPatrimonioLayoutEH.prototype.listen = /**
-     * @return {?}
-     */
-    function () {
-        var _this = this;
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        function (_a) {
-            var type = _a.type, payload = _a.payload;
-            switch (type) {
-                case 'aw-scheda-layout.init':
-                    _this.dataSource.onInit(payload);
-                    _this.configuration = payload.configuration;
-                    _this.route = payload.route;
-                    /** @type {?} */
-                    var paramId = _this.route.snapshot.params.id || "";
-                    _this.listenRoute();
-                    _this.loadNavigation(paramId);
-                    break;
-                case 'aw-scheda-layout.destroy':
-                    _this.destroyed$.next();
-                    break;
-                default:
-                    break;
-            }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        function (_a) {
-            var type = _a.type, payload = _a.payload;
-            switch (type) {
-                case 'aw-tree.click':
-                    if (payload) {
-                        _this.emitGlobal('navigate', { path: [_this.configuration.get("paths").schedaBasePath + payload], handler: 'router' });
-                    }
-                    break;
-                case "aw-sidebar-header.click":
-                    _this.dataSource.collapseSidebar();
-                    break;
-            }
-        }));
-    };
-    /**
-     * @private
-     * @return {?}
-     */
-    AwPatrimonioLayoutEH.prototype.listenRoute = /**
-     * @private
-     * @return {?}
-     */
-    function () {
-        var _this = this;
-        this.route.paramMap.subscribe((/**
-         * @param {?} params
-         * @return {?}
-         */
-        function (params) {
-            if (params.get('id')) {
-                _this.dataSource.loadItem(params.get('id')).subscribe((/**
-                 * @param {?} response
-                 * @return {?}
-                 */
-                function (response) {
-                    if (response) {
-                        _this.emitGlobal('navigate', { path: [_this.configuration.get("paths").schedaBasePath + response.item.id], handler: 'router' });
-                        _this.dataSource.loadContent(response);
-                    }
-                }));
-            }
-            else {
-                _this.dataSource.loadItem();
-            }
-        }));
-    };
-    /**
-     * @private
-     * @param {?} selectedItem
-     * @return {?}
-     */
-    AwPatrimonioLayoutEH.prototype.loadNavigation = /**
-     * @private
-     * @param {?} selectedItem
-     * @return {?}
-     */
-    function (selectedItem) {
-        var _this = this;
-        this.dataSource.getNavigation('patrimonio').subscribe((/**
-         * @param {?} response
-         * @return {?}
-         */
-        function (response) {
-            if (response) {
-                _this.dataSource.updateNavigation(response, selectedItem);
-            }
-            if (selectedItem) {
-                _this.emitOuter('selectItem', selectedItem);
-            }
-        }));
-    };
-    return AwPatrimonioLayoutEH;
-}(EventHandler));
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwPatrimonioLayoutEH.prototype.destroyed$;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwPatrimonioLayoutEH.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwPatrimonioLayoutEH.prototype.route;
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-var AwPatrimonioLayoutConfig = {
-    layoutId: 'aw-scheda-layout',
-    /**
-     * Array of components you want to use
-     * in this leyout
-     */
-    widgets: [
-        { id: 'aw-sidebar-header' },
-        { id: 'aw-tree' },
-        { id: 'aw-scheda-breadcrumbs' }
-    ],
-    layoutDS: AwPatrimonioLayoutDS,
-    layoutEH: AwPatrimonioLayoutEH,
-    widgetsDataSources: DS$1,
-    widgetsEventHandlers: EH$1,
-    options: {
-    // TODO
-    }
-};
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-var AwSchedaLayoutComponent = /** @class */ (function (_super) {
-    __extends(AwSchedaLayoutComponent, _super);
-    function AwSchedaLayoutComponent(router, route, configuration, layoutsConfiguration, mainState, titleService, communication) {
-        var _this = _super.call(this, layoutsConfiguration.get('AwPatrimonioLayoutConfig') || AwPatrimonioLayoutConfig) || this;
-        _this.router = router;
-        _this.route = route;
-        _this.configuration = configuration;
-        _this.layoutsConfiguration = layoutsConfiguration;
-        _this.mainState = mainState;
-        _this.titleService = titleService;
-        _this.communication = communication;
-        return _this;
-    }
-    /**
-     * Optional variables that can be accessed from the layout's logic.
-     * If removed, they must also be removed from the layout's DataSource file,
-     * and from this file imports.
-     */
-    /**
-     * Optional variables that can be accessed from the layout's logic.
-     * If removed, they must also be removed from the layout's DataSource file,
-     * and from this file imports.
-     * @protected
-     * @return {?}
-     */
-    AwSchedaLayoutComponent.prototype.initPayload = /**
-     * Optional variables that can be accessed from the layout's logic.
-     * If removed, they must also be removed from the layout's DataSource file,
-     * and from this file imports.
-     * @protected
-     * @return {?}
-     */
-    function () {
-        return {
-            configuration: this.configuration,
-            mainState: this.mainState,
-            router: this.router,
-            route: this.route,
-            titleService: this.titleService,
-            communication: this.communication,
-            options: this.config.options || {},
-        };
-    };
-    /**
-     * @return {?}
-     */
-    AwSchedaLayoutComponent.prototype.ngOnInit = /**
-     * @return {?}
-     */
-    function () {
-        this.onInit();
-    };
-    /**
-     * @return {?}
-     */
-    AwSchedaLayoutComponent.prototype.ngOnDestroy = /**
-     * @return {?}
-     */
-    function () {
-        this.onDestroy();
-    };
-    AwSchedaLayoutComponent.decorators = [
-        { type: Component, args: [{
-                    selector: 'aw-scheda-layout',
-                    template: "<div class=\"aw-scheda-layout n7-grid-2\" id=\"scheda-layout\">\n    <div> <!--Left sidebar -->\n        <n7-sidebar-header\n            [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\" \n            [emit]=\"lb.widgets['aw-sidebar-header'].emit\"\n        ></n7-sidebar-header>\n        <n7-tree\n            [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-tree'].emit\"            \n            [hidden]=\"lb.dataSource.sidebarCollapsed\"\n        ></n7-tree>\n    </div> <!--end Left sidebar -->\n    <div>  <!--Right sidebar --> \n        <n7-breadcrumbs\n            *ngIf=\"lb.dataSource.hasBreadcrumb\"\n            [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\" \n            [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\"\n        ></n7-breadcrumbs>\n        <div *ngFor=\"let part of lb.dataSource.contentParts\">\n            <div *ngIf=\"part.type == 'image'\">\n                <div \n                [ngStyle]=\"{\n                    'background-image': 'url(' + part.image + ')',\n                    'width': '100%',\n                    'height': '200px'\n                    }\">            \n                \n                \n                </div>               \n            </div>\n\n            <div>\n                <h1>{{ part.title }}</h1>\n                <div class=\"n7-grid-2\">\n                    <div [innerHTML]=\"part.content\" >\n                                      \n                    </div>                \n                </div>\n            </div> \n            <div *ngIf=\"part.type == 'metaGroup'\">\n                <div *ngFor=\"let meta of part.fields\">\n                    <strong>{{meta.key}}: </strong><span>{{meta.value}}</span>\n                </div>  \n        </div>\n    </div>  <!--end Right sidebar -->\n</div>\n"
-                }] }
-    ];
-    /** @nocollapse */
-    AwSchedaLayoutComponent.ctorParameters = function () { return [
-        { type: Router },
-        { type: ActivatedRoute },
-        { type: ConfigurationService },
-        { type: LayoutsConfigurationService },
-        { type: MainStateService },
-        { type: Title },
-        { type: CommunicationService }
-    ]; };
-    return AwSchedaLayoutComponent;
-}(AbstractLayout));
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutComponent.prototype.router;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutComponent.prototype.route;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutComponent.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutComponent.prototype.layoutsConfiguration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutComponent.prototype.mainState;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutComponent.prototype.titleService;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutComponent.prototype.communication;
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 /** @type {?} */
 var COMPONENTS$1 = [
-    AwHomeLayoutComponent,
     AwAboutLayoutComponent,
-    AwWorksLayoutComponent,
+    AwEntitaLayoutComponent,
+    AwHomeLayoutComponent,
     AwSchedaLayoutComponent,
+    AwWorksLayoutComponent,
 ];
 var N7BoilerplateAriannaWebModule = /** @class */ (function () {
     function N7BoilerplateAriannaWebModule() {
@@ -4290,5 +5027,5 @@ var N7BoilerplateLibModule = /** @class */ (function () {
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAboutLayoutComponent, AwAboutLayoutConfig, AwAboutLayoutDS, AwAboutLayoutEH, AwHeroDS, AwHeroEH, AwHomeBubbleChartDS, AwHomeBubbleChartEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemPreviewWrapperDS, AwHomeItemPreviewWrapperEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwPatrimonioLayoutConfig, AwPatrimonioLayoutDS, AwPatrimonioLayoutEH, AwSchedaBreadcrumbsDS, AwSchedaLayoutComponent, AwSchedaSidebarEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, AwWorksLayoutComponent, AwWorksLayoutConfig, AwWorksLayoutDS, AwWorksLayoutEH, BreadcrumbsDS, BreadcrumbsEH, CommunicationService, ConfigurationService, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SubnavDS, SubnavEH, CommunicationService as ɵa, MainStateService as ɵb };
+export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAboutLayoutComponent, AwAboutLayoutConfig, AwAboutLayoutDS, AwAboutLayoutEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaNavDS, AwEntitaNavEH, AwHeroDS, AwHeroEH, AwHomeBubbleChartDS, AwHomeBubbleChartEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemPreviewWrapperDS, AwHomeItemPreviewWrapperEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, AwWorksLayoutComponent, AwWorksLayoutConfig, AwWorksLayoutDS, AwWorksLayoutEH, BreadcrumbsDS, BreadcrumbsEH, CommunicationService, ConfigurationService, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SubnavDS, SubnavEH, CommunicationService as ɵa, MainStateService as ɵb };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

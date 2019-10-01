@@ -4,6 +4,7 @@ export * from './home-facets-wrapper.eh';
 export * from './home-hero-patrimonio.eh';
 export * from './home-item-preview-wrapper.eh';
 export * from './home-item-tags-wrapper.eh';
+export * from './entita-nav.eh';
 export * from './scheda-breadcrumbs.eh';
 export * from './sidebar-header.eh';
 export * from './tree.eh';

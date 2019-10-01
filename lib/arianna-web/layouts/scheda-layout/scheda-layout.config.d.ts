@@ -1,5 +1,5 @@
-import { AwPatrimonioLayoutDS } from './scheda-layout.ds';
-import { AwPatrimonioLayoutEH } from './scheda-layout.eh';
+import { AwSchedaLayoutDS } from './scheda-layout.ds';
+import { AwSchedaLayoutEH } from './scheda-layout.eh';
 import * as DS from '../../data-sources';
 import * as EH from '../../event-handlers';
 export declare const AwPatrimonioLayoutConfig: {
@@ -11,8 +11,8 @@ export declare const AwPatrimonioLayoutConfig: {
     widgets: {
         id: string;
     }[];
-    layoutDS: typeof AwPatrimonioLayoutDS;
-    layoutEH: typeof AwPatrimonioLayoutEH;
+    layoutDS: typeof AwSchedaLayoutDS;
+    layoutEH: typeof AwSchedaLayoutEH;
     widgetsDataSources: typeof DS;
     widgetsEventHandlers: typeof EH;
     options: {};

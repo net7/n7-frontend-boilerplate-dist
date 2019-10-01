@@ -1,5 +1,5 @@
 import { LayoutDataSource } from '@n7-frontend/core';
-export declare class AwPatrimonioLayoutDS extends LayoutDataSource {
+export declare class AwSchedaLayoutDS extends LayoutDataSource {
     /**
     * If you are not using these variables (from your-layout.ts),
     * remove them from here too.
