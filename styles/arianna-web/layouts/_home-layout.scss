@@ -10,16 +10,17 @@
     HERO
 \* ------------------------------------ */
 .aw-home {
-
     &__top-hero {
         .n7-hero {
-            &__title {
-                font-size: $font-size-xxxl;
-            }
+            height: $top-hero-height;
 
             &__text {
+                font-size: $font-size-xl;
+                line-height: 1.3;
+
                 &-wrapper {
-                    width: 60%;
+                    height: $top-hero-height;
+                    max-width: $hero-text-max-width;
                 }
             }
 
@@ -27,8 +28,8 @@
                 height: $hero-input-height;
                 padding-right: $space*2;
                 padding-left: $space*2;
-                border-top-right-radius: 0;
-                border-bottom-right-radius: 0;
+                border-radius: $hero-input-border-radius 0 0 $hero-input-border-radius;
+                box-shadow: $hero-input-box-shadow;
                 line-height: $hero-input-height;
 
                 @include placeholder {
@@ -38,8 +39,7 @@
 
             &__btn {
                 height: $hero-button-height;
-                border-top-left-radius: 0;
-                border-bottom-left-radius: 0;
+                border-radius: 0 $hero-input-border-radius $hero-input-border-radius 0;
                 border: none;
                 font-size: $font-size-l;
             }
@@ -53,7 +53,24 @@
     }
 
     .n7-hero {
+        &__title {
+            font-weight: $font-weight-black;
+            font-size: $font-size-xxxl;
+        }
+
         &.has-image {
+            .n7-hero__content {
+                grid-column-gap: 44px;
+            }
+
+            .n7-hero__title {
+                margin-bottom: $space*3;
+            }
+
+            .n7-hero__input-wrapper {
+                margin-top: $space*3;
+            }
+
             .n7-hero__image {
                 border: $hero-image-border;
                 border-radius: $border-radius;
@@ -185,28 +202,54 @@
 
         &__search-icon {
             line-height: $n7-facet-search-input-height;
+            // color: $color-people;
         }
     }
 
     /* Results */
     .aw-home__bubble-results {
         &-title {
+            margin-bottom: $space*2;
             font-weight: $font-weight-normal;
     
             &-counter {
                 margin-right: $space/2;
+                font-weight: $font-weight-black;
             }
         }
 
         &-list {
-            padding: $space*2 0;
+            overflow: auto;
+            max-height: 450px;
+        }
+        
+        &-list-wrapper {
             border-top: 1px solid $color-border-normal;
+            position: relative;
+            &-with-scroll {
+                position: absolute;
+                top: 400px;
+                bottom: 0;
+                width: 100%;
+                height: 50px;
+                background: rgb(243,242,242);
+                background: linear-gradient(180deg, rgba(243,242,242,0) 0%, rgba(243,242,242,1) 100%);
+            }
         }
 
         .n7-item-preview {
-            margin-bottom: $space*2;
+            margin: $space*2 0;
             padding-bottom: $space;
             border-bottom: 1px solid $color-border-normal;
+
+            &.has-image {
+                grid-template-columns: $item-preview-image-size 1fr;
+
+                .n7-item-preview__image {
+                    width: $item-preview-image-size;
+                    height: $item-preview-image-size;
+                }
+            }
         }
     }
 
@@ -288,7 +331,7 @@
 
                 &__text {
                     &-wrapper {
-                        width: 70%;
+                        max-width: 70%;
                     }
                 }
             }
@@ -306,7 +349,7 @@
 
                 &__text {
                     &-wrapper {
-                        width: 100%;
+                        max-width: 100%;
                     }
                 }
             }

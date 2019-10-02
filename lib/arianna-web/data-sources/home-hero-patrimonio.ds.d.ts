@@ -1,12 +1,12 @@
 import { DataSource } from '@n7-frontend/core';
 export declare class AwHomeHeroPatrimonioDS extends DataSource {
     protected transform(data: any): {
-        title: string;
-        backgroundImage: string;
-        image: string;
-        text: string;
+        title: any;
+        backgroundImage: any;
+        image: any;
+        text: any;
         button: {
-            text: string;
+            text: any;
             payload: string;
         };
     };

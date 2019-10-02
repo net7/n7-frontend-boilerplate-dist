@@ -1740,21 +1740,20 @@
          * @return {?}
          */
         function (data) {
-            /** @type {?} */
-            var HERO_DATA = {
-                title: "Arte, architettura e fotografia nel XXI secolo",
-                text: "Consulta il patrimonio completo del polo nazionale per l\'arte e l\'architettura contemporanee.",
+            var title = data.title, text = data.text, button = data.button, backgroundImage = data.backgroundImage, input = data.input;
+            return {
+                title: title,
+                text: text,
+                backgroundImage: backgroundImage,
                 button: {
-                    text: "CERCA",
+                    text: button.text,
                     payload: "cerca"
                 },
-                backgroundImage: "https://i.imgur.com/FgsxSYR.png",
                 input: {
-                    placeholder: "Cerca in MAXXI",
+                    placeholder: input.placeholder,
                     payload: "cerca-in-maxxi"
                 }
             };
-            return HERO_DATA;
         };
         return AwHeroDS;
     }(core$1.DataSource));
@@ -1804,18 +1803,17 @@
          * @return {?}
          */
         function (data) {
-            /** @type {?} */
-            var HERO_PATRIMONIO_DATA = {
-                title: "IL MAXXI",
-                backgroundImage: "https://www.solidbackgrounds.com/images/2560x1440/2560x1440-gray-solid-color-background.jpg",
-                image: "https://i.imgur.com/8BgHOBi.png",
-                text: "La storia del MAXXI inizia nell'autunno del 1997 quando l'allora Ministero per i beni culturali ottiene dal Ministero della Difesa la cessione di un'ampia area nel quartiene Flaminio di Roma, occupata da officine e padiglioni della ex Caserma Montello, in disuso da tempo, con il fine di creare un nuovo polo mseale nazionale dedicato alle arti contemporanee per la cui progettazione, nel 1998, viene bandito un concorso internazionale di idee in due fasi. Il bando di concorso prevedeva un piano funzionale complesso, con la presenza di vari poli museali: un museo per l'architettura e uno per le arti del XXI secolo, uno spazio per le produzioni sperimentali, la biblioteca, l'auditorium, spazi per eventi dal vivo e infine spazi didattici.",
+            var title = data.title, backgroundImage = data.backgroundImage, image = data.image, text = data.text, button = data.button;
+            return {
+                title: title,
+                backgroundImage: backgroundImage,
+                image: image,
+                text: text,
                 button: {
-                    text: "NAVIGA IL PATRIMONIO",
+                    text: button.text,
                     payload: "naviga-patrimonio"
                 }
             };
-            return HERO_PATRIMONIO_DATA;
         };
         return AwHomeHeroPatrimonioDS;
     }(core$1.DataSource));
@@ -1828,7 +1826,9 @@
         __extends(AwHomeBubbleChartDS, _super);
         function AwHomeBubbleChartDS() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
+            // threshold below which a bubble should not show its title
             _this.thresholdShowTitle = 50;
+            // threshold below which a bubble should not show its number
             _this.thresholdShowValue = 60;
             return _this;
         }
@@ -1850,12 +1850,15 @@
             var bubbleCointainer = document.getElementById("bubble-chart-container");
             /** @type {?} */
             var cWidth = bubbleCointainer.offsetWidth;
+            // now the bubblechart's height is hardcoded to 700, not sure
+            // how it sould be actually set
             // TODO: think of a good way to pass/compute cHeight
             /** @type {?} */
             var cHeight = 700;
             // bubbleCointainer.offsetHeight
             /** @type {?} */
             var containerSize = cWidth * cHeight;
+            // generic data of the bubble chart
             /** @type {?} */
             var bubblesData = {
                 containerId: "bubbleChartContainer",
@@ -1864,15 +1867,18 @@
                 isForceSimulationEnabled: true,
                 maxBubblesSelected: 3
             };
+            // data about each single bubble (starts as [] and gets filled)
             bubblesData['bubblesData'] = [];
+            // first loop over all the data's bubbles to gather various numbers, such
+            // as the maximum/minimum bubble value and number of selected bubbles
             /** @type {?} */
-            var maxBubbleCount = -1;
+            var maxBubbleValue = -1;
             /** @type {?} */
-            var minBubbleCount = -1;
+            var minBubbleValue = -1;
             /** @type {?} */
             var numOfBubbles = 0;
             /** @type {?} */
-            var totalCount = 0;
+            var totalValues = 0;
             /** @type {?} */
             var numOfSelectedBubbles = 0;
             data.bubbles.forEach((/**
@@ -1880,15 +1886,17 @@
              * @return {?}
              */
             function (bubble) {
-                if (maxBubbleCount < bubble.count)
-                    maxBubbleCount = bubble.count;
-                if (minBubbleCount < 0 || minBubbleCount > bubble.count)
-                    minBubbleCount = bubble.count;
+                if (maxBubbleValue < bubble.count)
+                    maxBubbleValue = bubble.count;
+                if (minBubbleValue < 0 || minBubbleValue > bubble.count)
+                    minBubbleValue = bubble.count;
                 numOfBubbles++;
-                totalCount += bubble.count;
+                totalValues += bubble.count;
                 if (bubble.selected)
                     numOfSelectedBubbles++;
             }));
+            // second loop  over all the data's bubbles, for each bubble a corresponding object
+            // is created and addded to the bubblesData array
             data.bubbles.forEach((/**
              * @param {?} bubble
              * @return {?}
@@ -1896,12 +1904,22 @@
             function (bubble) {
                 /** @type {?} */
                 var bId = bubble.id;
-                //let bubblePercentage = ( bubble.count - (minBubbleCount/3) )/( (maxBubbleCount*3) - (minBubbleCount/3) );
+                // here I compute the bubble's radius (could/should be improved), for it I compute a percentage of the bubble's value
+                // compared to all the bubbles and use that percentage to compute the bubble's radius
+                // Note : I also use the containerSize and the number of bubbles, ideally also the totValues and
+                //        numOfSelectedBubbles should be considered when computing the radius
+                //        (selected bubbles are in theory larger bubbles so taking that into account
+                //         could help for the radius computation)
+                // Note : the radius computation is very important, if the bubbles' radiuses are too big then
+                //        the bubbles will go one over the other and will not be able to move as they should, if
+                //        the rediuses are instead too small then the bubbles will be to small and conver only a
+                //        portion of the container
+                /** @type {?} */
+                var bubblePercentage = (bubble.count - (minBubbleValue / 3)) / ((maxBubbleValue * 3) - (minBubbleValue / 3));
                 //let bubbleRadius = 2*( ((containerSize/(numOfBubbles*(totalCount/600)))*bubblePercentage)/( Math.pow(numOfSelectedBubbles+1,1.8)) );
                 /** @type {?} */
-                var bubblePercentage = (bubble.count - (minBubbleCount / 3)) / ((maxBubbleCount * 3) - (minBubbleCount / 3));
-                /** @type {?} */
                 var bubbleRadius = (Math.log(containerSize) / 10) * (bubblePercentage * 3) * (70 - Math.sqrt(numOfBubbles));
+                // creation of the bubbleData object
                 /** @type {?} */
                 var bubbleData = {
                     id: bId,
@@ -1978,6 +1996,7 @@
                 };
                 bubblesData['bubblesData'].push(bubbleData);
             }));
+            // force simulation's parameters for the bubble chart
             bubblesData['forceSimulationData'] = {
                 xPull: cWidth / 2,
                 xPullStrength: -0.01,
@@ -2043,19 +2062,33 @@
                  * For each facet on back-end, push a header-component
                  * and a facet-component (search input only) to each array.
                  */
+                /**
+                 * For each facet on back-end, push a header-component
+                 * and a facet-component (search input only) to each array.
+                 * @type {?}
+                 */
+                var headerClasses = [];
+                /** @type {?} */
+                var iconClasses = [facet.icon];
+                if (facet.enabled)
+                    headerClasses.push('is-disabled');
+                if (facet.type.configKey) {
+                    headerClasses.push("color-" + facet.type.configKey);
+                    iconClasses.push("color-" + facet.type.configKey);
+                }
                 // make array of headers data
                 headers.push({
-                    iconLeft: facet.icon,
+                    iconLeft: iconClasses.join(' '),
                     text: facet.label,
                     additionalText: facet.count,
                     iconRight: (facet.enabled ? 'n7-icon-eye' : 'n7-icon-eye-slash'),
-                    classes: (facet.enabled ? 'prova' : 'is-disabled') + (facet.type.color ? " " + facet.type.color : ''),
+                    classes: headerClasses.join(' '),
                     payload: facet.type.id,
                 });
                 // make array of inputs data
                 inputs.push({
                     input: {
-                        placeholder: 'Search',
+                        placeholder: facet['input-placeholder'],
                         icon: 'n7-icon-search',
                         // disable input if faced header is not enabled
                         disabled: !facet.enabled,
@@ -2534,11 +2567,6 @@
                         break;
                 }
             }));
-            /*
-            this.outerEvents$.subscribe(event => {
-              
-            });
-            */
         };
         return AwHomeBubbleChartEH;
     }(core$1.EventHandler));
@@ -3502,23 +3530,37 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
-    /** @type {?} */
-    var config = require('src/assets/app-config.json');
     var AwHomeLayoutDS = /** @class */ (function (_super) {
         __extends(AwHomeLayoutDS, _super);
         function AwHomeLayoutDS() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.facetData = null;
             _this.facetInputs = {};
+            // all the bubbles as they have been given by apollo
+            // (the objects in the allBubbles are not the same bubble objects
+            // present in the bubble chart)
             _this.allBubbles = null;
+            // the bubbles currently selected (this are saved from the event handler's
+            // and correspond exactly to the bubblechart's bubble objects)
             _this.selectedBubbles = [];
             _this.numOfItemsStr = null;
+            // instance of the bubble chart (from which you can access all the various
+            // bubble objects)
             _this._bubbleChart = null;
+            // the maximum number of bubbles which can be selected at the same time
             _this.maxBubblesSelectable = 3;
+            // entities have their own unique id, these ids are generic and are very flexible
+            // bubbles (as the bubble chart's objects) have unique ids but do not allow certain
+            // characters, so each bubble has its own id different from the id of the entity which
+            // the bubble represents (given an bubble's id called bubbleId you can obtain the
+            // respective entity's id with as: entityId = entityBubbleIdMap[bubbleId] )
             _this.entityBubbleIdMap = {};
+            // widh of the window which is updated at each resize and it is used by the bubble
+            // chart to check if the width of the window has changed during the last resize
             _this.lastWindowWidth = -1;
             _this.bubblePopup = null;
             _this.currentHoverEntity = null;
+            _this.hasScrollBackground = false;
             return _this;
         }
         /**
@@ -3536,7 +3578,8 @@
             this.tippy = tippy;
             this.mainState = mainState;
             this.configuration = configuration;
-            this.one('aw-hero').update({});
+            this.one('aw-hero').update(this.configuration.get('home-layout')['top-hero']);
+            this.one('aw-home-hero-patrimonio').update(this.configuration.get('home-layout')['bottom-hero']);
             this.communication.request$('globalFilter', {
                 onError: (/**
                  * @param {?} error
@@ -3557,7 +3600,7 @@
                     /** @type {?} */
                     var teoConfigData = _this.configuration.get("config-keys")[ent.countData.type.configKey];
                     if (teoConfigData)
-                        _this.facetData.push(__assign({}, (ent.countData), { enabled: true, icon: teoConfigData.icon, label: teoConfigData.label }));
+                        _this.facetData.push(__assign({}, ent.countData, teoConfigData, { enabled: true }));
                 }));
                 _this.one('aw-home-facets-wrapper').update(_this.facetData);
                 _this.setAllBubblesFromApolloQuery(response);
@@ -3576,6 +3619,8 @@
              */
             function () {
                 // only resets the bubbles if the window's width has changed
+                // (if the resize only effects the window's hight then the bubble chart
+                // doesn't get reset)
                 if (_this.lastWindowWidth != window.outerWidth) {
                     _this.lastWindowWidth = window.outerWidth;
                     _this.updateBubblesAndItemPreviews(true);
@@ -3710,6 +3755,8 @@
                 this.numOfItemsStr = null;
             }
             this.one('aw-home-item-preview-wrapper').update(response.itemsPagination.items);
+            // scroll control
+            this._scrollBackgroundControl();
         };
         /**
          * @param {?} bubble
@@ -3751,13 +3798,28 @@
             }
         };
         /**
+         * updates the bubble chart and the item previews based on the currently
+         * selected bubbles
+         *
+         * @param onlyBubbles specifies if only the bubble chart should be updated,
+         *                    leaving the item previews as they are
+         */
+        /**
+         * updates the bubble chart and the item previews based on the currently
+         * selected bubbles
+         *
          * @private
-         * @param {?=} onlyBubbles
+         * @param {?=} onlyBubbles specifies if only the bubble chart should be updated,
+         *                    leaving the item previews as they are
          * @return {?}
          */
         AwHomeLayoutDS.prototype.updateBubblesAndItemPreviews = /**
+         * updates the bubble chart and the item previews based on the currently
+         * selected bubbles
+         *
          * @private
-         * @param {?=} onlyBubbles
+         * @param {?=} onlyBubbles specifies if only the bubble chart should be updated,
+         *                    leaving the item previews as they are
          * @return {?}
          */
         function (onlyBubbles) {
@@ -3783,7 +3845,7 @@
                 function (error) { return console.error(error); }),
                 params: {
                     selectedEntitiesIds: selectedEntitiesIds,
-                    itemsPagination: { offset: 0, limit: 4 }
+                    itemsPagination: { offset: 0, limit: this.configuration.get('home-layout')['results-limit'] }
                 },
             }).subscribe((/**
              * @param {?} response
@@ -3798,13 +3860,25 @@
             }));
         };
         /**
+         * converts the id of an entity to the id of a bubble
+         * ( // d3/svg does not allow Number as beginning of ID.
+         *   // d3/svg does not allow '-' as part of ID. )
+         * @param entityId id of the entity
+         */
+        /**
+         * converts the id of an entity to the id of a bubble
+         * ( // d3/svg does not allow Number as beginning of ID.
+         *   // d3/svg does not allow '-' as part of ID. )
          * @private
-         * @param {?} entityId
+         * @param {?} entityId id of the entity
          * @return {?}
          */
         AwHomeLayoutDS.prototype.convertEntityIdToBubbleId = /**
+         * converts the id of an entity to the id of a bubble
+         * ( // d3/svg does not allow Number as beginning of ID.
+         *   // d3/svg does not allow '-' as part of ID. )
          * @private
-         * @param {?} entityId
+         * @param {?} entityId id of the entity
          * @return {?}
          */
         function (entityId) {
@@ -3813,13 +3887,26 @@
             return ('B_' + entityId.replace(/-/g, '_'));
         };
         /**
-         * @param {?} response
-         * @param {?=} reset
+         * sets the this.allBubbles variable based on the response apollo has given
+         * for the globalFilterQuery
+         *
+         * @param response apollo's response
+         * @param reset true if the bubble chart has to be reset/redrawn
+         */
+        /**
+         * sets the this.allBubbles variable based on the response apollo has given
+         * for the globalFilterQuery
+         *
+         * @param {?} response apollo's response
+         * @param {?=} reset true if the bubble chart has to be reset/redrawn
          * @return {?}
          */
         AwHomeLayoutDS.prototype.setAllBubblesFromApolloQuery = /**
-         * @param {?} response
-         * @param {?=} reset
+         * sets the this.allBubbles variable based on the response apollo has given
+         * for the globalFilterQuery
+         *
+         * @param {?} response apollo's response
+         * @param {?=} reset true if the bubble chart has to be reset/redrawn
          * @return {?}
          */
         function (response, reset) {
@@ -3840,8 +3927,6 @@
              * @return {?}
              */
             function (bubble) {
-                // d3/svg does not allow Number as beginning of ID.
-                // d3/svg does not allow '-' as part of ID.
                 bubble.id = _this.convertEntityIdToBubbleId(bubble.entity.id);
                 _this.entityBubbleIdMap[bubble.id] = bubble.entity.id;
                 return bubble;
@@ -4127,6 +4212,51 @@
                     }]
             };
         };
+        /**
+         * @private
+         * @return {?}
+         */
+        AwHomeLayoutDS.prototype._scrollBackgroundControl = /**
+         * @private
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            /** @type {?} */
+            var el = document.getElementById('bubble-results-list');
+            /** @type {?} */
+            var source$ = rxjs.fromEvent(document.getElementById('bubble-results-list'), 'scroll');
+            // height control
+            setTimeout((/**
+             * @return {?}
+             */
+            function () {
+                _this._setHasScrollBackground(el);
+            }), 500);
+            // scroll listen
+            source$.pipe(operators.debounceTime(50)).subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var target = _a.target;
+                _this._setHasScrollBackground(target);
+            }));
+        };
+        /**
+         * @private
+         * @param {?} __0
+         * @return {?}
+         */
+        AwHomeLayoutDS.prototype._setHasScrollBackground = /**
+         * @private
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var scrollTop = _a.scrollTop, scrollHeight = _a.scrollHeight, clientHeight = _a.clientHeight;
+            this.hasScrollBackground = scrollHeight > (scrollTop + clientHeight);
+        };
         return AwHomeLayoutDS;
     }(core$1.LayoutDataSource));
     if (false) {
@@ -4196,6 +4326,8 @@
         AwHomeLayoutDS.prototype.bubblePopup;
         /** @type {?} */
         AwHomeLayoutDS.prototype.currentHoverEntity;
+        /** @type {?} */
+        AwHomeLayoutDS.prototype.hasScrollBackground;
     }
 
     /**
@@ -4329,8 +4461,7 @@
         widgets: [{
                 id: 'aw-hero',
             }, {
-                id: 'aw-home-hero-patrimonio',
-                hasStaticData: true
+                id: 'aw-home-hero-patrimonio'
             }, {
                 id: 'aw-home-bubble-chart',
             }, {
@@ -4402,7 +4533,7 @@
         AwHomeLayoutComponent.decorators = [
             { type: core.Component, args: [{
                         selector: 'aw-home-layout',
-                        template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- hidden buttons and div used to implement the bubbles' popups -->\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_closebutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-close-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_gotobutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-goto-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_selectbutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-select-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <div id=\"bubble-popup-menu\" style=\"display: none;\">\n        <h2>{{ ( lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.label : '' ) }}</h2>\n        <span class=\"n7-icon-close\" onclick=\"document.getElementById('bubble-popup-menu_closebutton').click();\"></span>\n        <p>\n                {{ ( lb.dataSource.currentHoverEntity ? '\u00C8 collegato a '+lb.dataSource.currentHoverEntity.count+' entit\u00E0' : '' ) }}\n        </p>\n        <span onclick=\"document.getElementById('bubble-popup-menu_gotobutton').click();\">Vai alla scheda</span> |\n        <span onclick=\"document.getElementById('bubble-popup-menu_selectbutton').click();\">Seleziona</span>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper\" [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length>0 }\">\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div id=\"bubble-chart-container\">\n            <n7-bubble-chart [data]=\"lb.widgets['aw-home-bubble-chart'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-home-bubble-chart'].emit\">\n            </n7-bubble-chart>\n        </div>\n\n        <ng-container *ngIf=\"lb.dataSource.selectedBubbles.length>0\">\n            <div class=\"aw-home__bubble-results\" [ngStyle]=\"{ 'display': 'flex' , 'flex-direction': 'column' }\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\"> <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">{{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span></h1></div>\n\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list\">\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-preview-wrapper'].ds.out$ | async;\">\n                        <n7-item-preview\n                            [data]=\"widgetData\"\n                            [emit]=\"lb.widgets['aw-home-item-preview-wrapper'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n               \n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n</div>"
+                        template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- hidden buttons and div used to implement the bubbles' popups -->\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_closebutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-close-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_gotobutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-goto-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_selectbutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-select-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <div id=\"bubble-popup-menu\" style=\"display: none;\">\n        <h2>{{ ( lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.label : '' ) }}</h2>\n        <span class=\"n7-icon-close\" onclick=\"document.getElementById('bubble-popup-menu_closebutton').click();\"></span>\n        <p>\n                {{ ( lb.dataSource.currentHoverEntity ? '\u00C8 collegato a '+lb.dataSource.currentHoverEntity.count+' entit\u00E0' : '' ) }}\n        </p>\n        <span onclick=\"document.getElementById('bubble-popup-menu_gotobutton').click();\">Vai alla scheda</span> |\n        <span onclick=\"document.getElementById('bubble-popup-menu_selectbutton').click();\">Seleziona</span>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper\" [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length>0 }\">\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div id=\"bubble-chart-container\">\n            <n7-bubble-chart [data]=\"lb.widgets['aw-home-bubble-chart'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-home-bubble-chart'].emit\">\n            </n7-bubble-chart>\n        </div>\n\n        <ng-container *ngIf=\"lb.dataSource.selectedBubbles.length>0\">\n            <div class=\"aw-home__bubble-results\" [ngStyle]=\"{ 'display': 'flex' , 'flex-direction': 'column' }\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\"> <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">{{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span></h1></div>\n\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list-wrapper\">\n                    <div class=\"aw-home__bubble-results-list\" [attr.id]=\"'bubble-results-list'\">\n                        <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-preview-wrapper'].ds.out$ | async;\">\n                            <n7-item-preview\n                                [data]=\"widgetData\"\n                                [emit]=\"lb.widgets['aw-home-item-preview-wrapper'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n                    </div>\n                    <div *ngIf=\"lb.dataSource.hasScrollBackground\" class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                </div>\n               \n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n</div>"
                     }] }
         ];
         /** @nocollapse */

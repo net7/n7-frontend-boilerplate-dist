@@ -1,15 +1,15 @@
 import { DataSource } from '@n7-frontend/core';
 export declare class AwHeroDS extends DataSource {
     protected transform(data: any): {
-        title: string;
-        text: string;
+        title: any;
+        text: any;
+        backgroundImage: any;
         button: {
-            text: string;
+            text: any;
             payload: string;
         };
-        backgroundImage: string;
         input: {
-            placeholder: string;
+            placeholder: any;
             payload: string;
         };
     };

@@ -15,6 +15,7 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     private lastWindowWidth;
     private bubblePopup;
     currentHoverEntity: any;
+    hasScrollBackground: boolean;
     onInit({ communication, mainState, configuration, tippy }: {
         communication: any;
         mainState: any;
@@ -26,8 +27,28 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     renderPreviewsFromApolloQuery(response: any): void;
     onBubbleSelected(bubble: any): void;
     onBubbleDeselected(payload: any): void;
+    /**
+     * updates the bubble chart and the item previews based on the currently
+     * selected bubbles
+     *
+     * @param onlyBubbles specifies if only the bubble chart should be updated,
+     *                    leaving the item previews as they are
+     */
     private updateBubblesAndItemPreviews;
+    /**
+     * converts the id of an entity to the id of a bubble
+     * ( // d3/svg does not allow Number as beginning of ID.
+     *   // d3/svg does not allow '-' as part of ID. )
+     * @param entityId id of the entity
+     */
     private convertEntityIdToBubbleId;
+    /**
+     * sets the this.allBubbles variable based on the response apollo has given
+     * for the globalFilterQuery
+     *
+     * @param response apollo's response
+     * @param reset true if the bubble chart has to be reset/redrawn
+     */
     setAllBubblesFromApolloQuery(response: any, reset?: boolean): void;
     filterBubblesBasedOnFacetsEnabled(): any[];
     handleFacetSearchChange(change: any): void;
@@ -37,4 +58,6 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     onTagClicked(payload: any): void;
     private _getSubnav;
     private _getBreadcrumbs;
+    private _scrollBackgroundControl;
+    private _setHasScrollBackground;
 }
