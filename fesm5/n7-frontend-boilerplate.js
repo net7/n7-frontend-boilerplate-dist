@@ -278,7 +278,7 @@ var ApolloProviderConfig = {
     },
     'getTree': {
         queryName: 'getTreeOfItems',
-        queryBody: "\n    {\n      getTreeOfItems(treeId: \"patrimonioId\" ) {\n        id\n        label\n        icon\n        branches {\n          label\n          id\n          icon   \n          branches {\n            label\n            id\n            icon  \n            branches {\n              label\n              id\n              icon          \n            }        \n          }       \n        }\n      }\n    }\n    "
+        queryBody: "\n    {\n      getTreeOfItems(treeId: \"patrimonioId\" ) {\n        id\n        label\n        icon\n        branches {\n          label\n          id\n          icon\n          branches {\n            label\n            id\n            icon\n            branches {\n              label\n              id\n              icon\n            }\n          }\n        }\n      }\n    }\n    "
     },
     'globalFilter': {
         queryName: 'globalFilter',
@@ -286,11 +286,15 @@ var ApolloProviderConfig = {
     },
     'getEntityDetails': {
         queryName: 'getEntityDetails',
-        queryBody: "{\n      getEntityDetails(__PARAMS__){\n        overviewTab\n        entity {\n          label\n          id\n        }\n        fieldsTab {\n          id\n          fields {\n            id\n            key\n            value\n          }\n        }\n        entities {\n          entity {\n            id\n            label\n            typeOfEntity {\n              configKey\n            }\n          }\n          count\n        }\n        items {\n          breadcrumbs {\n            link\n            label\n          }\n          item {\n            id\n            label\n          }\n          thumbnail\n          relatedTOEData {\n            type {\n              id\n              configKey\n            }\n            count\n          }\n        }\n      }\n    }\n    "
+        queryBody: "{\n      getEntityDetails(__PARAMS__){\n        overviewTab\n        entity {\n          label\n          id\n          typeOfEntity {\n            configKey\n          }\n        }\n        fieldsTab {\n          label\n          fields {\n            key\n            value\n          }\n        }\n        entities {\n          entity {\n            id\n            label\n            typeOfEntity {\n              configKey\n            }\n          }\n          count\n        }\n        items {\n          breadcrumbs {\n            link\n            label\n          }\n          item {\n            id\n            label\n            info {\n              key\n              value\n            }\n          }\n          thumbnail\n          relatedTOEData {\n            type {\n              id\n              configKey\n            }\n            count\n          }\n        }\n      }\n    }\n    "
     },
     'getItemDetails': {
         queryName: 'getItemDetails',
-        queryBody: "{\n        getItemDetails(__PARAMS__){\n            title\n            text\n            subTitle\n            image\n            fields {\n              id\n              label\n              fields {\n                id\n                key\n                value\n              }\n            }\n            item {\n              id\n            }\n            breadcrumbs {\n              label\n              link\n            }\n          }\n      }"
+        queryBody: "{\n        getItemDetails(__PARAMS__){\n          title\n          text\n          subTitle\n          image\n           item {\n            id\n            icon\n          }\n          similarItems {\n            thumbnail\n              item {\n                label\n                icon\n                info {\n                  key\n                  value\n                }\n              }\n            relatedTOEData {\n              count\n              type {\n                label\n                configKey\n              }\n            }\n          }\n          connectedEntities {\n            count\n            entity{\n             id\n            label\n              typeOfEntity {\n                id\n                label\n                configKey\n              }\n            }\n          }\n          fields {\n            id\n            label\n            fields {\n              id\n              key\n              value\n            }\n          }\n          breadcrumbs {\n            label\n            link\n          }\n        }\n      }"
+    },
+    'autoComplete': {
+        queryName: 'autoComplete',
+        queryBody: "{\n      autoComplete(__PARAMS__){\n        totalCount\n        items {\n          item {\n            id\n            label\n            info {\n              key\n              value\n            }\n            icon\n          }\n          thumbnail\n          typeOfEntity {\n            id\n            configKey\n          }\n        }\n      }\n    }"
     }
 };
 
@@ -796,7 +800,21 @@ var MainLayoutDS = /** @class */ (function (_super) {
             if (!payload.path)
                 throw Error('onNavigate: no path for router navigate');
             this.router.navigate(payload.path);
+            // on change
+            this._onRouterNavigate();
         }
+    };
+    /**
+     * @private
+     * @return {?}
+     */
+    MainLayoutDS.prototype._onRouterNavigate = /**
+     * @private
+     * @return {?}
+     */
+    function () {
+        // hide tippy
+        tippy.hideAll();
     };
     return MainLayoutDS;
 }(LayoutDataSource));
@@ -1225,7 +1243,7 @@ var MainLayoutComponent = /** @class */ (function (_super) {
     MainLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'main-layout',
-                    template: "<div class=\"n7-main-layout\" id=\"main-layout\">\n    <div class=\"n7-page-content\">\n        <n7-header\n        [emit]=\"lb.widgets['header'].emit\"\n        [data]=\"lb.widgets['header'].ds.out$ | async\"></n7-header>\n\n        <!-- <n7-nav \n        *ngIf=\"!lb.dataSource.options.sidebar\"\n        [emit]=\"lb.widgets['subnav'].emit\"\n        [data]=\"lb.widgets['subnav'].ds.out$ | async\">\n        </n7-nav> -->\n\n        <main class=\"n7-content\">\n            <div class=\"n7-top-page-bar\">\n                <div class=\"n7-top-page-bar__main\">\n                    <!-- <h1 \n                    *ngIf=\"lb.dataSource.pageTitle\"\n                    class=\"n7-top-page-bar__title\">{{ lb.dataSource.pageTitle }}</h1>\n                    <n7-breadcrumbs \n                    [emit]=\"lb.widgets['breadcrumbs'].emit\"\n                    [data]=\"lb.widgets['breadcrumbs'].ds.out$ | async\">\n                    </n7-breadcrumbs> -->\n                </div>\n                <!--<div *ngIf=\"lb.dataSource.pageTools\" class=\"n7-top-page-bar__tools\">\n                    <a *ngFor=\"let tool of lb.dataSource.pageTools\" \n                    (click)=\"lb.eventHandler.emitInner('tools-click', tool.payload)\" \n                    class=\"n7-btn {{ tool.classes || '' }}\">\n                        {{ tool.label | translate }}\n                    </a>\n                </div>-->\n            </div>\n            \n            <div class=\"n7-alert-bar\">\n                <!--<n7-alert\n                [attr.id]=\"'main-layout-alert'\"\n                [data]=\"lb.dataSource.alertData$ | async\"\n                [emit]=\"lb.dataSource.closeAlert.bind(lb.dataSource)\"></n7-alert>-->\n            </div>\n            <ng-content></ng-content>\n        </main>\n    </div>\n\n    <div class=\"n7-footer-wrapper\"></div>\n</div>"
+                    template: "<div class=\"n7-main-layout\" id=\"main-layout\">\n    <div class=\"n7-page-content\">\n        <n7-header\n        [emit]=\"lb.widgets['header'].emit\"\n        [data]=\"lb.widgets['header'].ds.out$ | async\"></n7-header>\n\n        <!-- <n7-nav \n        *ngIf=\"!lb.dataSource.options.sidebar\"\n        [emit]=\"lb.widgets['subnav'].emit\"\n        [data]=\"lb.widgets['subnav'].ds.out$ | async\">\n        </n7-nav> -->\n\n        <main class=\"n7-content\">\n            <div class=\"n7-top-page-bar\">\n                <div class=\"n7-top-page-bar__main\">\n                    <!-- <h1 \n                    *ngIf=\"lb.dataSource.pageTitle\"\n                    class=\"n7-top-page-bar__title\">{{ lb.dataSource.pageTitle }}</h1>\n                    <n7-breadcrumbs \n                    [emit]=\"lb.widgets['breadcrumbs'].emit\"\n                    [data]=\"lb.widgets['breadcrumbs'].ds.out$ | async\">\n                    </n7-breadcrumbs> -->\n                </div>\n                <!--<div *ngIf=\"lb.dataSource.pageTools\" class=\"n7-top-page-bar__tools\">\n                    <a *ngFor=\"let tool of lb.dataSource.pageTools\" \n                    (click)=\"lb.eventHandler.emitInner('tools-click', tool.payload)\" \n                    class=\"n7-btn {{ tool.classes || '' }}\">\n                        {{ tool.label | translate }}\n                    </a>\n                </div>-->\n            </div>\n            \n            <div class=\"n7-alert-bar\">\n                <!--<n7-alert\n                [attr.id]=\"'main-layout-alert'\"\n                [data]=\"lb.dataSource.alertData$ | async\"\n                [emit]=\"lb.dataSource.closeAlert.bind(lb.dataSource)\"></n7-alert>-->\n            </div>\n            <ng-content></ng-content>\n        </main>\n    </div>\n\n    <div class=\"n7-footer-wrapper\">\n        <div class=\"n7-footer\">\n            Footer\n        </div>\n    </div>\n</div>"
                 }] }
     ];
     /** @nocollapse */
@@ -1526,6 +1544,164 @@ var AwAboutLayoutEH = /** @class */ (function (_super) {
     };
     return AwAboutLayoutEH;
 }(EventHandler));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var AwLinkedObjectsDS = /** @class */ (function (_super) {
+    __extends(AwLinkedObjectsDS, _super);
+    function AwLinkedObjectsDS() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    AwLinkedObjectsDS.prototype.transform = /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    function (data) {
+        /** @type {?} */
+        var KEYS = this.options.configKeys;
+        this.pageSize = this.options.size;
+        this.currentPage = Number(this.options.page);
+        this.totalPages = Math.floor(data.length / Number(this.pageSize));
+        return unpackData(data, this.currentPage, this.pageSize, KEYS, this.totalPages);
+    };
+    return AwLinkedObjectsDS;
+}(DataSource));
+if (false) {
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.totalPages;
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.currentPage;
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.pageSize;
+}
+/**
+ * @param {?} data
+ * @param {?} page
+ * @param {?} size
+ * @param {?} keys
+ * @param {?} totalPages
+ * @return {?}
+ */
+function unpackData(data, page, size, keys, totalPages) {
+    // resize data
+    if (size && page) {
+        data = data.slice(page * size - size, page * size);
+    }
+    else if (size) {
+        data = data.slice(0, size);
+    }
+    /** @type {?} */
+    var result = [];
+    data.forEach((/**
+     * @param {?} el
+     * @return {?}
+     */
+    function (el) {
+        /** @type {?} */
+        var item = {
+            image: el.thumbnail,
+            title: el.item.label,
+            text: el.item.info[1].value,
+            payload: el.item.id,
+            metadata: [
+                {
+                    classes: 'n7-objects__metadata-artist',
+                    items: [
+                        {
+                            // Artista: Mimmo Jodice
+                            // label: el.item.info[0].key,
+                            label: 'Autore',
+                            value: el.item.info[0].value
+                        }
+                    ]
+                },
+                {
+                    classes: 'n7-objects__metadata-linked',
+                    items: el.relatedTOEData.map((/**
+                     * @param {?} toe
+                     * @return {?}
+                     */
+                    function (toe) {
+                        return {
+                            // Persone: 6, Organizz: 12, Luoghi: 2, Concetti: 32
+                            value: toe.count,
+                            // icon: 'n7-icon-bell' // TODO: link icon to config key
+                            icon: keys[toe.type.configKey].icon
+                        };
+                    }))
+                }
+            ]
+        };
+        if (el.breadcrumbs) {
+            item['breadcrumbs'] = {
+                // n7-breadcrumbs uses this as it's own data
+                items: el.breadcrumbs.map((/**
+                 * @param {?} crumb
+                 * @return {?}
+                 */
+                function (crumb) {
+                    return {
+                        label: crumb.label,
+                        payload: crumb.link,
+                    };
+                }))
+            };
+        }
+        result.push(item);
+    }));
+    if (page) { // if I'm on a page, render pagination data.
+        // if I'm on a page, render pagination data.
+        /** @type {?} */
+        var sizeOptions = [10, 25, 50];
+        return {
+            pagination: {
+                first: { payload: "goto-" + 1, classes: page == 1 ? "is-disabled" : '' },
+                prev: { payload: "goto-" + (page - 1), classes: page == 1 ? "is-disabled" : '' },
+                next: { payload: "goto-" + (page + 1), classes: page == totalPages ? "is-disabled" : '' },
+                last: { payload: "goto-" + totalPages, classes: page == totalPages ? "is-disabled" : '' },
+                links: makePagination(totalPages, page),
+                select: {
+                    label: 'Numero di risultati',
+                    options: sizeOptions.map((/**
+                     * @param {?} o
+                     * @return {?}
+                     */
+                    function (o) {
+                        return { text: o, selected: o == size, disabled: o > totalPages };
+                    })),
+                    payload: 'select-size'
+                }
+            },
+            previews: result
+        };
+    }
+    return result;
+}
+/**
+ * @param {?} totalPages
+ * @param {?} currentPage
+ * @return {?}
+ */
+function makePagination(totalPages, currentPage) {
+    /** @type {?} */
+    var result = []
+    // always push the first page
+    ;
+    // always push the first page
+    result.push({ text: '1', payload: 'page-1', classes: currentPage == 1 ? 'is-active' : '' });
+    for (var i = 1; i < totalPages; i++) {
+        result.push({ text: String(i + 1), payload: 'page-' + String(i + 1), classes: currentPage == i + 1 ? 'is-active' : '' });
+    }
+    return result;
+}
 
 /**
  * @fileoverview added by tsickle
@@ -1923,74 +2099,6 @@ var AwHomeFacetsWrapperDS = /** @class */ (function (_super) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-var AwHomeItemPreviewWrapperDS = /** @class */ (function (_super) {
-    __extends(AwHomeItemPreviewWrapperDS, _super);
-    function AwHomeItemPreviewWrapperDS() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    AwHomeItemPreviewWrapperDS.prototype.transform = /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    function (data) {
-        /** @type {?} */
-        var result = [];
-        data.forEach((/**
-         * @param {?} item
-         * @return {?}
-         */
-        function (item) {
-            /** @type {?} */
-            var infoGroup = [
-                { label: 'Autore', value: '' },
-                { label: '', value: '' }
-            ];
-            item.item.info.forEach((/**
-             * @param {?} i
-             * @return {?}
-             */
-            function (i) {
-                if (i.key === 'author')
-                    infoGroup[0].value = i.value;
-                else if (i.key === 'short_description')
-                    infoGroup[1].value = i.value;
-            }));
-            /** @type {?} */
-            var toeGroup = item.relatedTOEData.map((/**
-             * @param {?} rToe
-             * @return {?}
-             */
-            function (rToe) {
-                return {
-                    label: rToe.type.label,
-                    value: rToe.count,
-                    icon: rToe.type.icon
-                };
-            }));
-            /** @type {?} */
-            var metadata = [{ items: infoGroup }, { items: toeGroup }];
-            result.push({
-                image: item.thumbnail,
-                title: item.item.label,
-                metadata: metadata,
-                payload: item.item.id
-            });
-        }));
-        return result;
-    };
-    return AwHomeItemPreviewWrapperDS;
-}(DataSource));
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 var AwHomeItemTagsWrapperDS = /** @class */ (function (_super) {
     __extends(AwHomeItemTagsWrapperDS, _super);
     function AwHomeItemTagsWrapperDS() {
@@ -2016,10 +2124,91 @@ var AwHomeItemTagsWrapperDS = /** @class */ (function (_super) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-// import { NAV_MOCK } from '@n7-frontend/components';
-var  
-// import { NAV_MOCK } from '@n7-frontend/components';
-AwEntitaNavDS = /** @class */ (function (_super) {
+var AwHomeAutocompleteDS = /** @class */ (function (_super) {
+    __extends(AwHomeAutocompleteDS, _super);
+    function AwHomeAutocompleteDS() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    AwHomeAutocompleteDS.prototype.transform = /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    function (data) {
+        var items = data.items, totalCount = data.totalCount;
+        var config = this.options.config;
+        /** @type {?} */
+        var itemIds = [];
+        /** @type {?} */
+        var groups = {};
+        items.forEach((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var item = _a.item, typeOfEntity = _a.typeOfEntity;
+            if (!groups[typeOfEntity.id]) {
+                var _b = config[typeOfEntity.configKey], label = _b.label, icon = _b.icon;
+                groups[typeOfEntity.id] = {
+                    title: label,
+                    icon: icon,
+                    classes: "color-" + typeOfEntity.configKey,
+                    items: [],
+                };
+            }
+            if (itemIds.indexOf(item.id) === -1) {
+                /** @type {?} */
+                var metaDataValue_1 = '';
+                item.info.forEach((/**
+                 * @param {?} infoData
+                 * @return {?}
+                 */
+                function (infoData) {
+                    if (infoData.key === 'author')
+                        metaDataValue_1 = "di " + infoData.value;
+                }));
+                groups[typeOfEntity.id].items.push({
+                    label: item.label,
+                    value: metaDataValue_1,
+                    payload: {
+                        source: 'item',
+                        id: item.id
+                    }
+                });
+            }
+        }));
+        /** @type {?} */
+        var results = Object.keys(groups).map((/**
+         * @param {?} key
+         * @return {?}
+         */
+        function (key) { return ({ group: __assign({}, groups[key]) }); }));
+        return {
+            results: results,
+            actions: {
+                showMore: {
+                    text: "Visualizza tutti i " + totalCount + " risultati",
+                    payload: {
+                        source: 'showMore'
+                    }
+                }
+            },
+            fallback: 'Spiacenti, non è stato trovato nessun risultato. <br> Riprova con una nuova ricerca.'
+        };
+    };
+    return AwHomeAutocompleteDS;
+}(DataSource));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var AwEntitaNavDS = /** @class */ (function (_super) {
     __extends(AwEntitaNavDS, _super);
     function AwEntitaNavDS() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -2035,9 +2224,135 @@ AwEntitaNavDS = /** @class */ (function (_super) {
      * @return {?}
      */
     function (data) {
-        return data;
+        /** @type {?} */
+        var navigation = {
+            items: [
+                {
+                    text: 'OVERVIEW',
+                    payload: 'overview',
+                },
+                {
+                    text: 'CAMPI',
+                    payload: 'campi',
+                },
+                {
+                    text: 'OGGETTI COLLEGATI',
+                    payload: 'oggetti-collegati',
+                },
+                {
+                    text: 'ENTITA COLLEGATE',
+                    payload: 'entita-collegate',
+                },
+                {
+                    text: 'MAXXI',
+                    payload: 'maxxi',
+                },
+                {
+                    text: 'WIKIPEDIA',
+                    payload: 'wiki',
+                },
+            ],
+            payload: 'entita-nav'
+        };
+        return navigation;
     };
     return AwEntitaNavDS;
+}(DataSource));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var AwEntitaMetadataViewerDS = /** @class */ (function (_super) {
+    __extends(AwEntitaMetadataViewerDS, _super);
+    function AwEntitaMetadataViewerDS() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    AwEntitaMetadataViewerDS.prototype.transform = /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    function (data) {
+        /*
+          // console.log('metadata options: ', this.options);
+          - - -
+          Access and use this.options if the rendering
+          changes based on context.
+        */
+        return {
+            group: AwEntitaMetadataViewerDS.unpackFields(data)
+        };
+    };
+    /**
+     * @param {?} fields
+     * @return {?}
+     */
+    AwEntitaMetadataViewerDS.unpackFields = /**
+     * @param {?} fields
+     * @return {?}
+     */
+    function (fields) {
+        /*
+              Recursive unpacking for rendering res.fields
+              - - -
+              This function transforms the response object tree
+              into an array, usable by metadata-viewer-component
+            */
+        /** @type {?} */
+        var extracted = [] // holds transformed object
+        ;
+        if (!fields)
+            return []; // if is empty → quit
+        for (var i = 0; i < fields.length; i++) {
+            /** @type {?} */
+            var thisField = fields[i] // rename current field
+            ;
+            // rename current field
+            /** @type {?} */
+            var title = thisField.label // field title
+            ;
+            // field title
+            /** @type {?} */
+            var label = thisField.key // item label
+            ;
+            // item label
+            /** @type {?} */
+            var value = thisField.value // item value
+            ;
+            // item value
+            /** @type {?} */
+            var group = thisField.fields // child group
+            ;
+            // child group
+            /** @type {?} */
+            var temp = {} // temporary object
+            ;
+            if (title) { // if there is a title, use it
+                temp.title = title;
+            }
+            if (label && value) { // if there are a lable and value, use them
+                temp.label = label;
+                temp.value = value;
+            }
+            if (group) { // if there is a child group
+                if (group[0].key) { // if this group has a tuple of (label, value)
+                    temp.items = AwEntitaMetadataViewerDS.unpackFields(group); // make items array
+                }
+                else {
+                    temp.group = AwEntitaMetadataViewerDS.unpackFields(group); // make child group array
+                }
+            }
+            extracted.push(temp); // add this object to the new array
+        }
+        return extracted;
+    };
+    return AwEntitaMetadataViewerDS;
 }(DataSource));
 
 /**
@@ -2092,16 +2407,18 @@ var AwTreeDS = /** @class */ (function (_super) {
          * @return {?}
          */
         function (it) {
+            /** @type {?} */
+            var classes = it['classes'];
             if (it['_meta'] == id) {
-                if (it['classes'] == "is-expanded") {
-                    it['classes'] = "is-collapsed";
+                if (classes.indexOf("is-expanded") > -1) {
+                    it['classes'] = classes.replace(/is-expanded/g, "is-collapsed");
                 }
                 else {
-                    it['classes'] = "is-expanded";
+                    it['classes'] = classes.replace(/is-collapsed/g, "is-expanded");
                 }
             }
             else if (parents.indexOf(it['_meta']) >= 0) {
-                it['classes'] = "is-expanded";
+                it['classes'] = classes + ' is-expanded';
             }
             if (typeof it['items'] != "undefined" && it['items'].length > 0) {
                 _this.updateTree(it, parents, id);
@@ -2129,8 +2446,8 @@ var AwTreeDS = /** @class */ (function (_super) {
          * @return {?}
          */
         function (it) {
-            if (it['_meta'] == id) {
-                it['classes'] = it['classes'] + " is-active";
+            if (it['_meta'] == id && it['classes'].indexOf('is-active') < 0) {
+                it['classes'] = it['classes'] + ' is-active';
                 _this.currentItem = it;
             }
             else {
@@ -2160,6 +2477,115 @@ var AwTreeDS = /** @class */ (function (_super) {
             sidebarData.classes = "is-expanded";
         }
         this.update(sidebarData);
+    };
+    /**
+     * @private
+     * @param {?} data
+     * @return {?}
+     */
+    AwTreeDS.prototype.parseData = /**
+     * @private
+     * @param {?} data
+     * @return {?}
+     */
+    function (data) {
+        var _this = this;
+        /** @type {?} */
+        var treeObj = {
+            items: []
+        };
+        if (data['branches']) {
+            data['branches'].forEach((/**
+             * @param {?} item
+             * @return {?}
+             */
+            function (item) {
+                treeObj['items'].push(_this.parseTree(item, false, []));
+            }));
+        }
+        this.update(treeObj);
+    };
+    /**
+     * @private
+     * @param {?} data
+     * @param {?} toggle
+     * @param {?} parents
+     * @return {?}
+     */
+    AwTreeDS.prototype.parseTree = /**
+     * @private
+     * @param {?} data
+     * @param {?} toggle
+     * @param {?} parents
+     * @return {?}
+     */
+    function (data, toggle, parents) {
+        var _this = this;
+        /** @type {?} */
+        var currParents = __spread(parents);
+        /** @type {?} */
+        var treeItem = {};
+        /** @type {?} */
+        var showToggle = toggle && data['branches'] != null;
+        if (showToggle) {
+            treeItem['toggle'] = {
+                icon: 'n7-icon-angle-right',
+                payload: {
+                    source: "toggle",
+                    id: data['id'],
+                    parents: currParents,
+                }
+            };
+        }
+        Object.keys(data).forEach((/**
+         * @param {?} key
+         * @return {?}
+         */
+        function (key) {
+            if (key != "branches") {
+                switch (key) {
+                    case "label":
+                        treeItem['text'] = data[key];
+                        break;
+                    case "icon":
+                        if (showToggle && data[key] != null) {
+                            treeItem['toggle']['icon'] = data[key];
+                        }
+                        else {
+                            treeItem['icon'] = data[key];
+                        }
+                        break;
+                    case "id":
+                        treeItem['_meta'] = data[key];
+                        treeItem['payload'] = {
+                            source: "menuItem",
+                            id: data['id']
+                        };
+                        break;
+                    default:
+                        data[key];
+                        break;
+                }
+                treeItem['classes'] = 'is-collapsed';
+            }
+            else if (data['branches'] != null) {
+                currParents.push(data['id']);
+                /*Handle cases with menu item with children but without toggle*/
+                if (!toggle) {
+                    treeItem['payload']['source'] = "ToggleMenuItem";
+                    treeItem['payload']['parents'] = currParents;
+                }
+                treeItem['items'] = [];
+                data[key].forEach((/**
+                 * @param {?} item
+                 * @return {?}
+                 */
+                function (item) {
+                    treeItem['items'].push(_this.parseTree(item, true, currParents));
+                }));
+            }
+        }));
+        return treeItem;
     };
     return AwTreeDS;
 }(DataSource));
@@ -2199,11 +2625,13 @@ var AwSidebarHeaderDS = /** @class */ (function (_super) {
     function () {
         /** @type {?} */
         var sidebarData = this.output;
-        if (sidebarData.classes == "is-expanded") {
-            sidebarData.classes = "is-collapsed";
+        if (sidebarData.classes == 'is-expanded') {
+            sidebarData.classes = 'is-collapsed';
+            sidebarData.iconRight = 'n7-icon-tree-icon';
         }
         else {
-            sidebarData.classes = "is-expanded";
+            sidebarData.classes = 'is-expanded';
+            sidebarData.iconRight = 'n7-icon-angle-left';
         }
         this.update(sidebarData);
     };
@@ -2281,21 +2709,333 @@ var AwSchedaMetadataDS = /** @class */ (function (_super) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+var AwSchedaImageDS = /** @class */ (function (_super) {
+    __extends(AwSchedaImageDS, _super);
+    function AwSchedaImageDS() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    AwSchedaImageDS.prototype.transform = /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    function (data) {
+        return data;
+    };
+    return AwSchedaImageDS;
+}(DataSource));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var AwSchedaInnerTitleDS = /** @class */ (function (_super) {
+    __extends(AwSchedaInnerTitleDS, _super);
+    function AwSchedaInnerTitleDS() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    AwSchedaInnerTitleDS.prototype.transform = /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    function (data) {
+        return data;
+    };
+    return AwSchedaInnerTitleDS;
+}(DataSource));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var AwSchedaBubbleChartDS = /** @class */ (function (_super) {
+    __extends(AwSchedaBubbleChartDS, _super);
+    function AwSchedaBubbleChartDS() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.thresholdShowTitle = 50;
+        _this.thresholdShowValue = 60;
+        return _this;
+    }
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    AwSchedaBubbleChartDS.prototype.transform = /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    function (data) {
+        var _this = this;
+        if (!data)
+            return null;
+        /** @type {?} */
+        var bubbleCointainer = document.getElementById(data.containerId);
+        /** @type {?} */
+        var cWidth = bubbleCointainer.offsetWidth;
+        // TODO: think of a good way to pass/compute cHeight
+        /** @type {?} */
+        var cHeight = 700;
+        // bubbleCointainer.offsetHeight
+        /** @type {?} */
+        var containerSize = cWidth * cHeight;
+        /** @type {?} */
+        var bubblesData = {
+            containerId: "bubbleChartContainer",
+            containerWidth: cWidth,
+            containerHeight: cHeight,
+            isForceSimulationEnabled: true,
+            maxBubblesSelected: 3
+        };
+        bubblesData['bubblesData'] = [];
+        /** @type {?} */
+        var maxBubbleCount = -1;
+        /** @type {?} */
+        var minBubbleCount = -1;
+        /** @type {?} */
+        var numOfBubbles = 0;
+        /** @type {?} */
+        var totalCount = 0;
+        /** @type {?} */
+        var numOfSelectedBubbles = 0;
+        data.bubbles.forEach((/**
+         * @param {?} bubble
+         * @return {?}
+         */
+        function (bubble) {
+            if (maxBubbleCount < bubble.count) {
+                maxBubbleCount = bubble.count;
+            }
+            if (minBubbleCount < 0 || minBubbleCount > bubble.count) {
+                minBubbleCount = bubble.count;
+            }
+            numOfBubbles++;
+            totalCount += bubble.count;
+            if (bubble.selected) {
+                numOfSelectedBubbles++;
+            }
+        }));
+        data.bubbles.forEach((/**
+         * @param {?} bubble
+         * @return {?}
+         */
+        function (bubble) {
+            /** @type {?} */
+            var bId = bubble.id;
+            /** @type {?} */
+            var bubblePercentage = (bubble.count - (minBubbleCount / 3)) / ((maxBubbleCount * 3) - (minBubbleCount / 3));
+            /** @type {?} */
+            var bubbleRadius = (Math.log(containerSize) / 10) * (bubblePercentage * 3) * (70 - Math.sqrt(numOfBubbles));
+            /** @type {?} */
+            var bubbleData = {
+                id: bId,
+                texts: [
+                    {
+                        id: bId + '_label0',
+                        label: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        function (d) { return bubble.entity.label; }),
+                        x_function: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        function (d) { return d.x; }),
+                        y_function: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        function (d) {
+                            /** @type {?} */
+                            var mNum = (d.radius / 9);
+                            if (d.radius < _this.thresholdShowValue) {
+                                mNum = 0;
+                            }
+                            return d.y - mNum;
+                        }),
+                        'user_select': 'none',
+                        fontSize_function: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        function (d) { return d.radius / 5; }),
+                        color: 'white',
+                        'classes': ''
+                    },
+                    {
+                        id: bId + '_label1',
+                        label: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        function (d) { if (d.radius < _this.thresholdShowValue) {
+                            return null;
+                        } return bubble.count; }),
+                        x_function: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        function (d) { return d.x; }),
+                        y_function: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        function (d) { return d.y + (d.radius / 9); }),
+                        'user_select': 'none',
+                        fontSize_function: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        function (d) { return d.radius / 6; }),
+                        color: 'white',
+                        'classes': ''
+                    }
+                ],
+                x: cWidth / 2 + 50,
+                y: cHeight / 2 + 50,
+                'radius': bubbleRadius,
+                color: bubble.color,
+                hasCloseIcon: (bubble.selected ? bubble.selected : false),
+                payload: {
+                    id: bId
+                },
+            };
+            bubblesData['bubblesData'].push(bubbleData);
+        }));
+        bubblesData['forceSimulationData'] = {
+            xPull: cWidth / 2,
+            xPullStrength: -0.01,
+            yPull: cHeight / 2,
+            yPullStrength: -0.01,
+            collisionStrengh: 0.99,
+            collisionIterations: 1,
+            velocityDecay: 0.65
+        };
+        if (data.reset) {
+            bubblesData['reset'] = data.reset;
+        }
+        if (data.setUpdateReference) {
+            bubblesData['setUpdateReference'] = data.setUpdateReference;
+        }
+        if (data.setBubbleChart) {
+            bubblesData['setBubbleChart'] = data.setBubbleChart;
+        }
+        return bubblesData;
+    };
+    return AwSchedaBubbleChartDS;
+}(DataSource));
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaBubbleChartDS.prototype.thresholdShowTitle;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaBubbleChartDS.prototype.thresholdShowValue;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 
 var DS$1 = /*#__PURE__*/Object.freeze({
+    AwLinkedObjectsDS: AwLinkedObjectsDS,
     AwHeroDS: AwHeroDS,
     AwTableDS: AwTableDS,
     AwHomeHeroPatrimonioDS: AwHomeHeroPatrimonioDS,
     AwHomeBubbleChartDS: AwHomeBubbleChartDS,
     AwHomeFacetsWrapperDS: AwHomeFacetsWrapperDS,
-    AwHomeItemPreviewWrapperDS: AwHomeItemPreviewWrapperDS,
     AwHomeItemTagsWrapperDS: AwHomeItemTagsWrapperDS,
+    AwHomeAutocompleteDS: AwHomeAutocompleteDS,
     AwEntitaNavDS: AwEntitaNavDS,
+    AwEntitaMetadataViewerDS: AwEntitaMetadataViewerDS,
     AwTreeDS: AwTreeDS,
     AwSidebarHeaderDS: AwSidebarHeaderDS,
     AwSchedaBreadcrumbsDS: AwSchedaBreadcrumbsDS,
-    AwSchedaMetadataDS: AwSchedaMetadataDS
+    AwSchedaMetadataDS: AwSchedaMetadataDS,
+    AwSchedaImageDS: AwSchedaImageDS,
+    AwSchedaInnerTitleDS: AwSchedaInnerTitleDS,
+    AwSchedaBubbleChartDS: AwSchedaBubbleChartDS
 });
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var AwLinkedObjectsEH = /** @class */ (function (_super) {
+    __extends(AwLinkedObjectsEH, _super);
+    function AwLinkedObjectsEH() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @return {?}
+     */
+    AwLinkedObjectsEH.prototype.listen = /**
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                case 'aw-linked-objects.click':
+                    if (payload.startsWith('page')) {
+                        // pagination routing is handled by the parent layout
+                        _this.emitOuter('pagination', payload);
+                    }
+                    else if (payload.startsWith('goto')) {
+                        /** @type {?} */
+                        var targetPage = Number(payload.replace('goto-', ''))
+                        // kill impossible page navigations
+                        ;
+                        // kill impossible page navigations
+                        if (targetPage > _this.dataSource.totalPages)
+                            return;
+                        else if (targetPage < 1 || targetPage === _this.dataSource.currentPage)
+                            return;
+                        else
+                            _this.emitOuter('goto', payload);
+                    }
+                    else {
+                        // navigate to the patrimonio page of this item
+                        _this.emitGlobal('navigate', {
+                            handler: 'router',
+                            path: ["aw/patrimonio/" + payload]
+                        });
+                    }
+                    break;
+                case 'aw-linked-objects.change':
+                    _this.emitOuter('change', Number(payload.value));
+                    break;
+                default:
+                    console.warn('unhandled event type: ', type, ' with payload: ', payload);
+                    break;
+            }
+        }));
+    };
+    return AwLinkedObjectsEH;
+}(EventHandler));
 
 /**
  * @fileoverview added by tsickle
@@ -2331,9 +3071,6 @@ var AwHeroEH = /** @class */ (function (_super) {
                     break;
             }
         }));
-        /* this.outerEvents$.subscribe(event => {
-        
-        }); */
     };
     return AwHeroEH;
 }(EventHandler));
@@ -2471,31 +3208,6 @@ var AwHomeHeroPatrimonioEH = /** @class */ (function (_super) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-var AwHomeItemPreviewWrapperEH = /** @class */ (function (_super) {
-    __extends(AwHomeItemPreviewWrapperEH, _super);
-    function AwHomeItemPreviewWrapperEH() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    /**
-     * @return {?}
-     */
-    AwHomeItemPreviewWrapperEH.prototype.listen = /**
-     * @return {?}
-     */
-    function () {
-        // this.innerEvents$.subscribe( e => {
-        // });
-        /* this.outerEvents$.subscribe(event => {
-        
-        }); */
-    };
-    return AwHomeItemPreviewWrapperEH;
-}(EventHandler));
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 var AwHomeItemTagsWrapperEH = /** @class */ (function (_super) {
     __extends(AwHomeItemTagsWrapperEH, _super);
     function AwHomeItemTagsWrapperEH() {
@@ -2533,6 +3245,42 @@ var AwHomeItemTagsWrapperEH = /** @class */ (function (_super) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+var AwHomeAutocompleteEH = /** @class */ (function (_super) {
+    __extends(AwHomeAutocompleteEH, _super);
+    function AwHomeAutocompleteEH() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @return {?}
+     */
+    AwHomeAutocompleteEH.prototype.listen = /**
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                case "aw-home-autocomplete.click":
+                    if (payload && payload.source === 'item')
+                        _this.emitOuter('click', payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
+    };
+    return AwHomeAutocompleteEH;
+}(EventHandler));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 var AwEntitaNavEH = /** @class */ (function (_super) {
     __extends(AwEntitaNavEH, _super);
     function AwEntitaNavEH() {
@@ -2545,10 +3293,23 @@ var AwEntitaNavEH = /** @class */ (function (_super) {
      * @return {?}
      */
     function () {
+        var _this = this;
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                case 'aw-entita-nav.click':
+                    _this.emitOuter('click', payload);
+                    break;
+                default:
+                    console.warn('unhandled event type');
+                    break;
+            }
+        }));
         /*
-        this.innerEvents$.subscribe(event => {
-          
-        });
     
         this.outerEvents$.subscribe(event => {
           
@@ -2651,7 +3412,7 @@ var AwTreeEH = /** @class */ (function (_super) {
          */
         function (_a) {
             var type = _a.type, payload = _a.payload;
-            if (payload && typeof payload.source != "undefined") {
+            if (payload && typeof payload.source != 'undefined') {
                 switch (payload.source) {
                     case 'toggle':
                         _this.dataSource.updateTree(null, payload.parents, payload.id);
@@ -2670,12 +3431,17 @@ var AwTreeEH = /** @class */ (function (_super) {
          */
         function (_a) {
             var type = _a.type, payload = _a.payload;
-            if (type == 'aw-sidebar-header.click') {
-                _this.dataSource.toggleSidebar();
-            }
-            else if (type == 'aw-scheda-layout.selectItem') {
-                _this.dataSource.selectTreeItem(payload);
-                _this.dataSource.updateTree(null, _this.dataSource.currentItem.payload.parents, payload);
+            switch (type) {
+                case 'aw-sidebar-header.click':
+                    _this.dataSource.toggleSidebar();
+                    break;
+                case 'aw-scheda-layout.selectItem':
+                    _this.dataSource.selectTreeItem(payload);
+                    _this.dataSource.updateTree(null, _this.dataSource.currentItem.payload.parents, payload);
+                    break;
+                case 'aw-scheda-layout.navigationresponse':
+                    _this.dataSource.parseData(payload);
+                    break;
             }
         }));
     };
@@ -2717,12 +3483,13 @@ var AwTableEH = /** @class */ (function (_super) {
  */
 
 var EH$1 = /*#__PURE__*/Object.freeze({
+    AwLinkedObjectsEH: AwLinkedObjectsEH,
     AwHeroEH: AwHeroEH,
     AwHomeBubbleChartEH: AwHomeBubbleChartEH,
     AwHomeFacetsWrapperEH: AwHomeFacetsWrapperEH,
     AwHomeHeroPatrimonioEH: AwHomeHeroPatrimonioEH,
-    AwHomeItemPreviewWrapperEH: AwHomeItemPreviewWrapperEH,
     AwHomeItemTagsWrapperEH: AwHomeItemTagsWrapperEH,
+    AwHomeAutocompleteEH: AwHomeAutocompleteEH,
     AwEntitaNavEH: AwEntitaNavEH,
     AwSchedaSidebarEH: AwSchedaSidebarEH,
     AwSidebarHeaderEH: AwSidebarHeaderEH,
@@ -2832,6 +3599,33 @@ var JsonConfigService = /** @class */ (function () {
              * @return {?}
              */
             function (key) { return _this.config.set(key, response[key]); }));
+            // config keys colors
+            if (response['config-keys']) {
+                /** @type {?} */
+                var headTag = document.querySelector('head');
+                /** @type {?} */
+                var styleElement = document.createElement('style');
+                /** @type {?} */
+                var styles_1 = [];
+                Object.keys(response['config-keys']).forEach((/**
+                 * @param {?} key
+                 * @return {?}
+                 */
+                function (key) {
+                    /** @type {?} */
+                    var configKey = response['config-keys'][key] || {};
+                    if (configKey.color && configKey.color.hex) {
+                        // add css class
+                        styles_1.push("--color-" + key + ": " + configKey.color.hex + ";");
+                    }
+                }));
+                if (styles_1.length) {
+                    styles_1.unshift(':root {');
+                    styles_1.push('}');
+                    styleElement.appendChild(document.createTextNode(styles_1.join('\n')));
+                    headTag.appendChild(styleElement);
+                }
+            }
         }
     };
     JsonConfigService.decorators = [
@@ -2873,7 +3667,11 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
     __extends(AwEntitaLayoutDS, _super);
     function AwEntitaLayoutDS() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.myResponse = {}; // store response object
+        _this.myResponse = {}; // backend response object
+        // selected nav item
+        _this.navHeader = {}; // nav-header (custom) data
+        // pagination value (url param)
+        _this.pageSize = 10; // linked objects page size
         return _this;
     }
     /**
@@ -2886,18 +3684,12 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
      */
     function (_a) {
         var configuration = _a.configuration, mainState = _a.mainState, router = _a.router, options = _a.options, titleService = _a.titleService, communication = _a.communication;
+        this.communication = communication;
         this.configuration = configuration;
         this.mainState = mainState;
+        this.options = options;
         this.router = router;
         this.titleService = titleService;
-        this.options = options;
-        this.communication = communication;
-        // this.communication.request$('getEntityDetails', {
-        //   onError: (error) => console.log(error),
-        //   params: { entityId: "test" }
-        // }).subscribe((response) => {
-        //   console.log('apollo-response', { response })
-        // });
     };
     /**
      * @param {?} id
@@ -2908,11 +3700,8 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
      * @return {?}
      */
     function (id) {
-        /**
-         * Requests data from communication provider
-         *
-         * @param id - the id of the item to get
-         * @returns the response of getEntityDetails with entityId === id
+        /*
+          Requests data from communication provider
          */
         return this.communication.request$('getEntityDetails', {
             onError: (/**
@@ -2932,46 +3721,10 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
      * @return {?}
      */
     function (data) {
-        /**
-         * Updates the widgets on this layout, based on route
-         *
-         * @param data - communication reponse object
-         */
-        /**
-         * Updates the widgets on this layout, based on route
-         *
-         * \@param data - communication reponse object
-         * @type {?}
-         */
-        var navigation = { items: [
-                {
-                    text: 'OVERVIEW',
-                    payload: 'overview',
-                },
-                {
-                    text: 'CAMPI',
-                    payload: 'campi',
-                },
-                {
-                    text: 'OGGETTI COLLEGATI',
-                    payload: 'oggetti-collegati',
-                },
-                {
-                    text: 'ENTITA COLLEGATE',
-                    payload: 'entita-collegate',
-                },
-                {
-                    text: 'MAXXI',
-                    payload: 'maxxi',
-                },
-                {
-                    text: 'WIKIPEDIA',
-                    payload: 'wiki',
-                },
-            ],
-            payload: 'entita-nav'
-        };
-        this.one('aw-entita-nav').update(navigation);
+        /*
+          Updates the widgets on this layout, based on route
+        */
+        this.one('aw-entita-nav').update('some data');
     };
     /**
      * @param {?} id
@@ -2984,13 +3737,11 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
      * @return {?}
      */
     function (id, tab) {
-        /**
-         * Loads the data for the selected nav item, into the adjacent text block.
-         *
-         * @param id - id of item to request
-         * @param tab - selected nav tab
-         */
+        /*
+          Loads the data for the selected nav item, into the adjacent text block.
+        */
         if (id && tab) {
+            this.currentId = id; // store selected item from url
             this.selectedTab = tab; // store selected tab from url
             return this.communication.request$('getEntityDetails', {
                 onError: (/**
@@ -3014,9 +3765,59 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
      * @return {?}
      */
     function (res) {
-        console.log('loadcontent-response: ', { res: res });
+        console.log('Apollo responded with: ', { res: res });
         this.myResponse = res;
-        this.entityTitle = res.entity.label;
+        this.navHeader = {
+            // always render nav header
+            icon: this.configuration.get("config-keys")[this.myResponse.entity.typeOfEntity.configKey].icon,
+            text: this.myResponse.entity.label
+        };
+        switch (this.selectedTab) { // make dynamic content depending on request
+            case 'overview':
+                {
+                    this.one('aw-entita-metadata-viewer').updateOptions({ context: this.selectedTab });
+                    this.one('aw-entita-metadata-viewer').update(res.fieldsTab);
+                    this.one('aw-linked-objects').updateOptions({ size: 3, configKeys: this.configuration.get("config-keys") });
+                    this.one('aw-linked-objects').update(res.items);
+                }
+                break;
+            case 'campi':
+                {
+                    this.one('aw-entita-metadata-viewer').updateOptions({ context: this.selectedTab });
+                    this.one('aw-entita-metadata-viewer').update(res.fieldsTab);
+                }
+                break;
+            case 'oggetti-collegati':
+                {
+                    this.one('aw-linked-objects').updateOptions({
+                        context: this.selectedTab,
+                        configKeys: this.configuration.get("config-keys"),
+                        page: this.currentPage,
+                        size: this.pageSize,
+                    });
+                    this.one('aw-linked-objects').update(res.items);
+                }
+                break;
+            case 'entita-collegate':
+                {
+                    // entita
+                }
+                break;
+            case 'maxxi':
+                {
+                    // maxxi
+                }
+                break;
+            case 'wiki':
+                {
+                    // wiki
+                }
+                break;
+            default:
+                // the url is aw/entita/something/ ??? → unknown
+                console.warn('Unhandled navigation page');
+                break;
+        }
     };
     return AwEntitaLayoutDS;
 }(LayoutDataSource));
@@ -3048,9 +3849,15 @@ if (false) {
     /** @type {?} */
     AwEntitaLayoutDS.prototype.myResponse;
     /** @type {?} */
-    AwEntitaLayoutDS.prototype.entityTitle;
-    /** @type {?} */
     AwEntitaLayoutDS.prototype.selectedTab;
+    /** @type {?} */
+    AwEntitaLayoutDS.prototype.navHeader;
+    /** @type {?} */
+    AwEntitaLayoutDS.prototype.currentId;
+    /** @type {?} */
+    AwEntitaLayoutDS.prototype.currentPage;
+    /** @type {?} */
+    AwEntitaLayoutDS.prototype.pageSize;
     /**
      * @type {?}
      * @private
@@ -3090,12 +3897,61 @@ var AwEntitaLayoutEH = /** @class */ (function (_super) {
                     _this.route = payload.route;
                     /** @type {?} */
                     var paramId = _this.route.snapshot.params.id || "";
+                    _this.dataSource.currentPage = _this.route.snapshot.params.page || '';
                     _this.listenRoute();
                     _this.loadNavigation(paramId);
                     break;
                 case 'aw-entita-layout.destroy':
                     _this.destroyed$.next();
                     break;
+                default:
+                    break;
+            }
+        }));
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                case 'aw-entita-nav.click':
+                    if (payload) {
+                        _this.emitGlobal('navigate', {
+                            path: [
+                                _this.configuration.get("paths").entitaBasePath
+                                    + '/' +
+                                    _this.route.snapshot.params.id
+                                    + '/' +
+                                    payload
+                            ],
+                            handler: 'router'
+                        });
+                    }
+                    break;
+                case 'aw-linked-objects.pagination':
+                    _this.dataSource.currentPage = payload.split('-')[1];
+                    _this.emitGlobal('navigate', {
+                        handler: 'router',
+                        path: ["aw/entita/" + _this.route.snapshot.params.id + "/oggetti-collegati/" + payload.split('-')[1]]
+                    });
+                    break;
+                case 'aw-linked-objects.goto':
+                    /** @type {?} */
+                    var targetPage = Number(payload.replace('goto-', ''))
+                    // this.emitGlobal('navigate', {
+                    //   handler: 'router',
+                    //   path: [`aw/entita/${this.route.snapshot.params.id}/oggetti-collegati/${targetPage}`]
+                    // });
+                    ;
+                    // this.emitGlobal('navigate', {
+                    //   handler: 'router',
+                    //   path: [`aw/entita/${this.route.snapshot.params.id}/oggetti-collegati/${targetPage}`]
+                    // });
+                    break;
+                case 'aw-linked-objects.change':
+                    _this.dataSource.pageSize = payload;
+                    _this.listenRoute(); // reloads the page content with the new page size
                 default:
                     break;
             }
@@ -3195,13 +4051,10 @@ if (false) {
 /** @type {?} */
 var AwEntitaLayoutConfig = {
     layoutId: 'aw-entita-layout',
-    /**
-     * Array of components to use
-     * in this layout
-     */
     widgets: [
-        // { id: 'header' },
-        { id: 'aw-entita-nav' }
+        { id: 'aw-entita-nav', hasStaticData: true },
+        { id: 'aw-entita-metadata-viewer' },
+        { id: 'aw-linked-objects' },
     ],
     layoutDS: AwEntitaLayoutDS,
     layoutEH: AwEntitaLayoutEH,
@@ -3280,7 +4133,7 @@ var AwEntitaLayoutComponent = /** @class */ (function (_super) {
     AwEntitaLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-entita-layout',
-                    template: "<div class=\"aw-entita-layout\" *ngIf=\"lb.dataSource\">\n    <h2><span class=\"n7-icon-map-marker-alt\"></span> {{lb.dataSource.entityTitle}}</h2>\n    <n7-nav \n        [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" \n        [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n    </n7-nav>\n    <ng-container [ngSwitch]=\"lb.dataSource.selectedTab\">\n        <ng-container *ngSwitchCase=\"'overview'\">\n            <ng-container *ngTemplateOutlet=\"overview\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'campi'\">\n            <ng-container *ngTemplateOutlet=\"campi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'oggetti'\">\n            <ng-container *ngTemplateOutlet=\"oggetti\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'entita'\">\n            <ng-container *ngTemplateOutlet=\"entita\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'maxxi'\">\n            <ng-container *ngTemplateOutlet=\"maxxi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'wiki'\">\n            <ng-container *ngTemplateOutlet=\"wiki\"></ng-container>\n        </ng-container>\n    </ng-container>\n</div>\n\n<ng-template #overview>\n    <div>\n        {{lb.dataSource.myResponse.overviewTab}}\n    </div>\n</ng-template>\n\n<ng-template #campi>\n    <div>\n        Page campi\n    </div>\n</ng-template>\n\n<ng-template #oggetti>\n    <div>\n        Page oggetti\n    </div>\n</ng-template>\n\n<ng-template #entita>\n    <div>\n        Page entita\n    </div>\n</ng-template>\n\n<ng-template #maxxi>\n    <div>\n        Page maxxi\n    </div>\n</ng-template>\n\n<ng-template #wiki>\n    <div>\n        Page wiki\n    </div>\n</ng-template>\n"
+                    template: "<div class=\"aw-entity\" *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div class=\"aw-entity__sidebar-title-wrapper\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <n7-nav \n            [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" \n            [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n    \n    <div class=\"aw-entity__content\" \n         [ngSwitch]=\"lb.dataSource.selectedTab\">\n        <ng-container *ngSwitchCase=\"'overview'\">\n            <ng-container *ngTemplateOutlet=\"overview\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'campi'\">\n            <ng-container *ngTemplateOutlet=\"campi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'oggetti-collegati'\">\n            <ng-container *ngTemplateOutlet=\"oggetti\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'entita-collegate'\">\n            <ng-container *ngTemplateOutlet=\"entita\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'maxxi'\">\n            <ng-container *ngTemplateOutlet=\"maxxi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'wiki'\">\n            <ng-container *ngTemplateOutlet=\"wiki\"></ng-container>\n        </ng-container>\n    </div>\n</div>\n\n<!-- navigation page content templates -->\n<ng-template #overview>\n    <section>\n        <div class=\"aw-entity__content-section\">\n            <div class=\"aw-entity__overview-description\">\n                {{lb.dataSource.myResponse.overviewTab}}\n            </div>\n            <div class=\"aw-entita-layout__button-wrapper\">\n                <button class=\"n7-btn n7-btn-light\">DESCRIZIONE WIKIPEDIA</button>\n                <button class=\"n7-btn n7-btn-light\">DESCRIZIONE MAXXI</button>\n            </div>\n        </div>\n        \n        <ng-container *ngIf=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async as data\">\n            <div class=\"aw-entity__content-section\">\n                <h1>Campi</h1>\n                <button class=\"n7-btn n7-btn-light\">TUTTI I CAMPI</button>\n                <n7-metadata-viewer \n                    class=\"aw-entita-layout__metadata-viewer\"\n                    [data]=\"data\">\n                </n7-metadata-viewer>\n            </div>\n        </ng-container>\n        \n        <div class=\"aw-entity__content-section\">\n            <h1>Oggetti collegati</h1><button class=\"n7-btn n7-btn-light\">TUTTI GLI OGGETTI COLLEGATI</button>\n            <ng-container *ngFor=\"let preview of lb.widgets['aw-linked-objects'].ds.out$ | async\">\n                <n7-breadcrumbs\n                    [data]=\"preview.breadcrumbs\">\n                </n7-breadcrumbs>\n                <n7-item-preview\n                    [data]=\"preview\"\n                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-item-preview>\n            </ng-container>\n        </div>\n        \n    </section>\n</ng-template>\n\n<ng-template #campi>\n    <div>\n        <ng-container *ngIf=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async as data\">\n            <h1>Campi</h1>\n            <n7-metadata-viewer class=\"aw-entita-layout__metadata-viewer\"\n                [data]=\"data\">\n            </n7-metadata-viewer>\n        </ng-container>\n    </div>\n</ng-template>\n\n<ng-template #oggetti>\n    <div>\n        <h1>Oggetti collegati</h1>\n        <ng-container \n            *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n            <n7-breadcrumbs [data]=\"preview.breadcrumbs\">\n            </n7-breadcrumbs>\n            <n7-item-preview \n                [data]=\"preview\"\n                [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n            </n7-item-preview>\n        </ng-container>\n        <n7-pagination \n            [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n            [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n        </n7-pagination>\n    </div>\n</ng-template>\n\n<ng-template #entita>\n    <div>\n        Page entita\n    </div>\n</ng-template>\n\n<ng-template #maxxi>\n    <div>\n        Page maxxi\n    </div>\n</ng-template>\n\n<ng-template #wiki>\n    <div>\n        Page wiki\n    </div>\n</ng-template>\n"
                 }] }
     ];
     /** @nocollapse */
@@ -3347,6 +4200,8 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
         // (the objects in the allBubbles are not the same bubble objects
         // present in the bubble chart)
         _this.allBubbles = null;
+        _this.autocompletePopoverOpen = false;
+        _this.autocompleteChanged$ = new Subject();
         // the bubbles currently selected (this are saved from the event handler's
         // and correspond exactly to the bubblechart's bubble objects)
         _this.selectedBubbles = [];
@@ -3433,6 +4288,8 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
                 _this.updateBubblesAndItemPreviews(true);
             }
         }));
+        // listen autocomplete changes
+        this._listenAutoCompleteChanges();
     };
     /**
      * @param {?} source
@@ -3561,7 +4418,8 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
         else {
             this.numOfItemsStr = null;
         }
-        this.one('aw-home-item-preview-wrapper').update(response.itemsPagination.items);
+        this.one('aw-linked-objects').updateOptions({ context: 'home', configKeys: this.configuration.get('config-keys') });
+        this.one('aw-linked-objects').update(response.itemsPagination.items);
         // scroll control
         this._scrollBackgroundControl();
     };
@@ -3968,6 +4826,17 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
         this.updateBubblesAndItemPreviews();
     };
     /**
+     * @param {?} value
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.onHeroChange = /**
+     * @param {?} value
+     * @return {?}
+     */
+    function (value) {
+        this.autocompleteChanged$.next(value);
+    };
+    /**
      * @private
      * @return {?}
      */
@@ -4064,6 +4933,83 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
         var scrollTop = _a.scrollTop, scrollHeight = _a.scrollHeight, clientHeight = _a.clientHeight;
         this.hasScrollBackground = scrollHeight > (scrollTop + clientHeight);
     };
+    /**
+     * @private
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype._listenAutoCompleteChanges = /**
+     * @private
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        this.one('aw-home-autocomplete').updateOptions({ config: this.configuration.get('config-keys') });
+        this.autocompleteChanged$.pipe(debounceTime(500)).subscribe((/**
+         * @param {?} value
+         * @return {?}
+         */
+        function (value) {
+            if (value) {
+                _this.communication.request$('autoComplete', {
+                    onError: (/**
+                     * @param {?} error
+                     * @return {?}
+                     */
+                    function (error) { return console.error(error); }),
+                    params: {
+                        input: value,
+                        itemsPagination: { offset: 0, limit: _this.configuration.get('home-layout')['results-limit'] }
+                    }
+                }).subscribe((/**
+                 * @param {?} response
+                 * @return {?}
+                 */
+                function (response) {
+                    _this.one('aw-home-autocomplete').update(response);
+                    if (!_this.autocompletePopoverOpen)
+                        _this._toggleAutocompletePopover();
+                }));
+            }
+            else {
+                _this._toggleAutocompletePopover();
+            }
+        }));
+    };
+    /**
+     * @private
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype._toggleAutocompletePopover = /**
+     * @private
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        if (!this.autocompletePopover) {
+            /** @type {?} */
+            var template = document.getElementById('aw-home-advanced-autocomplete-popover');
+            template.style.display = 'block';
+            this.autocompletePopover = this.tippy('.aw-home__top-hero .n7-hero__input', {
+                content: template,
+                trigger: 'manual',
+                interactive: true,
+                arrow: false,
+                theme: 'light-border',
+                placement: 'bottom-start',
+                onHidden: (/**
+                 * @return {?}
+                 */
+                function () { return _this.autocompletePopoverOpen = false; }),
+            })[0];
+        }
+        if (this.autocompletePopoverOpen) {
+            this.autocompletePopover.hide();
+        }
+        else {
+            this.autocompletePopover.show();
+        }
+        this.autocompletePopoverOpen = !this.autocompletePopoverOpen;
+    };
     return AwHomeLayoutDS;
 }(LayoutDataSource));
 if (false) {
@@ -4102,6 +5048,21 @@ if (false) {
      * @private
      */
     AwHomeLayoutDS.prototype.allBubbles;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.autocompletePopover;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.autocompletePopoverOpen;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.autocompleteChanged$;
     /** @type {?} */
     AwHomeLayoutDS.prototype.selectedBubbles;
     /** @type {?} */
@@ -4165,6 +5126,7 @@ var AwHomeLayoutEH = /** @class */ (function (_super) {
             switch (type) {
                 case 'aw-home-layout.init':
                     _this.dataSource.onInit(payload);
+                    _this.configuration = payload.configuration;
                     break;
                 case 'aw-home-layout.destroy':
                     _this.destroyed$.next();
@@ -4195,8 +5157,7 @@ var AwHomeLayoutEH = /** @class */ (function (_super) {
             var type = _a.type, payload = _a.payload;
             switch (type) {
                 case 'aw-hero.change':
-                    var inputPayload = payload.inputPayload, value = payload.value;
-                    // TODO: do something
+                    _this.dataSource.onHeroChange(payload.value);
                     break;
                 /**
                  * Facets Event Handlers
@@ -4232,6 +5193,15 @@ var AwHomeLayoutEH = /** @class */ (function (_super) {
                  */
                 case 'aw-home-item-tags-wrapper.click':
                     _this.dataSource.onTagClicked(payload);
+                    break;
+                /**
+                 * Tags & Item Previews Event Handlers
+                 */
+                case 'aw-home-autocomplete.click':
+                    _this.emitGlobal('navigate', {
+                        handler: 'router',
+                        path: [_this.configuration.get('paths').entitaBasePath, payload.id]
+                    });
                     break;
                 default:
                     break;
@@ -4276,7 +5246,9 @@ var AwHomeLayoutConfig = {
         }, {
             id: 'aw-home-item-tags-wrapper',
         }, {
-            id: 'aw-home-item-preview-wrapper'
+            id: 'aw-home-autocomplete'
+        }, {
+            id: 'aw-linked-objects'
         }],
     layoutDS: AwHomeLayoutDS,
     layoutEH: AwHomeLayoutEH,
@@ -4340,7 +5312,7 @@ var AwHomeLayoutComponent = /** @class */ (function (_super) {
     AwHomeLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-home-layout',
-                    template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- hidden buttons and div used to implement the bubbles' popups -->\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_closebutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-close-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_gotobutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-goto-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_selectbutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-select-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <div id=\"bubble-popup-menu\" style=\"display: none;\">\n        <h2>{{ ( lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.label : '' ) }}</h2>\n        <span class=\"n7-icon-close\" onclick=\"document.getElementById('bubble-popup-menu_closebutton').click();\"></span>\n        <p>\n                {{ ( lb.dataSource.currentHoverEntity ? '\u00C8 collegato a '+lb.dataSource.currentHoverEntity.count+' entit\u00E0' : '' ) }}\n        </p>\n        <span onclick=\"document.getElementById('bubble-popup-menu_gotobutton').click();\">Vai alla scheda</span> |\n        <span onclick=\"document.getElementById('bubble-popup-menu_selectbutton').click();\">Seleziona</span>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper\" [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length>0 }\">\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div id=\"bubble-chart-container\">\n            <n7-bubble-chart [data]=\"lb.widgets['aw-home-bubble-chart'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-home-bubble-chart'].emit\">\n            </n7-bubble-chart>\n        </div>\n\n        <ng-container *ngIf=\"lb.dataSource.selectedBubbles.length>0\">\n            <div class=\"aw-home__bubble-results\" [ngStyle]=\"{ 'display': 'flex' , 'flex-direction': 'column' }\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\"> <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">{{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span></h1></div>\n\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list-wrapper\">\n                    <div class=\"aw-home__bubble-results-list\" [attr.id]=\"'bubble-results-list'\">\n                        <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-preview-wrapper'].ds.out$ | async;\">\n                            <n7-item-preview\n                                [data]=\"widgetData\"\n                                [emit]=\"lb.widgets['aw-home-item-preview-wrapper'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n                    </div>\n                    <div *ngIf=\"lb.dataSource.hasScrollBackground\" class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                </div>\n               \n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n</div>"
+                    template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- hidden buttons and div used to implement the bubbles' popups -->\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_closebutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-close-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_gotobutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-goto-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_selectbutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-select-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <div class=\"aw-bubble-popup-menu\" id=\"bubble-popup-menu\" style=\"display: none;\">\n        <h2 class=\"aw-bubble-popup-menu__title\">{{ ( lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.label : '' ) }}</h2>\n        <span class=\"n7-icon-close\" onclick=\"document.getElementById('bubble-popup-menu_closebutton').click();\"></span>\n        <p class=\"aw-bubble-popup-menu__text\">\n            {{ ( lb.dataSource.currentHoverEntity ? '\u00C8 collegato a '+lb.dataSource.currentHoverEntity.count+' entit\u00E0' : '' ) }}\n        </p>\n\n        <div class=\"aw-bubble-popup-menu__actions\">\n            <span class=\"aw-bubble-popup-menu__link\" onclick=\"document.getElementById('bubble-popup-menu_gotobutton').click();\">Vai alla scheda</span>\n            <span class=\"aw-bubble-popup-menu__link\" onclick=\"document.getElementById('bubble-popup-menu_selectbutton').click();\">Seleziona</span>\n        </div>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper\" [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length>0 }\">\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div id=\"bubble-chart-container\">\n            <n7-bubble-chart [data]=\"lb.widgets['aw-home-bubble-chart'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-home-bubble-chart'].emit\">\n            </n7-bubble-chart>\n        </div>\n\n        <ng-container *ngIf=\"lb.dataSource.selectedBubbles.length>0\">\n            <div class=\"aw-home__bubble-results\" [ngStyle]=\"{ 'display': 'flex' , 'flex-direction': 'column' }\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\"> <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">{{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span></h1></div>\n\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list-wrapper\">\n                    <div class=\"aw-home__bubble-results-list\" [attr.id]=\"'bubble-results-list'\">\n                        <ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">\n                            <n7-item-preview\n                                [data]=\"widgetData\"\n                                [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n                    </div>\n                    <div *ngIf=\"lb.dataSource.hasScrollBackground\" class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                    \n                    <div class=\"aw-home__bubble-results-list-actions\">\n                        <a class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\" href=\"\">Vedi tutti</a>\n                        <a class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-others\" href=\"\">Vedi altri</a>\n                    </div>\n                    \n                </div>\n               \n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- adavanced autocomplete popover  -->\n    <div id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <n7-advanced-autocomplete [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n</div>"
                 }] }
     ];
     /** @nocollapse */
@@ -4383,7 +5355,10 @@ if (false) {
 var AwSchedaLayoutDS = /** @class */ (function (_super) {
     __extends(AwSchedaLayoutDS, _super);
     function AwSchedaLayoutDS() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.allBubbles = null;
+        _this.selectedBubbles = [];
+        return _this;
     }
     /**
     * If you are not using these variables (from your-layout.ts),
@@ -4410,6 +5385,11 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
         this.communication = communication;
         this.options = options;
         this.sidebarCollapsed = false;
+        this.bubbleChartSectionTitle = this.configuration.get('scheda-layout')['bubble-chart']['title'];
+        this.similarItemsSectionTitle = this.configuration.get('scheda-layout')['related-items']['title'];
+        this.metadataSectionTitle = this.configuration.get('scheda-layout')['metadata']['title'];
+        this.hasSimilarItems = false;
+        this.hasBubbles = false;
     };
     /**
      * @param {?} id
@@ -4438,18 +5418,6 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
      * @return {?}
      */
     function (data) {
-        var _this = this;
-        /** @type {?} */
-        var treeObj = {
-            items: []
-        };
-        data['branches'].forEach((/**
-         * @param {?} item
-         * @return {?}
-         */
-        function (item) {
-            treeObj['items'].push(_this.parseTree(item, false, []));
-        }));
         /** @type {?} */
         var header = {
             iconLeft: 'n7-icon-tree-icon',
@@ -4458,9 +5426,7 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
             classes: 'is-expanded',
             payload: 'header'
         };
-        this.one('aw-tree').update(treeObj);
         this.one('aw-sidebar-header').update(header);
-        this.one('aw-scheda-breadcrumbs').update(null);
     };
     /**
      * @param {?} id
@@ -4472,19 +5438,20 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
      */
     function (id) {
         if (id) {
+            /** @type {?} */
+            var maxSimilarItems = this.configuration.get('scheda-layout')['related-items']['max-related-items'];
             return this.communication.request$('getItemDetails', {
                 onError: (/**
                  * @param {?} error
                  * @return {?}
                  */
                 function (error) { return console.error(error); }),
-                params: { itemId: id }
+                params: { itemId: id, maxSimilarItems: maxSimilarItems }
             });
         }
         else {
             /* TODO: valori statici, da prendere da config */
             this.pageTitle = 'Collezione d\'Arte';
-            this.hasBreadcrumb = false;
             this.contentParts = [
                 {
                     type: 'text',
@@ -4508,27 +5475,53 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
      * @return {?}
      */
     function (response) {
-        this.hasBreadcrumb = true;
+        var _this = this;
         if (response) {
             this.contentParts = [];
-            if (response.image) {
-                this.contentParts.push({
-                    image: response.image,
-                    type: 'image'
-                });
-            }
-            this.contentParts.push({
-                title: response.title,
-                content: response.text,
-                type: 'text'
-            });
             /** @type {?} */
-            var breadcrumbs_1 = {
-                items: []
+            var content = {};
+            if (response.text) {
+                content['content'] = response.text;
+            }
+            this.contentParts.push(content);
+            if (response.image) {
+                /** @type {?} */
+                var images_1 = [{ type: 'image', url: response.image, buildPyramid: false }];
+                if (!this.imageViewerIstance) {
+                    this.one('aw-scheda-image').update({
+                        viewerId: 'scheda-layout-viewer',
+                        _setViewer: (/**
+                         * @param {?} viewer
+                         * @return {?}
+                         */
+                        function (viewer) {
+                            _this.imageViewerIstance = viewer;
+                            viewer.open(images_1);
+                        }),
+                    });
+                }
+                else {
+                    this.imageViewerIstance.open(images_1);
+                }
+            }
+            /** @type {?} */
+            var titleObj = {
+                icon: response.item.icon,
+                title: {
+                    main: {
+                        text: response.title,
+                        classes: 'bold',
+                    }
+                },
+                tools: response.subTitle,
+                actions: {}
             };
+            this.one('aw-scheda-inner-title').update(titleObj);
+            /*Metadata section*/
             /** @type {?} */
             var group_1 = { group: [] };
             if (response.fields) {
+                this.hasMetadata = true;
                 response.fields.forEach((/**
                  * @param {?} field
                  * @return {?}
@@ -4546,11 +5539,15 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
                     group_1.group.push({
                         title: field.label,
                         items: items
-                        //items: field.fields
                     });
                 }));
             }
             this.one('aw-scheda-metadata').update(group_1);
+            /*Breadcrumb section*/
+            /** @type {?} */
+            var breadcrumbs_1 = {
+                items: []
+            };
             response.breadcrumbs.forEach((/**
              * @param {?} element
              * @return {?}
@@ -4563,83 +5560,25 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
             }));
             this.one('aw-scheda-breadcrumbs').update(breadcrumbs_1);
         }
-    };
-    /**
-     * @private
-     * @param {?} data
-     * @param {?} toggle
-     * @param {?} parents
-     * @return {?}
-     */
-    AwSchedaLayoutDS.prototype.parseTree = /**
-     * @private
-     * @param {?} data
-     * @param {?} toggle
-     * @param {?} parents
-     * @return {?}
-     */
-    function (data, toggle, parents) {
-        var _this = this;
-        /** @type {?} */
-        var currParents = __spread(parents);
-        /** @type {?} */
-        var treeItem = {};
-        Object.keys(data).forEach((/**
-         * @param {?} key
-         * @return {?}
-         */
-        function (key) {
-            if (toggle) {
-                treeItem['toggle'] = {
-                    icon: 'n7-icon-angle-right',
-                    payload: {
-                        source: "toggle",
-                        id: data['id'],
-                        parents: currParents,
-                    }
-                };
-            }
-            if (key != "branches") {
-                switch (key) {
-                    case "label":
-                        treeItem['text'] = data[key];
-                        break;
-                    case "icon":
-                        if (toggle) {
-                            treeItem['toggle']['icon'] = data[key];
-                        }
-                        break;
-                    case "id":
-                        treeItem['_meta'] = data[key];
-                        treeItem['payload'] = {
-                            source: "menuItem",
-                            id: data['id']
-                        };
-                        break;
-                    default:
-                        data[key];
-                        break;
-                }
-                treeItem['classes'] = 'is-collapsed';
-            }
-            else if (data['branches'] != null) {
-                currParents.push(data['id']);
-                /*Handle cases with menu item with children but without toggle*/
-                if (!toggle) {
-                    treeItem['payload']['source'] = "ToggleMenuItem";
-                    treeItem['payload']['parents'] = currParents;
-                }
-                treeItem['items'] = [];
-                data[key].forEach((/**
-                 * @param {?} item
-                 * @return {?}
-                 */
-                function (item) {
-                    treeItem['items'].push(_this.parseTree(item, true, currParents));
-                }));
-            }
-        }));
-        return treeItem;
+        /* Related Entities */
+        if (response.connectedEntities) {
+            this.hasBubbles = true;
+            this.setAllBubblesFromApolloQuery(response);
+        }
+        else {
+            this.hasBubbles = false;
+            this.one('aw-scheda-bubble-chart').update(null);
+        }
+        /* Similar item */
+        if (response.similarItems) {
+            this.hasSimilarItems = true;
+            this.one('aw-linked-objects').updateOptions({ context: 'scheda', configKeys: this.configuration.get("config-keys") });
+            this.one('aw-linked-objects').update(response.similarItems);
+        }
+        else {
+            this.hasSimilarItems = false;
+            this.one('aw-linked-objects').update(null);
+        }
     };
     /**
      * @return {?}
@@ -4649,6 +5588,48 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
      */
     function () {
         this.sidebarCollapsed = !this.sidebarCollapsed;
+    };
+    /**
+     * @param {?} response
+     * @param {?=} reset
+     * @return {?}
+     */
+    AwSchedaLayoutDS.prototype.setAllBubblesFromApolloQuery = /**
+     * @param {?} response
+     * @param {?=} reset
+     * @return {?}
+     */
+    function (response, reset) {
+        if (!response || !response.connectedEntities) {
+            return;
+        }
+        this.allBubbles = [];
+        for (var i = 0; i < response.connectedEntities.length; i++) {
+            /** @type {?} */
+            var color = this.configuration.get('config-keys')[response.connectedEntities[i].entity.typeOfEntity.configKey] ? this.configuration.get('config-keys')[response.connectedEntities[i].entity.typeOfEntity.configKey]['color']['hex'] : "";
+            this.allBubbles.push(__assign({ id: this.convertEntityIdToBubbleId(response.connectedEntities[i].entity.id) }, response.connectedEntities[i], { color: color }));
+        }
+        this.one('aw-scheda-bubble-chart').update({
+            containerId: 'bubble-chart-container',
+            width: window.innerWidth / 1.8,
+            bubbles: this.allBubbles,
+            reset: (reset ? reset : false)
+        });
+    };
+    /**
+     * @private
+     * @param {?} entityId
+     * @return {?}
+     */
+    AwSchedaLayoutDS.prototype.convertEntityIdToBubbleId = /**
+     * @private
+     * @param {?} entityId
+     * @return {?}
+     */
+    function (entityId) {
+        if (!entityId)
+            return null;
+        return ('B_' + entityId.replace(/-/g, '_'));
     };
     return AwSchedaLayoutDS;
 }(LayoutDataSource));
@@ -4680,6 +5661,13 @@ if (false) {
      * @protected
      */
     AwSchedaLayoutDS.prototype.titleService;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaLayoutDS.prototype.allBubbles;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.selectedBubbles;
     /** @type {?} */
     AwSchedaLayoutDS.prototype.options;
     /** @type {?} */
@@ -4692,6 +5680,20 @@ if (false) {
     AwSchedaLayoutDS.prototype.tree;
     /** @type {?} */
     AwSchedaLayoutDS.prototype.sidebarCollapsed;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.bubbleChartSectionTitle;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.similarItemsSectionTitle;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.metadataSectionTitle;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.hasMetadata;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.hasBubbles;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.hasSimilarItems;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.imageViewerIstance;
 }
 
 /**
@@ -4803,7 +5805,8 @@ var AwSchedaLayoutEH = /** @class */ (function (_super) {
          */
         function (response) {
             if (response) {
-                _this.dataSource.updateNavigation(response, selectedItem);
+                _this.dataSource.updateNavigation(response);
+                _this.emitOuter('navigationresponse', response);
             }
             if (selectedItem) {
                 _this.emitOuter('selectItem', selectedItem);
@@ -4845,7 +5848,11 @@ var AwPatrimonioLayoutConfig = {
         { id: 'aw-sidebar-header' },
         { id: 'aw-tree' },
         { id: 'aw-scheda-breadcrumbs' },
-        { id: 'aw-scheda-metadata' }
+        { id: 'aw-scheda-metadata' },
+        { id: 'aw-scheda-image' },
+        { id: 'aw-scheda-inner-title' },
+        { id: 'aw-scheda-bubble-chart' },
+        { id: 'aw-linked-objects' }
     ],
     layoutDS: AwSchedaLayoutDS,
     layoutEH: AwSchedaLayoutEH,
@@ -4924,7 +5931,7 @@ var AwSchedaLayoutComponent = /** @class */ (function (_super) {
     AwSchedaLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-scheda-layout',
-                    template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\n    <div class=\"aw-scheda__content\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree\">\n            <n7-sidebar-header\n                [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"\n            ></n7-sidebar-header>\n            <n7-tree\n                [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-tree'].emit\"\n                [hidden]=\"lb.dataSource.sidebarCollapsed\"\n            ></n7-tree>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper\">\n            <n7-breadcrumbs\n                *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\"\n            ></n7-breadcrumbs>\n            <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                <div *ngIf=\"part.type == 'image'\">\n                    <div\n                    [ngStyle]=\"{\n                        'background-image': 'url(' + part.image + ')',\n                        'width': '100%',\n                        'height': '200px'\n                        }\">\n                    </div>\n                </div>\n\n                <div>\n                    <h1>{{ part.title }}</h1>\n                    <div>\n                        <div [innerHTML]=\"part.content\" >\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <n7-metadata-viewer\n                [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\"\n            >\n            </n7-metadata-viewer>\n        </div>\n    </div>\n</div>\n"
+                    template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\n    <div class=\"aw-scheda__content\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n\n         <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree\">\n            <n7-sidebar-header\n                [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"\n            ></n7-sidebar-header>\n            <n7-tree\n                [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-tree'].emit\"\n                [hidden]=\"lb.dataSource.sidebarCollapsed\"\n            ></n7-tree>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper\">\n            <n7-breadcrumbs\n                [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\"\n            ></n7-breadcrumbs>\n\n            <n7-inner-title\n            [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\"\n            ></n7-inner-title>\n\n            <n7-image-viewer\n                [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\"\n            >\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\"\n                [hidden] = \"!lb.hasMetadata\"\n            >\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.metadataSectionTitle}}</div>\n                <n7-metadata-viewer\n                    [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section id=\"bubble-chart-container\" class=\"aw-scheda__bubble-chart\">\n                <div\n                    [hidden] = \"!lb.dataSource.hasBubbles\"\n                    class=\"aw-scheda__inner-title\">{{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <n7-bubble-chart [data]=\"lb.widgets['aw-scheda-bubble-chart'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-scheda-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </section>\n\n            <section\n                [hidden] = \"!lb.dataSource.hasSimilarItems\"\n                id=\"related-item-container\" class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.similarItemsSectionTitle}}</div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">\n                        <n7-item-preview\n                            [data]=\"widgetData\"\n                            >\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n             </section>\n        </div>\n    </div>\n</div>\n"
                 }] }
     ];
     /** @nocollapse */
@@ -5158,5 +6165,5 @@ var N7BoilerplateLibModule = /** @class */ (function () {
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAboutLayoutComponent, AwAboutLayoutConfig, AwAboutLayoutDS, AwAboutLayoutEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaNavDS, AwEntitaNavEH, AwHeroDS, AwHeroEH, AwHomeBubbleChartDS, AwHomeBubbleChartEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemPreviewWrapperDS, AwHomeItemPreviewWrapperEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, AwWorksLayoutComponent, AwWorksLayoutConfig, AwWorksLayoutDS, AwWorksLayoutEH, BreadcrumbsDS, BreadcrumbsEH, CommunicationService, ConfigurationService, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SubnavDS, SubnavEH, CommunicationService as ɵa, MainStateService as ɵb };
+export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAboutLayoutComponent, AwAboutLayoutConfig, AwAboutLayoutDS, AwAboutLayoutEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeBubbleChartDS, AwHomeBubbleChartEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaBubbleChartDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, AwWorksLayoutComponent, AwWorksLayoutConfig, AwWorksLayoutDS, AwWorksLayoutEH, BreadcrumbsDS, BreadcrumbsEH, CommunicationService, ConfigurationService, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SubnavDS, SubnavEH, CommunicationService as ɵa, MainStateService as ɵb };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

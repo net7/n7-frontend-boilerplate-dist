@@ -4,8 +4,6 @@
  * Layout for homepage
  */
 
- $page-max-width: 1140px; // TODO add in components variables!
-
  /* ------------------------------------ *\
     HERO
 \* ------------------------------------ */
@@ -54,7 +52,7 @@
 
     .n7-hero {
         &__title {
-            font-weight: $font-weight-black;
+            font-weight: $font-weight-bold;
             font-size: $font-size-xxxl;
         }
 
@@ -75,9 +73,30 @@
                 border: $hero-image-border;
                 border-radius: $border-radius;
             }
+
+            .n7-hero__btn {
+                background: $hero-button-bg;
+                border-color: $hero-button-border;
+                font-size: $font-size-l;
+
+                &:hover,
+                &:focus {
+                    background: $hero-button-bg-hover;
+                    border-color: $hero-button-border-hover;
+                }
+
+                &:active, &.active {
+                    background: $hero-button-bg-active;
+                }
+
+                &:disabled, &.disabled {
+                    background: $hero-button-bg-disabled;
+                }
+            }
         }
     }
 }
+
 
 /* ------------------------------------ *\
     BUBBLE-CHART
@@ -97,7 +116,6 @@
             grid-template-columns: 220px minmax(200px, 1fr) 400px;
         }
     }
-
 
     .aw-home__facets-wrapper {
         display: flex;
@@ -185,6 +203,34 @@
                 color: $color-text-link-hover;
             }
         }
+
+        &.color-people {
+            .n7-facet-header__icon-left,
+            .n7-facet-header__text {
+                color: $color-people;
+            }
+        }
+
+        &.color-places {
+            .n7-facet-header__icon-left,
+            .n7-facet-header__text {
+                color: $color-places;
+            }
+        }
+
+        &.color-concepts {
+            .n7-facet-header__icon-left,
+            .n7-facet-header__text {
+                color: $color-concepts;
+            }
+        }
+
+        &.color-organizations {
+            .n7-facet-header__icon-left,
+            .n7-facet-header__text {
+                color: $color-organizations;
+            }
+        }
     }
 
     .n7-facet {
@@ -202,33 +248,43 @@
 
         &__search-icon {
             line-height: $n7-facet-search-input-height;
-            // color: $color-people;
         }
     }
 
     /* Results */
     .aw-home__bubble-results {
+        background: #ffffff;
+
         &-title {
             margin-bottom: $space*2;
             font-weight: $font-weight-normal;
-    
+
             &-counter {
                 margin-right: $space/2;
-                font-weight: $font-weight-black;
+                font-weight: $font-weight-bold;
             }
         }
 
         &-list {
             overflow: auto;
-            max-height: 450px;
+            max-height: $bubble-results-height;
+
+            &-actions {
+                display: flex;
+                justify-content: center;
+
+                .n7-btn {
+                    font-weight: $font-weight-bold;
+                }
+            }
         }
-        
+
         &-list-wrapper {
             border-top: 1px solid $color-border-normal;
             position: relative;
             &-with-scroll {
                 position: absolute;
-                top: 400px;
+                top: $bubble-results-height - 50px;
                 bottom: 0;
                 width: 100%;
                 height: 50px;
@@ -237,20 +293,7 @@
             }
         }
 
-        .n7-item-preview {
-            margin: $space*2 0;
-            padding-bottom: $space;
-            border-bottom: 1px solid $color-border-normal;
 
-            &.has-image {
-                grid-template-columns: $item-preview-image-size 1fr;
-
-                .n7-item-preview__image {
-                    width: $item-preview-image-size;
-                    height: $item-preview-image-size;
-                }
-            }
-        }
     }
 
     .aw-home__results-wrapper {
@@ -295,24 +338,22 @@
         font-weight: $font-weight-normal;
     }
 
-    /* TODO: remove bg colors from here */
+    /* Tag colors */
     .tag-toe-people {
-        background-color:rgb(58, 129, 242);
+        background-color: $color-people;
     }
 
     .tag-toe-organizations {
-        background-color:rgb(196, 135, 49);
+        background-color: $color-organizations;
     }
 
     .tag-toe-concepts {
-        background-color: rgb(94, 171, 123);
+        background-color: $color-concepts;
     }
 
     .tag-toe-places {
-        background-color: rgb(242, 205, 58);
+        background-color: $color-places;
     }
-
-
 }
 
 /* ------------------------------------ *\

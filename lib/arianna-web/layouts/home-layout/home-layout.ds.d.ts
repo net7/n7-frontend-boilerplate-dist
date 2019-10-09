@@ -7,6 +7,9 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     private facetData;
     private facetInputs;
     private allBubbles;
+    private autocompletePopover;
+    private autocompletePopoverOpen;
+    private autocompleteChanged$;
     selectedBubbles: any[];
     numOfItemsStr: string;
     private _bubbleChart;
@@ -56,8 +59,11 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     handleFacetHeaderClick(facetId: any): void;
     renderItemTags(): void;
     onTagClicked(payload: any): void;
+    onHeroChange(value: any): void;
     private _getSubnav;
     private _getBreadcrumbs;
     private _scrollBackgroundControl;
     private _setHasScrollBackground;
+    private _listenAutoCompleteChanges;
+    private _toggleAutocompletePopover;
 }

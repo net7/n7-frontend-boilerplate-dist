@@ -14,4 +14,5 @@ export declare class MainLayoutDS extends LayoutDataSource {
         titleService: any;
     }): void;
     onNavigate(payload: any): void;
+    private _onRouterNavigate;
 }

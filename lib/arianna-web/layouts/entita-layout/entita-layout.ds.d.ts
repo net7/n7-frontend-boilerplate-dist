@@ -7,8 +7,11 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
     options: any;
     pageTitle: string;
     myResponse: any;
-    entityTitle: string;
     selectedTab: string;
+    navHeader: any;
+    currentId: string;
+    currentPage: any;
+    pageSize: number;
     private communication;
     onInit({ configuration, mainState, router, options, titleService, communication }: {
         configuration: any;

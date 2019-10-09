@@ -275,17 +275,17 @@ const ApolloProviderConfig = {
         branches {
           label
           id
-          icon   
+          icon
           branches {
             label
             id
-            icon  
+            icon
             branches {
               label
               id
-              icon          
-            }        
-          }       
+              icon
+            }
+          }
         }
       }
     }
@@ -348,11 +348,13 @@ const ApolloProviderConfig = {
         entity {
           label
           id
+          typeOfEntity {
+            configKey
+          }
         }
         fieldsTab {
-          id
+          label
           fields {
-            id
             key
             value
           }
@@ -375,6 +377,10 @@ const ApolloProviderConfig = {
           item {
             id
             label
+            info {
+              key
+              value
+            }
           }
           thumbnail
           relatedTOEData {
@@ -393,28 +399,83 @@ const ApolloProviderConfig = {
         queryName: 'getItemDetails',
         queryBody: `{
         getItemDetails(__PARAMS__){
-            title
-            text
-            subTitle
-            image
-            fields {
-              id
-              label
-              fields {
-                id
-                key
-                value
+          title
+          text
+          subTitle
+          image
+           item {
+            id
+            icon
+          }
+          similarItems {
+            thumbnail
+              item {
+                label
+                icon
+                info {
+                  key
+                  value
+                }
+              }
+            relatedTOEData {
+              count
+              type {
+                label
+                configKey
               }
             }
-            item {
-              id
-            }
-            breadcrumbs {
-              label
-              link
+          }
+          connectedEntities {
+            count
+            entity{
+             id
+            label
+              typeOfEntity {
+                id
+                label
+                configKey
+              }
             }
           }
+          fields {
+            id
+            label
+            fields {
+              id
+              key
+              value
+            }
+          }
+          breadcrumbs {
+            label
+            link
+          }
+        }
       }`
+    },
+    'autoComplete': {
+        queryName: 'autoComplete',
+        queryBody: `{
+      autoComplete(__PARAMS__){
+        totalCount
+        items {
+          item {
+            id
+            label
+            info {
+              key
+              value
+            }
+            icon
+          }
+          thumbnail
+          typeOfEntity {
+            id
+            configKey
+          }
+        }
+      }
+    }`
     }
 };
 
@@ -872,7 +933,17 @@ class MainLayoutDS extends LayoutDataSource {
             if (!payload.path)
                 throw Error('onNavigate: no path for router navigate');
             this.router.navigate(payload.path);
+            // on change
+            this._onRouterNavigate();
         }
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    _onRouterNavigate() {
+        // hide tippy
+        tippy.hideAll();
     }
 }
 if (false) {
@@ -1220,7 +1291,7 @@ class MainLayoutComponent extends AbstractLayout {
 MainLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'main-layout',
-                template: "<div class=\"n7-main-layout\" id=\"main-layout\">\n    <div class=\"n7-page-content\">\n        <n7-header\n        [emit]=\"lb.widgets['header'].emit\"\n        [data]=\"lb.widgets['header'].ds.out$ | async\"></n7-header>\n\n        <!-- <n7-nav \n        *ngIf=\"!lb.dataSource.options.sidebar\"\n        [emit]=\"lb.widgets['subnav'].emit\"\n        [data]=\"lb.widgets['subnav'].ds.out$ | async\">\n        </n7-nav> -->\n\n        <main class=\"n7-content\">\n            <div class=\"n7-top-page-bar\">\n                <div class=\"n7-top-page-bar__main\">\n                    <!-- <h1 \n                    *ngIf=\"lb.dataSource.pageTitle\"\n                    class=\"n7-top-page-bar__title\">{{ lb.dataSource.pageTitle }}</h1>\n                    <n7-breadcrumbs \n                    [emit]=\"lb.widgets['breadcrumbs'].emit\"\n                    [data]=\"lb.widgets['breadcrumbs'].ds.out$ | async\">\n                    </n7-breadcrumbs> -->\n                </div>\n                <!--<div *ngIf=\"lb.dataSource.pageTools\" class=\"n7-top-page-bar__tools\">\n                    <a *ngFor=\"let tool of lb.dataSource.pageTools\" \n                    (click)=\"lb.eventHandler.emitInner('tools-click', tool.payload)\" \n                    class=\"n7-btn {{ tool.classes || '' }}\">\n                        {{ tool.label | translate }}\n                    </a>\n                </div>-->\n            </div>\n            \n            <div class=\"n7-alert-bar\">\n                <!--<n7-alert\n                [attr.id]=\"'main-layout-alert'\"\n                [data]=\"lb.dataSource.alertData$ | async\"\n                [emit]=\"lb.dataSource.closeAlert.bind(lb.dataSource)\"></n7-alert>-->\n            </div>\n            <ng-content></ng-content>\n        </main>\n    </div>\n\n    <div class=\"n7-footer-wrapper\"></div>\n</div>"
+                template: "<div class=\"n7-main-layout\" id=\"main-layout\">\n    <div class=\"n7-page-content\">\n        <n7-header\n        [emit]=\"lb.widgets['header'].emit\"\n        [data]=\"lb.widgets['header'].ds.out$ | async\"></n7-header>\n\n        <!-- <n7-nav \n        *ngIf=\"!lb.dataSource.options.sidebar\"\n        [emit]=\"lb.widgets['subnav'].emit\"\n        [data]=\"lb.widgets['subnav'].ds.out$ | async\">\n        </n7-nav> -->\n\n        <main class=\"n7-content\">\n            <div class=\"n7-top-page-bar\">\n                <div class=\"n7-top-page-bar__main\">\n                    <!-- <h1 \n                    *ngIf=\"lb.dataSource.pageTitle\"\n                    class=\"n7-top-page-bar__title\">{{ lb.dataSource.pageTitle }}</h1>\n                    <n7-breadcrumbs \n                    [emit]=\"lb.widgets['breadcrumbs'].emit\"\n                    [data]=\"lb.widgets['breadcrumbs'].ds.out$ | async\">\n                    </n7-breadcrumbs> -->\n                </div>\n                <!--<div *ngIf=\"lb.dataSource.pageTools\" class=\"n7-top-page-bar__tools\">\n                    <a *ngFor=\"let tool of lb.dataSource.pageTools\" \n                    (click)=\"lb.eventHandler.emitInner('tools-click', tool.payload)\" \n                    class=\"n7-btn {{ tool.classes || '' }}\">\n                        {{ tool.label | translate }}\n                    </a>\n                </div>-->\n            </div>\n            \n            <div class=\"n7-alert-bar\">\n                <!--<n7-alert\n                [attr.id]=\"'main-layout-alert'\"\n                [data]=\"lb.dataSource.alertData$ | async\"\n                [emit]=\"lb.dataSource.closeAlert.bind(lb.dataSource)\"></n7-alert>-->\n            </div>\n            <ng-content></ng-content>\n        </main>\n    </div>\n\n    <div class=\"n7-footer-wrapper\">\n        <div class=\"n7-footer\">\n            Footer\n        </div>\n    </div>\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -1467,6 +1538,154 @@ class AwAboutLayoutEH extends EventHandler {
           
         }); */
     }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwLinkedObjectsDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        /** @type {?} */
+        const KEYS = this.options.configKeys;
+        this.pageSize = this.options.size;
+        this.currentPage = Number(this.options.page);
+        this.totalPages = Math.floor(data.length / Number(this.pageSize));
+        return unpackData(data, this.currentPage, this.pageSize, KEYS, this.totalPages);
+    }
+}
+if (false) {
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.totalPages;
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.currentPage;
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.pageSize;
+}
+/**
+ * @param {?} data
+ * @param {?} page
+ * @param {?} size
+ * @param {?} keys
+ * @param {?} totalPages
+ * @return {?}
+ */
+function unpackData(data, page, size, keys, totalPages) {
+    // resize data
+    if (size && page) {
+        data = data.slice(page * size - size, page * size);
+    }
+    else if (size) {
+        data = data.slice(0, size);
+    }
+    /** @type {?} */
+    var result = [];
+    data.forEach((/**
+     * @param {?} el
+     * @return {?}
+     */
+    el => {
+        /** @type {?} */
+        let item = {
+            image: el.thumbnail,
+            title: el.item.label,
+            text: el.item.info[1].value,
+            payload: el.item.id,
+            metadata: [
+                {
+                    classes: 'n7-objects__metadata-artist',
+                    items: [
+                        {
+                            // Artista: Mimmo Jodice
+                            // label: el.item.info[0].key,
+                            label: 'Autore',
+                            value: el.item.info[0].value
+                        }
+                    ]
+                },
+                {
+                    classes: 'n7-objects__metadata-linked',
+                    items: el.relatedTOEData.map((/**
+                     * @param {?} toe
+                     * @return {?}
+                     */
+                    toe => {
+                        return {
+                            // Persone: 6, Organizz: 12, Luoghi: 2, Concetti: 32
+                            value: toe.count,
+                            // icon: 'n7-icon-bell' // TODO: link icon to config key
+                            icon: keys[toe.type.configKey].icon
+                        };
+                    }))
+                }
+            ]
+        };
+        if (el.breadcrumbs) {
+            item['breadcrumbs'] = {
+                // n7-breadcrumbs uses this as it's own data
+                items: el.breadcrumbs.map((/**
+                 * @param {?} crumb
+                 * @return {?}
+                 */
+                crumb => {
+                    return {
+                        label: crumb.label,
+                        payload: crumb.link,
+                    };
+                }))
+            };
+        }
+        result.push(item);
+    }));
+    if (page) { // if I'm on a page, render pagination data.
+        // if I'm on a page, render pagination data.
+        /** @type {?} */
+        let sizeOptions = [10, 25, 50];
+        return {
+            pagination: {
+                first: { payload: `goto-${1}`, classes: page == 1 ? "is-disabled" : '' },
+                prev: { payload: `goto-${page - 1}`, classes: page == 1 ? "is-disabled" : '' },
+                next: { payload: `goto-${page + 1}`, classes: page == totalPages ? "is-disabled" : '' },
+                last: { payload: `goto-${totalPages}`, classes: page == totalPages ? "is-disabled" : '' },
+                links: makePagination(totalPages, page),
+                select: {
+                    label: 'Numero di risultati',
+                    options: sizeOptions.map((/**
+                     * @param {?} o
+                     * @return {?}
+                     */
+                    o => {
+                        return { text: o, selected: o == size, disabled: o > totalPages };
+                    })),
+                    payload: 'select-size'
+                }
+            },
+            previews: result
+        };
+    }
+    return result;
+}
+/**
+ * @param {?} totalPages
+ * @param {?} currentPage
+ * @return {?}
+ */
+function makePagination(totalPages, currentPage) {
+    /** @type {?} */
+    let result = []
+    // always push the first page
+    ;
+    // always push the first page
+    result.push({ text: '1', payload: 'page-1', classes: currentPage == 1 ? 'is-active' : '' });
+    for (let i = 1; i < totalPages; i++) {
+        result.push({ text: String(i + 1), payload: 'page-' + String(i + 1), classes: currentPage == i + 1 ? 'is-active' : '' });
+    }
+    return result;
 }
 
 /**
@@ -1816,64 +2035,6 @@ class AwHomeFacetsWrapperDS extends DataSource {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-class AwHomeItemPreviewWrapperDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        /** @type {?} */
-        let result = [];
-        data.forEach((/**
-         * @param {?} item
-         * @return {?}
-         */
-        item => {
-            /** @type {?} */
-            let infoGroup = [
-                { label: 'Autore', value: '' },
-                { label: '', value: '' }
-            ];
-            item.item.info.forEach((/**
-             * @param {?} i
-             * @return {?}
-             */
-            i => {
-                if (i.key === 'author')
-                    infoGroup[0].value = i.value;
-                else if (i.key === 'short_description')
-                    infoGroup[1].value = i.value;
-            }));
-            /** @type {?} */
-            let toeGroup = item.relatedTOEData.map((/**
-             * @param {?} rToe
-             * @return {?}
-             */
-            rToe => {
-                return {
-                    label: rToe.type.label,
-                    value: rToe.count,
-                    icon: rToe.type.icon
-                };
-            }));
-            /** @type {?} */
-            let metadata = [{ items: infoGroup }, { items: toeGroup }];
-            result.push({
-                image: item.thumbnail,
-                title: item.item.label,
-                metadata,
-                payload: item.item.id
-            });
-        }));
-        return result;
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwHomeItemTagsWrapperDS extends DataSource {
     /**
      * @protected
@@ -1889,7 +2050,79 @@ class AwHomeItemTagsWrapperDS extends DataSource {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-// import { NAV_MOCK } from '@n7-frontend/components';
+class AwHomeAutocompleteDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        const { items, totalCount } = data;
+        const { config } = this.options;
+        /** @type {?} */
+        let itemIds = [];
+        /** @type {?} */
+        let groups = {};
+        items.forEach((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ item, typeOfEntity }) => {
+            if (!groups[typeOfEntity.id]) {
+                const { label, icon } = config[typeOfEntity.configKey];
+                groups[typeOfEntity.id] = {
+                    title: label,
+                    icon,
+                    classes: `color-${typeOfEntity.configKey}`,
+                    items: [],
+                };
+            }
+            if (itemIds.indexOf(item.id) === -1) {
+                /** @type {?} */
+                let metaDataValue = '';
+                item.info.forEach((/**
+                 * @param {?} infoData
+                 * @return {?}
+                 */
+                infoData => {
+                    if (infoData.key === 'author')
+                        metaDataValue = `di ${infoData.value}`;
+                }));
+                groups[typeOfEntity.id].items.push({
+                    label: item.label,
+                    value: metaDataValue,
+                    payload: {
+                        source: 'item',
+                        id: item.id
+                    }
+                });
+            }
+        }));
+        /** @type {?} */
+        const results = Object.keys(groups).map((/**
+         * @param {?} key
+         * @return {?}
+         */
+        key => ({ group: Object.assign({}, groups[key]) })));
+        return {
+            results,
+            actions: {
+                showMore: {
+                    text: `Visualizza tutti i ${totalCount} risultati`,
+                    payload: {
+                        source: 'showMore'
+                    }
+                }
+            },
+            fallback: 'Spiacenti, non è stato trovato nessun risultato. <br> Riprova con una nuova ricerca.'
+        };
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 class AwEntitaNavDS extends DataSource {
     /**
      * @protected
@@ -1897,7 +2130,119 @@ class AwEntitaNavDS extends DataSource {
      * @return {?}
      */
     transform(data) {
-        return data;
+        /** @type {?} */
+        const navigation = {
+            items: [
+                {
+                    text: 'OVERVIEW',
+                    payload: 'overview',
+                },
+                {
+                    text: 'CAMPI',
+                    payload: 'campi',
+                },
+                {
+                    text: 'OGGETTI COLLEGATI',
+                    payload: 'oggetti-collegati',
+                },
+                {
+                    text: 'ENTITA COLLEGATE',
+                    payload: 'entita-collegate',
+                },
+                {
+                    text: 'MAXXI',
+                    payload: 'maxxi',
+                },
+                {
+                    text: 'WIKIPEDIA',
+                    payload: 'wiki',
+                },
+            ],
+            payload: 'entita-nav'
+        };
+        return navigation;
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwEntitaMetadataViewerDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        /*
+          // console.log('metadata options: ', this.options);
+          - - -
+          Access and use this.options if the rendering
+          changes based on context.
+        */
+        return {
+            group: AwEntitaMetadataViewerDS.unpackFields(data)
+        };
+    }
+    /**
+     * @param {?} fields
+     * @return {?}
+     */
+    static unpackFields(fields) {
+        /*
+              Recursive unpacking for rendering res.fields
+              - - -
+              This function transforms the response object tree
+              into an array, usable by metadata-viewer-component
+            */
+        /** @type {?} */
+        var extracted = [] // holds transformed object
+        ;
+        if (!fields)
+            return []; // if is empty → quit
+        for (let i = 0; i < fields.length; i++) {
+            /** @type {?} */
+            var thisField = fields[i] // rename current field
+            ;
+            // rename current field
+            /** @type {?} */
+            var title = thisField.label // field title
+            ;
+            // field title
+            /** @type {?} */
+            var label = thisField.key // item label
+            ;
+            // item label
+            /** @type {?} */
+            var value = thisField.value // item value
+            ;
+            // item value
+            /** @type {?} */
+            var group = thisField.fields // child group
+            ;
+            // child group
+            /** @type {?} */
+            var temp = {} // temporary object
+            ;
+            if (title) { // if there is a title, use it
+                temp.title = title;
+            }
+            if (label && value) { // if there are a lable and value, use them
+                temp.label = label;
+                temp.value = value;
+            }
+            if (group) { // if there is a child group
+                if (group[0].key) { // if this group has a tuple of (label, value)
+                    temp.items = AwEntitaMetadataViewerDS.unpackFields(group); // make items array
+                }
+                else {
+                    temp.group = AwEntitaMetadataViewerDS.unpackFields(group); // make child group array
+                }
+            }
+            extracted.push(temp); // add this object to the new array
+        }
+        return extracted;
     }
 }
 
@@ -1934,16 +2279,18 @@ class AwTreeDS extends DataSource {
          * @return {?}
          */
         (it) => {
+            /** @type {?} */
+            const classes = it['classes'];
             if (it['_meta'] == id) {
-                if (it['classes'] == "is-expanded") {
-                    it['classes'] = "is-collapsed";
+                if (classes.indexOf("is-expanded") > -1) {
+                    it['classes'] = classes.replace(/is-expanded/g, "is-collapsed");
                 }
                 else {
-                    it['classes'] = "is-expanded";
+                    it['classes'] = classes.replace(/is-collapsed/g, "is-expanded");
                 }
             }
             else if (parents.indexOf(it['_meta']) >= 0) {
-                it['classes'] = "is-expanded";
+                it['classes'] = classes + ' is-expanded';
             }
             if (typeof it['items'] != "undefined" && it['items'].length > 0) {
                 this.updateTree(it, parents, id);
@@ -1965,13 +2312,13 @@ class AwTreeDS extends DataSource {
          * @return {?}
          */
         (it) => {
-            if (it['_meta'] == id) {
-                it['classes'] = it['classes'] + " is-active";
+            if (it['_meta'] == id && it['classes'].indexOf('is-active') < 0) {
+                it['classes'] = it['classes'] + ' is-active';
                 this.currentItem = it;
             }
             else {
                 /** @type {?} */
-                let classes = it['classes'];
+                const classes = it['classes'];
                 it['classes'] = classes.replace("is-active", "");
             }
             if (typeof it['items'] != "undefined" && it['items'].length > 0) {
@@ -1993,6 +2340,101 @@ class AwTreeDS extends DataSource {
             sidebarData.classes = "is-expanded";
         }
         this.update(sidebarData);
+    }
+    /**
+     * @private
+     * @param {?} data
+     * @return {?}
+     */
+    parseData(data) {
+        /** @type {?} */
+        let treeObj = {
+            items: []
+        };
+        if (data['branches']) {
+            data['branches'].forEach((/**
+             * @param {?} item
+             * @return {?}
+             */
+            item => {
+                treeObj['items'].push(this.parseTree(item, false, []));
+            }));
+        }
+        this.update(treeObj);
+    }
+    /**
+     * @private
+     * @param {?} data
+     * @param {?} toggle
+     * @param {?} parents
+     * @return {?}
+     */
+    parseTree(data, toggle, parents) {
+        /** @type {?} */
+        var currParents = [...parents];
+        /** @type {?} */
+        let treeItem = {};
+        /** @type {?} */
+        const showToggle = toggle && data['branches'] != null;
+        if (showToggle) {
+            treeItem['toggle'] = {
+                icon: 'n7-icon-angle-right',
+                payload: {
+                    source: "toggle",
+                    id: data['id'],
+                    parents: currParents,
+                }
+            };
+        }
+        Object.keys(data).forEach((/**
+         * @param {?} key
+         * @return {?}
+         */
+        key => {
+            if (key != "branches") {
+                switch (key) {
+                    case "label":
+                        treeItem['text'] = data[key];
+                        break;
+                    case "icon":
+                        if (showToggle && data[key] != null) {
+                            treeItem['toggle']['icon'] = data[key];
+                        }
+                        else {
+                            treeItem['icon'] = data[key];
+                        }
+                        break;
+                    case "id":
+                        treeItem['_meta'] = data[key];
+                        treeItem['payload'] = {
+                            source: "menuItem",
+                            id: data['id']
+                        };
+                        break;
+                    default:
+                        data[key];
+                        break;
+                }
+                treeItem['classes'] = 'is-collapsed';
+            }
+            else if (data['branches'] != null) {
+                currParents.push(data['id']);
+                /*Handle cases with menu item with children but without toggle*/
+                if (!toggle) {
+                    treeItem['payload']['source'] = "ToggleMenuItem";
+                    treeItem['payload']['parents'] = currParents;
+                }
+                treeItem['items'] = [];
+                data[key].forEach((/**
+                 * @param {?} item
+                 * @return {?}
+                 */
+                item => {
+                    treeItem['items'].push(this.parseTree(item, true, currParents));
+                }));
+            }
+        }));
+        return treeItem;
     }
 }
 if (false) {
@@ -2019,11 +2461,13 @@ class AwSidebarHeaderDS extends DataSource {
     toggleSidebar() {
         /** @type {?} */
         let sidebarData = this.output;
-        if (sidebarData.classes == "is-expanded") {
-            sidebarData.classes = "is-collapsed";
+        if (sidebarData.classes == 'is-expanded') {
+            sidebarData.classes = 'is-collapsed';
+            sidebarData.iconRight = 'n7-icon-tree-icon';
         }
         else {
-            sidebarData.classes = "is-expanded";
+            sidebarData.classes = 'is-expanded';
+            sidebarData.iconRight = 'n7-icon-angle-left';
         }
         this.update(sidebarData);
     }
@@ -2077,21 +2521,294 @@ class AwSchedaMetadataDS extends DataSource {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+class AwSchedaImageDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        return data;
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwSchedaInnerTitleDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        return data;
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwSchedaBubbleChartDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.thresholdShowTitle = 50;
+        this.thresholdShowValue = 60;
+    }
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        if (!data)
+            return null;
+        /** @type {?} */
+        let bubbleCointainer = document.getElementById(data.containerId);
+        /** @type {?} */
+        const cWidth = bubbleCointainer.offsetWidth;
+        // TODO: think of a good way to pass/compute cHeight
+        /** @type {?} */
+        const cHeight = 700;
+        // bubbleCointainer.offsetHeight
+        /** @type {?} */
+        const containerSize = cWidth * cHeight;
+        /** @type {?} */
+        let bubblesData = {
+            containerId: "bubbleChartContainer",
+            containerWidth: cWidth,
+            containerHeight: cHeight,
+            isForceSimulationEnabled: true,
+            maxBubblesSelected: 3
+        };
+        bubblesData['bubblesData'] = [];
+        /** @type {?} */
+        let maxBubbleCount = -1;
+        /** @type {?} */
+        let minBubbleCount = -1;
+        /** @type {?} */
+        let numOfBubbles = 0;
+        /** @type {?} */
+        let totalCount = 0;
+        /** @type {?} */
+        let numOfSelectedBubbles = 0;
+        data.bubbles.forEach((/**
+         * @param {?} bubble
+         * @return {?}
+         */
+        bubble => {
+            if (maxBubbleCount < bubble.count) {
+                maxBubbleCount = bubble.count;
+            }
+            if (minBubbleCount < 0 || minBubbleCount > bubble.count) {
+                minBubbleCount = bubble.count;
+            }
+            numOfBubbles++;
+            totalCount += bubble.count;
+            if (bubble.selected) {
+                numOfSelectedBubbles++;
+            }
+        }));
+        data.bubbles.forEach((/**
+         * @param {?} bubble
+         * @return {?}
+         */
+        bubble => {
+            /** @type {?} */
+            let bId = bubble.id;
+            /** @type {?} */
+            let bubblePercentage = (bubble.count - (minBubbleCount / 3)) / ((maxBubbleCount * 3) - (minBubbleCount / 3));
+            /** @type {?} */
+            let bubbleRadius = (Math.log(containerSize) / 10) * (bubblePercentage * 3) * (70 - Math.sqrt(numOfBubbles));
+            /** @type {?} */
+            let bubbleData = {
+                id: bId,
+                texts: [
+                    {
+                        id: bId + '_label0',
+                        label: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        (d) => bubble.entity.label),
+                        x_function: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        (d) => d.x),
+                        y_function: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        (d) => {
+                            /** @type {?} */
+                            let mNum = (d.radius / 9);
+                            if (d.radius < this.thresholdShowValue) {
+                                mNum = 0;
+                            }
+                            return d.y - mNum;
+                        }),
+                        'user_select': 'none',
+                        fontSize_function: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        (d) => d.radius / 5),
+                        color: 'white',
+                        'classes': ''
+                    },
+                    {
+                        id: bId + '_label1',
+                        label: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        (d) => { if (d.radius < this.thresholdShowValue) {
+                            return null;
+                        } return bubble.count; }),
+                        x_function: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        (d) => d.x),
+                        y_function: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        (d) => d.y + (d.radius / 9)),
+                        'user_select': 'none',
+                        fontSize_function: (/**
+                         * @param {?} d
+                         * @return {?}
+                         */
+                        (d) => d.radius / 6),
+                        color: 'white',
+                        'classes': ''
+                    }
+                ],
+                x: cWidth / 2 + 50,
+                y: cHeight / 2 + 50,
+                'radius': bubbleRadius,
+                color: bubble.color,
+                hasCloseIcon: (bubble.selected ? bubble.selected : false),
+                payload: {
+                    id: bId
+                },
+            };
+            bubblesData['bubblesData'].push(bubbleData);
+        }));
+        bubblesData['forceSimulationData'] = {
+            xPull: cWidth / 2,
+            xPullStrength: -0.01,
+            yPull: cHeight / 2,
+            yPullStrength: -0.01,
+            collisionStrengh: 0.99,
+            collisionIterations: 1,
+            velocityDecay: 0.65
+        };
+        if (data.reset) {
+            bubblesData['reset'] = data.reset;
+        }
+        if (data.setUpdateReference) {
+            bubblesData['setUpdateReference'] = data.setUpdateReference;
+        }
+        if (data.setBubbleChart) {
+            bubblesData['setBubbleChart'] = data.setBubbleChart;
+        }
+        return bubblesData;
+    }
+}
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaBubbleChartDS.prototype.thresholdShowTitle;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaBubbleChartDS.prototype.thresholdShowValue;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 
 var DS$1 = /*#__PURE__*/Object.freeze({
+    AwLinkedObjectsDS: AwLinkedObjectsDS,
     AwHeroDS: AwHeroDS,
     AwTableDS: AwTableDS,
     AwHomeHeroPatrimonioDS: AwHomeHeroPatrimonioDS,
     AwHomeBubbleChartDS: AwHomeBubbleChartDS,
     AwHomeFacetsWrapperDS: AwHomeFacetsWrapperDS,
-    AwHomeItemPreviewWrapperDS: AwHomeItemPreviewWrapperDS,
     AwHomeItemTagsWrapperDS: AwHomeItemTagsWrapperDS,
+    AwHomeAutocompleteDS: AwHomeAutocompleteDS,
     AwEntitaNavDS: AwEntitaNavDS,
+    AwEntitaMetadataViewerDS: AwEntitaMetadataViewerDS,
     AwTreeDS: AwTreeDS,
     AwSidebarHeaderDS: AwSidebarHeaderDS,
     AwSchedaBreadcrumbsDS: AwSchedaBreadcrumbsDS,
-    AwSchedaMetadataDS: AwSchedaMetadataDS
+    AwSchedaMetadataDS: AwSchedaMetadataDS,
+    AwSchedaImageDS: AwSchedaImageDS,
+    AwSchedaInnerTitleDS: AwSchedaInnerTitleDS,
+    AwSchedaBubbleChartDS: AwSchedaBubbleChartDS
 });
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwLinkedObjectsEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-linked-objects.click':
+                    if (payload.startsWith('page')) {
+                        // pagination routing is handled by the parent layout
+                        this.emitOuter('pagination', payload);
+                    }
+                    else if (payload.startsWith('goto')) {
+                        /** @type {?} */
+                        let targetPage = Number(payload.replace('goto-', ''))
+                        // kill impossible page navigations
+                        ;
+                        // kill impossible page navigations
+                        if (targetPage > this.dataSource.totalPages)
+                            return;
+                        else if (targetPage < 1 || targetPage === this.dataSource.currentPage)
+                            return;
+                        else
+                            this.emitOuter('goto', payload);
+                    }
+                    else {
+                        // navigate to the patrimonio page of this item
+                        this.emitGlobal('navigate', {
+                            handler: 'router',
+                            path: [`aw/patrimonio/${payload}`]
+                        });
+                    }
+                    break;
+                case 'aw-linked-objects.change':
+                    this.emitOuter('change', Number(payload.value));
+                    break;
+                default:
+                    console.warn('unhandled event type: ', type, ' with payload: ', payload);
+                    break;
+            }
+        }));
+    }
+}
 
 /**
  * @fileoverview added by tsickle
@@ -2118,9 +2835,6 @@ class AwHeroEH extends EventHandler {
                     break;
             }
         }));
-        /* this.outerEvents$.subscribe(event => {
-        
-        }); */
     }
 }
 
@@ -2228,23 +2942,6 @@ class AwHomeHeroPatrimonioEH extends EventHandler {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-class AwHomeItemPreviewWrapperEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        // this.innerEvents$.subscribe( e => {
-        // });
-        /* this.outerEvents$.subscribe(event => {
-        
-        }); */
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwHomeItemTagsWrapperEH extends EventHandler {
     /**
      * @return {?}
@@ -2273,15 +2970,52 @@ class AwHomeItemTagsWrapperEH extends EventHandler {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+class AwHomeAutocompleteEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case "aw-home-autocomplete.click":
+                    if (payload && payload.source === 'item')
+                        this.emitOuter('click', payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 class AwEntitaNavEH extends EventHandler {
     /**
      * @return {?}
      */
     listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-entita-nav.click':
+                    this.emitOuter('click', payload);
+                    break;
+                default:
+                    console.warn('unhandled event type');
+                    break;
+            }
+        }));
         /*
-        this.innerEvents$.subscribe(event => {
-          
-        });
     
         this.outerEvents$.subscribe(event => {
           
@@ -2354,7 +3088,7 @@ class AwTreeEH extends EventHandler {
          * @return {?}
          */
         ({ type, payload }) => {
-            if (payload && typeof payload.source != "undefined") {
+            if (payload && typeof payload.source != 'undefined') {
                 switch (payload.source) {
                     case 'toggle':
                         this.dataSource.updateTree(null, payload.parents, payload.id);
@@ -2372,12 +3106,17 @@ class AwTreeEH extends EventHandler {
          * @return {?}
          */
         ({ type, payload }) => {
-            if (type == 'aw-sidebar-header.click') {
-                this.dataSource.toggleSidebar();
-            }
-            else if (type == 'aw-scheda-layout.selectItem') {
-                this.dataSource.selectTreeItem(payload);
-                this.dataSource.updateTree(null, this.dataSource.currentItem.payload.parents, payload);
+            switch (type) {
+                case 'aw-sidebar-header.click':
+                    this.dataSource.toggleSidebar();
+                    break;
+                case 'aw-scheda-layout.selectItem':
+                    this.dataSource.selectTreeItem(payload);
+                    this.dataSource.updateTree(null, this.dataSource.currentItem.payload.parents, payload);
+                    break;
+                case 'aw-scheda-layout.navigationresponse':
+                    this.dataSource.parseData(payload);
+                    break;
             }
         }));
     }
@@ -2410,12 +3149,13 @@ class AwTableEH extends EventHandler {
  */
 
 var EH$1 = /*#__PURE__*/Object.freeze({
+    AwLinkedObjectsEH: AwLinkedObjectsEH,
     AwHeroEH: AwHeroEH,
     AwHomeBubbleChartEH: AwHomeBubbleChartEH,
     AwHomeFacetsWrapperEH: AwHomeFacetsWrapperEH,
     AwHomeHeroPatrimonioEH: AwHomeHeroPatrimonioEH,
-    AwHomeItemPreviewWrapperEH: AwHomeItemPreviewWrapperEH,
     AwHomeItemTagsWrapperEH: AwHomeItemTagsWrapperEH,
+    AwHomeAutocompleteEH: AwHomeAutocompleteEH,
     AwEntitaNavEH: AwEntitaNavEH,
     AwSchedaSidebarEH: AwSchedaSidebarEH,
     AwSidebarHeaderEH: AwSidebarHeaderEH,
@@ -2510,6 +3250,33 @@ class JsonConfigService {
              * @return {?}
              */
             key => this.config.set(key, response[key])));
+            // config keys colors
+            if (response['config-keys']) {
+                /** @type {?} */
+                const headTag = document.querySelector('head');
+                /** @type {?} */
+                const styleElement = document.createElement('style');
+                /** @type {?} */
+                let styles = [];
+                Object.keys(response['config-keys']).forEach((/**
+                 * @param {?} key
+                 * @return {?}
+                 */
+                key => {
+                    /** @type {?} */
+                    const configKey = response['config-keys'][key] || {};
+                    if (configKey.color && configKey.color.hex) {
+                        // add css class
+                        styles.push(`--color-${key}: ${configKey.color.hex};`);
+                    }
+                }));
+                if (styles.length) {
+                    styles.unshift(':root {');
+                    styles.push('}');
+                    styleElement.appendChild(document.createTextNode(styles.join('\n')));
+                    headTag.appendChild(styleElement);
+                }
+            }
         }
     }
 }
@@ -2549,36 +3316,31 @@ if (false) {
 class AwEntitaLayoutDS extends LayoutDataSource {
     constructor() {
         super(...arguments);
-        this.myResponse = {}; // store response object
+        this.myResponse = {}; // backend response object
+        // selected nav item
+        this.navHeader = {}; // nav-header (custom) data
+        // pagination value (url param)
+        this.pageSize = 10; // linked objects page size
     }
     /**
      * @param {?} __0
      * @return {?}
      */
     onInit({ configuration, mainState, router, options, titleService, communication }) {
+        this.communication = communication;
         this.configuration = configuration;
         this.mainState = mainState;
+        this.options = options;
         this.router = router;
         this.titleService = titleService;
-        this.options = options;
-        this.communication = communication;
-        // this.communication.request$('getEntityDetails', {
-        //   onError: (error) => console.log(error),
-        //   params: { entityId: "test" }
-        // }).subscribe((response) => {
-        //   console.log('apollo-response', { response })
-        // });
     }
     /**
      * @param {?} id
      * @return {?}
      */
     getNavigation(id) {
-        /**
-         * Requests data from communication provider
-         *
-         * @param id - the id of the item to get
-         * @returns the response of getEntityDetails with entityId === id
+        /*
+          Requests data from communication provider
          */
         return this.communication.request$('getEntityDetails', {
             onError: (/**
@@ -2594,46 +3356,10 @@ class AwEntitaLayoutDS extends LayoutDataSource {
      * @return {?}
      */
     updateWidgets(data) {
-        /**
-         * Updates the widgets on this layout, based on route
-         *
-         * @param data - communication reponse object
-         */
-        /**
-         * Updates the widgets on this layout, based on route
-         *
-         * \@param data - communication reponse object
-         * @type {?}
-         */
-        const navigation = { items: [
-                {
-                    text: 'OVERVIEW',
-                    payload: 'overview',
-                },
-                {
-                    text: 'CAMPI',
-                    payload: 'campi',
-                },
-                {
-                    text: 'OGGETTI COLLEGATI',
-                    payload: 'oggetti-collegati',
-                },
-                {
-                    text: 'ENTITA COLLEGATE',
-                    payload: 'entita-collegate',
-                },
-                {
-                    text: 'MAXXI',
-                    payload: 'maxxi',
-                },
-                {
-                    text: 'WIKIPEDIA',
-                    payload: 'wiki',
-                },
-            ],
-            payload: 'entita-nav'
-        };
-        this.one('aw-entita-nav').update(navigation);
+        /*
+          Updates the widgets on this layout, based on route
+        */
+        this.one('aw-entita-nav').update('some data');
     }
     /**
      * @param {?} id
@@ -2641,13 +3367,11 @@ class AwEntitaLayoutDS extends LayoutDataSource {
      * @return {?}
      */
     loadItem(id, tab) {
-        /**
-         * Loads the data for the selected nav item, into the adjacent text block.
-         *
-         * @param id - id of item to request
-         * @param tab - selected nav tab
-         */
+        /*
+          Loads the data for the selected nav item, into the adjacent text block.
+        */
         if (id && tab) {
+            this.currentId = id; // store selected item from url
             this.selectedTab = tab; // store selected tab from url
             return this.communication.request$('getEntityDetails', {
                 onError: (/**
@@ -2667,9 +3391,59 @@ class AwEntitaLayoutDS extends LayoutDataSource {
      * @return {?}
      */
     loadContent(res) {
-        console.log('loadcontent-response: ', { res });
+        console.log('Apollo responded with: ', { res });
         this.myResponse = res;
-        this.entityTitle = res.entity.label;
+        this.navHeader = {
+            // always render nav header
+            icon: this.configuration.get("config-keys")[this.myResponse.entity.typeOfEntity.configKey].icon,
+            text: this.myResponse.entity.label
+        };
+        switch (this.selectedTab) { // make dynamic content depending on request
+            case 'overview':
+                {
+                    this.one('aw-entita-metadata-viewer').updateOptions({ context: this.selectedTab });
+                    this.one('aw-entita-metadata-viewer').update(res.fieldsTab);
+                    this.one('aw-linked-objects').updateOptions({ size: 3, configKeys: this.configuration.get("config-keys") });
+                    this.one('aw-linked-objects').update(res.items);
+                }
+                break;
+            case 'campi':
+                {
+                    this.one('aw-entita-metadata-viewer').updateOptions({ context: this.selectedTab });
+                    this.one('aw-entita-metadata-viewer').update(res.fieldsTab);
+                }
+                break;
+            case 'oggetti-collegati':
+                {
+                    this.one('aw-linked-objects').updateOptions({
+                        context: this.selectedTab,
+                        configKeys: this.configuration.get("config-keys"),
+                        page: this.currentPage,
+                        size: this.pageSize,
+                    });
+                    this.one('aw-linked-objects').update(res.items);
+                }
+                break;
+            case 'entita-collegate':
+                {
+                    // entita
+                }
+                break;
+            case 'maxxi':
+                {
+                    // maxxi
+                }
+                break;
+            case 'wiki':
+                {
+                    // wiki
+                }
+                break;
+            default:
+                // the url is aw/entita/something/ ??? → unknown
+                console.warn('Unhandled navigation page');
+                break;
+        }
     }
 }
 if (false) {
@@ -2700,9 +3474,15 @@ if (false) {
     /** @type {?} */
     AwEntitaLayoutDS.prototype.myResponse;
     /** @type {?} */
-    AwEntitaLayoutDS.prototype.entityTitle;
-    /** @type {?} */
     AwEntitaLayoutDS.prototype.selectedTab;
+    /** @type {?} */
+    AwEntitaLayoutDS.prototype.navHeader;
+    /** @type {?} */
+    AwEntitaLayoutDS.prototype.currentId;
+    /** @type {?} */
+    AwEntitaLayoutDS.prototype.currentPage;
+    /** @type {?} */
+    AwEntitaLayoutDS.prototype.pageSize;
     /**
      * @type {?}
      * @private
@@ -2735,12 +3515,60 @@ class AwEntitaLayoutEH extends EventHandler {
                     this.route = payload.route;
                     /** @type {?} */
                     let paramId = this.route.snapshot.params.id || "";
+                    this.dataSource.currentPage = this.route.snapshot.params.page || '';
                     this.listenRoute();
                     this.loadNavigation(paramId);
                     break;
                 case 'aw-entita-layout.destroy':
                     this.destroyed$.next();
                     break;
+                default:
+                    break;
+            }
+        }));
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-entita-nav.click':
+                    if (payload) {
+                        this.emitGlobal('navigate', {
+                            path: [
+                                this.configuration.get("paths").entitaBasePath
+                                    + '/' +
+                                    this.route.snapshot.params.id
+                                    + '/' +
+                                    payload
+                            ],
+                            handler: 'router'
+                        });
+                    }
+                    break;
+                case 'aw-linked-objects.pagination':
+                    this.dataSource.currentPage = payload.split('-')[1];
+                    this.emitGlobal('navigate', {
+                        handler: 'router',
+                        path: [`aw/entita/${this.route.snapshot.params.id}/oggetti-collegati/${payload.split('-')[1]}`]
+                    });
+                    break;
+                case 'aw-linked-objects.goto':
+                    /** @type {?} */
+                    let targetPage = Number(payload.replace('goto-', ''))
+                    // this.emitGlobal('navigate', {
+                    //   handler: 'router',
+                    //   path: [`aw/entita/${this.route.snapshot.params.id}/oggetti-collegati/${targetPage}`]
+                    // });
+                    ;
+                    // this.emitGlobal('navigate', {
+                    //   handler: 'router',
+                    //   path: [`aw/entita/${this.route.snapshot.params.id}/oggetti-collegati/${targetPage}`]
+                    // });
+                    break;
+                case 'aw-linked-objects.change':
+                    this.dataSource.pageSize = payload;
+                    this.listenRoute(); // reloads the page content with the new page size
                 default:
                     break;
             }
@@ -2828,13 +3656,10 @@ if (false) {
 /** @type {?} */
 const AwEntitaLayoutConfig = {
     layoutId: 'aw-entita-layout',
-    /**
-     * Array of components to use
-     * in this layout
-     */
     widgets: [
-        // { id: 'header' },
-        { id: 'aw-entita-nav' }
+        { id: 'aw-entita-nav', hasStaticData: true },
+        { id: 'aw-entita-metadata-viewer' },
+        { id: 'aw-linked-objects' },
     ],
     layoutDS: AwEntitaLayoutDS,
     layoutEH: AwEntitaLayoutEH,
@@ -2903,7 +3728,7 @@ class AwEntitaLayoutComponent extends AbstractLayout {
 AwEntitaLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-entita-layout',
-                template: "<div class=\"aw-entita-layout\" *ngIf=\"lb.dataSource\">\n    <h2><span class=\"n7-icon-map-marker-alt\"></span> {{lb.dataSource.entityTitle}}</h2>\n    <n7-nav \n        [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" \n        [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n    </n7-nav>\n    <ng-container [ngSwitch]=\"lb.dataSource.selectedTab\">\n        <ng-container *ngSwitchCase=\"'overview'\">\n            <ng-container *ngTemplateOutlet=\"overview\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'campi'\">\n            <ng-container *ngTemplateOutlet=\"campi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'oggetti'\">\n            <ng-container *ngTemplateOutlet=\"oggetti\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'entita'\">\n            <ng-container *ngTemplateOutlet=\"entita\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'maxxi'\">\n            <ng-container *ngTemplateOutlet=\"maxxi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'wiki'\">\n            <ng-container *ngTemplateOutlet=\"wiki\"></ng-container>\n        </ng-container>\n    </ng-container>\n</div>\n\n<ng-template #overview>\n    <div>\n        {{lb.dataSource.myResponse.overviewTab}}\n    </div>\n</ng-template>\n\n<ng-template #campi>\n    <div>\n        Page campi\n    </div>\n</ng-template>\n\n<ng-template #oggetti>\n    <div>\n        Page oggetti\n    </div>\n</ng-template>\n\n<ng-template #entita>\n    <div>\n        Page entita\n    </div>\n</ng-template>\n\n<ng-template #maxxi>\n    <div>\n        Page maxxi\n    </div>\n</ng-template>\n\n<ng-template #wiki>\n    <div>\n        Page wiki\n    </div>\n</ng-template>\n"
+                template: "<div class=\"aw-entity\" *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div class=\"aw-entity__sidebar-title-wrapper\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <n7-nav \n            [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" \n            [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n    \n    <div class=\"aw-entity__content\" \n         [ngSwitch]=\"lb.dataSource.selectedTab\">\n        <ng-container *ngSwitchCase=\"'overview'\">\n            <ng-container *ngTemplateOutlet=\"overview\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'campi'\">\n            <ng-container *ngTemplateOutlet=\"campi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'oggetti-collegati'\">\n            <ng-container *ngTemplateOutlet=\"oggetti\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'entita-collegate'\">\n            <ng-container *ngTemplateOutlet=\"entita\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'maxxi'\">\n            <ng-container *ngTemplateOutlet=\"maxxi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'wiki'\">\n            <ng-container *ngTemplateOutlet=\"wiki\"></ng-container>\n        </ng-container>\n    </div>\n</div>\n\n<!-- navigation page content templates -->\n<ng-template #overview>\n    <section>\n        <div class=\"aw-entity__content-section\">\n            <div class=\"aw-entity__overview-description\">\n                {{lb.dataSource.myResponse.overviewTab}}\n            </div>\n            <div class=\"aw-entita-layout__button-wrapper\">\n                <button class=\"n7-btn n7-btn-light\">DESCRIZIONE WIKIPEDIA</button>\n                <button class=\"n7-btn n7-btn-light\">DESCRIZIONE MAXXI</button>\n            </div>\n        </div>\n        \n        <ng-container *ngIf=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async as data\">\n            <div class=\"aw-entity__content-section\">\n                <h1>Campi</h1>\n                <button class=\"n7-btn n7-btn-light\">TUTTI I CAMPI</button>\n                <n7-metadata-viewer \n                    class=\"aw-entita-layout__metadata-viewer\"\n                    [data]=\"data\">\n                </n7-metadata-viewer>\n            </div>\n        </ng-container>\n        \n        <div class=\"aw-entity__content-section\">\n            <h1>Oggetti collegati</h1><button class=\"n7-btn n7-btn-light\">TUTTI GLI OGGETTI COLLEGATI</button>\n            <ng-container *ngFor=\"let preview of lb.widgets['aw-linked-objects'].ds.out$ | async\">\n                <n7-breadcrumbs\n                    [data]=\"preview.breadcrumbs\">\n                </n7-breadcrumbs>\n                <n7-item-preview\n                    [data]=\"preview\"\n                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-item-preview>\n            </ng-container>\n        </div>\n        \n    </section>\n</ng-template>\n\n<ng-template #campi>\n    <div>\n        <ng-container *ngIf=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async as data\">\n            <h1>Campi</h1>\n            <n7-metadata-viewer class=\"aw-entita-layout__metadata-viewer\"\n                [data]=\"data\">\n            </n7-metadata-viewer>\n        </ng-container>\n    </div>\n</ng-template>\n\n<ng-template #oggetti>\n    <div>\n        <h1>Oggetti collegati</h1>\n        <ng-container \n            *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n            <n7-breadcrumbs [data]=\"preview.breadcrumbs\">\n            </n7-breadcrumbs>\n            <n7-item-preview \n                [data]=\"preview\"\n                [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n            </n7-item-preview>\n        </ng-container>\n        <n7-pagination \n            [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n            [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n        </n7-pagination>\n    </div>\n</ng-template>\n\n<ng-template #entita>\n    <div>\n        Page entita\n    </div>\n</ng-template>\n\n<ng-template #maxxi>\n    <div>\n        Page maxxi\n    </div>\n</ng-template>\n\n<ng-template #wiki>\n    <div>\n        Page wiki\n    </div>\n</ng-template>\n"
             }] }
 ];
 /** @nocollapse */
@@ -2967,6 +3792,8 @@ class AwHomeLayoutDS extends LayoutDataSource {
         // (the objects in the allBubbles are not the same bubble objects
         // present in the bubble chart)
         this.allBubbles = null;
+        this.autocompletePopoverOpen = false;
+        this.autocompleteChanged$ = new Subject();
         // the bubbles currently selected (this are saved from the event handler's
         // and correspond exactly to the bubblechart's bubble objects)
         this.selectedBubbles = [];
@@ -3046,6 +3873,8 @@ class AwHomeLayoutDS extends LayoutDataSource {
                 this.updateBubblesAndItemPreviews(true);
             }
         }));
+        // listen autocomplete changes
+        this._listenAutoCompleteChanges();
     }
     /**
      * @param {?} source
@@ -3160,7 +3989,8 @@ class AwHomeLayoutDS extends LayoutDataSource {
         else {
             this.numOfItemsStr = null;
         }
-        this.one('aw-home-item-preview-wrapper').update(response.itemsPagination.items);
+        this.one('aw-linked-objects').updateOptions({ context: 'home', configKeys: this.configuration.get('config-keys') });
+        this.one('aw-linked-objects').update(response.itemsPagination.items);
         // scroll control
         this._scrollBackgroundControl();
     }
@@ -3487,6 +4317,13 @@ class AwHomeLayoutDS extends LayoutDataSource {
         this.updateBubblesAndItemPreviews();
     }
     /**
+     * @param {?} value
+     * @return {?}
+     */
+    onHeroChange(value) {
+        this.autocompleteChanged$.next(value);
+    }
+    /**
      * @private
      * @return {?}
      */
@@ -3563,6 +4400,73 @@ class AwHomeLayoutDS extends LayoutDataSource {
     _setHasScrollBackground({ scrollTop, scrollHeight, clientHeight }) {
         this.hasScrollBackground = scrollHeight > (scrollTop + clientHeight);
     }
+    /**
+     * @private
+     * @return {?}
+     */
+    _listenAutoCompleteChanges() {
+        this.one('aw-home-autocomplete').updateOptions({ config: this.configuration.get('config-keys') });
+        this.autocompleteChanged$.pipe(debounceTime(500)).subscribe((/**
+         * @param {?} value
+         * @return {?}
+         */
+        value => {
+            if (value) {
+                this.communication.request$('autoComplete', {
+                    onError: (/**
+                     * @param {?} error
+                     * @return {?}
+                     */
+                    (error) => console.error(error)),
+                    params: {
+                        input: value,
+                        itemsPagination: { offset: 0, limit: this.configuration.get('home-layout')['results-limit'] }
+                    }
+                }).subscribe((/**
+                 * @param {?} response
+                 * @return {?}
+                 */
+                (response) => {
+                    this.one('aw-home-autocomplete').update(response);
+                    if (!this.autocompletePopoverOpen)
+                        this._toggleAutocompletePopover();
+                }));
+            }
+            else {
+                this._toggleAutocompletePopover();
+            }
+        }));
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    _toggleAutocompletePopover() {
+        if (!this.autocompletePopover) {
+            /** @type {?} */
+            const template = document.getElementById('aw-home-advanced-autocomplete-popover');
+            template.style.display = 'block';
+            this.autocompletePopover = this.tippy('.aw-home__top-hero .n7-hero__input', {
+                content: template,
+                trigger: 'manual',
+                interactive: true,
+                arrow: false,
+                theme: 'light-border',
+                placement: 'bottom-start',
+                onHidden: (/**
+                 * @return {?}
+                 */
+                () => this.autocompletePopoverOpen = false),
+            })[0];
+        }
+        if (this.autocompletePopoverOpen) {
+            this.autocompletePopover.hide();
+        }
+        else {
+            this.autocompletePopover.show();
+        }
+        this.autocompletePopoverOpen = !this.autocompletePopoverOpen;
+    }
 }
 if (false) {
     /**
@@ -3600,6 +4504,21 @@ if (false) {
      * @private
      */
     AwHomeLayoutDS.prototype.allBubbles;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.autocompletePopover;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.autocompletePopoverOpen;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.autocompleteChanged$;
     /** @type {?} */
     AwHomeLayoutDS.prototype.selectedBubbles;
     /** @type {?} */
@@ -3656,6 +4575,7 @@ class AwHomeLayoutEH extends EventHandler {
             switch (type) {
                 case 'aw-home-layout.init':
                     this.dataSource.onInit(payload);
+                    this.configuration = payload.configuration;
                     break;
                 case 'aw-home-layout.destroy':
                     this.destroyed$.next();
@@ -3685,8 +4605,7 @@ class AwHomeLayoutEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'aw-hero.change':
-                    const { inputPayload, value } = payload;
-                    // TODO: do something
+                    this.dataSource.onHeroChange(payload.value);
                     break;
                 /**
                  * Facets Event Handlers
@@ -3722,6 +4641,15 @@ class AwHomeLayoutEH extends EventHandler {
                  */
                 case 'aw-home-item-tags-wrapper.click':
                     this.dataSource.onTagClicked(payload);
+                    break;
+                /**
+                 * Tags & Item Previews Event Handlers
+                 */
+                case 'aw-home-autocomplete.click':
+                    this.emitGlobal('navigate', {
+                        handler: 'router',
+                        path: [this.configuration.get('paths').entitaBasePath, payload.id]
+                    });
                     break;
                 default:
                     break;
@@ -3765,7 +4693,9 @@ const AwHomeLayoutConfig = {
         }, {
             id: 'aw-home-item-tags-wrapper',
         }, {
-            id: 'aw-home-item-preview-wrapper'
+            id: 'aw-home-autocomplete'
+        }, {
+            id: 'aw-linked-objects'
         }],
     layoutDS: AwHomeLayoutDS,
     layoutEH: AwHomeLayoutEH,
@@ -3825,7 +4755,7 @@ class AwHomeLayoutComponent extends AbstractLayout {
 AwHomeLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-home-layout',
-                template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- hidden buttons and div used to implement the bubbles' popups -->\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_closebutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-close-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_gotobutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-goto-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_selectbutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-select-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <div id=\"bubble-popup-menu\" style=\"display: none;\">\n        <h2>{{ ( lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.label : '' ) }}</h2>\n        <span class=\"n7-icon-close\" onclick=\"document.getElementById('bubble-popup-menu_closebutton').click();\"></span>\n        <p>\n                {{ ( lb.dataSource.currentHoverEntity ? '\u00C8 collegato a '+lb.dataSource.currentHoverEntity.count+' entit\u00E0' : '' ) }}\n        </p>\n        <span onclick=\"document.getElementById('bubble-popup-menu_gotobutton').click();\">Vai alla scheda</span> |\n        <span onclick=\"document.getElementById('bubble-popup-menu_selectbutton').click();\">Seleziona</span>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper\" [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length>0 }\">\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div id=\"bubble-chart-container\">\n            <n7-bubble-chart [data]=\"lb.widgets['aw-home-bubble-chart'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-home-bubble-chart'].emit\">\n            </n7-bubble-chart>\n        </div>\n\n        <ng-container *ngIf=\"lb.dataSource.selectedBubbles.length>0\">\n            <div class=\"aw-home__bubble-results\" [ngStyle]=\"{ 'display': 'flex' , 'flex-direction': 'column' }\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\"> <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">{{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span></h1></div>\n\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list-wrapper\">\n                    <div class=\"aw-home__bubble-results-list\" [attr.id]=\"'bubble-results-list'\">\n                        <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-preview-wrapper'].ds.out$ | async;\">\n                            <n7-item-preview\n                                [data]=\"widgetData\"\n                                [emit]=\"lb.widgets['aw-home-item-preview-wrapper'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n                    </div>\n                    <div *ngIf=\"lb.dataSource.hasScrollBackground\" class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                </div>\n               \n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n</div>"
+                template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- hidden buttons and div used to implement the bubbles' popups -->\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_closebutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-close-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_gotobutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-goto-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_selectbutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-select-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <div class=\"aw-bubble-popup-menu\" id=\"bubble-popup-menu\" style=\"display: none;\">\n        <h2 class=\"aw-bubble-popup-menu__title\">{{ ( lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.label : '' ) }}</h2>\n        <span class=\"n7-icon-close\" onclick=\"document.getElementById('bubble-popup-menu_closebutton').click();\"></span>\n        <p class=\"aw-bubble-popup-menu__text\">\n            {{ ( lb.dataSource.currentHoverEntity ? '\u00C8 collegato a '+lb.dataSource.currentHoverEntity.count+' entit\u00E0' : '' ) }}\n        </p>\n\n        <div class=\"aw-bubble-popup-menu__actions\">\n            <span class=\"aw-bubble-popup-menu__link\" onclick=\"document.getElementById('bubble-popup-menu_gotobutton').click();\">Vai alla scheda</span>\n            <span class=\"aw-bubble-popup-menu__link\" onclick=\"document.getElementById('bubble-popup-menu_selectbutton').click();\">Seleziona</span>\n        </div>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper\" [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length>0 }\">\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div id=\"bubble-chart-container\">\n            <n7-bubble-chart [data]=\"lb.widgets['aw-home-bubble-chart'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-home-bubble-chart'].emit\">\n            </n7-bubble-chart>\n        </div>\n\n        <ng-container *ngIf=\"lb.dataSource.selectedBubbles.length>0\">\n            <div class=\"aw-home__bubble-results\" [ngStyle]=\"{ 'display': 'flex' , 'flex-direction': 'column' }\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\"> <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">{{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span></h1></div>\n\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list-wrapper\">\n                    <div class=\"aw-home__bubble-results-list\" [attr.id]=\"'bubble-results-list'\">\n                        <ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">\n                            <n7-item-preview\n                                [data]=\"widgetData\"\n                                [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n                    </div>\n                    <div *ngIf=\"lb.dataSource.hasScrollBackground\" class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                    \n                    <div class=\"aw-home__bubble-results-list-actions\">\n                        <a class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\" href=\"\">Vedi tutti</a>\n                        <a class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-others\" href=\"\">Vedi altri</a>\n                    </div>\n                    \n                </div>\n               \n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- adavanced autocomplete popover  -->\n    <div id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <n7-advanced-autocomplete [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -3864,6 +4794,11 @@ if (false) {
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaLayoutDS extends LayoutDataSource {
+    constructor() {
+        super(...arguments);
+        this.allBubbles = null;
+        this.selectedBubbles = [];
+    }
     /**
      * If you are not using these variables (from your-layout.ts),
      * remove them from onInit() parameters and inside the function.
@@ -3878,6 +4813,11 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         this.communication = communication;
         this.options = options;
         this.sidebarCollapsed = false;
+        this.bubbleChartSectionTitle = this.configuration.get('scheda-layout')['bubble-chart']['title'];
+        this.similarItemsSectionTitle = this.configuration.get('scheda-layout')['related-items']['title'];
+        this.metadataSectionTitle = this.configuration.get('scheda-layout')['metadata']['title'];
+        this.hasSimilarItems = false;
+        this.hasBubbles = false;
     }
     /**
      * @param {?} id
@@ -3899,17 +4839,6 @@ class AwSchedaLayoutDS extends LayoutDataSource {
      */
     updateNavigation(data) {
         /** @type {?} */
-        let treeObj = {
-            items: []
-        };
-        data['branches'].forEach((/**
-         * @param {?} item
-         * @return {?}
-         */
-        item => {
-            treeObj['items'].push(this.parseTree(item, false, []));
-        }));
-        /** @type {?} */
         let header = {
             iconLeft: 'n7-icon-tree-icon',
             text: data['label'],
@@ -3917,9 +4846,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
             classes: 'is-expanded',
             payload: 'header'
         };
-        this.one('aw-tree').update(treeObj);
         this.one('aw-sidebar-header').update(header);
-        this.one('aw-scheda-breadcrumbs').update(null);
     }
     /**
      * @param {?} id
@@ -3927,19 +4854,20 @@ class AwSchedaLayoutDS extends LayoutDataSource {
      */
     loadItem(id) {
         if (id) {
+            /** @type {?} */
+            const maxSimilarItems = this.configuration.get('scheda-layout')['related-items']['max-related-items'];
             return this.communication.request$('getItemDetails', {
                 onError: (/**
                  * @param {?} error
                  * @return {?}
                  */
                 (error) => console.error(error)),
-                params: { itemId: id }
+                params: { itemId: id, maxSimilarItems }
             });
         }
         else {
             /* TODO: valori statici, da prendere da config */
             this.pageTitle = 'Collezione d\'Arte';
-            this.hasBreadcrumb = false;
             this.contentParts = [
                 {
                     type: 'text',
@@ -3959,27 +4887,52 @@ class AwSchedaLayoutDS extends LayoutDataSource {
      * @return {?}
      */
     loadContent(response) {
-        this.hasBreadcrumb = true;
         if (response) {
             this.contentParts = [];
-            if (response.image) {
-                this.contentParts.push({
-                    image: response.image,
-                    type: 'image'
-                });
-            }
-            this.contentParts.push({
-                title: response.title,
-                content: response.text,
-                type: 'text'
-            });
             /** @type {?} */
-            let breadcrumbs = {
-                items: []
+            let content = {};
+            if (response.text) {
+                content['content'] = response.text;
+            }
+            this.contentParts.push(content);
+            if (response.image) {
+                /** @type {?} */
+                const images = [{ type: 'image', url: response.image, buildPyramid: false }];
+                if (!this.imageViewerIstance) {
+                    this.one('aw-scheda-image').update({
+                        viewerId: 'scheda-layout-viewer',
+                        _setViewer: (/**
+                         * @param {?} viewer
+                         * @return {?}
+                         */
+                        (viewer) => {
+                            this.imageViewerIstance = viewer;
+                            viewer.open(images);
+                        }),
+                    });
+                }
+                else {
+                    this.imageViewerIstance.open(images);
+                }
+            }
+            /** @type {?} */
+            let titleObj = {
+                icon: response.item.icon,
+                title: {
+                    main: {
+                        text: response.title,
+                        classes: 'bold',
+                    }
+                },
+                tools: response.subTitle,
+                actions: {}
             };
+            this.one('aw-scheda-inner-title').update(titleObj);
+            /*Metadata section*/
             /** @type {?} */
             let group = { group: [] };
             if (response.fields) {
+                this.hasMetadata = true;
                 response.fields.forEach((/**
                  * @param {?} field
                  * @return {?}
@@ -3997,11 +4950,15 @@ class AwSchedaLayoutDS extends LayoutDataSource {
                     group.group.push({
                         title: field.label,
                         items: items
-                        //items: field.fields
                     });
                 }));
             }
             this.one('aw-scheda-metadata').update(group);
+            /*Breadcrumb section*/
+            /** @type {?} */
+            let breadcrumbs = {
+                items: []
+            };
             response.breadcrumbs.forEach((/**
              * @param {?} element
              * @return {?}
@@ -4014,81 +4971,63 @@ class AwSchedaLayoutDS extends LayoutDataSource {
             }));
             this.one('aw-scheda-breadcrumbs').update(breadcrumbs);
         }
-    }
-    /**
-     * @private
-     * @param {?} data
-     * @param {?} toggle
-     * @param {?} parents
-     * @return {?}
-     */
-    parseTree(data, toggle, parents) {
-        /** @type {?} */
-        var currParents = [...parents];
-        /** @type {?} */
-        let treeItem = {};
-        Object.keys(data).forEach((/**
-         * @param {?} key
-         * @return {?}
-         */
-        key => {
-            if (toggle) {
-                treeItem['toggle'] = {
-                    icon: 'n7-icon-angle-right',
-                    payload: {
-                        source: "toggle",
-                        id: data['id'],
-                        parents: currParents,
-                    }
-                };
-            }
-            if (key != "branches") {
-                switch (key) {
-                    case "label":
-                        treeItem['text'] = data[key];
-                        break;
-                    case "icon":
-                        if (toggle) {
-                            treeItem['toggle']['icon'] = data[key];
-                        }
-                        break;
-                    case "id":
-                        treeItem['_meta'] = data[key];
-                        treeItem['payload'] = {
-                            source: "menuItem",
-                            id: data['id']
-                        };
-                        break;
-                    default:
-                        data[key];
-                        break;
-                }
-                treeItem['classes'] = 'is-collapsed';
-            }
-            else if (data['branches'] != null) {
-                currParents.push(data['id']);
-                /*Handle cases with menu item with children but without toggle*/
-                if (!toggle) {
-                    treeItem['payload']['source'] = "ToggleMenuItem";
-                    treeItem['payload']['parents'] = currParents;
-                }
-                treeItem['items'] = [];
-                data[key].forEach((/**
-                 * @param {?} item
-                 * @return {?}
-                 */
-                item => {
-                    treeItem['items'].push(this.parseTree(item, true, currParents));
-                }));
-            }
-        }));
-        return treeItem;
+        /* Related Entities */
+        if (response.connectedEntities) {
+            this.hasBubbles = true;
+            this.setAllBubblesFromApolloQuery(response);
+        }
+        else {
+            this.hasBubbles = false;
+            this.one('aw-scheda-bubble-chart').update(null);
+        }
+        /* Similar item */
+        if (response.similarItems) {
+            this.hasSimilarItems = true;
+            this.one('aw-linked-objects').updateOptions({ context: 'scheda', configKeys: this.configuration.get("config-keys") });
+            this.one('aw-linked-objects').update(response.similarItems);
+        }
+        else {
+            this.hasSimilarItems = false;
+            this.one('aw-linked-objects').update(null);
+        }
     }
     /**
      * @return {?}
      */
     collapseSidebar() {
         this.sidebarCollapsed = !this.sidebarCollapsed;
+    }
+    /**
+     * @param {?} response
+     * @param {?=} reset
+     * @return {?}
+     */
+    setAllBubblesFromApolloQuery(response, reset) {
+        if (!response || !response.connectedEntities) {
+            return;
+        }
+        this.allBubbles = [];
+        for (let i = 0; i < response.connectedEntities.length; i++) {
+            /** @type {?} */
+            const color = this.configuration.get('config-keys')[response.connectedEntities[i].entity.typeOfEntity.configKey] ? this.configuration.get('config-keys')[response.connectedEntities[i].entity.typeOfEntity.configKey]['color']['hex'] : "";
+            this.allBubbles.push(Object.assign({ id: this.convertEntityIdToBubbleId(response.connectedEntities[i].entity.id) }, response.connectedEntities[i], { color: color }));
+        }
+        this.one('aw-scheda-bubble-chart').update({
+            containerId: 'bubble-chart-container',
+            width: window.innerWidth / 1.8,
+            bubbles: this.allBubbles,
+            reset: (reset ? reset : false)
+        });
+    }
+    /**
+     * @private
+     * @param {?} entityId
+     * @return {?}
+     */
+    convertEntityIdToBubbleId(entityId) {
+        if (!entityId)
+            return null;
+        return ('B_' + entityId.replace(/-/g, '_'));
     }
 }
 if (false) {
@@ -4119,6 +5058,13 @@ if (false) {
      * @protected
      */
     AwSchedaLayoutDS.prototype.titleService;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSchedaLayoutDS.prototype.allBubbles;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.selectedBubbles;
     /** @type {?} */
     AwSchedaLayoutDS.prototype.options;
     /** @type {?} */
@@ -4131,6 +5077,20 @@ if (false) {
     AwSchedaLayoutDS.prototype.tree;
     /** @type {?} */
     AwSchedaLayoutDS.prototype.sidebarCollapsed;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.bubbleChartSectionTitle;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.similarItemsSectionTitle;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.metadataSectionTitle;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.hasMetadata;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.hasBubbles;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.hasSimilarItems;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.imageViewerIstance;
 }
 
 /**
@@ -4223,7 +5183,8 @@ class AwSchedaLayoutEH extends EventHandler {
          */
         (response) => {
             if (response) {
-                this.dataSource.updateNavigation(response, selectedItem);
+                this.dataSource.updateNavigation(response);
+                this.emitOuter('navigationresponse', response);
             }
             if (selectedItem) {
                 this.emitOuter('selectItem', selectedItem);
@@ -4264,7 +5225,11 @@ const AwPatrimonioLayoutConfig = {
         { id: 'aw-sidebar-header' },
         { id: 'aw-tree' },
         { id: 'aw-scheda-breadcrumbs' },
-        { id: 'aw-scheda-metadata' }
+        { id: 'aw-scheda-metadata' },
+        { id: 'aw-scheda-image' },
+        { id: 'aw-scheda-inner-title' },
+        { id: 'aw-scheda-bubble-chart' },
+        { id: 'aw-linked-objects' }
     ],
     layoutDS: AwSchedaLayoutDS,
     layoutEH: AwSchedaLayoutEH,
@@ -4333,7 +5298,7 @@ class AwSchedaLayoutComponent extends AbstractLayout {
 AwSchedaLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-scheda-layout',
-                template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\n    <div class=\"aw-scheda__content\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree\">\n            <n7-sidebar-header\n                [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"\n            ></n7-sidebar-header>\n            <n7-tree\n                [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-tree'].emit\"\n                [hidden]=\"lb.dataSource.sidebarCollapsed\"\n            ></n7-tree>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper\">\n            <n7-breadcrumbs\n                *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\"\n            ></n7-breadcrumbs>\n            <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                <div *ngIf=\"part.type == 'image'\">\n                    <div\n                    [ngStyle]=\"{\n                        'background-image': 'url(' + part.image + ')',\n                        'width': '100%',\n                        'height': '200px'\n                        }\">\n                    </div>\n                </div>\n\n                <div>\n                    <h1>{{ part.title }}</h1>\n                    <div>\n                        <div [innerHTML]=\"part.content\" >\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <n7-metadata-viewer\n                [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\"\n            >\n            </n7-metadata-viewer>\n        </div>\n    </div>\n</div>\n"
+                template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\n    <div class=\"aw-scheda__content\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n\n         <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree\">\n            <n7-sidebar-header\n                [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"\n            ></n7-sidebar-header>\n            <n7-tree\n                [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-tree'].emit\"\n                [hidden]=\"lb.dataSource.sidebarCollapsed\"\n            ></n7-tree>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper\">\n            <n7-breadcrumbs\n                [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\"\n            ></n7-breadcrumbs>\n\n            <n7-inner-title\n            [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\"\n            ></n7-inner-title>\n\n            <n7-image-viewer\n                [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\"\n            >\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\"\n                [hidden] = \"!lb.hasMetadata\"\n            >\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.metadataSectionTitle}}</div>\n                <n7-metadata-viewer\n                    [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section id=\"bubble-chart-container\" class=\"aw-scheda__bubble-chart\">\n                <div\n                    [hidden] = \"!lb.dataSource.hasBubbles\"\n                    class=\"aw-scheda__inner-title\">{{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <n7-bubble-chart [data]=\"lb.widgets['aw-scheda-bubble-chart'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-scheda-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </section>\n\n            <section\n                [hidden] = \"!lb.dataSource.hasSimilarItems\"\n                id=\"related-item-container\" class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.similarItemsSectionTitle}}</div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">\n                        <n7-item-preview\n                            [data]=\"widgetData\"\n                            >\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n             </section>\n        </div>\n    </div>\n</div>\n"
             }] }
 ];
 /** @nocollapse */
@@ -4534,5 +5499,5 @@ N7BoilerplateLibModule.decorators = [
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAboutLayoutComponent, AwAboutLayoutConfig, AwAboutLayoutDS, AwAboutLayoutEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaNavDS, AwEntitaNavEH, AwHeroDS, AwHeroEH, AwHomeBubbleChartDS, AwHomeBubbleChartEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemPreviewWrapperDS, AwHomeItemPreviewWrapperEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, AwWorksLayoutComponent, AwWorksLayoutConfig, AwWorksLayoutDS, AwWorksLayoutEH, BreadcrumbsDS, BreadcrumbsEH, CommunicationService, ConfigurationService, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SubnavDS, SubnavEH, CommunicationService as ɵa, MainStateService as ɵb };
+export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAboutLayoutComponent, AwAboutLayoutConfig, AwAboutLayoutDS, AwAboutLayoutEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeBubbleChartDS, AwHomeBubbleChartEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaBubbleChartDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, AwWorksLayoutComponent, AwWorksLayoutConfig, AwWorksLayoutDS, AwWorksLayoutEH, BreadcrumbsDS, BreadcrumbsEH, CommunicationService, ConfigurationService, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SubnavDS, SubnavEH, CommunicationService as ɵa, MainStateService as ɵb };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map
