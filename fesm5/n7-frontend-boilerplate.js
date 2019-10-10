@@ -278,7 +278,7 @@ var ApolloProviderConfig = {
     },
     'getTree': {
         queryName: 'getTreeOfItems',
-        queryBody: "\n    {\n      getTreeOfItems(treeId: \"patrimonioId\" ) {\n        id\n        label\n        icon\n        branches {\n          label\n          id\n          icon\n          branches {\n            label\n            id\n            icon\n            branches {\n              label\n              id\n              icon\n            }\n          }\n        }\n      }\n    }\n    "
+        queryBody: "\n    {\n      getTreeOfItems(treeId: \"patrimonioId\" ) {\n        id\n        label\n        icon\n        branches {\n          label\n          id\n          icon\n          img\n          branches {\n            label\n            id\n            icon\n            img\n            branches {\n              label\n              id\n              icon\n              img\n            }\n          }\n        }\n      }\n    }\n    "
     },
     'globalFilter': {
         queryName: 'globalFilter',
@@ -286,7 +286,7 @@ var ApolloProviderConfig = {
     },
     'getEntityDetails': {
         queryName: 'getEntityDetails',
-        queryBody: "{\n      getEntityDetails(__PARAMS__){\n        overviewTab\n        entity {\n          label\n          id\n          typeOfEntity {\n            configKey\n          }\n        }\n        fieldsTab {\n          label\n          fields {\n            key\n            value\n          }\n        }\n        entities {\n          entity {\n            id\n            label\n            typeOfEntity {\n              configKey\n            }\n          }\n          count\n        }\n        items {\n          breadcrumbs {\n            link\n            label\n          }\n          item {\n            id\n            label\n            info {\n              key\n              value\n            }\n          }\n          thumbnail\n          relatedTOEData {\n            type {\n              id\n              configKey\n            }\n            count\n          }\n        }\n      }\n    }\n    "
+        queryBody: "{\n      getEntityDetails(__PARAMS__){\n        overviewTab\n        entity {\n          label\n          id\n          typeOfEntity {\n            configKey\n          }\n        }\n        fieldsTab {\n          label\n          fields {\n            key\n            value\n          }\n        }\n        entities {\n          entity {\n            id\n            label\n            typeOfEntity {\n              configKey\n            }\n          }\n          count\n        }\n        extraTabUrl\n        wikiTabUrl\n        items {\n          breadcrumbs {\n            link\n            label\n          }\n          item {\n            id\n            label\n            info {\n              key\n              value\n            }\n          }\n          thumbnail\n          relatedTOEData {\n            type {\n              id\n              configKey\n            }\n            count\n          }\n        }\n      }\n    }\n    "
     },
     'getItemDetails': {
         queryName: 'getItemDetails',
@@ -1675,7 +1675,10 @@ function unpackData(data, page, size, keys, totalPages) {
                      * @return {?}
                      */
                     function (o) {
-                        return { text: o, selected: o == size, disabled: o > totalPages };
+                        return {
+                            text: o,
+                            selected: o == size,
+                        };
                     })),
                     payload: 'select-size'
                 }
@@ -2215,45 +2218,63 @@ var AwEntitaNavDS = /** @class */ (function (_super) {
     }
     /**
      * @protected
-     * @param {?} data
+     * @param {?} param
      * @return {?}
      */
     AwEntitaNavDS.prototype.transform = /**
      * @protected
-     * @param {?} data
+     * @param {?} param
      * @return {?}
      */
-    function (data) {
+    function (param) {
+        if (!param)
+            return;
         /** @type {?} */
-        var navigation = {
-            items: [
-                {
-                    text: 'OVERVIEW',
-                    payload: 'overview',
-                },
-                {
-                    text: 'CAMPI',
-                    payload: 'campi',
-                },
-                {
-                    text: 'OGGETTI COLLEGATI',
-                    payload: 'oggetti-collegati',
-                },
-                {
-                    text: 'ENTITA COLLEGATE',
-                    payload: 'entita-collegate',
-                },
-                {
-                    text: 'MAXXI',
-                    payload: 'maxxi',
-                },
-                {
-                    text: 'WIKIPEDIA',
-                    payload: 'wiki',
-                },
-            ],
-            payload: 'entita-nav'
-        };
+        var data = param.data;
+        /** @type {?} */
+        var selected = param.selected;
+        /** @type {?} */
+        var navigation = { items: [], payload: 'entita-nav' };
+        navigation.items.push({
+            text: 'OVERVIEW',
+            payload: 'overview',
+            classes: selected == 'overview' ? 'is-selected' : ''
+        });
+        if (data.fieldsTab) {
+            navigation.items.push({
+                text: 'CAMPI',
+                payload: 'campi',
+                classes: selected == 'campi' ? 'is-selected' : ''
+            });
+        }
+        if (data.items) {
+            navigation.items.push({
+                text: 'OGGETTI-COLLEGATI',
+                payload: 'oggetti-collegati',
+                classes: selected == 'oggetti-collegati' ? 'is-selected' : ''
+            });
+        }
+        if (data.entities) {
+            navigation.items.push({
+                text: 'ENTITÀ COLLEGATE',
+                payload: 'entita-collegate',
+                classes: selected == 'entita-collegate' ? 'is-selected' : ''
+            });
+        }
+        if (data.extraTabUrl) {
+            navigation.items.push({
+                text: 'MAXXI',
+                payload: 'maxxi',
+                classes: selected == 'maxxi' ? 'is-selected' : ''
+            });
+        }
+        if (data.wikiTabUrl) {
+            navigation.items.push({
+                text: 'WIKIPEDIA',
+                payload: 'wiki',
+                classes: selected == 'wiki' ? 'is-selected' : ''
+            });
+        }
         return navigation;
     };
     return AwEntitaNavDS;
@@ -2546,6 +2567,9 @@ var AwTreeDS = /** @class */ (function (_super) {
                 switch (key) {
                     case "label":
                         treeItem['text'] = data[key];
+                        break;
+                    case "img":
+                        treeItem['img'] = data[key];
                         break;
                     case "icon":
                         if (showToggle && data[key] != null) {
@@ -3722,9 +3746,11 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
      */
     function (data) {
         /*
-          Updates the widgets on this layout, based on route
-        */
-        this.one('aw-entita-nav').update('some data');
+              Updates the widgets on this layout, based on route
+            */
+        /** @type {?} */
+        var selected = this.selectedTab;
+        this.one('aw-entita-nav').update({ data: data, selected: selected });
     };
     /**
      * @param {?} id
@@ -3770,7 +3796,8 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
         this.navHeader = {
             // always render nav header
             icon: this.configuration.get("config-keys")[this.myResponse.entity.typeOfEntity.configKey].icon,
-            text: this.myResponse.entity.label
+            text: this.myResponse.entity.label,
+            color: this.myResponse.entity.typeOfEntity.configKey
         };
         switch (this.selectedTab) { // make dynamic content depending on request
             case 'overview':
@@ -3876,10 +3903,14 @@ var AwEntitaLayoutEH = /** @class */ (function (_super) {
         _this.destroyed$ = new Subject();
         return _this;
     }
+    // private selectedTab: string;
+    // private selectedTab: string;
     /**
      * @return {?}
      */
-    AwEntitaLayoutEH.prototype.listen = /**
+    AwEntitaLayoutEH.prototype.listen = 
+    // private selectedTab: string;
+    /**
      * @return {?}
      */
     function () {
@@ -3895,14 +3926,27 @@ var AwEntitaLayoutEH = /** @class */ (function (_super) {
                     _this.dataSource.onInit(payload);
                     _this.configuration = payload.configuration;
                     _this.route = payload.route;
-                    /** @type {?} */
-                    var paramId = _this.route.snapshot.params.id || "";
+                    _this.entityId = _this.route.snapshot.params.id || "";
                     _this.dataSource.currentPage = _this.route.snapshot.params.page || '';
                     _this.listenRoute();
-                    _this.loadNavigation(paramId);
+                    _this.loadNavigation(_this.entityId);
                     break;
                 case 'aw-entita-layout.destroy':
                     _this.destroyed$.next();
+                    break;
+                case 'aw-entita-layout.showmore':
+                    if (payload) {
+                        _this.emitGlobal('navigate', {
+                            path: [
+                                _this.configuration.get("paths").entitaBasePath
+                                    + '/' +
+                                    _this.entityId
+                                    + '/' +
+                                    payload
+                            ],
+                            handler: 'router'
+                        });
+                    }
                     break;
                 default:
                     break;
@@ -3921,7 +3965,7 @@ var AwEntitaLayoutEH = /** @class */ (function (_super) {
                             path: [
                                 _this.configuration.get("paths").entitaBasePath
                                     + '/' +
-                                    _this.route.snapshot.params.id
+                                    _this.entityId
                                     + '/' +
                                     payload
                             ],
@@ -4006,12 +4050,7 @@ var AwEntitaLayoutEH = /** @class */ (function (_super) {
      */
     function (selectedItem) {
         var _this = this;
-        /**
-         * Fetches the content for this page, based on the URL.
-         *
-         * @param selectItem - item to get from the communication provider
-         */
-        this.dataSource.getNavigation('entita').subscribe((/**
+        this.dataSource.getNavigation(selectedItem).subscribe((/**
          * @param {?} response
          * @return {?}
          */
@@ -4042,6 +4081,11 @@ if (false) {
      * @private
      */
     AwEntitaLayoutEH.prototype.route;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwEntitaLayoutEH.prototype.entityId;
 }
 
 /**
@@ -4133,7 +4177,7 @@ var AwEntitaLayoutComponent = /** @class */ (function (_super) {
     AwEntitaLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-entita-layout',
-                    template: "<div class=\"aw-entity\" *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div class=\"aw-entity__sidebar-title-wrapper\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <n7-nav \n            [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" \n            [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n    \n    <div class=\"aw-entity__content\" \n         [ngSwitch]=\"lb.dataSource.selectedTab\">\n        <ng-container *ngSwitchCase=\"'overview'\">\n            <ng-container *ngTemplateOutlet=\"overview\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'campi'\">\n            <ng-container *ngTemplateOutlet=\"campi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'oggetti-collegati'\">\n            <ng-container *ngTemplateOutlet=\"oggetti\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'entita-collegate'\">\n            <ng-container *ngTemplateOutlet=\"entita\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'maxxi'\">\n            <ng-container *ngTemplateOutlet=\"maxxi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'wiki'\">\n            <ng-container *ngTemplateOutlet=\"wiki\"></ng-container>\n        </ng-container>\n    </div>\n</div>\n\n<!-- navigation page content templates -->\n<ng-template #overview>\n    <section>\n        <div class=\"aw-entity__content-section\">\n            <div class=\"aw-entity__overview-description\">\n                {{lb.dataSource.myResponse.overviewTab}}\n            </div>\n            <div class=\"aw-entita-layout__button-wrapper\">\n                <button class=\"n7-btn n7-btn-light\">DESCRIZIONE WIKIPEDIA</button>\n                <button class=\"n7-btn n7-btn-light\">DESCRIZIONE MAXXI</button>\n            </div>\n        </div>\n        \n        <ng-container *ngIf=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async as data\">\n            <div class=\"aw-entity__content-section\">\n                <h1>Campi</h1>\n                <button class=\"n7-btn n7-btn-light\">TUTTI I CAMPI</button>\n                <n7-metadata-viewer \n                    class=\"aw-entita-layout__metadata-viewer\"\n                    [data]=\"data\">\n                </n7-metadata-viewer>\n            </div>\n        </ng-container>\n        \n        <div class=\"aw-entity__content-section\">\n            <h1>Oggetti collegati</h1><button class=\"n7-btn n7-btn-light\">TUTTI GLI OGGETTI COLLEGATI</button>\n            <ng-container *ngFor=\"let preview of lb.widgets['aw-linked-objects'].ds.out$ | async\">\n                <n7-breadcrumbs\n                    [data]=\"preview.breadcrumbs\">\n                </n7-breadcrumbs>\n                <n7-item-preview\n                    [data]=\"preview\"\n                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-item-preview>\n            </ng-container>\n        </div>\n        \n    </section>\n</ng-template>\n\n<ng-template #campi>\n    <div>\n        <ng-container *ngIf=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async as data\">\n            <h1>Campi</h1>\n            <n7-metadata-viewer class=\"aw-entita-layout__metadata-viewer\"\n                [data]=\"data\">\n            </n7-metadata-viewer>\n        </ng-container>\n    </div>\n</ng-template>\n\n<ng-template #oggetti>\n    <div>\n        <h1>Oggetti collegati</h1>\n        <ng-container \n            *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n            <n7-breadcrumbs [data]=\"preview.breadcrumbs\">\n            </n7-breadcrumbs>\n            <n7-item-preview \n                [data]=\"preview\"\n                [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n            </n7-item-preview>\n        </ng-container>\n        <n7-pagination \n            [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n            [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n        </n7-pagination>\n    </div>\n</ng-template>\n\n<ng-template #entita>\n    <div>\n        Page entita\n    </div>\n</ng-template>\n\n<ng-template #maxxi>\n    <div>\n        Page maxxi\n    </div>\n</ng-template>\n\n<ng-template #wiki>\n    <div>\n        Page wiki\n    </div>\n</ng-template>\n"
+                    template: "<div class=\"aw-entity\" *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <n7-nav \n            [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" \n            [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n    \n    <div class=\"aw-entity__content\" \n         [ngSwitch]=\"lb.dataSource.selectedTab\">\n        <ng-container *ngSwitchCase=\"'overview'\">\n            <ng-container *ngTemplateOutlet=\"overview\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'campi'\">\n            <ng-container *ngTemplateOutlet=\"campi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'oggetti-collegati'\">\n            <ng-container *ngTemplateOutlet=\"oggetti\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'entita-collegate'\">\n            <ng-container *ngTemplateOutlet=\"entita\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'maxxi'\">\n            <ng-container *ngTemplateOutlet=\"maxxi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'wiki'\">\n            <ng-container *ngTemplateOutlet=\"wiki\"></ng-container>\n        </ng-container>\n    </div>\n</div>\n\n<!-- navigation page content templates -->\n<ng-template #overview>\n    <section>\n        <div class=\"aw-entity__content-section\">\n            <div class=\"aw-entity__overview-description\">\n                {{lb.dataSource.myResponse.overviewTab}}\n            </div>\n            <div class=\"aw-entita-layout__button-wrapper\">\n                <button *ngIf=\"lb.dataSource.myResponse.wikiTabUrl\"\n                        class=\"n7-btn n7-btn-light\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'wiki')\">\n                    DESCRIZIONE WIKIPEDIA\n                </button>\n                <button *ngIf=\"lb.dataSource.myResponse.extraTabUrl\"\n                        class=\"n7-btn n7-btn-light\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'maxxi')\">\n                    DESCRIZIONE MAXXI\n                </button>\n            </div>\n        </div>\n        \n        <ng-container *ngIf=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async as data\">\n            <div class=\"aw-entity__content-section\">\n                <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                <button class=\"n7-btn n7-btn-light\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'campi')\">\n                    TUTTI I CAMPI\n                </button>\n                <n7-metadata-viewer \n                    class=\"aw-entita-layout__metadata-viewer\"\n                    [data]=\"data\">\n                </n7-metadata-viewer>\n            </div>\n        </ng-container>\n        \n        <div class=\"aw-entity__content-section\">\n            <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n            <button class=\"n7-btn n7-btn-light\"\n                    (click)=\"lb.eventHandler.emitInner('showmore', 'oggetti-collegati')\">\n                TUTTI GLI OGGETTI COLLEGATI\n            </button>\n            <ng-container *ngFor=\"let preview of lb.widgets['aw-linked-objects'].ds.out$ | async\">\n                <n7-breadcrumbs\n                    [data]=\"preview.breadcrumbs\">\n                </n7-breadcrumbs>\n                <n7-item-preview\n                    [data]=\"preview\"\n                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-item-preview>\n            </ng-container>\n        </div>\n\n        <div class=\"aw-entity__content-section\">\n            <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n            <button class=\"n7-btn n7-btn-light\"\n                    (click)=\"lb.eventHandler.emitInner('showmore', 'entita-collegate')\">\n                TUTTE LE ENTIT\u00C0 COLLEGATE\n            </button>\n            <!-- BUBBLE CHART GOES HERE -->\n            <img src=\"https://i.imgur.com/P21HGo5.png\" alt=\"bubble chart\" (dragstart)=\"false\">\n        </div>\n        \n    </section>\n</ng-template>\n\n<ng-template #campi>\n    <div>\n        <ng-container *ngIf=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async as data\">\n            <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n            <n7-metadata-viewer class=\"aw-entita-layout__metadata-viewer\"\n                [data]=\"data\">\n            </n7-metadata-viewer>\n        </ng-container>\n    </div>\n</ng-template>\n\n<ng-template #oggetti>\n    <div>\n        <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n        <ng-container \n            *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n            <n7-breadcrumbs [data]=\"preview.breadcrumbs\">\n            </n7-breadcrumbs>\n            <n7-item-preview \n                [data]=\"preview\"\n                [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n            </n7-item-preview>\n        </ng-container>\n        <n7-pagination \n            [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n            [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n        </n7-pagination>\n    </div>\n</ng-template>\n\n<ng-template #entita>\n    <div>\n        <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n        <!-- BUBBLE CHART GOES HERE -->\n        <img src=\"https://i.imgur.com/P21HGo5.png\" alt=\"bubble chart\" (dragstart)=\"false\">\n    </div>\n</ng-template>\n\n<ng-template #maxxi>\n    <div>\n        <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n        <div>\n            {{lb.dataSource.myResponse.overviewTab}}\n        </div>\n        <a href=\"{{lb.dataSource.myResponse.extraTabUrl}}\">\n            {{lb.dataSource.myResponse.extraTabUrl}}\n        </a>\n    </div>\n</ng-template>\n\n<ng-template #wiki>\n    <div>\n        <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n        <div>\n            {{lb.dataSource.myResponse.overviewTab}}\n        </div>\n        <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n            {{lb.dataSource.myResponse.wikiTabUrl}}\n        </a>\n    </div>\n</ng-template>\n"
                 }] }
     ];
     /** @nocollapse */
@@ -4994,8 +5038,10 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
                 trigger: 'manual',
                 interactive: true,
                 arrow: false,
+                appendTo: 'parent',
                 theme: 'light-border',
                 placement: 'bottom-start',
+                maxWidth: '100%',
                 onHidden: (/**
                  * @return {?}
                  */
@@ -5312,7 +5358,7 @@ var AwHomeLayoutComponent = /** @class */ (function (_super) {
     AwHomeLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-home-layout',
-                    template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- hidden buttons and div used to implement the bubbles' popups -->\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_closebutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-close-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_gotobutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-goto-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_selectbutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-select-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <div class=\"aw-bubble-popup-menu\" id=\"bubble-popup-menu\" style=\"display: none;\">\n        <h2 class=\"aw-bubble-popup-menu__title\">{{ ( lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.label : '' ) }}</h2>\n        <span class=\"n7-icon-close\" onclick=\"document.getElementById('bubble-popup-menu_closebutton').click();\"></span>\n        <p class=\"aw-bubble-popup-menu__text\">\n            {{ ( lb.dataSource.currentHoverEntity ? '\u00C8 collegato a '+lb.dataSource.currentHoverEntity.count+' entit\u00E0' : '' ) }}\n        </p>\n\n        <div class=\"aw-bubble-popup-menu__actions\">\n            <span class=\"aw-bubble-popup-menu__link\" onclick=\"document.getElementById('bubble-popup-menu_gotobutton').click();\">Vai alla scheda</span>\n            <span class=\"aw-bubble-popup-menu__link\" onclick=\"document.getElementById('bubble-popup-menu_selectbutton').click();\">Seleziona</span>\n        </div>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper\" [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length>0 }\">\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div id=\"bubble-chart-container\">\n            <n7-bubble-chart [data]=\"lb.widgets['aw-home-bubble-chart'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-home-bubble-chart'].emit\">\n            </n7-bubble-chart>\n        </div>\n\n        <ng-container *ngIf=\"lb.dataSource.selectedBubbles.length>0\">\n            <div class=\"aw-home__bubble-results\" [ngStyle]=\"{ 'display': 'flex' , 'flex-direction': 'column' }\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\"> <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">{{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span></h1></div>\n\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list-wrapper\">\n                    <div class=\"aw-home__bubble-results-list\" [attr.id]=\"'bubble-results-list'\">\n                        <ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">\n                            <n7-item-preview\n                                [data]=\"widgetData\"\n                                [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n                    </div>\n                    <div *ngIf=\"lb.dataSource.hasScrollBackground\" class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                    \n                    <div class=\"aw-home__bubble-results-list-actions\">\n                        <a class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\" href=\"\">Vedi tutti</a>\n                        <a class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-others\" href=\"\">Vedi altri</a>\n                    </div>\n                    \n                </div>\n               \n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- adavanced autocomplete popover  -->\n    <div id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <n7-advanced-autocomplete [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n</div>"
+                    template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- hidden buttons and div used to implement the bubbles' popups -->\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_closebutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-close-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_gotobutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-goto-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_selectbutton\"\n            (click)=\"lb.eventHandler.emitInner('bubble-tooltip-select-click',{entityId:(lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.id : null)} )\"></button>\n    <div class=\"aw-bubble-popup-menu\" id=\"bubble-popup-menu\" style=\"display: none;\">\n        <h2 class=\"aw-bubble-popup-menu__title\">{{ ( lb.dataSource.currentHoverEntity ? lb.dataSource.currentHoverEntity.label : '' ) }}</h2>\n        <span class=\"aw-bubble-popup-menu__close n7-icon-close\" onclick=\"document.getElementById('bubble-popup-menu_closebutton').click();\"></span>\n        <p class=\"aw-bubble-popup-menu__text\">\n            {{ ( lb.dataSource.currentHoverEntity ? '\u00C8 collegato a '+lb.dataSource.currentHoverEntity.count+' entit\u00E0' : '' ) }}\n        </p>\n\n        <div class=\"aw-bubble-popup-menu__actions\">\n            <span class=\"aw-bubble-popup-menu__link\" onclick=\"document.getElementById('bubble-popup-menu_gotobutton').click();\">Vai alla scheda</span>\n            <span class=\"aw-bubble-popup-menu__link\" onclick=\"document.getElementById('bubble-popup-menu_selectbutton').click();\">Seleziona</span>\n        </div>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper\" [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length>0 }\">\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div id=\"bubble-chart-container\">\n            <n7-bubble-chart [data]=\"lb.widgets['aw-home-bubble-chart'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-home-bubble-chart'].emit\">\n            </n7-bubble-chart>\n        </div>\n\n        <ng-container *ngIf=\"lb.dataSource.selectedBubbles.length>0\">\n            <div class=\"aw-home__bubble-results\" [ngStyle]=\"{ 'display': 'flex' , 'flex-direction': 'column' }\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\"> <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">{{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span></h1></div>\n\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list-wrapper\">\n                    <div class=\"aw-home__bubble-results-list\" [attr.id]=\"'bubble-results-list'\">\n                        <ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">\n                            <n7-item-preview\n                                [data]=\"widgetData\"\n                                [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n                    </div>\n                    <div *ngIf=\"lb.dataSource.hasScrollBackground\" class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                    \n                    <div class=\"aw-home__bubble-results-list-actions\">\n                        <a class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\" href=\"\">Vedi tutti</a>\n                        <a class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-others\" href=\"\">Vedi altri</a>\n                    </div>\n                    \n                </div>\n               \n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- adavanced autocomplete popover  -->\n    <div id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <n7-advanced-autocomplete [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n</div>"
                 }] }
     ];
     /** @nocollapse */
@@ -5465,6 +5511,12 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
                 }
             ];
         }
+        /*Breadcrumb section*/
+        /** @type {?} */
+        var breadcrumbs = {
+            items: []
+        };
+        this.one('aw-scheda-breadcrumbs').update(breadcrumbs);
     };
     /**
      * @param {?} response

@@ -27,7 +27,6 @@ export declare class AwLinkedObjectsDS extends DataSource {
                 options: {
                     text: number;
                     selected: boolean;
-                    disabled: boolean;
                 }[];
                 payload: string;
             };
