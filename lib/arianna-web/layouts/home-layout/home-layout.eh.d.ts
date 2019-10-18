@@ -4,4 +4,5 @@ export declare class AwHomeLayoutEH extends EventHandler {
     private configuration;
     private route;
     listen(): void;
+    private loadFilters;
 }

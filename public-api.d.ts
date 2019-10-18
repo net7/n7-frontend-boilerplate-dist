@@ -9,3 +9,4 @@ export * from './lib/arianna-web/n7-boilerplate-arianna-web.module';
 export * from './lib/arianna-web/data-sources/index';
 export * from './lib/arianna-web/event-handlers/index';
 export * from './lib/arianna-web/layouts/index';
+export * from './lib/arianna-web/components/index';

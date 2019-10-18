@@ -1,8 +1,9 @@
 import { DataSource } from '@n7-frontend/core';
 export declare class AwLinkedObjectsDS extends DataSource {
-    totalPages: Number;
-    currentPage: Number;
-    pageSize: Number;
+    totalPages: number;
+    currentPage: number;
+    pageSize: number;
+    context: string;
     protected transform(data: any): any[] | {
         pagination: {
             first: {

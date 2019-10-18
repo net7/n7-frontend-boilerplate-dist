@@ -15,11 +15,6 @@ export declare class AwEntitaLayoutComponent extends AbstractLayout implements O
     private mainState;
     private titleService;
     constructor(router: Router, route: ActivatedRoute, configuration: ConfigurationService, layoutsConfiguration: LayoutsConfigurationService, communication: CommunicationService, mainState: MainStateService, titleService: Title);
-    /**
-     * Optional variables that can be accessed from the layout's logic.
-     * If removed, they must also be removed from the layout's DataSource file,
-     * and from this file imports.
-     */
     protected initPayload(): {
         configuration: ConfigurationService;
         mainState: MainStateService;

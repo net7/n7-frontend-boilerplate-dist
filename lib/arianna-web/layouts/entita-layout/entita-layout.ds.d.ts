@@ -22,6 +22,7 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
         communication: any;
     }): void;
     getNavigation(id: any): any;
+    handleNavUpdate: (tab: any) => void;
     updateWidgets(data: any): void;
     loadItem(id: any, tab: any): any;
     loadContent(res: any): void;

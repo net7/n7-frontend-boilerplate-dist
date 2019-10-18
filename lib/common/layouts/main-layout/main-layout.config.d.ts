@@ -4,9 +4,13 @@ import * as DS from '../../data-sources';
 import * as EH from '../../event-handlers';
 export declare const MainLayoutConfig: {
     layoutId: string;
-    widgets: {
+    widgets: ({
         id: string;
-    }[];
+        hasStaticData?: undefined;
+    } | {
+        id: string;
+        hasStaticData: boolean;
+    })[];
     layoutDS: typeof MainLayoutDS;
     layoutEH: typeof MainLayoutEH;
     widgetsDataSources: typeof DS;
