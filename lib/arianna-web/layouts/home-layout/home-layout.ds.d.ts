@@ -5,6 +5,7 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     private tippy;
     private configuration;
     private facetData;
+    private lockedFacets;
     private facetInputs;
     private allBubbles;
     private autocompletePopover;
@@ -20,12 +21,15 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     currentHoverEntity: any;
     hasScrollBackground: boolean;
     loadingBubbles: boolean;
+    bubblesEnabled: boolean;
     onInit({ communication, mainState, configuration, tippy }: {
         communication: any;
         mainState: any;
         configuration: any;
         tippy: any;
     }): void;
+    makeRequest$(query: any, params: any): any;
+    updateComponent: (id: any, data: any, options: any) => void;
     initialFilterRequest(): any;
     parseInitialRequest(response: any): void;
     renderPreviewsFromApolloQuery(response: any): void;
@@ -54,6 +58,4 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     private _setHasScrollBackground;
     private _listenAutoCompleteChanges;
     private _toggleAutocompletePopover;
-    makeRequest$(query: any, params: any): any;
-    updateComponent: (comp: any, data: any) => void;
 }

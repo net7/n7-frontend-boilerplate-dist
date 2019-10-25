@@ -1,10 +1,10 @@
-import { Injectable, Inject, ɵɵdefineInjectable, ɵɵinject, Component, NgModule, Input } from '@angular/core';
+import { Injectable, Inject, ɵɵdefineInjectable, ɵɵinject, Component, Input, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FOOTER_MOCK, DvComponentsLibModule, TABLE_MOCK } from '@n7-frontend/components';
 import { ReplaySubject, empty, Subject, fromEvent, interval, of } from 'rxjs';
-import { map, catchError, takeUntil, debounce, tap, debounceTime } from 'rxjs/operators';
-import { __extends, __assign, __spread } from 'tslib';
+import { map, catchError, takeUntil, filter, first, debounce, tap, debounceTime } from 'rxjs/operators';
+import { __extends, __assign, __spread, __read } from 'tslib';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { LayoutBuilder, LayoutDataSource, EventHandler, DataSource } from '@n7-frontend/core';
@@ -738,10 +738,11 @@ var MainLayoutDS = /** @class */ (function (_super) {
      */
     function (_a) {
         var _this = this;
-        var configuration = _a.configuration, mainState = _a.mainState, router = _a.router, options = _a.options, titleService = _a.titleService;
+        var configuration = _a.configuration, mainState = _a.mainState, router = _a.router, options = _a.options, titleService = _a.titleService, route = _a.route;
         this.configuration = configuration;
         this.mainState = mainState;
         this.router = router;
+        this.route = route;
         this.titleService = titleService;
         this.options = options;
         // update header
@@ -796,10 +797,20 @@ var MainLayoutDS = /** @class */ (function (_super) {
     function (payload) {
         // router navigation
         if (payload.handler === 'router') {
+            var path = payload.path, queryParams = payload.queryParams;
             // path control
-            if (!payload.path)
+            if (!path)
                 throw Error('onNavigate: no path for router navigate');
-            this.router.navigate(payload.path);
+            if (queryParams) {
+                this.router.navigate(path, {
+                    relativeTo: this.route,
+                    queryParams: queryParams,
+                    queryParamsHandling: 'merge'
+                });
+            }
+            else {
+                this.router.navigate(path);
+            }
             // on change
             this._onRouterNavigate();
         }
@@ -834,6 +845,11 @@ if (false) {
      * @protected
      */
     MainLayoutDS.prototype.router;
+    /**
+     * @type {?}
+     * @protected
+     */
+    MainLayoutDS.prototype.route;
     /**
      * @type {?}
      * @protected
@@ -873,6 +889,9 @@ var MainLayoutEH = /** @class */ (function (_super) {
             switch (type) {
                 case 'main-layout.init':
                     _this.dataSource.onInit(payload);
+                    _this.route = payload.route;
+                    _this.router = payload.router;
+                    _this._listenRouterChanges();
                     break;
                 case 'main-layout.destroy':
                     _this.destroyed$.next();
@@ -897,6 +916,38 @@ var MainLayoutEH = /** @class */ (function (_super) {
             }
         }));
     };
+    /**
+     * @private
+     * @return {?}
+     */
+    MainLayoutEH.prototype._listenRouterChanges = /**
+     * @private
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        this.route.queryParams.pipe(filter((/**
+         * @param {?} params
+         * @return {?}
+         */
+        function (params) {
+            if (Object.keys(params).length)
+                return true;
+            return false;
+        })), first()).subscribe((/**
+         * @param {?} params
+         * @return {?}
+         */
+        function (params) {
+            // setTimeout for fixing route event timings
+            setTimeout((/**
+             * @return {?}
+             */
+            function () {
+                _this.emitGlobal('queryparams', params);
+            }));
+        }));
+    };
     return MainLayoutEH;
 }(EventHandler));
 if (false) {
@@ -905,6 +956,16 @@ if (false) {
      * @private
      */
     MainLayoutEH.prototype.destroyed$;
+    /**
+     * @type {?}
+     * @private
+     */
+    MainLayoutEH.prototype.route;
+    /**
+     * @type {?}
+     * @private
+     */
+    MainLayoutEH.prototype.router;
 }
 
 /**
@@ -1026,6 +1087,326 @@ var BreadcrumbsDS = /** @class */ (function (_super) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+var FacetsDS = /** @class */ (function (_super) {
+    __extends(FacetsDS, _super);
+    function FacetsDS() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @protected
+     * @param {?} __0
+     * @return {?}
+     */
+    FacetsDS.prototype.transform = /**
+     * @protected
+     * @param {?} __0
+     * @return {?}
+     */
+    function (_a) {
+        var fields = _a.fields;
+        var searchModel = this.options.searchModel;
+        this.searchModel = searchModel;
+        return fields;
+    };
+    return FacetsDS;
+}(DataSource));
+if (false) {
+    /** @type {?} */
+    FacetsDS.prototype.searchModel;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/** @type {?} */
+var HEADER_ICON_OPEN = 'n7-icon-angle-down';
+/** @type {?} */
+var HEADER_ICON_CLOSE = 'n7-icon-angle-right';
+var FacetsWrapperDS = /** @class */ (function (_super) {
+    __extends(FacetsWrapperDS, _super);
+    function FacetsWrapperDS() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.getRequestParams = (/**
+         * @return {?}
+         */
+        function () { return _this.searchModel.getRequestParams(); });
+        _this.filtersAsQueryParams = (/**
+         * @param {?} filters
+         * @return {?}
+         */
+        function (filters) { return _this.searchModel.filtersAsQueryParams(filters); });
+        _this.updateFiltersFromQueryParams = (/**
+         * @param {?} queryParams
+         * @return {?}
+         */
+        function (queryParams) { return _this.searchModel.updateFiltersFromQueryParams(queryParams); });
+        _this.getInputByFacetId = (/**
+         * @param {?} facetId
+         * @return {?}
+         */
+        function (facetId) { return _this.searchModel.getInputByFacetId(facetId); });
+        _this.filterTarget = (/**
+         * @param {?} target
+         * @return {?}
+         */
+        function (target) { return _this.searchModel.filterTarget(target); });
+        return _this;
+    }
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    FacetsWrapperDS.prototype.transform = /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    function (data) {
+        var _this = this;
+        /** @type {?} */
+        var groups = [];
+        if (!this.searchModel)
+            this.searchModel = data.searchModel;
+        /** @type {?} */
+        var id = this.searchModel.getId();
+        /** @type {?} */
+        var fields = this.searchModel.getFields();
+        fields.forEach((/**
+         * @param {?} fieldConfig
+         * @param {?} fieldIndex
+         * @return {?}
+         */
+        function (fieldConfig, fieldIndex) {
+            /** @type {?} */
+            var groupId = "group-" + id + "-" + fieldIndex;
+            // header config
+            /** @type {?} */
+            var header = _this._headerConfig(fieldConfig.header, groupId);
+            // inputs config
+            /** @type {?} */
+            var sections = [];
+            _this.searchModel.getInputs()
+                .filter((/**
+             * @param {?} input
+             * @return {?}
+             */
+            function (input) { return input.getSectionIndex() === fieldIndex; }))
+                .map((/**
+             * @param {?} input
+             * @return {?}
+             */
+            function (input) {
+                input.update();
+                return {
+                    facetId: input.getFacetId(),
+                    type: input.getType(),
+                    output: input.getOutput()
+                };
+            }))
+                .forEach((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, output = _a.output, facetId = _a.facetId;
+                sections.push({
+                    classes: _this._getSectionClasses(type),
+                    inputs: Array.isArray(output) ? output : [output],
+                    _meta: {
+                        facetId: facetId
+                    }
+                });
+            }));
+            groups.push({
+                header: header,
+                facet: { sections: sections },
+                classes: "n7-facets-wrapper__" + groupId,
+                isOpen: true,
+                _meta: {
+                    groupId: groupId
+                }
+            });
+        }));
+        return {
+            groups: groups,
+            classes: "n7-facets-wrapper__" + this.searchModel.getId()
+        };
+    };
+    /**
+     * @param {?} __0
+     * @return {?}
+     */
+    FacetsWrapperDS.prototype.toggleGroup = /**
+     * @param {?} __0
+     * @return {?}
+     */
+    function (_a) {
+        var eventPayload = _a.eventPayload;
+        this.output.groups.forEach((/**
+         * @param {?} group
+         * @return {?}
+         */
+        function (group) {
+            if (group._meta.groupId === eventPayload.groupId) {
+                group.isOpen = !group.isOpen;
+                group.header.iconRight = group.isOpen ? HEADER_ICON_OPEN : HEADER_ICON_CLOSE;
+            }
+        }));
+    };
+    /**
+     * @param {?} __0
+     * @return {?}
+     */
+    FacetsWrapperDS.prototype.onFacetChange = /**
+     * @param {?} __0
+     * @return {?}
+     */
+    function (_a) {
+        var eventPayload = _a.eventPayload;
+        var _b = eventPayload.inputPayload, facetId = _b.facetId, source = _b.source, trigger = _b.trigger;
+        /** @type {?} */
+        var filter = this.searchModel.getFiltersByFacetId(facetId)[0] || {};
+        /** @type {?} */
+        var filterValue = filter['value'];
+        /** @type {?} */
+        var remove = false;
+        /** @type {?} */
+        var value = eventPayload.inputPayload.value || eventPayload.value;
+        // normalize
+        value = '' + value;
+        // remove control
+        if (Array.isArray(filterValue)) {
+            remove = filterValue.indexOf(value) !== -1;
+        }
+        else {
+            remove = filterValue === value;
+        }
+        // input text control
+        // TODO: gestire i casi enter / icon click nel input text
+        if (source === 'input-text' && ['enter', 'icon'].indexOf(trigger) !== -1)
+            return;
+        this.searchModel.updateFilter(facetId, value, remove);
+        this.searchModel.updateInputsFromFilters();
+    };
+    /**
+     * @param {?} target
+     * @return {?}
+     */
+    FacetsWrapperDS.prototype.updateFilteredTarget = /**
+     * @param {?} target
+     * @return {?}
+     */
+    function (target) {
+        /** @type {?} */
+        var input = this.searchModel.getInputByFacetId(target);
+        this.output.groups
+            .map((/**
+         * @param {?} group
+         * @return {?}
+         */
+        function (group) { return group.facet; }))
+            .map((/**
+         * @param {?} facet
+         * @return {?}
+         */
+        function (facet) { return facet.sections; }))
+            .map((/**
+         * @param {?} sections
+         * @return {?}
+         */
+        function (sections) {
+            sections.forEach((/**
+             * @param {?} section
+             * @return {?}
+             */
+            function (section) {
+                if (section._meta.facetId === target) {
+                    /** @type {?} */
+                    var inputOutput = input.getOutput();
+                    section.inputs = Array.isArray(inputOutput) ? inputOutput : [inputOutput];
+                }
+            }));
+        }));
+    };
+    /**
+     * @return {?}
+     */
+    FacetsWrapperDS.prototype.updateInputsFromFilters = /**
+     * @return {?}
+     */
+    function () {
+        this.searchModel.updateInputsFromFilters();
+    };
+    /**
+     * @private
+     * @param {?} type
+     * @return {?}
+     */
+    FacetsWrapperDS.prototype._getSectionClasses = /**
+     * @private
+     * @param {?} type
+     * @return {?}
+     */
+    function (type) {
+        /** @type {?} */
+        var classesMap = {
+            'text': 'text',
+            'checkbox': 'checkboxes',
+            'link': 'links',
+            'select': 'select'
+        };
+        return "n7-facet__section-input-" + classesMap[type];
+    };
+    /**
+     * @private
+     * @param {?} header
+     * @param {?} groupId
+     * @return {?}
+     */
+    FacetsWrapperDS.prototype._headerConfig = /**
+     * @private
+     * @param {?} header
+     * @param {?} groupId
+     * @return {?}
+     */
+    function (header, groupId) {
+        return header ? {
+            text: header.label,
+            iconRight: HEADER_ICON_OPEN,
+            classes: header.classes,
+            payload: {
+                source: 'group-header',
+                id: groupId + "-header",
+                groupId: groupId
+            },
+            _meta: {
+                id: groupId + "-header"
+            }
+        } : null;
+    };
+    return FacetsWrapperDS;
+}(DataSource));
+if (false) {
+    /** @type {?} */
+    FacetsWrapperDS.prototype.searchModel;
+    /** @type {?} */
+    FacetsWrapperDS.prototype.getRequestParams;
+    /** @type {?} */
+    FacetsWrapperDS.prototype.filtersAsQueryParams;
+    /** @type {?} */
+    FacetsWrapperDS.prototype.updateFiltersFromQueryParams;
+    /** @type {?} */
+    FacetsWrapperDS.prototype.getInputByFacetId;
+    /** @type {?} */
+    FacetsWrapperDS.prototype.filterTarget;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 var FooterDS = /** @class */ (function (_super) {
     __extends(FooterDS, _super);
     function FooterDS() {
@@ -1056,6 +1437,8 @@ var DS = /*#__PURE__*/Object.freeze({
     HeaderDS: HeaderDS,
     SubnavDS: SubnavDS,
     BreadcrumbsDS: BreadcrumbsDS,
+    FacetsDS: FacetsDS,
+    FacetsWrapperDS: FacetsWrapperDS,
     FooterDS: FooterDS
 });
 
@@ -1186,6 +1569,133 @@ var BreadcrumbsEH = /** @class */ (function (_super) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+var FacetsEH = /** @class */ (function (_super) {
+    __extends(FacetsEH, _super);
+    function FacetsEH() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @return {?}
+     */
+    FacetsEH.prototype.listen = /**
+     * @return {?}
+     */
+    function () {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                // TODO
+                default:
+                    break;
+            }
+        }));
+    };
+    return FacetsEH;
+}(EventHandler));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var FacetsWrapperEH = /** @class */ (function (_super) {
+    __extends(FacetsWrapperEH, _super);
+    function FacetsWrapperEH() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this._facetsChanged = false;
+        return _this;
+    }
+    /**
+     * @return {?}
+     */
+    FacetsWrapperEH.prototype.listen = /**
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        // listen to inner (widget) events
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                case 'facets-wrapper.facet':
+                    var facetId = payload.eventPayload.inputPayload.facetId;
+                    /** @type {?} */
+                    var input = _this.dataSource.getInputByFacetId(facetId);
+                    /** @type {?} */
+                    var context = input.getContext();
+                    _this._facetsChanged = true;
+                    // update
+                    _this.dataSource.onFacetChange(payload);
+                    // internal
+                    if (context === 'internal') {
+                        _this.dataSource.filterTarget(input.getTarget());
+                        _this.dataSource.updateFilteredTarget(input.getTarget());
+                        // external
+                    }
+                    else {
+                        /** @type {?} */
+                        var requestParams = _this.dataSource.getRequestParams();
+                        /** @type {?} */
+                        var queryParams_1 = _this.dataSource.filtersAsQueryParams(requestParams.filters);
+                        Object.keys(queryParams_1).forEach((/**
+                         * @param {?} key
+                         * @return {?}
+                         */
+                        function (key) { return queryParams_1[key] = queryParams_1[key] || null; }));
+                        _this.emitGlobal('navigate', {
+                            handler: 'router',
+                            path: [],
+                            queryParams: queryParams_1
+                        });
+                    }
+                    break;
+                case 'facets-wrapper.facetheader':
+                    _this.dataSource.toggleGroup(payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
+        // listen to outer events
+        EventHandler.globalEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                case 'global.queryparams':
+                    if (!_this._facetsChanged) {
+                        _this.dataSource.updateFiltersFromQueryParams(payload);
+                        _this.dataSource.updateInputsFromFilters();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }));
+    };
+    return FacetsWrapperEH;
+}(EventHandler));
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    FacetsWrapperEH.prototype._facetsChanged;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 var FooterEH = /** @class */ (function (_super) {
     __extends(FooterEH, _super);
     function FooterEH() {
@@ -1223,6 +1733,8 @@ var EH = /*#__PURE__*/Object.freeze({
     HeaderEH: HeaderEH,
     SubnavEH: SubnavEH,
     BreadcrumbsEH: BreadcrumbsEH,
+    FacetsEH: FacetsEH,
+    FacetsWrapperEH: FacetsWrapperEH,
     FooterEH: FooterEH
 });
 
@@ -1258,9 +1770,10 @@ var MainLayoutConfig = {
  */
 var MainLayoutComponent = /** @class */ (function (_super) {
     __extends(MainLayoutComponent, _super);
-    function MainLayoutComponent(router, configuration, layoutsConfiguration, mainState, titleService) {
+    function MainLayoutComponent(router, route, configuration, layoutsConfiguration, mainState, titleService) {
         var _this = _super.call(this, layoutsConfiguration.get('MainLayoutConfig') || MainLayoutConfig) || this;
         _this.router = router;
+        _this.route = route;
         _this.configuration = configuration;
         _this.layoutsConfiguration = layoutsConfiguration;
         _this.mainState = mainState;
@@ -1280,6 +1793,7 @@ var MainLayoutComponent = /** @class */ (function (_super) {
             configuration: this.configuration,
             mainState: this.mainState,
             router: this.router,
+            route: this.route,
             titleService: this.titleService,
             options: this.config.options || {},
         };
@@ -1311,6 +1825,7 @@ var MainLayoutComponent = /** @class */ (function (_super) {
     /** @nocollapse */
     MainLayoutComponent.ctorParameters = function () { return [
         { type: Router },
+        { type: ActivatedRoute },
         { type: ConfigurationService },
         { type: LayoutsConfigurationService },
         { type: MainStateService },
@@ -1324,6 +1839,11 @@ if (false) {
      * @private
      */
     MainLayoutComponent.prototype.router;
+    /**
+     * @type {?}
+     * @private
+     */
+    MainLayoutComponent.prototype.route;
     /**
      * @type {?}
      * @private
@@ -1500,7 +2020,7 @@ var Page404LayoutComponent = /** @class */ (function (_super) {
     Page404LayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'n7-page404-layout',
-                    template: "<div class=\"n7-page404-layout\">\n    PAGE404!!!\n</div>"
+                    template: "<div class=\"n7-page404-layout\">\n    404 - Resource not found\n</div>"
                 }] }
     ];
     /** @nocollapse */
@@ -1514,10 +2034,67 @@ var Page404LayoutComponent = /** @class */ (function (_super) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+var FacetsWrapperComponent = /** @class */ (function () {
+    function FacetsWrapperComponent() {
+    }
+    /**
+     * @param {?} eventType
+     * @param {?} eventPayload
+     * @return {?}
+     */
+    FacetsWrapperComponent.prototype.headerEmit = /**
+     * @param {?} eventType
+     * @param {?} eventPayload
+     * @return {?}
+     */
+    function (eventType, eventPayload) {
+        if (!this.emit)
+            return;
+        this.emit('facetheader', { eventType: eventType, eventPayload: eventPayload });
+    };
+    /**
+     * @param {?} eventType
+     * @param {?} eventPayload
+     * @return {?}
+     */
+    FacetsWrapperComponent.prototype.facetEmit = /**
+     * @param {?} eventType
+     * @param {?} eventPayload
+     * @return {?}
+     */
+    function (eventType, eventPayload) {
+        if (!this.emit)
+            return;
+        this.emit('facet', { eventType: eventType, eventPayload: eventPayload });
+    };
+    FacetsWrapperComponent.decorators = [
+        { type: Component, args: [{
+                    selector: 'n7-facets-wrapper',
+                    template: "<div *ngIf=\"data\" class=\"n7-facets-wrapper {{ data.classes || '' }}\">\n    <div *ngFor=\"let group of data.groups\" class=\"n7-facets-wrapper__group {{ group.classes || '' }}\">\n        <n7-facet-header\n            [data]=\"group.header\"\n            [emit]=\"headerEmit.bind(this)\"\n        ></n7-facet-header>\n\n        <n7-facet\n            *ngIf=\"group.isOpen\"\n            [data]=\"group.facet\"\n            [emit]=\"facetEmit.bind(this)\"\n        ></n7-facet>\n    </div>\n</div>"
+                }] }
+    ];
+    FacetsWrapperComponent.propDecorators = {
+        data: [{ type: Input }],
+        emit: [{ type: Input }]
+    };
+    return FacetsWrapperComponent;
+}());
+if (false) {
+    /** @type {?} */
+    FacetsWrapperComponent.prototype.data;
+    /** @type {?} */
+    FacetsWrapperComponent.prototype.emit;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 /** @type {?} */
 var COMPONENTS = [
     MainLayoutComponent,
     Page404LayoutComponent,
+    FacetsWrapperComponent,
 ];
 var N7BoilerplateCommonModule = /** @class */ (function () {
     function N7BoilerplateCommonModule() {
@@ -1628,12 +2205,12 @@ var AwLinkedObjectsDS = /** @class */ (function (_super) {
      */
     function (data) {
         /** @type {?} */
-        var KEYS = this.options.configKeys;
+        var CONFIG = this.options.config;
         this.pageSize = this.options.size;
         this.currentPage = Number(this.options.page);
         this.totalPages = Math.floor(data.length / Number(this.pageSize));
         this.context = this.options.context;
-        return unpackData(data, this.currentPage, this.pageSize, KEYS, this.totalPages, this.context);
+        return unpackData(data, this.currentPage, this.pageSize, CONFIG, this.totalPages, this.context);
     };
     return AwLinkedObjectsDS;
 }(DataSource));
@@ -1651,12 +2228,24 @@ if (false) {
  * @param {?} data
  * @param {?} page
  * @param {?} size
- * @param {?} keys
+ * @param {?} config
  * @param {?} totalPages
  * @param {?} context
  * @return {?}
  */
-function unpackData(data, page, size, keys, totalPages, context) {
+function unpackData(data, page, size, config, totalPages, context) {
+    if (config) {
+        /** @type {?} */
+        var keys = config.get('config-keys');
+        switch (context) {
+            case 'home':
+                /** @type {?} */
+                var lengthLimit = config.get('home-layout')['max-item-length'];
+                break;
+            default:
+                break;
+        }
+    }
     // resize data
     if (size && page) {
         data = data.slice(page * size - size, page * size);
@@ -1674,24 +2263,26 @@ function unpackData(data, page, size, keys, totalPages, context) {
         /** @type {?} */
         var item = {
             image: el.thumbnail,
-            title: el.item.label,
+            title: 
+            // if there is a max string length in config, use it
+            lengthLimit && el.item.label.length > lengthLimit ?
+                el.item.label.slice(0, lengthLimit) + '...' : el.item.label,
             payload: el.item.id,
             classes: context == 'entita' ? 'is-fullwidth' : '',
             metadata: [
                 {
                     classes: 'n7-objects__metadata-artist',
-                    items: [
-                        {
-                            // Artista: Mimmo Jodice
-                            // label: el.item.info[0].key,
-                            label: 'Autore',
-                            value: el.item.info[0].value
-                        },
-                        {
-                            // olio su tela
-                            value: el.item.info[1].value
-                        }
-                    ]
+                    items: el.item.info.map((/**
+                     * @param {?} __0
+                     * @return {?}
+                     */
+                    function (_a) {
+                        var value = _a.value, key = _a.key;
+                        return ({
+                            label: key === 'author' ? 'Artista' : null,
+                            value: value
+                        });
+                    }))
                 },
                 {
                     classes: 'n7-objects__metadata-linked',
@@ -1757,6 +2348,15 @@ function unpackData(data, page, size, keys, totalPages, context) {
             previews: result
         };
     }
+    if (context === 'home') {
+        return {
+            result: result,
+            actions: [
+                { label: 'Vedi Tutti 7805' },
+                { label: 'Vedi Altri 7795' }
+            ]
+        };
+    }
     return result;
 }
 /**
@@ -1799,30 +2399,40 @@ var AwAutocompleteWrapperDS = /** @class */ (function (_super) {
     function (data) {
         var key = data.key, response = data.response;
         /** @type {?} */
-        var regex = new RegExp('(.*?)' + key + '(.*)');
+        var regex = new RegExp('(.*?)' + key + '(.*)', 'i') // 'i' = case insensitive
+        ;
+        // 'i' = case insensitive
         /** @type {?} */
         var append = [];
+        /** @type {?} */
+        var config = this.options.config;
+        /** @type {?} */
+        var maxLength = config.get('home-layout')['max-item-length'] / 2;
         response.items.forEach((/**
          * @param {?} el
          * @return {?}
          */
         function (el) {
-            /** @type {?} */
-            var position = el.item.label.indexOf(key)
-            // if the typed text is not in the label, skip it
-            ;
-            // if the typed text is not in the label, skip it
-            if (position < 0) {
-                return;
-            }
             // divide prefix and suffix
+            // let match = el.item.label.match(regex)
             /** @type {?} */
-            var match = el.item.label.match(regex);
-            /** @type {?} */
-            var prefix = match[1];
-            /** @type {?} */
-            var suffix = match[2];
-            append.push({ prefix: prefix, suffix: suffix, payload: el.item.id });
+            var match = regex.exec(el.item.label);
+            if (match) {
+                /** @type {?} */
+                var prefix = match[1];
+                /** @type {?} */
+                var suffix = match[2]
+                // string manipulation
+                ;
+                // string manipulation
+                if (maxLength && (prefix.length > maxLength)) {
+                    prefix = '...' + prefix.slice(prefix.length - maxLength, prefix.length);
+                }
+                if (maxLength && (suffix.length > maxLength)) {
+                    suffix = suffix.slice(0, maxLength) + '...';
+                }
+                append.push({ prefix: prefix, suffix: suffix, payload: el.item.id });
+            }
         }));
         return { typed: key, append: append };
     };
@@ -2731,10 +3341,11 @@ var AwHomeFacetsWrapperDS = /** @class */ (function (_super) {
                     /** @type {?} */
                     var target = '.' + id;
                     ac_1.tippy = tippy(target, {
-                        content: '<span>Loading tippy</span>',
+                        content: '<span>Loading results</span>',
                         trigger: 'manual',
                         interactive: true,
                         arrow: false,
+                        flip: false,
                         appendTo: 'parent',
                         theme: 'light-border aw-home__facet-tippy',
                         placement: 'bottom-start',
@@ -2775,20 +3386,21 @@ var AwHomeFacetsWrapperDS = /** @class */ (function (_super) {
     }
     /**
      * @protected
-     * @param {?} data
+     * @param {?} __0
      * @return {?}
      */
     AwHomeFacetsWrapperDS.prototype.transform = /**
      * @protected
-     * @param {?} data
+     * @param {?} __0
      * @return {?}
      */
-    function (data) {
+    function (_a) {
+        var facetData = _a.facetData, lockedFacets = _a.lockedFacets;
         /** @type {?} */
         var headers = [];
         /** @type {?} */
         var inputs = [];
-        data.forEach((/**
+        facetData.forEach((/**
          * @param {?} facet
          * @return {?}
          */
@@ -2797,10 +3409,13 @@ var AwHomeFacetsWrapperDS = /** @class */ (function (_super) {
              For each facet on back-end, push a header-component
              and a facet-component (search input only) to each array.
              */
-            /*
-                   For each facet on back-end, push a header-component
-                   and a facet-component (search input only) to each array.
-                   */
+            if (lockedFacets[facet.type.id.replace('toe-', '')]) {
+                // if bubble chart say lock this facet, lock it
+                facet.locked = true;
+            }
+            else {
+                facet.locked = false;
+            }
             /** @type {?} */
             var headerClasses = [];
             /** @type {?} */
@@ -3194,17 +3809,23 @@ var AwTreeDS = /** @class */ (function (_super) {
             /** @type {?} */
             var classes = it['classes'];
             if (it['_meta'] == id) {
-                if (classes.indexOf("is-expanded") > -1) {
-                    it['classes'] = classes.replace(/is-expanded/g, "is-collapsed");
+                if (classes.indexOf('is-expanded') > -1) {
+                    it['classes'] = classes.replace(/is-expanded/g, 'is-collapsed');
+                    if (it['toggle']) {
+                        it['toggle']['icon'] = 'n7-icon-angle-right';
+                    }
                 }
                 else {
-                    it['classes'] = classes.replace(/is-collapsed/g, "is-expanded");
+                    it['classes'] = classes.replace(/is-collapsed/g, 'is-expanded');
+                    if (it['toggle']) {
+                        it['toggle']['icon'] = 'n7-icon-angle-down';
+                    }
                 }
             }
             else if (parents.indexOf(it['_meta']) >= 0) {
                 it['classes'] = classes + ' is-expanded';
             }
-            if (typeof it['items'] != "undefined" && it['items'].length > 0) {
+            if (typeof it['items'] != 'undefined' && it['items'].length > 0) {
                 _this.updateTree(it, parents, id);
             }
         }));
@@ -3722,6 +4343,7 @@ var AwBubbleChartEH = /** @class */ (function (_super) {
                     _this.emitOuter('bubble-tooltip-select-click', event.payload);
                     break;
                 default:
+                    console.warn('unhandled inner event of type', event.type);
                     break;
             }
         }));
@@ -3897,7 +4519,11 @@ var AwHomeFacetsWrapperEH = /** @class */ (function (_super) {
                 case 'aw-home-layout.facetswrapperresponse':
                     _this.dataSource.tippyMaker(payload.response, payload.facetId.inputPayload);
                     break;
+                case 'aw-home-layout.filterbubbleresponse':
+                    // console.log({type, payload})
+                    break;
                 default:
+                    // console.warn('unhandled outer event of type', type)
                     // silent ignore
                     break;
             }
@@ -4405,6 +5031,1126 @@ if (false) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+/**
+ * @record
+ */
+function IFacetInputData() { }
+if (false) {
+    /** @type {?} */
+    IFacetInputData.prototype.value;
+    /** @type {?} */
+    IFacetInputData.prototype.label;
+    /** @type {?} */
+    IFacetInputData.prototype.counter;
+    /** @type {?|undefined} */
+    IFacetInputData.prototype.hidden;
+    /** @type {?|undefined} */
+    IFacetInputData.prototype.options;
+}
+/**
+ * @abstract
+ */
+var FacetInput = /** @class */ (function () {
+    function FacetInput(config) {
+        var _this = this;
+        this.update = (/**
+         * @return {?}
+         */
+        function () { return _this.output = _this.transform(); });
+        this.getId = (/**
+         * @return {?}
+         */
+        function () { return _this.id; });
+        this.getData = (/**
+         * @return {?}
+         */
+        function () { return _this.data; });
+        this.getConfig = (/**
+         * @return {?}
+         */
+        function () { return _this.config; });
+        this.getFacetId = (/**
+         * @return {?}
+         */
+        function () { return _this.config.facetId; });
+        this.getInputIndex = (/**
+         * @return {?}
+         */
+        function () { return _this.config.inputIndex; });
+        this.getSectionIndex = (/**
+         * @return {?}
+         */
+        function () { return _this.config.sectionIndex; });
+        this.getContext = (/**
+         * @return {?}
+         */
+        function () { return _this.config.filterConfig.context || 'external'; });
+        this.getTarget = (/**
+         * @return {?}
+         */
+        function () { return _this.config.filterConfig.target || null; });
+        this.getSearchIn = (/**
+         * @return {?}
+         */
+        function () { return _this.config.filterConfig.searchIn || null; });
+        this.getType = (/**
+         * @return {?}
+         */
+        function () { return _this.config.type; });
+        this.getOutput = (/**
+         * @return {?}
+         */
+        function () { return _this.output; });
+        this.setData = (/**
+         * @param {?} newData
+         * @return {?}
+         */
+        function (newData) { return _this.data = newData; });
+        this.config = config;
+        this._setId();
+        FacetInput.index++;
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    FacetInput.prototype._setId = /**
+     * @private
+     * @return {?}
+     */
+    function () {
+        this.id = "facet-input-" + this.getType() + "-" + FacetInput.index;
+    };
+    ;
+    FacetInput.index = 0;
+    return FacetInput;
+}());
+if (false) {
+    /** @type {?} */
+    FacetInput.index;
+    /**
+     * @type {?}
+     * @private
+     */
+    FacetInput.prototype.id;
+    /**
+     * @type {?}
+     * @protected
+     */
+    FacetInput.prototype.config;
+    /**
+     * @type {?}
+     * @protected
+     */
+    FacetInput.prototype.output;
+    /**
+     * @type {?}
+     * @protected
+     */
+    FacetInput.prototype.data;
+    /** @type {?} */
+    FacetInput.prototype.update;
+    /** @type {?} */
+    FacetInput.prototype.getId;
+    /** @type {?} */
+    FacetInput.prototype.getData;
+    /** @type {?} */
+    FacetInput.prototype.getConfig;
+    /** @type {?} */
+    FacetInput.prototype.getFacetId;
+    /** @type {?} */
+    FacetInput.prototype.getInputIndex;
+    /** @type {?} */
+    FacetInput.prototype.getSectionIndex;
+    /** @type {?} */
+    FacetInput.prototype.getContext;
+    /** @type {?} */
+    FacetInput.prototype.getTarget;
+    /** @type {?} */
+    FacetInput.prototype.getSearchIn;
+    /** @type {?} */
+    FacetInput.prototype.getType;
+    /** @type {?} */
+    FacetInput.prototype.getOutput;
+    /** @type {?} */
+    FacetInput.prototype.setData;
+    /* Skipping unhandled member: ;*/
+    /**
+     * @abstract
+     * @param {?} facetValue
+     * @return {?}
+     */
+    FacetInput.prototype.setActive = function (facetValue) { };
+    /**
+     * @abstract
+     * @protected
+     * @return {?}
+     */
+    FacetInput.prototype.transform = function () { };
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var FacetInputCheckbox = /** @class */ (function (_super) {
+    __extends(FacetInputCheckbox, _super);
+    function FacetInputCheckbox() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @protected
+     * @return {?}
+     */
+    FacetInputCheckbox.prototype.transform = /**
+     * @protected
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        /** @type {?} */
+        var facetId = this.getFacetId();
+        return this.data.map((/**
+         * @param {?} __0
+         * @param {?} index
+         * @return {?}
+         */
+        function (_a, index) {
+            var label = _a.label, value = _a.value;
+            // normalize value
+            value = '' + value;
+            return {
+                type: 'checkbox',
+                id: _this.getId() + '-' + index,
+                label: label,
+                payload: {
+                    facetId: facetId,
+                    source: 'input-checkbox',
+                    value: value
+                },
+                _meta: { facetId: facetId, value: value }
+            };
+        }));
+    };
+    /**
+     * @param {?} facetValue
+     * @return {?}
+     */
+    FacetInputCheckbox.prototype.setActive = /**
+     * @param {?} facetValue
+     * @return {?}
+     */
+    function (facetValue) {
+        var isArray = this.config.filterConfig.isArray;
+        this.output.forEach((/**
+         * @param {?} config
+         * @return {?}
+         */
+        function (config) {
+            if (isArray && Array.isArray(facetValue) && facetValue.indexOf(config._meta.value) !== -1) {
+                config.checked = true;
+            }
+            else if (facetValue === config._meta.value) {
+                config.checked = true;
+            }
+            else {
+                config.checked = false;
+            }
+        }));
+    };
+    return FacetInputCheckbox;
+}(FacetInput));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var FacetInputText = /** @class */ (function (_super) {
+    __extends(FacetInputText, _super);
+    function FacetInputText() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @protected
+     * @return {?}
+     */
+    FacetInputText.prototype.transform = /**
+     * @protected
+     * @return {?}
+     */
+    function () {
+        /** @type {?} */
+        var facetId = this.getFacetId();
+        /** @type {?} */
+        var payload = {
+            facetId: facetId,
+            source: 'input-text'
+        };
+        return {
+            type: 'text',
+            id: this.getId(),
+            label: this.config.label,
+            disabled: this.config.disabled,
+            placeholder: this.config.placeholder,
+            icon: this.config.icon,
+            inputPayload: __assign({}, payload, { trigger: 'input' }),
+            enterPayload: __assign({}, payload, { trigger: 'enter' }),
+            iconPayload: __assign({}, payload, { trigger: 'icon' }),
+            _meta: { facetId: facetId }
+        };
+    };
+    /**
+     * @param {?} facetValue
+     * @return {?}
+     */
+    FacetInputText.prototype.setActive = /**
+     * @param {?} facetValue
+     * @return {?}
+     */
+    function (facetValue) {
+        this.output.value = facetValue || null;
+    };
+    return FacetInputText;
+}(FacetInput));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var FacetInputLink = /** @class */ (function (_super) {
+    __extends(FacetInputLink, _super);
+    function FacetInputLink() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @protected
+     * @return {?}
+     */
+    FacetInputLink.prototype.transform = /**
+     * @protected
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        /** @type {?} */
+        var facetId = this.getFacetId();
+        return this.data.map((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var label = _a.label, value = _a.value, counter = _a.counter, hidden = _a.hidden;
+            // normalize value
+            value = '' + value;
+            return {
+                type: 'link',
+                id: _this.getId(),
+                text: label,
+                counter: counter,
+                payload: {
+                    facetId: facetId,
+                    source: 'input-link',
+                    value: value
+                },
+                classes: hidden ? 'is-hidden' : '',
+                _meta: { facetId: facetId, value: value }
+            };
+        }));
+    };
+    /**
+     * @param {?} facetValue
+     * @return {?}
+     */
+    FacetInputLink.prototype.setActive = /**
+     * @param {?} facetValue
+     * @return {?}
+     */
+    function (facetValue) {
+        var isArray = this.config.filterConfig.isArray;
+        this.output.forEach((/**
+         * @param {?} config
+         * @return {?}
+         */
+        function (config) {
+            if (isArray && Array.isArray(facetValue) && facetValue.indexOf(config._meta.value) !== -1) {
+                config.classes = 'is-active';
+            }
+            else if (facetValue === config._meta.value) {
+                config.classes = 'is-active';
+            }
+            else {
+                config.classes = null;
+            }
+        }));
+    };
+    return FacetInputLink;
+}(FacetInput));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var FacetInputSelect = /** @class */ (function (_super) {
+    __extends(FacetInputSelect, _super);
+    function FacetInputSelect() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @protected
+     * @return {?}
+     */
+    FacetInputSelect.prototype.transform = /**
+     * @protected
+     * @return {?}
+     */
+    function () {
+        /** @type {?} */
+        var facetId = this.getFacetId();
+        return {
+            type: 'select',
+            id: this.getId(),
+            label: this.config.label,
+            disabled: this.config.disabled,
+            options: this.data.map((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var value = _a.value, label = _a.label;
+                return ({
+                    // normalize value
+                    value: '' + value,
+                    label: label
+                });
+            })),
+            payload: {
+                facetId: facetId,
+                source: 'input-select',
+            },
+            _meta: { facetId: facetId }
+        };
+    };
+    /**
+     * @param {?} facetValue
+     * @return {?}
+     */
+    FacetInputSelect.prototype.setActive = /**
+     * @param {?} facetValue
+     * @return {?}
+     */
+    function (facetValue) {
+        this.output.options
+            .filter((/**
+         * @param {?} option
+         * @return {?}
+         */
+        function (option) { return option.value === facetValue; }))
+            .forEach((/**
+         * @param {?} option
+         * @return {?}
+         */
+        function (option) { return option.selected = true; }));
+    };
+    return FacetInputSelect;
+}(FacetInput));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/** @type {?} */
+var INPUTS_MAP = {
+    'checkbox': FacetInputCheckbox,
+    'text': FacetInputText,
+    'link': FacetInputLink,
+    'select': FacetInputSelect,
+};
+/**
+ * @record
+ */
+function ISearchConfig() { }
+if (false) {
+    /** @type {?} */
+    ISearchConfig.prototype.facets;
+    /** @type {?} */
+    ISearchConfig.prototype.page;
+    /** @type {?} */
+    ISearchConfig.prototype.results;
+    /** @type {?} */
+    ISearchConfig.prototype.fields;
+    /** @type {?} */
+    ISearchConfig.prototype.baseUrl;
+}
+/**
+ * @record
+ */
+function IFacet() { }
+if (false) {
+    /** @type {?} */
+    IFacet.prototype.id;
+    /** @type {?} */
+    IFacet.prototype.type;
+    /** @type {?} */
+    IFacet.prototype.operator;
+    /** @type {?|undefined} */
+    IFacet.prototype.data;
+}
+/**
+ * @record
+ */
+function IFilter() { }
+if (false) {
+    /** @type {?} */
+    IFilter.prototype.facetId;
+    /** @type {?} */
+    IFilter.prototype.value;
+    /** @type {?} */
+    IFilter.prototype.searchIn;
+    /** @type {?|undefined} */
+    IFilter.prototype.isArray;
+    /** @type {?|undefined} */
+    IFilter.prototype.context;
+    /** @type {?|undefined} */
+    IFilter.prototype.target;
+}
+var SearchModel = /** @class */ (function () {
+    function SearchModel(id, config) {
+        var _this = this;
+        this._filters = [];
+        this._facets = [];
+        this._inputs = [];
+        this._results$ = new Subject();
+        this.getId = (/**
+         * @return {?}
+         */
+        function () { return _this._id; });
+        this.getFilters = (/**
+         * @return {?}
+         */
+        function () { return _this._filters; });
+        this.getFacets = (/**
+         * @return {?}
+         */
+        function () { return _this._facets; });
+        this.getInputs = (/**
+         * @return {?}
+         */
+        function () { return _this._inputs; });
+        this.getConfig = (/**
+         * @return {?}
+         */
+        function () { return _this._config; });
+        this.getFields = (/**
+         * @return {?}
+         */
+        function () { return _this._config.fields; });
+        this.getResults$ = (/**
+         * @return {?}
+         */
+        function () { return _this._results$; });
+        this.setResults = (/**
+         * @param {?} results
+         * @return {?}
+         */
+        function (results) { return _this._results$.next(results); });
+        this._id = id;
+        this._config = config;
+        this._setFilters();
+        this._setFacets();
+        this._setPage();
+        this._setInputs();
+        this._setInputsData();
+    }
+    /**
+     * @param {?} facetId
+     * @param {?} value
+     * @param {?=} remove
+     * @return {?}
+     */
+    SearchModel.prototype.updateFilter = /**
+     * @param {?} facetId
+     * @param {?} value
+     * @param {?=} remove
+     * @return {?}
+     */
+    function (facetId, value, remove) {
+        /** @type {?} */
+        var selectedFilters = this.getFiltersByFacetId(facetId);
+        selectedFilters.forEach((/**
+         * @param {?} filter
+         * @return {?}
+         */
+        function (filter) {
+            if (Array.isArray(filter.value) && remove) {
+                filter.value = filter.value.filter((/**
+                 * @param {?} item
+                 * @return {?}
+                 */
+                function (item) { return item !== value; }));
+            }
+            else if (Array.isArray(filter.value) && filter.value.indexOf(value) === -1) {
+                filter.value.push(value);
+            }
+            else {
+                filter.value = !remove ? value : null;
+            }
+        }));
+    };
+    /**
+     * @param {?} queryParams
+     * @return {?}
+     */
+    SearchModel.prototype.updateFiltersFromQueryParams = /**
+     * @param {?} queryParams
+     * @return {?}
+     */
+    function (queryParams) {
+        var _this = this;
+        Object.keys(queryParams).forEach((/**
+         * @param {?} facetId
+         * @return {?}
+         */
+        function (facetId) {
+            /** @type {?} */
+            var selectedFilters = _this.getFiltersByFacetId(facetId);
+            /** @type {?} */
+            var value = queryParams[facetId];
+            selectedFilters.forEach((/**
+             * @param {?} filter
+             * @return {?}
+             */
+            function (filter) {
+                filter.value = filter.isArray ? value.split(',') : value;
+            }));
+        }));
+    };
+    /**
+     * @return {?}
+     */
+    SearchModel.prototype.updateInputsFromFilters = /**
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        this._filters.forEach((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var facetId = _a.facetId, value = _a.value;
+            _this._inputs
+                .filter((/**
+             * @param {?} input
+             * @return {?}
+             */
+            function (input) { return input.getFacetId() === facetId; }))
+                .forEach((/**
+             * @param {?} input
+             * @return {?}
+             */
+            function (input) {
+                input.setActive(value);
+            }));
+        }));
+    };
+    /**
+     * @param {?} facetId
+     * @param {?} data
+     * @return {?}
+     */
+    SearchModel.prototype.updateFacet = /**
+     * @param {?} facetId
+     * @param {?} data
+     * @return {?}
+     */
+    function (facetId, data) {
+        /** @type {?} */
+        var selectedFacets = this._facets.filter((/**
+         * @param {?} facet
+         * @return {?}
+         */
+        function (facet) { return facet.id === facetId; }));
+        if (!selectedFacets.length) {
+            throw Error("Facet with id \"" + facetId + "\" does not exists");
+        }
+        selectedFacets.forEach((/**
+         * @param {?} facet
+         * @return {?}
+         */
+        function (facet) { return facet.data = data; }));
+    };
+    /**
+     * @return {?}
+     */
+    SearchModel.prototype.reset = /**
+     * @return {?}
+     */
+    function () {
+        this._filters.forEach((/**
+         * @param {?} filter
+         * @return {?}
+         */
+        function (filter) { return filter.value = null; }));
+    };
+    /**
+     * @return {?}
+     */
+    SearchModel.prototype.getRequestParams = /**
+     * @return {?}
+     */
+    function () {
+        return {
+            facets: this._facets,
+            page: this._page,
+            results: this._config.results,
+            filters: this._filters
+                .filter((/**
+             * @param {?} filter
+             * @return {?}
+             */
+            function (filter) { return filter.context !== 'internal'; }))
+                .map((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var facetId = _a.facetId, value = _a.value, searchIn = _a.searchIn;
+                return ({ facetId: facetId, value: value, searchIn: searchIn });
+            }))
+        };
+    };
+    /**
+     * @return {?}
+     */
+    SearchModel.prototype.getInternalFilters = /**
+     * @return {?}
+     */
+    function () {
+        return this._filters
+            .filter((/**
+         * @param {?} filter
+         * @return {?}
+         */
+        function (filter) {
+            return (filter.context === 'internal') && ((Array.isArray(filter.value) && filter.value.length) ||
+                (!Array.isArray(filter.value) && filter.value));
+        }))
+            .map((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var facetId = _a.facetId, value = _a.value, searchIn = _a.searchIn;
+            return ({ facetId: facetId, value: value, searchIn: searchIn });
+        }));
+    };
+    /**
+     * @param {?} filters
+     * @return {?}
+     */
+    SearchModel.prototype.filtersAsQueryParams = /**
+     * @param {?} filters
+     * @return {?}
+     */
+    function (filters) {
+        /** @type {?} */
+        var queryParams = {};
+        filters.forEach((/**
+         * @param {?} filter
+         * @return {?}
+         */
+        function (filter) { return queryParams[filter.facetId] = Array.isArray(filter.value) ? filter.value.join(',') : filter.value; }));
+        return queryParams;
+    };
+    /**
+     * @param {?} facetId
+     * @return {?}
+     */
+    SearchModel.prototype.getFiltersByFacetId = /**
+     * @param {?} facetId
+     * @return {?}
+     */
+    function (facetId) {
+        return this._filters.filter((/**
+         * @param {?} filter
+         * @return {?}
+         */
+        function (filter) { return filter.facetId === facetId; }));
+    };
+    /**
+     * @param {?} facetId
+     * @return {?}
+     */
+    SearchModel.prototype.getInputByFacetId = /**
+     * @param {?} facetId
+     * @return {?}
+     */
+    function (facetId) {
+        return this._inputs.filter((/**
+         * @param {?} input
+         * @return {?}
+         */
+        function (input) { return input.getFacetId() === facetId; }))[0];
+    };
+    /**
+     * @param {?} facetId
+     * @param {?} data
+     * @return {?}
+     */
+    SearchModel.prototype.setInputData = /**
+     * @param {?} facetId
+     * @param {?} data
+     * @return {?}
+     */
+    function (facetId, data) {
+        this._inputs
+            .filter((/**
+         * @param {?} input
+         * @return {?}
+         */
+        function (input) { return input.getFacetId() === facetId; }))
+            .forEach((/**
+         * @param {?} input
+         * @return {?}
+         */
+        function (input) { return input.setData(data); }));
+    };
+    /**
+     * @param {?} target
+     * @return {?}
+     */
+    SearchModel.prototype.filterTarget = /**
+     * @param {?} target
+     * @return {?}
+     */
+    function (target) {
+        var _this = this;
+        /** @type {?} */
+        var inputs = this._inputs.filter((/**
+         * @param {?} input
+         * @return {?}
+         */
+        function (input) { return input.getTarget() === target; }));
+        /** @type {?} */
+        var targetInput = this.getInputByFacetId(target);
+        /** @type {?} */
+        var facet = this._facets.filter((/**
+         * @param {?} facet
+         * @return {?}
+         */
+        function (facet) { return facet.id === target; }))[0];
+        /** @type {?} */
+        var facetData = facet.data;
+        /** @type {?} */
+        var searchIns = [];
+        inputs.forEach((/**
+         * @param {?} input
+         * @return {?}
+         */
+        function (input) {
+            /** @type {?} */
+            var filter = _this.getFiltersByFacetId(input.getFacetId())[0];
+            /** @type {?} */
+            var searchIn = input.getSearchIn();
+            /** @type {?} */
+            var value = filter.value;
+            searchIns.push([searchIn, value]);
+        }));
+        // filter
+        facetData.forEach((/**
+         * @param {?} item
+         * @return {?}
+         */
+        function (item) { return _this._filterData(searchIns, item); }));
+        // update
+        targetInput.setData(facetData);
+        targetInput.update();
+    };
+    /**
+     * @private
+     * @param {?} searchIns
+     * @param {?} item
+     * @return {?}
+     */
+    SearchModel.prototype._filterData = /**
+     * @private
+     * @param {?} searchIns
+     * @param {?} item
+     * @return {?}
+     */
+    function (searchIns, item) {
+        searchIns.forEach((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var _b = __read(_a, 2), searchIn = _b[0], value = _b[1];
+            searchIn.forEach((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var key = _a.key, operator = _a.operator;
+                switch (operator) {
+                    // '=' EQUALS
+                    case '=':
+                        if (Array.isArray(value)) {
+                            item.hidden = !(!value.length || value.indexOf(item.metadata[key]) !== -1);
+                        }
+                        else {
+                            item.hidden = !(value && value === item.metadata[key]);
+                        }
+                        break;
+                    // '>' GREATER THAN
+                    case '>':
+                        if (!Array.isArray(value)) {
+                            item.hidden = !(value && value > item.metadata[key]);
+                        }
+                        break;
+                    // '<' LESS THAN
+                    case '<':
+                        if (!Array.isArray(value)) {
+                            item.hidden = !(value && value < item.metadata[key]);
+                        }
+                        break;
+                    // '>=' GREATER OR EQUALS
+                    case '>=':
+                        if (!Array.isArray(value)) {
+                            item.hidden = !(value && value >= item.metadata[key]);
+                        }
+                        break;
+                    // '<=' LESS OR EQUALS
+                    case '<=':
+                        if (!Array.isArray(value)) {
+                            item.hidden = !(value && value <= item.metadata[key]);
+                        }
+                        break;
+                    // '<>' NOT EQUAL
+                    case '<>':
+                        if (!Array.isArray(value)) {
+                            item.hidden = !(value && value !== item.metadata[key]);
+                        }
+                        break;
+                    //  'LIKE'
+                    case 'LIKE':
+                        if (value &&
+                            item.metadata[key] &&
+                            typeof value === 'string' &&
+                            typeof item.metadata[key] === 'string') {
+                            /** @type {?} */
+                            var haystack = item.metadata[key].toLowerCase();
+                            /** @type {?} */
+                            var needle = value.toLocaleLowerCase();
+                            item.hidden = !(haystack.indexOf(needle) !== -1);
+                        }
+                        break;
+                    default:
+                        console.warn("SearchIn: operator " + operator + " not supported");
+                        break;
+                }
+            }));
+        }));
+    };
+    /**
+     * @private
+     * @return {?}
+     */
+    SearchModel.prototype._setFilters = /**
+     * @private
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        this._config.fields.forEach((/**
+         * @param {?} field
+         * @return {?}
+         */
+        function (field) {
+            field.inputs.forEach((/**
+             * @param {?} input
+             * @return {?}
+             */
+            function (input) { return _this._filters.push(__assign({}, input.filterConfig, { facetId: input.facetId, value: input.filterConfig.isArray ? [] : null })); }));
+        }));
+    };
+    /**
+     * @private
+     * @return {?}
+     */
+    SearchModel.prototype._setFacets = /**
+     * @private
+     * @return {?}
+     */
+    function () {
+        this._facets = this._config.facets;
+    };
+    /**
+     * @private
+     * @return {?}
+     */
+    SearchModel.prototype._setPage = /**
+     * @private
+     * @return {?}
+     */
+    function () {
+        this._page = this._config.page;
+    };
+    /**
+     * @private
+     * @return {?}
+     */
+    SearchModel.prototype._setInputs = /**
+     * @private
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        this._config.fields.forEach((/**
+         * @param {?} sectionConfig
+         * @param {?} sectionIndex
+         * @return {?}
+         */
+        function (sectionConfig, sectionIndex) {
+            sectionConfig.inputs.forEach((/**
+             * @param {?} inputConfig
+             * @param {?} inputIndex
+             * @return {?}
+             */
+            function (inputConfig, inputIndex) {
+                /** @type {?} */
+                var inputModel = INPUTS_MAP[inputConfig.type];
+                if (!inputModel)
+                    throw Error("Input type " + inputConfig.type + " not supported");
+                _this._inputs.push(new inputModel(__assign({}, inputConfig, { inputIndex: inputIndex, sectionIndex: sectionIndex })));
+            }));
+        }));
+    };
+    /**
+     * @private
+     * @return {?}
+     */
+    SearchModel.prototype._setInputsData = /**
+     * @private
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        this._facets.forEach((/**
+         * @param {?} facet
+         * @return {?}
+         */
+        function (facet) { return _this.setInputData(facet.id, facet.data); }));
+    };
+    return SearchModel;
+}());
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchModel.prototype._id;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchModel.prototype._filters;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchModel.prototype._facets;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchModel.prototype._inputs;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchModel.prototype._page;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchModel.prototype._config;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchModel.prototype._results$;
+    /** @type {?} */
+    SearchModel.prototype.getId;
+    /** @type {?} */
+    SearchModel.prototype.getFilters;
+    /** @type {?} */
+    SearchModel.prototype.getFacets;
+    /** @type {?} */
+    SearchModel.prototype.getInputs;
+    /** @type {?} */
+    SearchModel.prototype.getConfig;
+    /** @type {?} */
+    SearchModel.prototype.getFields;
+    /** @type {?} */
+    SearchModel.prototype.getResults$;
+    /** @type {?} */
+    SearchModel.prototype.setResults;
+}
+var SearchService = /** @class */ (function () {
+    function SearchService() {
+        this._models = {};
+    }
+    /**
+     * @param {?} id
+     * @param {?} config
+     * @return {?}
+     */
+    SearchService.prototype.add = /**
+     * @param {?} id
+     * @param {?} config
+     * @return {?}
+     */
+    function (id, config) {
+        if (this._models[id])
+            throw Error("Search model \"" + id + "\" already exists!");
+        this._models[id] = new SearchModel(id, config);
+    };
+    /**
+     * @param {?} id
+     * @return {?}
+     */
+    SearchService.prototype.model = /**
+     * @param {?} id
+     * @return {?}
+     */
+    function (id) {
+        return this._models[id] || null;
+    };
+    SearchService.decorators = [
+        { type: Injectable, args: [{
+                    providedIn: 'root'
+                },] }
+    ];
+    /** @nocollapse */ SearchService.ngInjectableDef = ɵɵdefineInjectable({ factory: function SearchService_Factory() { return new SearchService(); }, token: SearchService, providedIn: "root" });
+    return SearchService;
+}());
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchService.prototype._models;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 
 /**
  * @fileoverview added by tsickle
@@ -4448,6 +6194,7 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
         this.options = options;
         this.router = router;
         this.titleService = titleService;
+        this.bubblesEnabled = this.configuration.get('features-enabled') ? this.configuration.get('features-enabled')['bubblechart'] : false;
     };
     /**
      * @param {?} id
@@ -4544,7 +6291,7 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
                     });
                     this.one('aw-entita-metadata-viewer').updateOptions({ context: this.selectedTab });
                     this.one('aw-entita-metadata-viewer').update(res.fieldsTab);
-                    this.one('aw-linked-objects').updateOptions({ size: 3, configKeys: this.configuration.get("config-keys"), context: 'entita' });
+                    this.one('aw-linked-objects').updateOptions({ size: 3, config: this.configuration, context: 'entita' });
                     this.one('aw-linked-objects').update(res.items);
                 }
                 break;
@@ -4558,7 +6305,7 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
                 {
                     this.one('aw-linked-objects').updateOptions({
                         context: this.selectedTab,
-                        configKeys: this.configuration.get("config-keys"),
+                        config: this.configuration,
                         page: this.currentPage,
                         size: this.pageSize,
                     });
@@ -4630,6 +6377,8 @@ if (false) {
     AwEntitaLayoutDS.prototype.currentPage;
     /** @type {?} */
     AwEntitaLayoutDS.prototype.pageSize;
+    /** @type {?} */
+    AwEntitaLayoutDS.prototype.bubblesEnabled;
     /**
      * @type {?}
      * @private
@@ -4790,7 +6539,9 @@ var AwEntitaLayoutEH = /** @class */ (function (_super) {
                         res['connectedEntities'] = res.entities;
                         /** @type {?} */
                         var connectedEntities = { source: res };
-                        _this.emitOuter('filterbubbleresponse', connectedEntities);
+                        if (_this.dataSource.bubblesEnabled) {
+                            _this.emitOuter('filterbubbleresponse', connectedEntities);
+                        }
                     }
                 }));
             }
@@ -4944,7 +6695,7 @@ var AwEntitaLayoutComponent = /** @class */ (function (_super) {
     AwEntitaLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-entita-layout',
-                    template: "<div class=\"aw-entity\" *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <div class=\"aw-entity__content\" [ngSwitch]=\"lb.dataSource.selectedTab\">\n        <ng-container *ngSwitchCase=\"'overview'\">\n            <ng-container *ngTemplateOutlet=\"overview\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'campi'\">\n            <ng-container *ngTemplateOutlet=\"campi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'oggetti-collegati'\">\n            <ng-container *ngTemplateOutlet=\"oggetti\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'entita-collegate'\">\n            <ng-container *ngTemplateOutlet=\"entita\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'maxxi'\">\n            <ng-container *ngTemplateOutlet=\"maxxi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'wiki'\">\n            <ng-container *ngTemplateOutlet=\"wiki\"></ng-container>\n        </ng-container>\n    </div>\n</div>\n\n<!-- navigation page content templates -->\n<ng-template #overview>\n    <section>\n        <div class=\"aw-entity__content-section\">\n            <div class=\"aw-entity__overview-description\">\n                {{lb.dataSource.myResponse.extraTab}}\n            </div>\n            <div class=\"aw-entity-layout__button-wrapper\">\n                <button *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\n                    (click)=\"lb.eventHandler.emitInner('showmore', 'wiki')\">\n                    DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                </button>\n                <button *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\n                    (click)=\"lb.eventHandler.emitInner('showmore', 'maxxi')\">\n                    DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                </button>\n            </div>\n        </div>\n\n        <ng-container *ngIf=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async as data\">\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                    <button class=\"n7-btn n7-btn-light\" (click)=\"lb.eventHandler.emitInner('showmore', 'campi')\">\n                        TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n                <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\" [data]=\"data\">\n                </n7-metadata-viewer>\n            </div>\n        </ng-container>\n\n        <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n            <div class=\"aw-entity__content-section-header\">\n                <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n                <button class=\"n7-btn n7-btn-light\"\n                    (click)=\"lb.eventHandler.emitInner('showmore', 'oggetti-collegati')\">\n                    TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                </button>\n            </div>\n            <ng-container *ngFor=\"let preview of lb.widgets['aw-linked-objects'].ds.out$ | async\">\n                <n7-breadcrumbs [data]=\"preview.breadcrumbs\">\n                </n7-breadcrumbs>\n                <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-item-preview>\n            </ng-container>\n        </div>\n\n        <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n            <div class=\"aw-entity__content-section-header\">\n                <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                <button class=\"n7-btn n7-btn-light\" (click)=\"lb.eventHandler.emitInner('showmore', 'entita-collegate')\">\n                    TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                </button>\n            </div>\n            <div  [style.overflow]=\"'hidden'\">\n                <aw-bubble-chart-wrapper\n                [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                [container]=\"'bubble-chart-container-overview'\"\n                [buttons]=\"['goto']\"\n                >\n                    <n7-bubble-chart\n                    [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </div>\n        </div>\n    </section>\n</ng-template>\n\n<ng-template #campi>\n    <div class=\"aw-entity__content-section aw-entity__content-section-fields\">\n        <ng-container *ngIf=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async as data\">\n            <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n            </div>\n            <n7-metadata-viewer class=\"aw-entita-layout__metadata-viewer\" [data]=\"data\">\n            </n7-metadata-viewer>\n        </ng-container>\n    </div>\n</ng-template>\n\n<ng-template #oggetti>\n    <div class=\"aw-entity__content-section aw-entity__content-section-objects\">\n        <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n            <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n        </div>\n        <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n            <n7-breadcrumbs [data]=\"preview.breadcrumbs\">\n            </n7-breadcrumbs>\n            <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n            </n7-item-preview>\n        </ng-container>\n        <n7-pagination [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n            [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n        </n7-pagination>\n    </div>\n</ng-template>\n\n<ng-template #entita>\n    <div class=\"aw-entity__content-section aw-entity__content-section-entities\">\n        <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n            <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n        </div>\n        <div  [style.overflow]=\"'hidden'\">\n            <aw-bubble-chart-wrapper\n            [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n            [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n            [container]=\"'bubble-chart-container'\"\n            [buttons]=\"['goto']\"\n            >\n                <n7-bubble-chart\n                [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n    </div>\n</ng-template>\n\n<ng-template #maxxi>\n    <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\">\n        <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n            <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n        </div>\n        <div>\n            {{lb.dataSource.myResponse.extraTab}}\n        </div>\n    </div>\n</ng-template>\n\n<ng-template #wiki>\n    <div class=\"aw-entity__content-section aw-entity__content-section-wiki\">\n        <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n            <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n        </div>\n        <div>\n            {{lb.dataSource.myResponse.wikiTab.text}}\n        </div>\n        <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n            {{lb.dataSource.myResponse.wikiTab.url}}\n        </a>\n    </div>\n</ng-template>"
+                    template: "<div class=\"aw-entity\" *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <div class=\"aw-entity__content\" [ngSwitch]=\"lb.dataSource.selectedTab\">\n        <ng-container *ngSwitchCase=\"'overview'\">\n            <ng-container *ngTemplateOutlet=\"overview\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'campi'\">\n            <ng-container *ngTemplateOutlet=\"campi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'oggetti-collegati'\">\n            <ng-container *ngTemplateOutlet=\"oggetti\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'entita-collegate'\">\n            <ng-container *ngTemplateOutlet=\"entita\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'maxxi'\">\n            <ng-container *ngTemplateOutlet=\"maxxi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'wiki'\">\n            <ng-container *ngTemplateOutlet=\"wiki\"></ng-container>\n        </ng-container>\n    </div>\n</div>\n\n<!-- navigation page content templates -->\n<ng-template #overview>\n    <section>\n        <div class=\"aw-entity__content-section\">\n            <div class=\"aw-entity__overview-description\">\n                {{lb.dataSource.myResponse.extraTab}}\n            </div>\n            <div class=\"aw-entity-layout__button-wrapper\">\n                <button *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\n                    (click)=\"lb.eventHandler.emitInner('showmore', 'wiki')\">\n                    DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                </button>\n                <button *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\n                    (click)=\"lb.eventHandler.emitInner('showmore', 'maxxi')\">\n                    DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                </button>\n            </div>\n        </div>\n\n        <ng-container *ngIf=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async as data\">\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                    <button class=\"n7-btn n7-btn-light\" (click)=\"lb.eventHandler.emitInner('showmore', 'campi')\">\n                        TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n                <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\" [data]=\"data\">\n                </n7-metadata-viewer>\n            </div>\n        </ng-container>\n\n        <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n            <div class=\"aw-entity__content-section-header\">\n                <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n                <button class=\"n7-btn n7-btn-light\"\n                    (click)=\"lb.eventHandler.emitInner('showmore', 'oggetti-collegati')\">\n                    TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                </button>\n            </div>\n            <ng-container *ngFor=\"let preview of lb.widgets['aw-linked-objects'].ds.out$ | async\">\n                <n7-breadcrumbs [data]=\"preview.breadcrumbs\">\n                </n7-breadcrumbs>\n                <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-item-preview>\n            </ng-container>\n        </div>\n\n        <div\n            class=\"aw-entity__content-section aw-entity__content-section-overview\"\n            *ngIf=\"lb.dataSource.bubblesEnabled\"\n        >\n            <div class=\"aw-entity__content-section-header\">\n                <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                <button class=\"n7-btn n7-btn-light\" (click)=\"lb.eventHandler.emitInner('showmore', 'entita-collegate')\">\n                    TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                </button>\n            </div>\n            <div  [style.overflow]=\"'hidden'\">\n                <aw-bubble-chart-wrapper\n                [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                [container]=\"'bubble-chart-container-overview'\"\n                [buttons]=\"['goto']\"\n                >\n                    <n7-bubble-chart\n                    [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </div>\n        </div>\n    </section>\n</ng-template>\n\n<ng-template #campi>\n    <div class=\"aw-entity__content-section aw-entity__content-section-fields\">\n        <ng-container *ngIf=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async as data\">\n            <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n            </div>\n            <n7-metadata-viewer class=\"aw-entita-layout__metadata-viewer\" [data]=\"data\">\n            </n7-metadata-viewer>\n        </ng-container>\n    </div>\n</ng-template>\n\n<ng-template #oggetti>\n    <div class=\"aw-entity__content-section aw-entity__content-section-objects\">\n        <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n            <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n        </div>\n        <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n            <n7-breadcrumbs [data]=\"preview.breadcrumbs\">\n            </n7-breadcrumbs>\n            <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n            </n7-item-preview>\n        </ng-container>\n        <n7-pagination [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n            [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n        </n7-pagination>\n    </div>\n</ng-template>\n\n<ng-template #entita>\n    <div class=\"aw-entity__content-section aw-entity__content-section-entities\">\n        <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n            <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n        </div>\n        <div  [style.overflow]=\"'hidden'\">\n            <aw-bubble-chart-wrapper\n            [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n            [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n            [container]=\"'bubble-chart-container'\"\n            [buttons]=\"['goto']\"\n            >\n                <n7-bubble-chart\n                [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n    </div>\n</ng-template>\n\n<ng-template #maxxi>\n    <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\">\n        <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n            <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n        </div>\n        <div>\n            {{lb.dataSource.myResponse.extraTab}}\n        </div>\n    </div>\n</ng-template>\n\n<ng-template #wiki>\n    <div class=\"aw-entity__content-section aw-entity__content-section-wiki\">\n        <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n            <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n        </div>\n        <div>\n            {{lb.dataSource.myResponse.wikiTab.text}}\n        </div>\n        <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n            {{lb.dataSource.myResponse.wikiTab.url}}\n        </a>\n    </div>\n</ng-template>"
                 }] }
     ];
     /** @nocollapse */
@@ -5006,6 +6757,7 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
     function AwHomeLayoutDS() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.facetData = null;
+        _this.lockedFacets = {};
         _this.facetInputs = {};
         // all the bubbles as they have been given by apollo
         // (the objects in the allBubbles are not the same bubble objects
@@ -5035,13 +6787,18 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
         _this.currentHoverEntity = null;
         _this.hasScrollBackground = false;
         _this.loadingBubbles = false;
+        _this.bubblesEnabled = false;
         _this.updateComponent = (/**
-         * @param {?} comp
+         * @param {?} id
          * @param {?} data
+         * @param {?} options
          * @return {?}
          */
-        function (comp, data) {
-            _this.one(comp).update(data);
+        function (id, data, options) {
+            if (options) {
+                _this.one(id).updateOptions(options);
+            }
+            _this.one(id).update(data);
         });
         return _this;
     }
@@ -5056,11 +6813,12 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
     function (_a) {
         var communication = _a.communication, mainState = _a.mainState, configuration = _a.configuration, tippy = _a.tippy;
         this.communication = communication;
-        this.tippy = tippy;
-        this.mainState = mainState;
         this.configuration = configuration;
-        this.lastWindowWidth = window.outerWidth;
         this.facetData = [];
+        this.lastWindowWidth = window.outerWidth;
+        this.mainState = mainState;
+        this.tippy = tippy;
+        this.bubblesEnabled = this.configuration.get('features-enabled') ? this.configuration.get('features-enabled')['bubblechart'] : false;
         this.one('aw-hero').update(this.configuration.get('home-layout')['top-hero']);
         this.one('aw-home-hero-patrimonio').update(this.configuration.get('home-layout')['bottom-hero']);
         // update streams
@@ -5068,6 +6826,26 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
         this.mainState.update('pageTitle', 'Arianna Web: Home Layout');
         // listen autocomplete changes
         this._listenAutoCompleteChanges();
+    };
+    /**
+     * @param {?} query
+     * @param {?} params
+     * @return {?}
+     */
+    AwHomeLayoutDS.prototype.makeRequest$ = /**
+     * @param {?} query
+     * @param {?} params
+     * @return {?}
+     */
+    function (query, params) {
+        return this.communication.request$(query, {
+            onError: (/**
+             * @param {?} error
+             * @return {?}
+             */
+            function (error) { return console.error(error); }),
+            params: params
+        });
     };
     /**
      * @return {?}
@@ -5104,7 +6882,10 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
             if (teoConfigData)
                 _this.facetData.push(__assign({}, ent.countData, teoConfigData, { enabled: true }));
         }));
-        this.one('aw-home-facets-wrapper').update(this.facetData);
+        this.one('aw-home-facets-wrapper').update({
+            facetData: this.facetData,
+            lockedFacets: this.lockedFacets
+        });
         this.one('aw-bubble-chart').updateOptions({
             context: 'home',
             configKeys: this.configuration.get("config-keys"),
@@ -5149,7 +6930,7 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
         else {
             this.numOfItemsStr = null;
         }
-        this.one('aw-linked-objects').updateOptions({ context: 'home', configKeys: this.configuration.get('config-keys') });
+        this.one('aw-linked-objects').updateOptions({ context: 'home', config: this.configuration });
         this.one('aw-linked-objects').update(response.itemsPagination.items);
     };
     /**
@@ -5267,17 +7048,48 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
         var _this = this;
         /** @type {?} */
         var selectedEntitiesIds = [];
-        if (this.entityBubbleIdMap)
+        if (this.entityBubbleIdMap) {
+            /** @type {?} */
+            var k_1 = this.configuration.get('config-keys');
+            /** @type {?} */
+            var activeBubbles_1 = {
+                places: false,
+                people: false,
+                concepts: false,
+                organizations: false,
+            };
             this.selectedBubbles.forEach((/**
              * @param {?} sB
              * @return {?}
              */
             function (sB) {
                 /** @type {?} */
+                var c = sB.color;
+                /** @type {?} */
+                var findTypeFromColor = (/**
+                 * @param {?} obj
+                 * @param {?} color
+                 * @return {?}
+                 */
+                function (obj, color) {
+                    return Object.keys(obj).find((/**
+                     * @param {?} key
+                     * @return {?}
+                     */
+                    function (key) { return obj[key].color.hex === color; }));
+                });
+                activeBubbles_1[findTypeFromColor(k_1, c)] = true;
+                /** @type {?} */
                 var entityId = _this.entityBubbleIdMap[sB.id];
                 if (entityId)
                     selectedEntitiesIds.push(entityId);
             }));
+            this.lockedFacets = activeBubbles_1;
+            this.one('aw-home-facets-wrapper').update({
+                facetData: this.facetData,
+                lockedFacets: this.lockedFacets
+            });
+        }
         return this.communication.request$('globalFilter', {
             onError: (/**
              * @param {?} error
@@ -5435,7 +7247,10 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
                 }
             }
         }));
-        this.one('aw-home-facets-wrapper').update(this.facetData);
+        this.one('aw-home-facets-wrapper').update({
+            facetData: this.facetData,
+            lockedFacets: this.lockedFacets
+        });
         if (updateBubbles) {
             /** @type {?} */
             var disableFacetsIds_1 = [];
@@ -5681,26 +7496,6 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
         }
         this.autocompletePopoverOpen = !this.autocompletePopoverOpen;
     };
-    /**
-     * @param {?} query
-     * @param {?} params
-     * @return {?}
-     */
-    AwHomeLayoutDS.prototype.makeRequest$ = /**
-     * @param {?} query
-     * @param {?} params
-     * @return {?}
-     */
-    function (query, params) {
-        return this.communication.request$(query, {
-            onError: (/**
-             * @param {?} error
-             * @return {?}
-             */
-            function (error) { return console.error(error); }),
-            params: params
-        });
-    };
     return AwHomeLayoutDS;
 }(LayoutDataSource));
 if (false) {
@@ -5729,6 +7524,11 @@ if (false) {
      * @private
      */
     AwHomeLayoutDS.prototype.facetData;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeLayoutDS.prototype.lockedFacets;
     /**
      * @type {?}
      * @private
@@ -5789,6 +7589,8 @@ if (false) {
     AwHomeLayoutDS.prototype.hasScrollBackground;
     /** @type {?} */
     AwHomeLayoutDS.prototype.loadingBubbles;
+    /** @type {?} */
+    AwHomeLayoutDS.prototype.bubblesEnabled;
     /** @type {?} */
     AwHomeLayoutDS.prototype.updateComponent;
 }
@@ -5866,7 +7668,10 @@ AwHomeLayoutEH = /** @class */ (function (_super) {
                          */
                         function (response) {
                             _this.emitOuter('facetswrapperresponse', { facetId: payload, response: response });
-                            _this.dataSource.updateComponent('aw-autocomplete-wrapper', { key: payload.value, response: response });
+                            _this.dataSource.updateComponent('aw-autocomplete-wrapper', // ID
+                            { key: payload.value, response: response }, // DATA
+                            { config: _this.configuration } // OPTIONS
+                            );
                         }));
                     }
                     break;
@@ -5899,6 +7704,7 @@ AwHomeLayoutEH = /** @class */ (function (_super) {
                                  */
                                 function (response) {
                                     if (response) {
+                                        // console.log('filterRequest() returned: ', response)
                                         _this.emitOuter('filterbubbleresponse', _this.dataSource.getBubblePayload(response));
                                         _this.dataSource.updateBubbles(response);
                                     }
@@ -5971,18 +7777,20 @@ AwHomeLayoutEH = /** @class */ (function (_super) {
         function (response) {
             if (response) {
                 _this.dataSource.parseInitialRequest(response);
-                /** @type {?} */
-                var bubblePayload = {
-                    setBubbleChart: (/**
-                     * @param {?} bubbleCref
-                     * @return {?}
-                     */
-                    function (bubbleCref) { return _this.dataSource._bubbleChart = bubbleCref; }),
-                    source: response,
-                    reset: false,
-                    facetData: _this.dataSource.facetData
-                };
-                _this.emitOuter('filterbubbleresponse', bubblePayload);
+                if (_this.dataSource.bubblesEnabled) {
+                    /** @type {?} */
+                    var bubblePayload = {
+                        setBubbleChart: (/**
+                         * @param {?} bubbleCref
+                         * @return {?}
+                         */
+                        function (bubbleCref) { return _this.dataSource._bubbleChart = bubbleCref; }),
+                        source: response,
+                        reset: false,
+                        facetData: _this.dataSource.facetData
+                    };
+                    _this.emitOuter('filterbubbleresponse', bubblePayload);
+                }
             }
         }));
     };
@@ -6092,7 +7900,7 @@ var AwHomeLayoutComponent = /** @class */ (function (_super) {
     AwHomeLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-home-layout',
-                    template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper\" [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length > 0 }\">\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n        <div\n            class=\"aw-home__bubble-chart-wrapper\"\n            [style.overflow]=\"lb.dataSource.loadingBubbles ? 'visible' : 'hidden'\"\n        >\n            <aw-bubble-chart-wrapper\n                [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                [container]=\"'bubble-chart-container'\"\n                [buttons]=\"['select', 'goto']\"\n            >\n                    <n7-bubble-chart\n                        [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n\n        <!-- Linked objects -->\n        <!--<ng-container *ngIf=\"lb.dataSource.selectedBubbles.length>0\"> -->\n        <ng-container *ngIf=\"lb.dataSource.selectedBubbles.length > 0\" >\n            <div class=\"aw-home__bubble-results\"\n                id=\"home-bubble-results\"\n                [ngStyle]=\"{ 'display': 'flex' , 'flex-direction': 'column', 'transition': 'opacity 1s ease-in-out;' }\"\n                [style.opacity]=\"lb.dataSource.loadingBubbles ? '0' : '1'\"\n            >\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\">\n                    <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">\n                        {{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span>\n                    </h1>\n                </div>\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list-wrapper\" >\n                    <div class=\"aw-home__bubble-results-list\" [attr.id]=\"'bubble-results-list'\">\n                        <ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">\n                            <n7-item-preview\n                                [data]=\"widgetData\"\n                                [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n                    </div>\n                    <div *ngIf=\"lb.dataSource.hasScrollBackground\" class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n\n                    <div class=\"aw-home__bubble-results-list-actions\">\n                        <a class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\" href=\"\">Vedi tutti</a>\n                        <a class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-others\" href=\"\">Vedi altri</a>\n                    </div>\n\n                </div>\n\n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- adavanced autocomplete popover  -->\n    <div id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <n7-advanced-autocomplete\n            [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n\n    <!-- simple autocomplete popover. DO NOT CHANGE parent div class! -->\n    <!-- creating one template for each facet -->\n    <!-- <div id=\"aw-simple-autocomplete__template\">\n        <span>tippyJS</span>\n        <n7-simple-autocomplete\n            [data]=\"lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-autocomplete-wrapper'].emit\">\n        </n7-simple-autocomplete>\n    </div> -->\n    <div *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\"\n         class=\"aw-simple-autocomplete__{{widgetData.header.payload}}\"\n         style=\"display: none;\">\n         <n7-simple-autocomplete\n            [data]=\"lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-autocomplete-wrapper'].emit\">\n        </n7-simple-autocomplete>\n    </div>\n</div>"
+                    template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper\"\n        [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length > 0 }\"\n        *ngIf=\"lb.dataSource.bubblesEnabled\"\n    >\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n        <div\n            class=\"aw-home__bubble-chart-wrapper\"\n            [style.overflow]=\"lb.dataSource.loadingBubbles ? 'visible' : 'hidden'\"\n        >\n            <aw-bubble-chart-wrapper\n                [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                [container]=\"'bubble-chart-container'\"\n                [buttons]=\"['select', 'goto']\"\n            >\n                    <n7-bubble-chart\n                        [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n\n        <!-- Linked objects -->\n        <ng-container *ngIf=\"lb.dataSource.selectedBubbles.length > 0\" >\n            <div class=\"aw-home__bubble-results\"\n                id=\"home-bubble-results\"\n                [ngStyle]=\"{ 'display': 'flex' , 'flex-direction': 'column', 'transition': 'opacity 1s ease-in-out;' }\"\n                [style.opacity]=\"lb.dataSource.loadingBubbles ? '0' : '1'\"\n            >\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\">\n                    <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">\n                        {{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span>\n                    </h1>\n                </div>\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list-wrapper\" >\n                    <div class=\"aw-home__bubble-results-list\" [attr.id]=\"'bubble-results-list'\">\n                        <ng-container *ngFor=\"let widgetData of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.result;\">\n                            <n7-item-preview\n                                [data]=\"widgetData\"\n                                [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n                    </div>\n                    <div *ngIf=\"lb.dataSource.hasScrollBackground\" class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                    <!-- aw-linked-objects__actions -->\n                    <div *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.actions as action\" class=\"aw-home__bubble-results-list-actions\">\n                        <button class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\">\n                            {{action[0].label}}\n                        </button>\n                        <button class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-others\">\n                            {{action[1].label}}\n                        </button>\n                    </div>\n                </div>\n\n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Adavanced autocomplete popover  -->\n    <div id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <n7-advanced-autocomplete\n            [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n\n    <!-- Simple autocomplete popover. DO NOT CHANGE parent div class! -->\n    <!-- Creating one template for each facet -->\n    <div *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\"\n         class=\"aw-simple-autocomplete__{{widgetData.header.payload}}\"\n         style=\"display: none;\">\n         <n7-simple-autocomplete\n            [data]=\"lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-autocomplete-wrapper'].emit\">\n        </n7-simple-autocomplete>\n    </div>\n</div>"
                 }] }
     ];
     /** @nocollapse */
@@ -6169,7 +7977,7 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
         this.similarItemsSectionTitle = this.configuration.get('scheda-layout')['related-items']['title'];
         this.metadataSectionTitle = this.configuration.get('scheda-layout')['metadata']['title'];
         this.hasSimilarItems = false;
-        this.hasBubbles = false;
+        this.bubblesEnabled = this.configuration.get('features-enabled') ? this.configuration.get('features-enabled')['bubblechart'] : false;
     };
     /**
      * @param {?} id
@@ -6363,7 +8171,7 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
         /* Similar item */
         if (response.similarItems) {
             this.hasSimilarItems = true;
-            this.one('aw-linked-objects').updateOptions({ context: 'scheda', configKeys: this.configuration.get("config-keys") });
+            this.one('aw-linked-objects').updateOptions({ context: 'scheda', config: this.configuration });
             this.one('aw-linked-objects').update(response.similarItems);
         }
         else {
@@ -6482,6 +8290,8 @@ if (false) {
     /** @type {?} */
     AwSchedaLayoutDS.prototype.hasBubbles;
     /** @type {?} */
+    AwSchedaLayoutDS.prototype.bubblesEnabled;
+    /** @type {?} */
     AwSchedaLayoutDS.prototype.hasSimilarItems;
     /** @type {?} */
     AwSchedaLayoutDS.prototype.imageViewerIstance;
@@ -6582,7 +8392,9 @@ var AwSchedaLayoutEH = /** @class */ (function (_super) {
                             _this.dataSource.hasBubbles = true;
                             /** @type {?} */
                             var connectedEntities = { source: response, connectedEntities: response.connectedEntities };
-                            _this.emitOuter('filterbubbleresponse', connectedEntities);
+                            if (_this.dataSource.bubblesEnabled) {
+                                _this.emitOuter('filterbubbleresponse', connectedEntities);
+                            }
                         }
                     }
                 }));
@@ -6736,7 +8548,7 @@ var AwSchedaLayoutComponent = /** @class */ (function (_super) {
     AwSchedaLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-scheda-layout',
-                    template: "<div class=\"aw-scheda\" id=\"scheda-layout\" [style.overflow]=\"'hidden'\">\n    <div class=\"aw-scheda__content\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n\n         <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree\">\n            <n7-sidebar-header\n                [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"\n            ></n7-sidebar-header>\n            <n7-tree\n                [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-tree'].emit\"\n                [hidden]=\"lb.dataSource.sidebarCollapsed\"\n            ></n7-tree>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper\">\n            <n7-breadcrumbs\n                [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\"\n            ></n7-breadcrumbs>\n\n            <n7-inner-title\n            [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\"\n            ></n7-inner-title>\n\n            <n7-image-viewer\n                [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\"\n            >\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\"\n                [hidden] = \"!lb.hasMetadata\"\n            >\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.metadataSectionTitle}}</div>\n                <n7-metadata-viewer\n                    [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section\n                class=\"aw-scheda__bubble-chart\"\n            >\n                <div\n                    [hidden] = \"!lb.dataSource.hasBubbles\"\n                    class=\"aw-scheda__inner-title\">{{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <div  [style.overflow]=\"'hidden'\">\n                    <aw-bubble-chart-wrapper\n                    [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                    [container]=\"'bubble-chart-container'\"\n                    [buttons]=\"['goto']\"\n                    >\n                        <n7-bubble-chart\n                        [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </section>\n\n            <section\n                [hidden] = \"!lb.dataSource.hasSimilarItems\"\n                id=\"related-item-container\" class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.similarItemsSectionTitle}}</div>\n                <div class=\"aw-scheda__related-items\">\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">\n                        <n7-item-preview\n                            [data]=\"widgetData\"\n                            >\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n             </section>\n        </div>\n    </div>\n</div>\n"
+                    template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\n    <div class=\"aw-scheda__content\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n\n         <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree\">\n            <n7-sidebar-header\n                [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"\n            ></n7-sidebar-header>\n            <n7-tree\n                [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-tree'].emit\"\n                [hidden]=\"lb.dataSource.sidebarCollapsed\"\n            ></n7-tree>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper\">\n            <n7-breadcrumbs\n                [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\"\n            ></n7-breadcrumbs>\n\n            <n7-inner-title\n            [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\"\n            ></n7-inner-title>\n\n            <n7-image-viewer\n                [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\"\n            >\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\"\n                [hidden] = \"!lb.hasMetadata\"\n            >\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.metadataSectionTitle}}</div>\n                <n7-metadata-viewer\n                    [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section\n                class=\"aw-scheda__bubble-chart\"\n                *ngIf=\"lb.dataSource.bubblesEnabled\"\n            >\n                <div\n                    [hidden] = \"!lb.dataSource.hasBubbles\"\n                    class=\"aw-scheda__inner-title\">{{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <div  [style.overflow]=\"'hidden'\">\n                    <aw-bubble-chart-wrapper\n                    [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                    [container]=\"'bubble-chart-container'\"\n                    [buttons]=\"['goto']\"\n                    >\n                        <n7-bubble-chart\n                        [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </section>\n\n            <section\n                [hidden] = \"!lb.dataSource.hasSimilarItems\"\n                id=\"related-item-container\" class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.similarItemsSectionTitle}}</div>\n                <div class=\"aw-scheda__related-items\">\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">\n                        <n7-item-preview\n                            [data]=\"widgetData\"\n                            >\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n             </section>\n        </div>\n    </div>\n</div>\n"
                 }] }
     ];
     /** @nocollapse */
@@ -6897,6 +8709,499 @@ var AwWorksLayoutComponent = /** @class */ (function (_super) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+var ɵ0 = [], ɵ1 = [{
+        value: '1',
+        label: 'Cerca in tutti campi delle schede'
+    }], ɵ2 = [], ɵ3 = [], ɵ4 = [{
+        value: 'milano',
+        label: 'Milano',
+        count: 1,
+        metadata: {
+            title: 'Milano',
+            'entity-type': 'places'
+        }
+    }, {
+        value: 'roma',
+        label: 'Comune di Roma',
+        count: 2,
+        metadata: {
+            title: 'Comune di Roma',
+            'entity-type': 'places'
+        }
+    }, {
+        value: 'spazio',
+        label: 'Spazio',
+        count: 3,
+        metadata: {
+            title: 'Spazio',
+            'entity-type': 'concepts'
+        }
+    }, {
+        value: 'rodolfo-marna',
+        label: 'Rodolfo Marna',
+        count: 4,
+        metadata: {
+            title: 'Rodolfo Marna',
+            'entity-type': 'people'
+        }
+    }, {
+        value: 'alighiero-boetti',
+        label: 'Alighiero Boetti',
+        count: 5,
+        metadata: {
+            title: 'Alighiero Boetti',
+            'entity-type': 'people'
+        }
+    }], ɵ5 = [], ɵ6 = [];
+/** @type {?} */
+var SEARCH_CONFIG = {
+    facets: [{
+            id: 'query',
+            type: 'value',
+            data: ɵ0
+        }, {
+            id: 'query-all',
+            type: 'value',
+            data: ɵ1
+        }, {
+            id: 'query-links',
+            type: 'value',
+            data: ɵ2
+        }, {
+            id: 'entity-types',
+            type: 'value',
+            operator: 'OR',
+            limit: 10,
+            order: 'count',
+        }, {
+            id: 'entity-search',
+            type: 'value',
+            data: ɵ3
+        }, {
+            id: 'entity-links',
+            type: 'value',
+            metadata: ['title', 'entity-type'],
+            data: ɵ4
+        }, {
+            id: 'date-from',
+            type: 'value',
+            data: ɵ5
+        }, {
+            id: 'date-to',
+            type: 'value',
+            data: ɵ6
+        }],
+    fields: [{
+            inputs: [{
+                    type: 'text',
+                    facetId: 'query',
+                    placeholder: 'Cerca...',
+                    // icon: 'n7-icon-search',
+                    filterConfig: {
+                        delay: 500,
+                        minChars: 3,
+                        searchIn: [{
+                                key: 'source.title',
+                                operator: 'LIKE'
+                            }]
+                    }
+                }, {
+                    type: 'checkbox',
+                    facetId: 'query-all',
+                    filterConfig: {
+                        searchIn: [{
+                                key: 'query-all',
+                                operator: '='
+                            }]
+                    }
+                }, {
+                    type: 'link',
+                    facetId: 'query-links',
+                    filterConfig: {
+                        isArray: true,
+                        searchIn: [{
+                                key: 'source.entityType',
+                                operator: '='
+                            }]
+                    }
+                }]
+        }, {
+            header: {
+                label: 'Relazione con',
+                classes: 'related-class'
+            },
+            inputs: [{
+                    type: 'checkbox',
+                    facetId: 'entity-types',
+                    filterConfig: {
+                        isArray: true,
+                        context: 'internal',
+                        target: 'entity-links',
+                        searchIn: [{
+                                key: 'entity-type',
+                                operator: '='
+                            }]
+                    }
+                }, {
+                    type: 'text',
+                    facetId: 'entity-search',
+                    placeholder: 'Cerca entità',
+                    // icon: 'n7-icon-search',
+                    filterConfig: {
+                        delay: 500,
+                        minChars: 3,
+                        context: 'internal',
+                        target: 'entity-links',
+                        searchIn: [{
+                                key: 'title',
+                                operator: 'LIKE'
+                            }]
+                    }
+                }, {
+                    type: 'link',
+                    facetId: 'entity-links',
+                    filterConfig: {
+                        limit: 20,
+                        searchIn: [{
+                                key: 'source.id',
+                                operator: '='
+                            }]
+                    }
+                }]
+        }, {
+            header: {
+                label: 'Data',
+                classes: 'date-class'
+            },
+            inputs: [{
+                    type: 'select',
+                    facetId: 'date-from',
+                    label: 'Dal',
+                    filterConfig: {
+                        searchIn: [{
+                                key: 'source.dateStart',
+                                operator: '>='
+                            }]
+                    }
+                }, {
+                    type: 'select',
+                    facetId: 'date-to',
+                    label: 'Al',
+                    filterConfig: {
+                        searchIn: [{
+                                key: 'source.dateEnd',
+                                operator: '<='
+                            }]
+                    }
+                }]
+        }],
+    results: {
+        order: {
+            type: 'score',
+            // score | text | date
+            key: 'author',
+            // docPath, elastic key, ecc
+            direction: 'ASC',
+        },
+        fields: {
+            title: {
+                highlight: true,
+                limit: 50,
+            }
+        },
+    },
+    page: null,
+    baseUrl: ''
+};
+/** @type {?} */
+var SEARCH_ID = 'search-facets';
+var AwSearchLayoutDS = /** @class */ (function (_super) {
+    __extends(AwSearchLayoutDS, _super);
+    function AwSearchLayoutDS() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @param {?} __0
+     * @return {?}
+     */
+    AwSearchLayoutDS.prototype.onInit = /**
+     * @param {?} __0
+     * @return {?}
+     */
+    function (_a) {
+        var configuration = _a.configuration, mainState = _a.mainState, options = _a.options, communication = _a.communication, search = _a.search;
+        this.configuration = configuration;
+        this.mainState = mainState;
+        this.communication = communication;
+        this.search = search;
+        this.options = options;
+        // FIXME: togliere
+        /** @type {?} */
+        var configKeys = this.configuration.get('config-keys');
+        /** @type {?} */
+        var queryLinksData = Object.keys(configKeys).map((/**
+         * @param {?} key
+         * @return {?}
+         */
+        function (key) {
+            /** @type {?} */
+            var config = configKeys[key];
+            return {
+                value: key,
+                label: config.label,
+                count: 1,
+                // questi vanno aggiunti a mano lato front-end
+                icon: config.icon,
+                classes: "color-" + key
+            };
+        }));
+        /** @type {?} */
+        var entityTypesData = Object.keys(configKeys).map((/**
+         * @param {?} key
+         * @return {?}
+         */
+        function (key) {
+            /** @type {?} */
+            var config = configKeys[key];
+            return {
+                value: key,
+                label: config.label,
+            };
+        }));
+        SEARCH_CONFIG.facets.filter((/**
+         * @param {?} facet
+         * @return {?}
+         */
+        function (facet) { return facet.id === 'query-links'; })).forEach((/**
+         * @param {?} facet
+         * @return {?}
+         */
+        function (facet) {
+            facet.data = queryLinksData;
+        }));
+        SEARCH_CONFIG.facets.filter((/**
+         * @param {?} facet
+         * @return {?}
+         */
+        function (facet) { return facet.id === 'entity-types'; })).forEach((/**
+         * @param {?} facet
+         * @return {?}
+         */
+        function (facet) {
+            facet.data = entityTypesData;
+        }));
+        if (!this.search.model(SEARCH_ID))
+            this.search.add(SEARCH_ID, SEARCH_CONFIG);
+        /** @type {?} */
+        var searchModel = this.search.model(SEARCH_ID);
+        this.one('facets-wrapper').update({ searchModel: searchModel });
+    };
+    return AwSearchLayoutDS;
+}(LayoutDataSource));
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutDS.prototype.communication;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutDS.prototype.configuration;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutDS.prototype.mainState;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutDS.prototype.search;
+    /** @type {?} */
+    AwSearchLayoutDS.prototype.options;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var AwSearchLayoutEH = /** @class */ (function (_super) {
+    __extends(AwSearchLayoutEH, _super);
+    function AwSearchLayoutEH() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @return {?}
+     */
+    AwSearchLayoutEH.prototype.listen = /**
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                case 'aw-search-layout.init':
+                    _this.dataSource.onInit(payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                // TODO
+                default:
+                    break;
+            }
+        }));
+    };
+    return AwSearchLayoutEH;
+}(EventHandler));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/** @type {?} */
+var AwSearchLayoutConfig = {
+    layoutId: 'aw-search-layout',
+    /**
+     * Array of components you want to use
+     * in this layout
+     */
+    widgets: [
+        { id: 'facets-wrapper', dataSource: FacetsWrapperDS, eventHandler: FacetsWrapperEH },
+    ],
+    layoutDS: AwSearchLayoutDS,
+    layoutEH: AwSearchLayoutEH,
+    widgetsDataSources: DS$1,
+    widgetsEventHandlers: EH$1,
+    options: {
+    // TODO
+    }
+};
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var AwSearchLayoutComponent = /** @class */ (function (_super) {
+    __extends(AwSearchLayoutComponent, _super);
+    function AwSearchLayoutComponent(configuration, layoutsConfiguration, mainState, communication, search) {
+        var _this = _super.call(this, layoutsConfiguration.get('AwSearchLayoutConfig') || AwSearchLayoutConfig) || this;
+        _this.configuration = configuration;
+        _this.layoutsConfiguration = layoutsConfiguration;
+        _this.mainState = mainState;
+        _this.communication = communication;
+        _this.search = search;
+        return _this;
+    }
+    /**
+     * Optional variables that can be accessed from the layout's logic.
+     * If removed, they must also be removed from the layout's DataSource file,
+     * and from this file imports.
+     */
+    /**
+     * Optional variables that can be accessed from the layout's logic.
+     * If removed, they must also be removed from the layout's DataSource file,
+     * and from this file imports.
+     * @protected
+     * @return {?}
+     */
+    AwSearchLayoutComponent.prototype.initPayload = /**
+     * Optional variables that can be accessed from the layout's logic.
+     * If removed, they must also be removed from the layout's DataSource file,
+     * and from this file imports.
+     * @protected
+     * @return {?}
+     */
+    function () {
+        return {
+            configuration: this.configuration,
+            mainState: this.mainState,
+            communication: this.communication,
+            search: this.search,
+            options: this.config.options || {},
+        };
+    };
+    /**
+     * @return {?}
+     */
+    AwSearchLayoutComponent.prototype.ngOnInit = /**
+     * @return {?}
+     */
+    function () {
+        this.onInit();
+    };
+    /**
+     * @return {?}
+     */
+    AwSearchLayoutComponent.prototype.ngOnDestroy = /**
+     * @return {?}
+     */
+    function () {
+        this.onDestroy();
+    };
+    AwSearchLayoutComponent.decorators = [
+        { type: Component, args: [{
+                    selector: 'aw-search-layout',
+                    template: "<div class=\"aw-search\" id=\"search-layout\">\n    <div class=\"aw-search__content\">\n\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-search__facets\">\n            <n7-facets-wrapper\n                [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                [emit]=\"lb.widgets['facets-wrapper'].emit\">\n            </n7-facets-wrapper>\n        </div>\n\n        <!-- Search details -->\n        <div class=\"aw-search__search-wrapper\">\n            #TODO: results\n        </div>\n    </div>\n</div>\n"
+                }] }
+    ];
+    /** @nocollapse */
+    AwSearchLayoutComponent.ctorParameters = function () { return [
+        { type: ConfigurationService },
+        { type: LayoutsConfigurationService },
+        { type: MainStateService },
+        { type: CommunicationService },
+        { type: SearchService }
+    ]; };
+    return AwSearchLayoutComponent;
+}(AbstractLayout));
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutComponent.prototype.configuration;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutComponent.prototype.layoutsConfiguration;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutComponent.prototype.mainState;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutComponent.prototype.communication;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutComponent.prototype.search;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 var BubbleChartWrapperComponent = /** @class */ (function () {
     function BubbleChartWrapperComponent() {
     }
@@ -6916,7 +9221,7 @@ var BubbleChartWrapperComponent = /** @class */ (function () {
     BubbleChartWrapperComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-bubble-chart-wrapper',
-                    template: "<div class=\"aw-bubble-chart-wrapper\">\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_closebutton\"\n            (click)=\"onClick('bubble-tooltip-close-click',{entityId: (hover ? hover.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_gotobutton\"\n            (click)=\"onClick('bubble-tooltip-goto-click',{entityId:(hover  ? hover.id : null)} )\"></button>\n    <button style=\"display: none;\"\n            id=\"bubble-popup-menu_selectbutton\"\n            (click)=\"onClick('bubble-tooltip-select-click',{entityId:(hover ? hover.id : null)} )\"></button>\n    <div id=\"bubble-popup-menu\" class=\"aw-bubble-popup-menu\" style=\"display: none;\">\n        <h2 class=\"aw-bubble-popup-menu__title\">{{ ( hover ? hover.label : '' ) }}</h2>\n        <span class=\"n7-icon-close aw-bubble-popup-menu__close\" onclick=\"document.getElementById('bubble-popup-menu_closebutton').click();\"></span>\n        <p class=\"aw-bubble-popup-menu__text\">\n                {{ ( hover ? '\u00C8 collegato a '+ hover.count + ' entit\u00E0' : '' ) }}\n        </p>\n        <div class=\"aw-bubble-popup-menu__actions\">\n            <span\n            class=\"aw-bubble-popup-menu__link\"\n            *ngIf=\"buttons.indexOf('goto') >= 0\"\n            onclick=\"document.getElementById('bubble-popup-menu_gotobutton').click();\">\n                Vai alla scheda\n            </span> <ng-container *ngIf=\"buttons.length > 1\"> | </ng-container>\n            <span\n                class=\"aw-bubble-popup-menu__link\"\n                *ngIf=\"buttons.indexOf('select') >= 0\"\n                onclick=\"document.getElementById('bubble-popup-menu_selectbutton').click();\">\n                    Seleziona\n            </span>\n        </div>\n    </div>\n    <div [id]=\"container\">\n        <ng-content></ng-content>\n    </div>\n</div>"
+                    template: "<div class=\"aw-bubble-chart-wrapper\">\n    <button style=\"display: none;\" id=\"bubble-popup-menu_closebutton\"\n        (click)=\"onClick('bubble-tooltip-close-click',{entityId: (hover ? hover.id : null)} )\"></button>\n    <button style=\"display: none;\" id=\"bubble-popup-menu_gotobutton\"\n        (click)=\"onClick('bubble-tooltip-goto-click',{entityId:(hover  ? hover.id : null)} )\"></button>\n    <button style=\"display: none;\" id=\"bubble-popup-menu_selectbutton\"\n        (click)=\"onClick('bubble-tooltip-select-click',{entityId:(hover ? hover.id : null)} )\"></button>\n    <div id=\"bubble-popup-menu\" class=\"aw-bubble-popup-menu\" style=\"display: none;\">\n        <h2 class=\"aw-bubble-popup-menu__title\">{{ ( hover ? hover.label : '' ) }}</h2>\n        <span class=\"n7-icon-close aw-bubble-popup-menu__close\"\n            onclick=\"document.getElementById('bubble-popup-menu_closebutton').click();\"></span>\n        <p class=\"aw-bubble-popup-menu__text\">\n            {{ ( hover ? '\u00C8 collegato a '+ hover.count + ' entit\u00E0' : '' ) }}\n        </p>\n        <div class=\"aw-bubble-popup-menu__actions\">\n            <span class=\"aw-bubble-popup-menu__link\" *ngIf=\"buttons.indexOf('goto') >= 0\"\n                onclick=\"document.getElementById('bubble-popup-menu_gotobutton').click();\">Vai alla scheda</span>\n            <ng-container *ngIf=\"buttons.length > 1\"></ng-container>\n            <span class=\"aw-bubble-popup-menu__link\" *ngIf=\"buttons.indexOf('select') >= 0\"\n                onclick=\"document.getElementById('bubble-popup-menu_selectbutton').click();\">Seleziona</span>\n        </div>\n    </div>\n    <div [id]=\"container\">\n        <ng-content></ng-content>\n    </div>\n</div>"
                 }] }
     ];
     BubbleChartWrapperComponent.propDecorators = {
@@ -6949,6 +9254,7 @@ var COMPONENTS$1 = [
     AwHomeLayoutComponent,
     AwSchedaLayoutComponent,
     AwWorksLayoutComponent,
+    AwSearchLayoutComponent,
     BubbleChartWrapperComponent
 ];
 var N7BoilerplateAriannaWebModule = /** @class */ (function () {
@@ -7021,5 +9327,5 @@ var N7BoilerplateLibModule = /** @class */ (function () {
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAboutLayoutComponent, AwAboutLayoutConfig, AwAboutLayoutDS, AwAboutLayoutEH, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeBubbleChartDS, AwHomeBubbleChartEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, AwWorksLayoutComponent, AwWorksLayoutConfig, AwWorksLayoutDS, AwWorksLayoutEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, CommunicationService, ConfigurationService, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SubnavDS, SubnavEH, CommunicationService as ɵa, MainStateService as ɵb };
+export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAboutLayoutComponent, AwAboutLayoutConfig, AwAboutLayoutDS, AwAboutLayoutEH, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeBubbleChartDS, AwHomeBubbleChartEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, AwWorksLayoutComponent, AwWorksLayoutConfig, AwWorksLayoutDS, AwWorksLayoutEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, CommunicationService, ConfigurationService, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsEH, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SearchModel, SearchService, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwAboutLayoutComponent as ɵk, AwEntitaLayoutComponent as ɵl, CommunicationService as ɵm, MainStateService as ɵn, AwHomeLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwWorksLayoutComponent as ɵq, AwSearchLayoutComponent as ɵr, ConfigurationService as ɵs, LayoutsConfigurationService as ɵt, SearchService as ɵu, BubbleChartWrapperComponent as ɵv };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

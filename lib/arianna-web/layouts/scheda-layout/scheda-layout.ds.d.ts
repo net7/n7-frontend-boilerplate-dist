@@ -22,6 +22,7 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
     metadataSectionTitle: string;
     hasMetadata: boolean;
     hasBubbles: boolean;
+    bubblesEnabled: boolean;
     hasSimilarItems: boolean;
     imageViewerIstance: any;
     /**

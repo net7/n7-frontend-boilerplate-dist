@@ -1,0 +1,6 @@
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+export { FacetsWrapperComponent } from './facets-wrapper/facets-wrapper';
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290Ijoibmc6Ly9AbjctZnJvbnRlbmQvYm9pbGVycGxhdGUvIiwic291cmNlcyI6WyJsaWIvY29tbW9uL2NvbXBvbmVudHMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7OztBQUNBLHVDQUFjLGlDQUFpQyxDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiXG5leHBvcnQgKiBmcm9tICcuL2ZhY2V0cy13cmFwcGVyL2ZhY2V0cy13cmFwcGVyJzsiXX0=

@@ -33,5 +33,14 @@ export declare class AwLinkedObjectsDS extends DataSource {
             };
         };
         previews: any[];
+        result?: undefined;
+        actions?: undefined;
+    } | {
+        result: any[];
+        actions: {
+            label: string;
+        }[];
+        pagination?: undefined;
+        previews?: undefined;
     };
 }
