@@ -74,7 +74,7 @@ $font-weight-black: 900;
 // COLORS
 // ------------------------------------ //
 // Text Colors
-// $color-text: $color-gray-06;
+// $color-text: $color-gray-05;
 // $color-text-inverse: $color-gray-00;
 // $color-text-light: $color-gray-04;
 // $color-text-link: $color-main;
@@ -300,7 +300,28 @@ $scheda-title-font-weight: $font-weight-bold;
 // #ENTITA
 // ------------------------------------ //
 $entity-sidebar-title-background: $color-gray-01;
-$entity-nav-item-active-decoration-bg: $color-gray-06;
+$entity-nav-item-active-decoration-bg: $color-gray-05;
+
+
+// ------------------------------------ //
+// #SEARCH
+// ------------------------------------ //
+$search-box-shadow: 0 0 15px 0 rgba(0,0,0,0.05);
+$search-nav-decoration-height: 5px;
+
+
+// ------------------------------------ //
+// #FACET
+// ------------------------------------ //
+$facet-counter-background: $color-gray-04;
+$facet-text-color: $color-gray-05;
+
+
+// ------------------------------------ //
+// #FACET-HEADER
+// ------------------------------------ //
+$facet-header-border-radius: 3px;
+$facet-header-background: $color-gray-04;
 
 
 // ------------------------------------ //

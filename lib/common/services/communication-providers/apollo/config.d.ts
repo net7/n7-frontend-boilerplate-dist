@@ -23,4 +23,8 @@ export declare const ApolloProviderConfig: {
         queryName: string;
         queryBody: string;
     };
+    'search': {
+        queryName: string;
+        queryBody: string;
+    };
 };

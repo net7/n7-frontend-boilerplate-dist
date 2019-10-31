@@ -488,6 +488,10 @@
         'autoComplete': {
             queryName: 'autoComplete',
             queryBody: "{\n      autoComplete(__PARAMS__){\n        totalCount\n        items {\n          item {\n            id\n            label\n            info {\n              key\n              value\n            }\n            icon\n          }\n          thumbnail\n          typeOfEntity {\n            id\n            configKey\n          }\n        }\n      }\n    }"
+        },
+        'search': {
+            queryName: 'search',
+            queryBody: "{\n      search(__PARAMS__){\n        totalCount\n        facets\n        filters\n        results\n        page\n      }\n    }"
         }
     };
 
@@ -1064,6 +1068,1352 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
+    var JsonConfigService = /** @class */ (function () {
+        function JsonConfigService(http, config) {
+            this.http = http;
+            this.config = config;
+        }
+        /**
+         * @param {?} path
+         * @return {?}
+         */
+        JsonConfigService.prototype.load = /**
+         * @param {?} path
+         * @return {?}
+         */
+        function (path) {
+            var _this = this;
+            return this.http.get(path).pipe(operators.catchError((/**
+             * @param {?} error
+             * @return {?}
+             */
+            function (error) { return rxjs.of({}); })), operators.tap((/**
+             * @param {?} response
+             * @return {?}
+             */
+            function (response) { return _this._handleResponse(response); }))).toPromise();
+        };
+        /**
+         * @private
+         * @param {?} response
+         * @return {?}
+         */
+        JsonConfigService.prototype._handleResponse = /**
+         * @private
+         * @param {?} response
+         * @return {?}
+         */
+        function (response) {
+            var _this = this;
+            if (response) {
+                Object.keys(response).forEach((/**
+                 * @param {?} key
+                 * @return {?}
+                 */
+                function (key) { return _this.config.set(key, response[key]); }));
+                // config keys colors
+                if (response['config-keys']) {
+                    /** @type {?} */
+                    var headTag = document.querySelector('head');
+                    /** @type {?} */
+                    var styleElement = document.createElement('style');
+                    /** @type {?} */
+                    var styles_1 = [];
+                    Object.keys(response['config-keys']).forEach((/**
+                     * @param {?} key
+                     * @return {?}
+                     */
+                    function (key) {
+                        /** @type {?} */
+                        var configKey = response['config-keys'][key] || {};
+                        if (configKey.color && configKey.color.hex) {
+                            // add css class
+                            styles_1.push("--color-" + key + ": " + configKey.color.hex + ";");
+                        }
+                    }));
+                    if (styles_1.length) {
+                        styles_1.unshift(':root {');
+                        styles_1.push('}');
+                        styleElement.appendChild(document.createTextNode(styles_1.join('\n')));
+                        headTag.appendChild(styleElement);
+                    }
+                }
+            }
+        };
+        JsonConfigService.decorators = [
+            { type: core.Injectable, args: [{
+                        providedIn: 'root'
+                    },] }
+        ];
+        /** @nocollapse */
+        JsonConfigService.ctorParameters = function () { return [
+            { type: http.HttpClient },
+            { type: ConfigurationService }
+        ]; };
+        /** @nocollapse */ JsonConfigService.ngInjectableDef = core.ɵɵdefineInjectable({ factory: function JsonConfigService_Factory() { return new JsonConfigService(core.ɵɵinject(http.HttpClient), core.ɵɵinject(ConfigurationService)); }, token: JsonConfigService, providedIn: "root" });
+        return JsonConfigService;
+    }());
+    if (false) {
+        /**
+         * @type {?}
+         * @private
+         */
+        JsonConfigService.prototype.http;
+        /**
+         * @type {?}
+         * @private
+         */
+        JsonConfigService.prototype.config;
+    }
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    /**
+     * @record
+     */
+    function IFacetInputData() { }
+    if (false) {
+        /** @type {?} */
+        IFacetInputData.prototype.value;
+        /** @type {?} */
+        IFacetInputData.prototype.label;
+        /** @type {?} */
+        IFacetInputData.prototype.counter;
+        /** @type {?|undefined} */
+        IFacetInputData.prototype.hidden;
+        /** @type {?|undefined} */
+        IFacetInputData.prototype.options;
+    }
+    /**
+     * @abstract
+     */
+    var FacetInput = /** @class */ (function () {
+        function FacetInput(config) {
+            var _this = this;
+            this.update = (/**
+             * @return {?}
+             */
+            function () { return _this.output = _this.transform(); });
+            this.getId = (/**
+             * @return {?}
+             */
+            function () { return _this.id; });
+            this.getData = (/**
+             * @return {?}
+             */
+            function () { return _this.data; });
+            this.getConfig = (/**
+             * @return {?}
+             */
+            function () { return _this.config; });
+            this.getFacetId = (/**
+             * @return {?}
+             */
+            function () { return _this.config.facetId; });
+            this.getInputIndex = (/**
+             * @return {?}
+             */
+            function () { return _this.config.inputIndex; });
+            this.getSectionIndex = (/**
+             * @return {?}
+             */
+            function () { return _this.config.sectionIndex; });
+            this.getContext = (/**
+             * @return {?}
+             */
+            function () { return _this.config.filterConfig.context || 'external'; });
+            this.getTarget = (/**
+             * @return {?}
+             */
+            function () { return _this.config.filterConfig.target || null; });
+            this.getSearchIn = (/**
+             * @return {?}
+             */
+            function () { return _this.config.filterConfig.searchIn || null; });
+            this.getType = (/**
+             * @return {?}
+             */
+            function () { return _this.config.type; });
+            this.getOutput = (/**
+             * @return {?}
+             */
+            function () { return _this.output; });
+            this.setData = (/**
+             * @param {?} newData
+             * @return {?}
+             */
+            function (newData) { return _this.data = newData; });
+            this.config = config;
+            this._setId();
+            FacetInput.index++;
+        }
+        /**
+         * @private
+         * @return {?}
+         */
+        FacetInput.prototype._setId = /**
+         * @private
+         * @return {?}
+         */
+        function () {
+            this.id = "facet-input-" + this.getType() + "-" + FacetInput.index;
+        };
+        ;
+        FacetInput.index = 0;
+        return FacetInput;
+    }());
+    if (false) {
+        /** @type {?} */
+        FacetInput.index;
+        /**
+         * @type {?}
+         * @private
+         */
+        FacetInput.prototype.id;
+        /**
+         * @type {?}
+         * @protected
+         */
+        FacetInput.prototype.config;
+        /**
+         * @type {?}
+         * @protected
+         */
+        FacetInput.prototype.output;
+        /**
+         * @type {?}
+         * @protected
+         */
+        FacetInput.prototype.data;
+        /** @type {?} */
+        FacetInput.prototype.update;
+        /** @type {?} */
+        FacetInput.prototype.getId;
+        /** @type {?} */
+        FacetInput.prototype.getData;
+        /** @type {?} */
+        FacetInput.prototype.getConfig;
+        /** @type {?} */
+        FacetInput.prototype.getFacetId;
+        /** @type {?} */
+        FacetInput.prototype.getInputIndex;
+        /** @type {?} */
+        FacetInput.prototype.getSectionIndex;
+        /** @type {?} */
+        FacetInput.prototype.getContext;
+        /** @type {?} */
+        FacetInput.prototype.getTarget;
+        /** @type {?} */
+        FacetInput.prototype.getSearchIn;
+        /** @type {?} */
+        FacetInput.prototype.getType;
+        /** @type {?} */
+        FacetInput.prototype.getOutput;
+        /** @type {?} */
+        FacetInput.prototype.setData;
+        /* Skipping unhandled member: ;*/
+        /**
+         * @abstract
+         * @param {?} facetValue
+         * @return {?}
+         */
+        FacetInput.prototype.setActive = function (facetValue) { };
+        /**
+         * @abstract
+         * @protected
+         * @return {?}
+         */
+        FacetInput.prototype.transform = function () { };
+    }
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var FacetInputCheckbox = /** @class */ (function (_super) {
+        __extends(FacetInputCheckbox, _super);
+        function FacetInputCheckbox() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @protected
+         * @return {?}
+         */
+        FacetInputCheckbox.prototype.transform = /**
+         * @protected
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            /** @type {?} */
+            var facetId = this.getFacetId();
+            return this.data.map((/**
+             * @param {?} __0
+             * @param {?} index
+             * @return {?}
+             */
+            function (_a, index) {
+                var label = _a.label, value = _a.value;
+                // normalize value
+                value = '' + value;
+                return {
+                    type: 'checkbox',
+                    id: _this.getId() + '-' + index,
+                    label: label,
+                    payload: {
+                        facetId: facetId,
+                        source: 'input-checkbox',
+                        value: value
+                    },
+                    _meta: { facetId: facetId, value: value }
+                };
+            }));
+        };
+        /**
+         * @param {?} facetValue
+         * @return {?}
+         */
+        FacetInputCheckbox.prototype.setActive = /**
+         * @param {?} facetValue
+         * @return {?}
+         */
+        function (facetValue) {
+            var isArray = this.config.filterConfig.isArray;
+            this.output.forEach((/**
+             * @param {?} config
+             * @return {?}
+             */
+            function (config) {
+                if (isArray && Array.isArray(facetValue) && facetValue.indexOf(config._meta.value) !== -1) {
+                    config.checked = true;
+                }
+                else if (facetValue === config._meta.value) {
+                    config.checked = true;
+                }
+                else {
+                    config.checked = false;
+                }
+            }));
+        };
+        return FacetInputCheckbox;
+    }(FacetInput));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var FacetInputText = /** @class */ (function (_super) {
+        __extends(FacetInputText, _super);
+        function FacetInputText() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @protected
+         * @return {?}
+         */
+        FacetInputText.prototype.transform = /**
+         * @protected
+         * @return {?}
+         */
+        function () {
+            /** @type {?} */
+            var facetId = this.getFacetId();
+            /** @type {?} */
+            var payload = {
+                facetId: facetId,
+                source: 'input-text'
+            };
+            return {
+                type: 'text',
+                id: this.getId(),
+                label: this.config.label,
+                disabled: this.config.disabled,
+                placeholder: this.config.placeholder,
+                icon: this.config.icon,
+                inputPayload: __assign({}, payload, { trigger: 'input' }),
+                enterPayload: __assign({}, payload, { trigger: 'enter' }),
+                iconPayload: __assign({}, payload, { trigger: 'icon' }),
+                _meta: { facetId: facetId }
+            };
+        };
+        /**
+         * @param {?} facetValue
+         * @return {?}
+         */
+        FacetInputText.prototype.setActive = /**
+         * @param {?} facetValue
+         * @return {?}
+         */
+        function (facetValue) {
+            this.output.value = facetValue || null;
+        };
+        return FacetInputText;
+    }(FacetInput));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var FacetInputLink = /** @class */ (function (_super) {
+        __extends(FacetInputLink, _super);
+        function FacetInputLink() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @protected
+         * @return {?}
+         */
+        FacetInputLink.prototype.transform = /**
+         * @protected
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            /** @type {?} */
+            var facetId = this.getFacetId();
+            return this.data.map((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var label = _a.label, value = _a.value, counter = _a.counter, hidden = _a.hidden, options = _a.options;
+                // normalize value
+                value = '' + value;
+                options = options || {};
+                /** @type {?} */
+                var classes = [];
+                if (options.classes)
+                    classes.push(options.classes);
+                if (hidden)
+                    classes.push('is-hidden');
+                if (_this._isActive(_this.facetValue, value))
+                    classes.push('is-active');
+                return {
+                    type: 'link',
+                    id: _this.getId(),
+                    text: label,
+                    counter: counter,
+                    payload: {
+                        facetId: facetId,
+                        source: 'input-link',
+                        value: value
+                    },
+                    icon: options.icon || null,
+                    classes: classes.join(' '),
+                    _meta: { facetId: facetId, value: value }
+                };
+            }));
+        };
+        /**
+         * @param {?} facetValue
+         * @return {?}
+         */
+        FacetInputLink.prototype.setActive = /**
+         * @param {?} facetValue
+         * @return {?}
+         */
+        function (facetValue) {
+            var _this = this;
+            this.output.forEach((/**
+             * @param {?} config
+             * @return {?}
+             */
+            function (config) {
+                /** @type {?} */
+                var classes = config.classes ? config.classes.split(' ') : [];
+                /** @type {?} */
+                var isActive = _this._isActive(facetValue, config._meta.value);
+                if (!isActive) {
+                    classes = classes.filter((/**
+                     * @param {?} className
+                     * @return {?}
+                     */
+                    function (className) { return className !== 'is-active'; }));
+                }
+                else if (classes.indexOf('is-active') === -1) {
+                    classes.push('is-active');
+                }
+                config.classes = classes.join(' ');
+            }));
+        };
+        /**
+         * @private
+         * @param {?} facetValue
+         * @param {?} value
+         * @return {?}
+         */
+        FacetInputLink.prototype._isActive = /**
+         * @private
+         * @param {?} facetValue
+         * @param {?} value
+         * @return {?}
+         */
+        function (facetValue, value) {
+            this.facetValue = facetValue;
+            return ((Array.isArray(facetValue) && facetValue.indexOf(value) !== -1) ||
+                (facetValue === value));
+        };
+        return FacetInputLink;
+    }(FacetInput));
+    if (false) {
+        /**
+         * @type {?}
+         * @private
+         */
+        FacetInputLink.prototype.facetValue;
+    }
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var FacetInputSelect = /** @class */ (function (_super) {
+        __extends(FacetInputSelect, _super);
+        function FacetInputSelect() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @protected
+         * @return {?}
+         */
+        FacetInputSelect.prototype.transform = /**
+         * @protected
+         * @return {?}
+         */
+        function () {
+            /** @type {?} */
+            var facetId = this.getFacetId();
+            return {
+                type: 'select',
+                id: this.getId(),
+                label: this.config.label,
+                disabled: this.config.disabled,
+                options: this.data.map((/**
+                 * @param {?} __0
+                 * @return {?}
+                 */
+                function (_a) {
+                    var value = _a.value, label = _a.label;
+                    return ({
+                        // normalize value
+                        value: '' + value,
+                        label: label
+                    });
+                })),
+                payload: {
+                    facetId: facetId,
+                    source: 'input-select',
+                },
+                _meta: { facetId: facetId }
+            };
+        };
+        /**
+         * @param {?} facetValue
+         * @return {?}
+         */
+        FacetInputSelect.prototype.setActive = /**
+         * @param {?} facetValue
+         * @return {?}
+         */
+        function (facetValue) {
+            this.output.options
+                .filter((/**
+             * @param {?} option
+             * @return {?}
+             */
+            function (option) { return option.value === facetValue; }))
+                .forEach((/**
+             * @param {?} option
+             * @return {?}
+             */
+            function (option) { return option.selected = true; }));
+        };
+        return FacetInputSelect;
+    }(FacetInput));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    /** @type {?} */
+    var INPUTS_MAP = {
+        'checkbox': FacetInputCheckbox,
+        'text': FacetInputText,
+        'link': FacetInputLink,
+        'select': FacetInputSelect,
+    };
+    /**
+     * @record
+     */
+    function ISearchConfig() { }
+    if (false) {
+        /** @type {?} */
+        ISearchConfig.prototype.totalCount;
+        /** @type {?} */
+        ISearchConfig.prototype.facets;
+        /** @type {?} */
+        ISearchConfig.prototype.page;
+        /** @type {?} */
+        ISearchConfig.prototype.results;
+        /** @type {?} */
+        ISearchConfig.prototype.fields;
+    }
+    /**
+     * @record
+     */
+    function IFacet() { }
+    if (false) {
+        /** @type {?} */
+        IFacet.prototype.id;
+        /** @type {?} */
+        IFacet.prototype.type;
+        /** @type {?} */
+        IFacet.prototype.operator;
+        /** @type {?|undefined} */
+        IFacet.prototype.data;
+    }
+    /**
+     * @record
+     */
+    function IFilter() { }
+    if (false) {
+        /** @type {?} */
+        IFilter.prototype.facetId;
+        /** @type {?} */
+        IFilter.prototype.value;
+        /** @type {?} */
+        IFilter.prototype.searchIn;
+        /** @type {?|undefined} */
+        IFilter.prototype.isArray;
+        /** @type {?|undefined} */
+        IFilter.prototype.context;
+        /** @type {?|undefined} */
+        IFilter.prototype.target;
+    }
+    var SearchModel = /** @class */ (function () {
+        function SearchModel(id, config) {
+            var _this = this;
+            this._filters = [];
+            this._facets = [];
+            this._inputs = [];
+            this._results$ = new rxjs.Subject();
+            this.getId = (/**
+             * @return {?}
+             */
+            function () { return _this._id; });
+            this.getFilters = (/**
+             * @return {?}
+             */
+            function () { return _this._filters; });
+            this.getFacets = (/**
+             * @return {?}
+             */
+            function () { return _this._facets; });
+            this.getInputs = (/**
+             * @return {?}
+             */
+            function () { return _this._inputs; });
+            this.getConfig = (/**
+             * @return {?}
+             */
+            function () { return _this._config; });
+            this.getTotalCount = (/**
+             * @return {?}
+             */
+            function () { return _this._totalCount; });
+            this.getFields = (/**
+             * @return {?}
+             */
+            function () { return _this._config.fields; });
+            this.getResults$ = (/**
+             * @return {?}
+             */
+            function () { return _this._results$; });
+            this.setResults = (/**
+             * @param {?} results
+             * @return {?}
+             */
+            function (results) { return _this._results$.next(results); });
+            this._id = id;
+            this._config = config;
+            this._setFilters();
+            this._setFacets();
+            this._setPage();
+            this._setInputs();
+            this._setInputsData();
+            this._setTotalCount();
+        }
+        /**
+         * @param {?} facetId
+         * @param {?} value
+         * @param {?=} remove
+         * @return {?}
+         */
+        SearchModel.prototype.updateFilter = /**
+         * @param {?} facetId
+         * @param {?} value
+         * @param {?=} remove
+         * @return {?}
+         */
+        function (facetId, value, remove) {
+            /** @type {?} */
+            var selectedFilters = this.getFiltersByFacetId(facetId);
+            selectedFilters.forEach((/**
+             * @param {?} filter
+             * @return {?}
+             */
+            function (filter) {
+                if (Array.isArray(filter.value) && remove) {
+                    filter.value = filter.value.filter((/**
+                     * @param {?} item
+                     * @return {?}
+                     */
+                    function (item) { return item !== value; }));
+                }
+                else if (Array.isArray(filter.value) && filter.value.indexOf(value) === -1) {
+                    filter.value.push(value);
+                }
+                else {
+                    filter.value = !remove ? value : null;
+                }
+            }));
+        };
+        /**
+         * @param {?} queryParams
+         * @return {?}
+         */
+        SearchModel.prototype.updateFiltersFromQueryParams = /**
+         * @param {?} queryParams
+         * @return {?}
+         */
+        function (queryParams) {
+            var _this = this;
+            Object.keys(queryParams).forEach((/**
+             * @param {?} facetId
+             * @return {?}
+             */
+            function (facetId) {
+                /** @type {?} */
+                var selectedFilters = _this.getFiltersByFacetId(facetId);
+                /** @type {?} */
+                var value = queryParams[facetId];
+                selectedFilters.forEach((/**
+                 * @param {?} filter
+                 * @return {?}
+                 */
+                function (filter) {
+                    filter.value = filter.isArray ? value.split(',') : value;
+                }));
+            }));
+        };
+        /**
+         * @return {?}
+         */
+        SearchModel.prototype.updateInputsFromFilters = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this._filters.forEach((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var facetId = _a.facetId, value = _a.value;
+                _this.getInputByFacetId(facetId).setActive(value);
+            }));
+        };
+        /**
+         * @param {?} facets
+         * @return {?}
+         */
+        SearchModel.prototype.updateFacets = /**
+         * @param {?} facets
+         * @return {?}
+         */
+        function (facets) {
+            var _this = this;
+            facets.forEach((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var id = _a.id, data = _a.data;
+                return _this.updateFacet(id, data);
+            }));
+            this._setInputsData();
+        };
+        /**
+         * @param {?} totalCount
+         * @return {?}
+         */
+        SearchModel.prototype.updateTotalCount = /**
+         * @param {?} totalCount
+         * @return {?}
+         */
+        function (totalCount) {
+            this._totalCount = totalCount;
+        };
+        /**
+         * @param {?} facetId
+         * @param {?} data
+         * @return {?}
+         */
+        SearchModel.prototype.updateFacet = /**
+         * @param {?} facetId
+         * @param {?} data
+         * @return {?}
+         */
+        function (facetId, data) {
+            /** @type {?} */
+            var selectedFacets = this._facets.filter((/**
+             * @param {?} facet
+             * @return {?}
+             */
+            function (facet) { return facet.id === facetId; }));
+            if (!selectedFacets.length) {
+                throw Error("Facet with id \"" + facetId + "\" does not exists");
+            }
+            selectedFacets.forEach((/**
+             * @param {?} facet
+             * @return {?}
+             */
+            function (facet) { return facet.data = data; }));
+        };
+        /**
+         * @return {?}
+         */
+        SearchModel.prototype.reset = /**
+         * @return {?}
+         */
+        function () {
+            this._filters.forEach((/**
+             * @param {?} filter
+             * @return {?}
+             */
+            function (filter) { return filter.value = null; }));
+        };
+        /**
+         * @return {?}
+         */
+        SearchModel.prototype.getRequestParams = /**
+         * @return {?}
+         */
+        function () {
+            return {
+                facets: this._facets,
+                page: this._page,
+                results: this._config.results,
+                filters: this._filters
+                    .filter((/**
+                 * @param {?} filter
+                 * @return {?}
+                 */
+                function (filter) { return filter.context !== 'internal'; }))
+                    .map((/**
+                 * @param {?} __0
+                 * @return {?}
+                 */
+                function (_a) {
+                    var facetId = _a.facetId, value = _a.value, searchIn = _a.searchIn;
+                    return ({ facetId: facetId, value: value, searchIn: searchIn });
+                }))
+            };
+        };
+        /**
+         * @return {?}
+         */
+        SearchModel.prototype.getInternalFilters = /**
+         * @return {?}
+         */
+        function () {
+            return this._filters
+                .filter((/**
+             * @param {?} filter
+             * @return {?}
+             */
+            function (filter) {
+                return (filter.context === 'internal') && ((Array.isArray(filter.value) && filter.value.length) ||
+                    (!Array.isArray(filter.value) && filter.value));
+            }))
+                .map((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var facetId = _a.facetId, value = _a.value, searchIn = _a.searchIn;
+                return ({ facetId: facetId, value: value, searchIn: searchIn });
+            }));
+        };
+        /**
+         * @param {?} filters
+         * @return {?}
+         */
+        SearchModel.prototype.filtersAsQueryParams = /**
+         * @param {?} filters
+         * @return {?}
+         */
+        function (filters) {
+            /** @type {?} */
+            var queryParams = {};
+            filters.forEach((/**
+             * @param {?} filter
+             * @return {?}
+             */
+            function (filter) { return queryParams[filter.facetId] = Array.isArray(filter.value) ? filter.value.join(',') : filter.value; }));
+            return queryParams;
+        };
+        /**
+         * @param {?} facetId
+         * @return {?}
+         */
+        SearchModel.prototype.getFiltersByFacetId = /**
+         * @param {?} facetId
+         * @return {?}
+         */
+        function (facetId) {
+            return this._filters.filter((/**
+             * @param {?} filter
+             * @return {?}
+             */
+            function (filter) { return filter.facetId === facetId; }));
+        };
+        /**
+         * @param {?} facetId
+         * @return {?}
+         */
+        SearchModel.prototype.getInputByFacetId = /**
+         * @param {?} facetId
+         * @return {?}
+         */
+        function (facetId) {
+            return this._inputs.filter((/**
+             * @param {?} input
+             * @return {?}
+             */
+            function (input) { return input.getFacetId() === facetId; }))[0];
+        };
+        /**
+         * @param {?} facetId
+         * @param {?} data
+         * @return {?}
+         */
+        SearchModel.prototype.setInputData = /**
+         * @param {?} facetId
+         * @param {?} data
+         * @return {?}
+         */
+        function (facetId, data) {
+            this.getInputByFacetId(facetId).setData(data);
+        };
+        /**
+         * @param {?} target
+         * @return {?}
+         */
+        SearchModel.prototype.filterTarget = /**
+         * @param {?} target
+         * @return {?}
+         */
+        function (target) {
+            var _this = this;
+            /** @type {?} */
+            var inputs = this._inputs.filter((/**
+             * @param {?} input
+             * @return {?}
+             */
+            function (input) { return input.getTarget() === target; }));
+            /** @type {?} */
+            var targetInput = this.getInputByFacetId(target);
+            /** @type {?} */
+            var facet = this._facets.filter((/**
+             * @param {?} facet
+             * @return {?}
+             */
+            function (facet) { return facet.id === target; }))[0];
+            /** @type {?} */
+            var facetData = facet.data;
+            /** @type {?} */
+            var searchIns = [];
+            inputs.forEach((/**
+             * @param {?} input
+             * @return {?}
+             */
+            function (input) {
+                /** @type {?} */
+                var filter = _this.getFiltersByFacetId(input.getFacetId())[0];
+                /** @type {?} */
+                var searchIn = input.getSearchIn();
+                /** @type {?} */
+                var value = filter.value;
+                searchIns.push([searchIn, value]);
+            }));
+            // filter
+            facetData.forEach((/**
+             * @param {?} item
+             * @return {?}
+             */
+            function (item) { return _this._filterData(searchIns, item); }));
+            // update
+            targetInput.setData(facetData);
+            targetInput.update();
+        };
+        /**
+         * @param {?} orderBy
+         * @return {?}
+         */
+        SearchModel.prototype.setSearchConfigOrderBy = /**
+         * @param {?} orderBy
+         * @return {?}
+         */
+        function (orderBy) {
+            this._config.results.order.type = orderBy;
+        };
+        /**
+         * @param {?} direction
+         * @return {?}
+         */
+        SearchModel.prototype.setSearchConfigDirection = /**
+         * @param {?} direction
+         * @return {?}
+         */
+        function (direction) {
+            this._config.results.order.direction = direction;
+        };
+        /**
+         * @param {?} offset
+         * @return {?}
+         */
+        SearchModel.prototype.setPageConfigOffset = /**
+         * @param {?} offset
+         * @return {?}
+         */
+        function (offset) {
+            this._config.page.offset = offset;
+        };
+        /**
+         * @param {?} limit
+         * @return {?}
+         */
+        SearchModel.prototype.setPageConfigLimit = /**
+         * @param {?} limit
+         * @return {?}
+         */
+        function (limit) {
+            this._config.page.limit = limit;
+        };
+        /**
+         * @private
+         * @param {?} searchIns
+         * @param {?} item
+         * @return {?}
+         */
+        SearchModel.prototype._filterData = /**
+         * @private
+         * @param {?} searchIns
+         * @param {?} item
+         * @return {?}
+         */
+        function (searchIns, item) {
+            searchIns.forEach((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var _b = __read(_a, 2), searchIn = _b[0], value = _b[1];
+                searchIn.forEach((/**
+                 * @param {?} __0
+                 * @return {?}
+                 */
+                function (_a) {
+                    var key = _a.key, operator = _a.operator;
+                    switch (operator) {
+                        // '=' EQUALS
+                        case '=':
+                            if (Array.isArray(value)) {
+                                item.hidden = !(!value.length || value.indexOf(item.metadata[key]) !== -1);
+                            }
+                            else {
+                                item.hidden = !(value && value === item.metadata[key]);
+                            }
+                            break;
+                        // '>' GREATER THAN
+                        case '>':
+                            if (!Array.isArray(value)) {
+                                item.hidden = !(value && value > item.metadata[key]);
+                            }
+                            break;
+                        // '<' LESS THAN
+                        case '<':
+                            if (!Array.isArray(value)) {
+                                item.hidden = !(value && value < item.metadata[key]);
+                            }
+                            break;
+                        // '>=' GREATER OR EQUALS
+                        case '>=':
+                            if (!Array.isArray(value)) {
+                                item.hidden = !(value && value >= item.metadata[key]);
+                            }
+                            break;
+                        // '<=' LESS OR EQUALS
+                        case '<=':
+                            if (!Array.isArray(value)) {
+                                item.hidden = !(value && value <= item.metadata[key]);
+                            }
+                            break;
+                        // '<>' NOT EQUAL
+                        case '<>':
+                            if (!Array.isArray(value)) {
+                                item.hidden = !(value && value !== item.metadata[key]);
+                            }
+                            break;
+                        //  'LIKE'
+                        case 'LIKE':
+                            if (value &&
+                                item.metadata[key] &&
+                                typeof value === 'string' &&
+                                typeof item.metadata[key] === 'string') {
+                                /** @type {?} */
+                                var haystack = item.metadata[key].toLowerCase();
+                                /** @type {?} */
+                                var needle = value.toLocaleLowerCase();
+                                item.hidden = !(haystack.indexOf(needle) !== -1);
+                            }
+                            break;
+                        default:
+                            console.warn("SearchIn: operator " + operator + " not supported");
+                            break;
+                    }
+                }));
+            }));
+        };
+        /**
+         * @private
+         * @return {?}
+         */
+        SearchModel.prototype._setFilters = /**
+         * @private
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this._config.fields.forEach((/**
+             * @param {?} field
+             * @return {?}
+             */
+            function (field) {
+                field.inputs.forEach((/**
+                 * @param {?} input
+                 * @return {?}
+                 */
+                function (input) { return _this._filters.push(__assign({}, input.filterConfig, { facetId: input.facetId, value: input.filterConfig.isArray ? [] : null })); }));
+            }));
+        };
+        /**
+         * @private
+         * @return {?}
+         */
+        SearchModel.prototype._setFacets = /**
+         * @private
+         * @return {?}
+         */
+        function () {
+            this._facets = this._config.facets;
+        };
+        /**
+         * @private
+         * @return {?}
+         */
+        SearchModel.prototype._setPage = /**
+         * @private
+         * @return {?}
+         */
+        function () {
+            this._page = this._config.page;
+        };
+        /**
+         * @private
+         * @return {?}
+         */
+        SearchModel.prototype._setTotalCount = /**
+         * @private
+         * @return {?}
+         */
+        function () {
+            this._totalCount = this._config.totalCount;
+        };
+        /**
+         * @private
+         * @return {?}
+         */
+        SearchModel.prototype._setInputs = /**
+         * @private
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this._config.fields.forEach((/**
+             * @param {?} sectionConfig
+             * @param {?} sectionIndex
+             * @return {?}
+             */
+            function (sectionConfig, sectionIndex) {
+                sectionConfig.inputs.forEach((/**
+                 * @param {?} inputConfig
+                 * @param {?} inputIndex
+                 * @return {?}
+                 */
+                function (inputConfig, inputIndex) {
+                    /** @type {?} */
+                    var inputModel = INPUTS_MAP[inputConfig.type];
+                    if (!inputModel)
+                        throw Error("Input type " + inputConfig.type + " not supported");
+                    _this._inputs.push(new inputModel(__assign({}, inputConfig, { inputIndex: inputIndex, sectionIndex: sectionIndex })));
+                }));
+            }));
+        };
+        /**
+         * @private
+         * @return {?}
+         */
+        SearchModel.prototype._setInputsData = /**
+         * @private
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this._facets.forEach((/**
+             * @param {?} facet
+             * @return {?}
+             */
+            function (facet) { return _this.setInputData(facet.id, facet.data); }));
+        };
+        return SearchModel;
+    }());
+    if (false) {
+        /**
+         * @type {?}
+         * @private
+         */
+        SearchModel.prototype._id;
+        /**
+         * @type {?}
+         * @private
+         */
+        SearchModel.prototype._filters;
+        /**
+         * @type {?}
+         * @private
+         */
+        SearchModel.prototype._facets;
+        /**
+         * @type {?}
+         * @private
+         */
+        SearchModel.prototype._inputs;
+        /**
+         * @type {?}
+         * @private
+         */
+        SearchModel.prototype._page;
+        /**
+         * @type {?}
+         * @private
+         */
+        SearchModel.prototype._totalCount;
+        /**
+         * @type {?}
+         * @private
+         */
+        SearchModel.prototype._config;
+        /**
+         * @type {?}
+         * @private
+         */
+        SearchModel.prototype._results$;
+        /** @type {?} */
+        SearchModel.prototype.getId;
+        /** @type {?} */
+        SearchModel.prototype.getFilters;
+        /** @type {?} */
+        SearchModel.prototype.getFacets;
+        /** @type {?} */
+        SearchModel.prototype.getInputs;
+        /** @type {?} */
+        SearchModel.prototype.getConfig;
+        /** @type {?} */
+        SearchModel.prototype.getTotalCount;
+        /** @type {?} */
+        SearchModel.prototype.getFields;
+        /** @type {?} */
+        SearchModel.prototype.getResults$;
+        /** @type {?} */
+        SearchModel.prototype.setResults;
+    }
+    var SearchService = /** @class */ (function () {
+        function SearchService() {
+            this._models = {};
+        }
+        /**
+         * @param {?} id
+         * @param {?} config
+         * @return {?}
+         */
+        SearchService.prototype.add = /**
+         * @param {?} id
+         * @param {?} config
+         * @return {?}
+         */
+        function (id, config) {
+            if (this._models[id])
+                throw Error("Search model \"" + id + "\" already exists!");
+            this._models[id] = new SearchModel(id, config);
+        };
+        /**
+         * @param {?} id
+         * @return {?}
+         */
+        SearchService.prototype.model = /**
+         * @param {?} id
+         * @return {?}
+         */
+        function (id) {
+            return this._models[id] || null;
+        };
+        SearchService.queryParams = null;
+        SearchService.decorators = [
+            { type: core.Injectable, args: [{
+                        providedIn: 'root'
+                    },] }
+        ];
+        /** @nocollapse */ SearchService.ngInjectableDef = core.ɵɵdefineInjectable({ factory: function SearchService_Factory() { return new SearchService(); }, token: SearchService, providedIn: "root" });
+        return SearchService;
+    }());
+    if (false) {
+        /** @type {?} */
+        SearchService.queryParams;
+        /**
+         * @type {?}
+         * @private
+         */
+        SearchService.prototype._models;
+    }
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
     var MainLayoutEH = /** @class */ (function (_super) {
         __extends(MainLayoutEH, _super);
         function MainLayoutEH() {
@@ -1138,13 +2488,9 @@
              * @return {?}
              */
             function (params) {
-                // setTimeout for fixing route event timings
-                setTimeout((/**
-                 * @return {?}
-                 */
-                function () {
-                    _this.emitGlobal('queryparams', params);
-                }));
+                _this.emitGlobal('queryparams', params);
+                // to use in searchs
+                SearchService.queryParams = params;
             }));
         };
         return MainLayoutEH;
@@ -1388,14 +2734,15 @@
          */
         function (data) {
             var _this = this;
-            /** @type {?} */
-            var groups = [];
-            if (!this.searchModel)
+            if (!this.searchModel) {
                 this.searchModel = data.searchModel;
+            }
             /** @type {?} */
             var id = this.searchModel.getId();
             /** @type {?} */
             var fields = this.searchModel.getFields();
+            /** @type {?} */
+            var groups = [];
             fields.forEach((/**
              * @param {?} fieldConfig
              * @param {?} fieldIndex
@@ -1452,6 +2799,13 @@
                     }
                 });
             }));
+            // query params control
+            if (SearchService.queryParams) {
+                this.searchModel.updateFiltersFromQueryParams(SearchService.queryParams);
+                this.searchModel.updateInputsFromFilters();
+                // reset queryparams
+                SearchService.queryParams = null;
+            }
             return {
                 groups: groups,
                 classes: "n7-facets-wrapper__" + this.searchModel.getId()
@@ -1546,6 +2900,58 @@
                  */
                 function (section) {
                     if (section._meta.facetId === target) {
+                        /** @type {?} */
+                        var inputOutput = input.getOutput();
+                        section.inputs = Array.isArray(inputOutput) ? inputOutput : [inputOutput];
+                    }
+                }));
+            }));
+        };
+        /**
+         * @return {?}
+         */
+        FacetsWrapperDS.prototype.updateInputLinks = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            /** @type {?} */
+            var linksFacetIds = this.searchModel.getInputs()
+                .filter((/**
+             * @param {?} input
+             * @return {?}
+             */
+            function (input) { return input.getType() === 'link'; }))
+                .map((/**
+             * @param {?} input
+             * @return {?}
+             */
+            function (input) { return input.getFacetId(); }));
+            this.output.groups
+                .map((/**
+             * @param {?} group
+             * @return {?}
+             */
+            function (group) { return group.facet; }))
+                .map((/**
+             * @param {?} facet
+             * @return {?}
+             */
+            function (facet) { return facet.sections; }))
+                .map((/**
+             * @param {?} sections
+             * @return {?}
+             */
+            function (sections) {
+                sections.forEach((/**
+                 * @param {?} section
+                 * @return {?}
+                 */
+                function (section) {
+                    if (linksFacetIds.indexOf(section._meta.facetId) !== -1) {
+                        /** @type {?} */
+                        var input = _this.searchModel.getInputByFacetId(section._meta.facetId);
+                        input.update();
                         /** @type {?} */
                         var inputOutput = input.getOutput();
                         section.inputs = Array.isArray(inputOutput) ? inputOutput : [inputOutput];
@@ -1873,6 +3279,9 @@
                              * @return {?}
                              */
                             function (key) { return queryParams_1[key] = queryParams_1[key] || null; }));
+                            // signal
+                            _this.emitOuter('facetschange');
+                            // router signal
                             _this.emitGlobal('navigate', {
                                 handler: 'router',
                                 path: [],
@@ -1887,7 +3296,7 @@
                         break;
                 }
             }));
-            // listen to outer events
+            // listen to global events
             core$1.EventHandler.globalEvents$.subscribe((/**
              * @param {?} __0
              * @return {?}
@@ -1895,10 +3304,9 @@
             function (_a) {
                 var type = _a.type, payload = _a.payload;
                 switch (type) {
-                    case 'global.queryparams':
-                        if (!_this._facetsChanged) {
-                            _this.dataSource.updateFiltersFromQueryParams(payload);
-                            _this.dataSource.updateInputsFromFilters();
+                    case 'global.searchresponse':
+                        if (_this.dataSource.searchModel.getId() === payload) {
+                            _this.dataSource.updateInputLinks();
                         }
                         break;
                     default:
@@ -4461,6 +5869,65 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
+    var AwSearchLayoutTabsDS = /** @class */ (function (_super) {
+        __extends(AwSearchLayoutTabsDS, _super);
+        function AwSearchLayoutTabsDS() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.selected = 'list';
+            return _this;
+        }
+        /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        AwSearchLayoutTabsDS.prototype.transform = /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        function (data) {
+            return {
+                items: [{
+                        text: 'LISTA',
+                        payload: 'list',
+                        classes: this.selected === 'list' ? 'is-selected' : ''
+                    }, {
+                        text: 'GRAFICO',
+                        payload: 'chart',
+                        classes: this.selected === 'chart' ? 'is-selected' : ''
+                    }, {
+                        text: 'TIMELINE',
+                        payload: 'timeline',
+                        classes: this.selected === 'timeline' ? 'is-selected' : ''
+                    }]
+            };
+        };
+        /**
+         * @param {?} tabId
+         * @return {?}
+         */
+        AwSearchLayoutTabsDS.prototype.setSelected = /**
+         * @param {?} tabId
+         * @return {?}
+         */
+        function (tabId) {
+            this.selected = tabId;
+        };
+        return AwSearchLayoutTabsDS;
+    }(core$1.DataSource));
+    if (false) {
+        /**
+         * @type {?}
+         * @private
+         */
+        AwSearchLayoutTabsDS.prototype.selected;
+    }
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
 
     var DS$1 = /*#__PURE__*/Object.freeze({
         AwLinkedObjectsDS: AwLinkedObjectsDS,
@@ -4480,7 +5947,8 @@
         AwSchedaBreadcrumbsDS: AwSchedaBreadcrumbsDS,
         AwSchedaMetadataDS: AwSchedaMetadataDS,
         AwSchedaImageDS: AwSchedaImageDS,
-        AwSchedaInnerTitleDS: AwSchedaInnerTitleDS
+        AwSchedaInnerTitleDS: AwSchedaInnerTitleDS,
+        AwSearchLayoutTabsDS: AwSearchLayoutTabsDS
     });
 
     /**
@@ -5132,6 +6600,27 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
+    var AwSearchLayoutTabsEH = /** @class */ (function (_super) {
+        __extends(AwSearchLayoutTabsEH, _super);
+        function AwSearchLayoutTabsEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        AwSearchLayoutTabsEH.prototype.listen = /**
+         * @return {?}
+         */
+        function () {
+            // TODO
+        };
+        return AwSearchLayoutTabsEH;
+    }(core$1.EventHandler));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
     var AwTableEH = /** @class */ (function (_super) {
         __extends(AwTableEH, _super);
         function AwTableEH() {
@@ -5176,6 +6665,7 @@
         AwSchedaSidebarEH: AwSchedaSidebarEH,
         AwSidebarHeaderEH: AwSidebarHeaderEH,
         AwTreeEH: AwTreeEH,
+        AwSearchLayoutTabsEH: AwSearchLayoutTabsEH,
         AwTableEH: AwTableEH
     });
 
@@ -5233,1233 +6723,6 @@
         AwAboutLayoutComponent.ctorParameters = function () { return []; };
         return AwAboutLayoutComponent;
     }(AbstractLayout));
-
-    /**
-     * @fileoverview added by tsickle
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-    var JsonConfigService = /** @class */ (function () {
-        function JsonConfigService(http, config) {
-            this.http = http;
-            this.config = config;
-        }
-        /**
-         * @param {?} path
-         * @return {?}
-         */
-        JsonConfigService.prototype.load = /**
-         * @param {?} path
-         * @return {?}
-         */
-        function (path) {
-            var _this = this;
-            return this.http.get(path).pipe(operators.catchError((/**
-             * @param {?} error
-             * @return {?}
-             */
-            function (error) { return rxjs.of({}); })), operators.tap((/**
-             * @param {?} response
-             * @return {?}
-             */
-            function (response) { return _this._handleResponse(response); }))).toPromise();
-        };
-        /**
-         * @private
-         * @param {?} response
-         * @return {?}
-         */
-        JsonConfigService.prototype._handleResponse = /**
-         * @private
-         * @param {?} response
-         * @return {?}
-         */
-        function (response) {
-            var _this = this;
-            if (response) {
-                Object.keys(response).forEach((/**
-                 * @param {?} key
-                 * @return {?}
-                 */
-                function (key) { return _this.config.set(key, response[key]); }));
-                // config keys colors
-                if (response['config-keys']) {
-                    /** @type {?} */
-                    var headTag = document.querySelector('head');
-                    /** @type {?} */
-                    var styleElement = document.createElement('style');
-                    /** @type {?} */
-                    var styles_1 = [];
-                    Object.keys(response['config-keys']).forEach((/**
-                     * @param {?} key
-                     * @return {?}
-                     */
-                    function (key) {
-                        /** @type {?} */
-                        var configKey = response['config-keys'][key] || {};
-                        if (configKey.color && configKey.color.hex) {
-                            // add css class
-                            styles_1.push("--color-" + key + ": " + configKey.color.hex + ";");
-                        }
-                    }));
-                    if (styles_1.length) {
-                        styles_1.unshift(':root {');
-                        styles_1.push('}');
-                        styleElement.appendChild(document.createTextNode(styles_1.join('\n')));
-                        headTag.appendChild(styleElement);
-                    }
-                }
-            }
-        };
-        JsonConfigService.decorators = [
-            { type: core.Injectable, args: [{
-                        providedIn: 'root'
-                    },] }
-        ];
-        /** @nocollapse */
-        JsonConfigService.ctorParameters = function () { return [
-            { type: http.HttpClient },
-            { type: ConfigurationService }
-        ]; };
-        /** @nocollapse */ JsonConfigService.ngInjectableDef = core.ɵɵdefineInjectable({ factory: function JsonConfigService_Factory() { return new JsonConfigService(core.ɵɵinject(http.HttpClient), core.ɵɵinject(ConfigurationService)); }, token: JsonConfigService, providedIn: "root" });
-        return JsonConfigService;
-    }());
-    if (false) {
-        /**
-         * @type {?}
-         * @private
-         */
-        JsonConfigService.prototype.http;
-        /**
-         * @type {?}
-         * @private
-         */
-        JsonConfigService.prototype.config;
-    }
-
-    /**
-     * @fileoverview added by tsickle
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-    /**
-     * @record
-     */
-    function IFacetInputData() { }
-    if (false) {
-        /** @type {?} */
-        IFacetInputData.prototype.value;
-        /** @type {?} */
-        IFacetInputData.prototype.label;
-        /** @type {?} */
-        IFacetInputData.prototype.counter;
-        /** @type {?|undefined} */
-        IFacetInputData.prototype.hidden;
-        /** @type {?|undefined} */
-        IFacetInputData.prototype.options;
-    }
-    /**
-     * @abstract
-     */
-    var FacetInput = /** @class */ (function () {
-        function FacetInput(config) {
-            var _this = this;
-            this.update = (/**
-             * @return {?}
-             */
-            function () { return _this.output = _this.transform(); });
-            this.getId = (/**
-             * @return {?}
-             */
-            function () { return _this.id; });
-            this.getData = (/**
-             * @return {?}
-             */
-            function () { return _this.data; });
-            this.getConfig = (/**
-             * @return {?}
-             */
-            function () { return _this.config; });
-            this.getFacetId = (/**
-             * @return {?}
-             */
-            function () { return _this.config.facetId; });
-            this.getInputIndex = (/**
-             * @return {?}
-             */
-            function () { return _this.config.inputIndex; });
-            this.getSectionIndex = (/**
-             * @return {?}
-             */
-            function () { return _this.config.sectionIndex; });
-            this.getContext = (/**
-             * @return {?}
-             */
-            function () { return _this.config.filterConfig.context || 'external'; });
-            this.getTarget = (/**
-             * @return {?}
-             */
-            function () { return _this.config.filterConfig.target || null; });
-            this.getSearchIn = (/**
-             * @return {?}
-             */
-            function () { return _this.config.filterConfig.searchIn || null; });
-            this.getType = (/**
-             * @return {?}
-             */
-            function () { return _this.config.type; });
-            this.getOutput = (/**
-             * @return {?}
-             */
-            function () { return _this.output; });
-            this.setData = (/**
-             * @param {?} newData
-             * @return {?}
-             */
-            function (newData) { return _this.data = newData; });
-            this.config = config;
-            this._setId();
-            FacetInput.index++;
-        }
-        /**
-         * @private
-         * @return {?}
-         */
-        FacetInput.prototype._setId = /**
-         * @private
-         * @return {?}
-         */
-        function () {
-            this.id = "facet-input-" + this.getType() + "-" + FacetInput.index;
-        };
-        ;
-        FacetInput.index = 0;
-        return FacetInput;
-    }());
-    if (false) {
-        /** @type {?} */
-        FacetInput.index;
-        /**
-         * @type {?}
-         * @private
-         */
-        FacetInput.prototype.id;
-        /**
-         * @type {?}
-         * @protected
-         */
-        FacetInput.prototype.config;
-        /**
-         * @type {?}
-         * @protected
-         */
-        FacetInput.prototype.output;
-        /**
-         * @type {?}
-         * @protected
-         */
-        FacetInput.prototype.data;
-        /** @type {?} */
-        FacetInput.prototype.update;
-        /** @type {?} */
-        FacetInput.prototype.getId;
-        /** @type {?} */
-        FacetInput.prototype.getData;
-        /** @type {?} */
-        FacetInput.prototype.getConfig;
-        /** @type {?} */
-        FacetInput.prototype.getFacetId;
-        /** @type {?} */
-        FacetInput.prototype.getInputIndex;
-        /** @type {?} */
-        FacetInput.prototype.getSectionIndex;
-        /** @type {?} */
-        FacetInput.prototype.getContext;
-        /** @type {?} */
-        FacetInput.prototype.getTarget;
-        /** @type {?} */
-        FacetInput.prototype.getSearchIn;
-        /** @type {?} */
-        FacetInput.prototype.getType;
-        /** @type {?} */
-        FacetInput.prototype.getOutput;
-        /** @type {?} */
-        FacetInput.prototype.setData;
-        /* Skipping unhandled member: ;*/
-        /**
-         * @abstract
-         * @param {?} facetValue
-         * @return {?}
-         */
-        FacetInput.prototype.setActive = function (facetValue) { };
-        /**
-         * @abstract
-         * @protected
-         * @return {?}
-         */
-        FacetInput.prototype.transform = function () { };
-    }
-
-    /**
-     * @fileoverview added by tsickle
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-    var FacetInputCheckbox = /** @class */ (function (_super) {
-        __extends(FacetInputCheckbox, _super);
-        function FacetInputCheckbox() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        /**
-         * @protected
-         * @return {?}
-         */
-        FacetInputCheckbox.prototype.transform = /**
-         * @protected
-         * @return {?}
-         */
-        function () {
-            var _this = this;
-            /** @type {?} */
-            var facetId = this.getFacetId();
-            return this.data.map((/**
-             * @param {?} __0
-             * @param {?} index
-             * @return {?}
-             */
-            function (_a, index) {
-                var label = _a.label, value = _a.value;
-                // normalize value
-                value = '' + value;
-                return {
-                    type: 'checkbox',
-                    id: _this.getId() + '-' + index,
-                    label: label,
-                    payload: {
-                        facetId: facetId,
-                        source: 'input-checkbox',
-                        value: value
-                    },
-                    _meta: { facetId: facetId, value: value }
-                };
-            }));
-        };
-        /**
-         * @param {?} facetValue
-         * @return {?}
-         */
-        FacetInputCheckbox.prototype.setActive = /**
-         * @param {?} facetValue
-         * @return {?}
-         */
-        function (facetValue) {
-            var isArray = this.config.filterConfig.isArray;
-            this.output.forEach((/**
-             * @param {?} config
-             * @return {?}
-             */
-            function (config) {
-                if (isArray && Array.isArray(facetValue) && facetValue.indexOf(config._meta.value) !== -1) {
-                    config.checked = true;
-                }
-                else if (facetValue === config._meta.value) {
-                    config.checked = true;
-                }
-                else {
-                    config.checked = false;
-                }
-            }));
-        };
-        return FacetInputCheckbox;
-    }(FacetInput));
-
-    /**
-     * @fileoverview added by tsickle
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-    var FacetInputText = /** @class */ (function (_super) {
-        __extends(FacetInputText, _super);
-        function FacetInputText() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        /**
-         * @protected
-         * @return {?}
-         */
-        FacetInputText.prototype.transform = /**
-         * @protected
-         * @return {?}
-         */
-        function () {
-            /** @type {?} */
-            var facetId = this.getFacetId();
-            /** @type {?} */
-            var payload = {
-                facetId: facetId,
-                source: 'input-text'
-            };
-            return {
-                type: 'text',
-                id: this.getId(),
-                label: this.config.label,
-                disabled: this.config.disabled,
-                placeholder: this.config.placeholder,
-                icon: this.config.icon,
-                inputPayload: __assign({}, payload, { trigger: 'input' }),
-                enterPayload: __assign({}, payload, { trigger: 'enter' }),
-                iconPayload: __assign({}, payload, { trigger: 'icon' }),
-                _meta: { facetId: facetId }
-            };
-        };
-        /**
-         * @param {?} facetValue
-         * @return {?}
-         */
-        FacetInputText.prototype.setActive = /**
-         * @param {?} facetValue
-         * @return {?}
-         */
-        function (facetValue) {
-            this.output.value = facetValue || null;
-        };
-        return FacetInputText;
-    }(FacetInput));
-
-    /**
-     * @fileoverview added by tsickle
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-    var FacetInputLink = /** @class */ (function (_super) {
-        __extends(FacetInputLink, _super);
-        function FacetInputLink() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        /**
-         * @protected
-         * @return {?}
-         */
-        FacetInputLink.prototype.transform = /**
-         * @protected
-         * @return {?}
-         */
-        function () {
-            var _this = this;
-            /** @type {?} */
-            var facetId = this.getFacetId();
-            return this.data.map((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            function (_a) {
-                var label = _a.label, value = _a.value, counter = _a.counter, hidden = _a.hidden;
-                // normalize value
-                value = '' + value;
-                return {
-                    type: 'link',
-                    id: _this.getId(),
-                    text: label,
-                    counter: counter,
-                    payload: {
-                        facetId: facetId,
-                        source: 'input-link',
-                        value: value
-                    },
-                    classes: hidden ? 'is-hidden' : '',
-                    _meta: { facetId: facetId, value: value }
-                };
-            }));
-        };
-        /**
-         * @param {?} facetValue
-         * @return {?}
-         */
-        FacetInputLink.prototype.setActive = /**
-         * @param {?} facetValue
-         * @return {?}
-         */
-        function (facetValue) {
-            var isArray = this.config.filterConfig.isArray;
-            this.output.forEach((/**
-             * @param {?} config
-             * @return {?}
-             */
-            function (config) {
-                if (isArray && Array.isArray(facetValue) && facetValue.indexOf(config._meta.value) !== -1) {
-                    config.classes = 'is-active';
-                }
-                else if (facetValue === config._meta.value) {
-                    config.classes = 'is-active';
-                }
-                else {
-                    config.classes = null;
-                }
-            }));
-        };
-        return FacetInputLink;
-    }(FacetInput));
-
-    /**
-     * @fileoverview added by tsickle
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-    var FacetInputSelect = /** @class */ (function (_super) {
-        __extends(FacetInputSelect, _super);
-        function FacetInputSelect() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        /**
-         * @protected
-         * @return {?}
-         */
-        FacetInputSelect.prototype.transform = /**
-         * @protected
-         * @return {?}
-         */
-        function () {
-            /** @type {?} */
-            var facetId = this.getFacetId();
-            return {
-                type: 'select',
-                id: this.getId(),
-                label: this.config.label,
-                disabled: this.config.disabled,
-                options: this.data.map((/**
-                 * @param {?} __0
-                 * @return {?}
-                 */
-                function (_a) {
-                    var value = _a.value, label = _a.label;
-                    return ({
-                        // normalize value
-                        value: '' + value,
-                        label: label
-                    });
-                })),
-                payload: {
-                    facetId: facetId,
-                    source: 'input-select',
-                },
-                _meta: { facetId: facetId }
-            };
-        };
-        /**
-         * @param {?} facetValue
-         * @return {?}
-         */
-        FacetInputSelect.prototype.setActive = /**
-         * @param {?} facetValue
-         * @return {?}
-         */
-        function (facetValue) {
-            this.output.options
-                .filter((/**
-             * @param {?} option
-             * @return {?}
-             */
-            function (option) { return option.value === facetValue; }))
-                .forEach((/**
-             * @param {?} option
-             * @return {?}
-             */
-            function (option) { return option.selected = true; }));
-        };
-        return FacetInputSelect;
-    }(FacetInput));
-
-    /**
-     * @fileoverview added by tsickle
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-
-    /**
-     * @fileoverview added by tsickle
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-    /** @type {?} */
-    var INPUTS_MAP = {
-        'checkbox': FacetInputCheckbox,
-        'text': FacetInputText,
-        'link': FacetInputLink,
-        'select': FacetInputSelect,
-    };
-    /**
-     * @record
-     */
-    function ISearchConfig() { }
-    if (false) {
-        /** @type {?} */
-        ISearchConfig.prototype.facets;
-        /** @type {?} */
-        ISearchConfig.prototype.page;
-        /** @type {?} */
-        ISearchConfig.prototype.results;
-        /** @type {?} */
-        ISearchConfig.prototype.fields;
-        /** @type {?} */
-        ISearchConfig.prototype.baseUrl;
-    }
-    /**
-     * @record
-     */
-    function IFacet() { }
-    if (false) {
-        /** @type {?} */
-        IFacet.prototype.id;
-        /** @type {?} */
-        IFacet.prototype.type;
-        /** @type {?} */
-        IFacet.prototype.operator;
-        /** @type {?|undefined} */
-        IFacet.prototype.data;
-    }
-    /**
-     * @record
-     */
-    function IFilter() { }
-    if (false) {
-        /** @type {?} */
-        IFilter.prototype.facetId;
-        /** @type {?} */
-        IFilter.prototype.value;
-        /** @type {?} */
-        IFilter.prototype.searchIn;
-        /** @type {?|undefined} */
-        IFilter.prototype.isArray;
-        /** @type {?|undefined} */
-        IFilter.prototype.context;
-        /** @type {?|undefined} */
-        IFilter.prototype.target;
-    }
-    var SearchModel = /** @class */ (function () {
-        function SearchModel(id, config) {
-            var _this = this;
-            this._filters = [];
-            this._facets = [];
-            this._inputs = [];
-            this._results$ = new rxjs.Subject();
-            this.getId = (/**
-             * @return {?}
-             */
-            function () { return _this._id; });
-            this.getFilters = (/**
-             * @return {?}
-             */
-            function () { return _this._filters; });
-            this.getFacets = (/**
-             * @return {?}
-             */
-            function () { return _this._facets; });
-            this.getInputs = (/**
-             * @return {?}
-             */
-            function () { return _this._inputs; });
-            this.getConfig = (/**
-             * @return {?}
-             */
-            function () { return _this._config; });
-            this.getFields = (/**
-             * @return {?}
-             */
-            function () { return _this._config.fields; });
-            this.getResults$ = (/**
-             * @return {?}
-             */
-            function () { return _this._results$; });
-            this.setResults = (/**
-             * @param {?} results
-             * @return {?}
-             */
-            function (results) { return _this._results$.next(results); });
-            this._id = id;
-            this._config = config;
-            this._setFilters();
-            this._setFacets();
-            this._setPage();
-            this._setInputs();
-            this._setInputsData();
-        }
-        /**
-         * @param {?} facetId
-         * @param {?} value
-         * @param {?=} remove
-         * @return {?}
-         */
-        SearchModel.prototype.updateFilter = /**
-         * @param {?} facetId
-         * @param {?} value
-         * @param {?=} remove
-         * @return {?}
-         */
-        function (facetId, value, remove) {
-            /** @type {?} */
-            var selectedFilters = this.getFiltersByFacetId(facetId);
-            selectedFilters.forEach((/**
-             * @param {?} filter
-             * @return {?}
-             */
-            function (filter) {
-                if (Array.isArray(filter.value) && remove) {
-                    filter.value = filter.value.filter((/**
-                     * @param {?} item
-                     * @return {?}
-                     */
-                    function (item) { return item !== value; }));
-                }
-                else if (Array.isArray(filter.value) && filter.value.indexOf(value) === -1) {
-                    filter.value.push(value);
-                }
-                else {
-                    filter.value = !remove ? value : null;
-                }
-            }));
-        };
-        /**
-         * @param {?} queryParams
-         * @return {?}
-         */
-        SearchModel.prototype.updateFiltersFromQueryParams = /**
-         * @param {?} queryParams
-         * @return {?}
-         */
-        function (queryParams) {
-            var _this = this;
-            Object.keys(queryParams).forEach((/**
-             * @param {?} facetId
-             * @return {?}
-             */
-            function (facetId) {
-                /** @type {?} */
-                var selectedFilters = _this.getFiltersByFacetId(facetId);
-                /** @type {?} */
-                var value = queryParams[facetId];
-                selectedFilters.forEach((/**
-                 * @param {?} filter
-                 * @return {?}
-                 */
-                function (filter) {
-                    filter.value = filter.isArray ? value.split(',') : value;
-                }));
-            }));
-        };
-        /**
-         * @return {?}
-         */
-        SearchModel.prototype.updateInputsFromFilters = /**
-         * @return {?}
-         */
-        function () {
-            var _this = this;
-            this._filters.forEach((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            function (_a) {
-                var facetId = _a.facetId, value = _a.value;
-                _this._inputs
-                    .filter((/**
-                 * @param {?} input
-                 * @return {?}
-                 */
-                function (input) { return input.getFacetId() === facetId; }))
-                    .forEach((/**
-                 * @param {?} input
-                 * @return {?}
-                 */
-                function (input) {
-                    input.setActive(value);
-                }));
-            }));
-        };
-        /**
-         * @param {?} facetId
-         * @param {?} data
-         * @return {?}
-         */
-        SearchModel.prototype.updateFacet = /**
-         * @param {?} facetId
-         * @param {?} data
-         * @return {?}
-         */
-        function (facetId, data) {
-            /** @type {?} */
-            var selectedFacets = this._facets.filter((/**
-             * @param {?} facet
-             * @return {?}
-             */
-            function (facet) { return facet.id === facetId; }));
-            if (!selectedFacets.length) {
-                throw Error("Facet with id \"" + facetId + "\" does not exists");
-            }
-            selectedFacets.forEach((/**
-             * @param {?} facet
-             * @return {?}
-             */
-            function (facet) { return facet.data = data; }));
-        };
-        /**
-         * @return {?}
-         */
-        SearchModel.prototype.reset = /**
-         * @return {?}
-         */
-        function () {
-            this._filters.forEach((/**
-             * @param {?} filter
-             * @return {?}
-             */
-            function (filter) { return filter.value = null; }));
-        };
-        /**
-         * @return {?}
-         */
-        SearchModel.prototype.getRequestParams = /**
-         * @return {?}
-         */
-        function () {
-            return {
-                facets: this._facets,
-                page: this._page,
-                results: this._config.results,
-                filters: this._filters
-                    .filter((/**
-                 * @param {?} filter
-                 * @return {?}
-                 */
-                function (filter) { return filter.context !== 'internal'; }))
-                    .map((/**
-                 * @param {?} __0
-                 * @return {?}
-                 */
-                function (_a) {
-                    var facetId = _a.facetId, value = _a.value, searchIn = _a.searchIn;
-                    return ({ facetId: facetId, value: value, searchIn: searchIn });
-                }))
-            };
-        };
-        /**
-         * @return {?}
-         */
-        SearchModel.prototype.getInternalFilters = /**
-         * @return {?}
-         */
-        function () {
-            return this._filters
-                .filter((/**
-             * @param {?} filter
-             * @return {?}
-             */
-            function (filter) {
-                return (filter.context === 'internal') && ((Array.isArray(filter.value) && filter.value.length) ||
-                    (!Array.isArray(filter.value) && filter.value));
-            }))
-                .map((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            function (_a) {
-                var facetId = _a.facetId, value = _a.value, searchIn = _a.searchIn;
-                return ({ facetId: facetId, value: value, searchIn: searchIn });
-            }));
-        };
-        /**
-         * @param {?} filters
-         * @return {?}
-         */
-        SearchModel.prototype.filtersAsQueryParams = /**
-         * @param {?} filters
-         * @return {?}
-         */
-        function (filters) {
-            /** @type {?} */
-            var queryParams = {};
-            filters.forEach((/**
-             * @param {?} filter
-             * @return {?}
-             */
-            function (filter) { return queryParams[filter.facetId] = Array.isArray(filter.value) ? filter.value.join(',') : filter.value; }));
-            return queryParams;
-        };
-        /**
-         * @param {?} facetId
-         * @return {?}
-         */
-        SearchModel.prototype.getFiltersByFacetId = /**
-         * @param {?} facetId
-         * @return {?}
-         */
-        function (facetId) {
-            return this._filters.filter((/**
-             * @param {?} filter
-             * @return {?}
-             */
-            function (filter) { return filter.facetId === facetId; }));
-        };
-        /**
-         * @param {?} facetId
-         * @return {?}
-         */
-        SearchModel.prototype.getInputByFacetId = /**
-         * @param {?} facetId
-         * @return {?}
-         */
-        function (facetId) {
-            return this._inputs.filter((/**
-             * @param {?} input
-             * @return {?}
-             */
-            function (input) { return input.getFacetId() === facetId; }))[0];
-        };
-        /**
-         * @param {?} facetId
-         * @param {?} data
-         * @return {?}
-         */
-        SearchModel.prototype.setInputData = /**
-         * @param {?} facetId
-         * @param {?} data
-         * @return {?}
-         */
-        function (facetId, data) {
-            this._inputs
-                .filter((/**
-             * @param {?} input
-             * @return {?}
-             */
-            function (input) { return input.getFacetId() === facetId; }))
-                .forEach((/**
-             * @param {?} input
-             * @return {?}
-             */
-            function (input) { return input.setData(data); }));
-        };
-        /**
-         * @param {?} target
-         * @return {?}
-         */
-        SearchModel.prototype.filterTarget = /**
-         * @param {?} target
-         * @return {?}
-         */
-        function (target) {
-            var _this = this;
-            /** @type {?} */
-            var inputs = this._inputs.filter((/**
-             * @param {?} input
-             * @return {?}
-             */
-            function (input) { return input.getTarget() === target; }));
-            /** @type {?} */
-            var targetInput = this.getInputByFacetId(target);
-            /** @type {?} */
-            var facet = this._facets.filter((/**
-             * @param {?} facet
-             * @return {?}
-             */
-            function (facet) { return facet.id === target; }))[0];
-            /** @type {?} */
-            var facetData = facet.data;
-            /** @type {?} */
-            var searchIns = [];
-            inputs.forEach((/**
-             * @param {?} input
-             * @return {?}
-             */
-            function (input) {
-                /** @type {?} */
-                var filter = _this.getFiltersByFacetId(input.getFacetId())[0];
-                /** @type {?} */
-                var searchIn = input.getSearchIn();
-                /** @type {?} */
-                var value = filter.value;
-                searchIns.push([searchIn, value]);
-            }));
-            // filter
-            facetData.forEach((/**
-             * @param {?} item
-             * @return {?}
-             */
-            function (item) { return _this._filterData(searchIns, item); }));
-            // update
-            targetInput.setData(facetData);
-            targetInput.update();
-        };
-        /**
-         * @private
-         * @param {?} searchIns
-         * @param {?} item
-         * @return {?}
-         */
-        SearchModel.prototype._filterData = /**
-         * @private
-         * @param {?} searchIns
-         * @param {?} item
-         * @return {?}
-         */
-        function (searchIns, item) {
-            searchIns.forEach((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            function (_a) {
-                var _b = __read(_a, 2), searchIn = _b[0], value = _b[1];
-                searchIn.forEach((/**
-                 * @param {?} __0
-                 * @return {?}
-                 */
-                function (_a) {
-                    var key = _a.key, operator = _a.operator;
-                    switch (operator) {
-                        // '=' EQUALS
-                        case '=':
-                            if (Array.isArray(value)) {
-                                item.hidden = !(!value.length || value.indexOf(item.metadata[key]) !== -1);
-                            }
-                            else {
-                                item.hidden = !(value && value === item.metadata[key]);
-                            }
-                            break;
-                        // '>' GREATER THAN
-                        case '>':
-                            if (!Array.isArray(value)) {
-                                item.hidden = !(value && value > item.metadata[key]);
-                            }
-                            break;
-                        // '<' LESS THAN
-                        case '<':
-                            if (!Array.isArray(value)) {
-                                item.hidden = !(value && value < item.metadata[key]);
-                            }
-                            break;
-                        // '>=' GREATER OR EQUALS
-                        case '>=':
-                            if (!Array.isArray(value)) {
-                                item.hidden = !(value && value >= item.metadata[key]);
-                            }
-                            break;
-                        // '<=' LESS OR EQUALS
-                        case '<=':
-                            if (!Array.isArray(value)) {
-                                item.hidden = !(value && value <= item.metadata[key]);
-                            }
-                            break;
-                        // '<>' NOT EQUAL
-                        case '<>':
-                            if (!Array.isArray(value)) {
-                                item.hidden = !(value && value !== item.metadata[key]);
-                            }
-                            break;
-                        //  'LIKE'
-                        case 'LIKE':
-                            if (value &&
-                                item.metadata[key] &&
-                                typeof value === 'string' &&
-                                typeof item.metadata[key] === 'string') {
-                                /** @type {?} */
-                                var haystack = item.metadata[key].toLowerCase();
-                                /** @type {?} */
-                                var needle = value.toLocaleLowerCase();
-                                item.hidden = !(haystack.indexOf(needle) !== -1);
-                            }
-                            break;
-                        default:
-                            console.warn("SearchIn: operator " + operator + " not supported");
-                            break;
-                    }
-                }));
-            }));
-        };
-        /**
-         * @private
-         * @return {?}
-         */
-        SearchModel.prototype._setFilters = /**
-         * @private
-         * @return {?}
-         */
-        function () {
-            var _this = this;
-            this._config.fields.forEach((/**
-             * @param {?} field
-             * @return {?}
-             */
-            function (field) {
-                field.inputs.forEach((/**
-                 * @param {?} input
-                 * @return {?}
-                 */
-                function (input) { return _this._filters.push(__assign({}, input.filterConfig, { facetId: input.facetId, value: input.filterConfig.isArray ? [] : null })); }));
-            }));
-        };
-        /**
-         * @private
-         * @return {?}
-         */
-        SearchModel.prototype._setFacets = /**
-         * @private
-         * @return {?}
-         */
-        function () {
-            this._facets = this._config.facets;
-        };
-        /**
-         * @private
-         * @return {?}
-         */
-        SearchModel.prototype._setPage = /**
-         * @private
-         * @return {?}
-         */
-        function () {
-            this._page = this._config.page;
-        };
-        /**
-         * @private
-         * @return {?}
-         */
-        SearchModel.prototype._setInputs = /**
-         * @private
-         * @return {?}
-         */
-        function () {
-            var _this = this;
-            this._config.fields.forEach((/**
-             * @param {?} sectionConfig
-             * @param {?} sectionIndex
-             * @return {?}
-             */
-            function (sectionConfig, sectionIndex) {
-                sectionConfig.inputs.forEach((/**
-                 * @param {?} inputConfig
-                 * @param {?} inputIndex
-                 * @return {?}
-                 */
-                function (inputConfig, inputIndex) {
-                    /** @type {?} */
-                    var inputModel = INPUTS_MAP[inputConfig.type];
-                    if (!inputModel)
-                        throw Error("Input type " + inputConfig.type + " not supported");
-                    _this._inputs.push(new inputModel(__assign({}, inputConfig, { inputIndex: inputIndex, sectionIndex: sectionIndex })));
-                }));
-            }));
-        };
-        /**
-         * @private
-         * @return {?}
-         */
-        SearchModel.prototype._setInputsData = /**
-         * @private
-         * @return {?}
-         */
-        function () {
-            var _this = this;
-            this._facets.forEach((/**
-             * @param {?} facet
-             * @return {?}
-             */
-            function (facet) { return _this.setInputData(facet.id, facet.data); }));
-        };
-        return SearchModel;
-    }());
-    if (false) {
-        /**
-         * @type {?}
-         * @private
-         */
-        SearchModel.prototype._id;
-        /**
-         * @type {?}
-         * @private
-         */
-        SearchModel.prototype._filters;
-        /**
-         * @type {?}
-         * @private
-         */
-        SearchModel.prototype._facets;
-        /**
-         * @type {?}
-         * @private
-         */
-        SearchModel.prototype._inputs;
-        /**
-         * @type {?}
-         * @private
-         */
-        SearchModel.prototype._page;
-        /**
-         * @type {?}
-         * @private
-         */
-        SearchModel.prototype._config;
-        /**
-         * @type {?}
-         * @private
-         */
-        SearchModel.prototype._results$;
-        /** @type {?} */
-        SearchModel.prototype.getId;
-        /** @type {?} */
-        SearchModel.prototype.getFilters;
-        /** @type {?} */
-        SearchModel.prototype.getFacets;
-        /** @type {?} */
-        SearchModel.prototype.getInputs;
-        /** @type {?} */
-        SearchModel.prototype.getConfig;
-        /** @type {?} */
-        SearchModel.prototype.getFields;
-        /** @type {?} */
-        SearchModel.prototype.getResults$;
-        /** @type {?} */
-        SearchModel.prototype.setResults;
-    }
-    var SearchService = /** @class */ (function () {
-        function SearchService() {
-            this._models = {};
-        }
-        /**
-         * @param {?} id
-         * @param {?} config
-         * @return {?}
-         */
-        SearchService.prototype.add = /**
-         * @param {?} id
-         * @param {?} config
-         * @return {?}
-         */
-        function (id, config) {
-            if (this._models[id])
-                throw Error("Search model \"" + id + "\" already exists!");
-            this._models[id] = new SearchModel(id, config);
-        };
-        /**
-         * @param {?} id
-         * @return {?}
-         */
-        SearchService.prototype.model = /**
-         * @param {?} id
-         * @return {?}
-         */
-        function (id) {
-            return this._models[id] || null;
-        };
-        SearchService.decorators = [
-            { type: core.Injectable, args: [{
-                        providedIn: 'root'
-                    },] }
-        ];
-        /** @nocollapse */ SearchService.ngInjectableDef = core.ɵɵdefineInjectable({ factory: function SearchService_Factory() { return new SearchService(); }, token: SearchService, providedIn: "root" });
-        return SearchService;
-    }());
-    if (false) {
-        /**
-         * @type {?}
-         * @private
-         */
-        SearchService.prototype._models;
-    }
-
-    /**
-     * @fileoverview added by tsickle
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
 
     /**
      * @fileoverview added by tsickle
@@ -9029,87 +9292,46 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
-    var ɵ0 = [], ɵ1 = [{
-            value: '1',
-            label: 'Cerca in tutti campi delle schede'
-        }], ɵ2 = [], ɵ3 = [], ɵ4 = [{
-            value: 'milano',
-            label: 'Milano',
-            count: 1,
-            metadata: {
-                title: 'Milano',
-                'entity-type': 'places'
-            }
-        }, {
-            value: 'roma',
-            label: 'Comune di Roma',
-            count: 2,
-            metadata: {
-                title: 'Comune di Roma',
-                'entity-type': 'places'
-            }
-        }, {
-            value: 'spazio',
-            label: 'Spazio',
-            count: 3,
-            metadata: {
-                title: 'Spazio',
-                'entity-type': 'concepts'
-            }
-        }, {
-            value: 'rodolfo-marna',
-            label: 'Rodolfo Marna',
-            count: 4,
-            metadata: {
-                title: 'Rodolfo Marna',
-                'entity-type': 'people'
-            }
-        }, {
-            value: 'alighiero-boetti',
-            label: 'Alighiero Boetti',
-            count: 5,
-            metadata: {
-                title: 'Alighiero Boetti',
-                'entity-type': 'people'
-            }
-        }], ɵ5 = [], ɵ6 = [];
-    /** @type {?} */
-    var SEARCH_CONFIG = {
+    var facetsConfig = {
+        totalCount: 0,
         facets: [{
                 id: 'query',
-                type: 'value',
-                data: ɵ0
+                type: 'value'
             }, {
                 id: 'query-all',
                 type: 'value',
-                data: ɵ1
+                data: [{
+                        value: '1',
+                        label: 'Cerca in tutti campi delle schede'
+                    }]
             }, {
                 id: 'query-links',
                 type: 'value',
-                data: ɵ2
+                data: []
             }, {
                 id: 'entity-types',
                 type: 'value',
                 operator: 'OR',
                 limit: 10,
                 order: 'count',
+                // count | text
+                data: []
             }, {
                 id: 'entity-search',
-                type: 'value',
-                data: ɵ3
+                type: 'value'
             }, {
                 id: 'entity-links',
                 type: 'value',
                 metadata: ['title', 'entity-type'],
-                data: ɵ4
+                data: []
             }, {
                 id: 'date-from',
                 type: 'value',
-                data: ɵ5
+                data: []
             }, {
                 id: 'date-to',
                 type: 'value',
-                data: ɵ6
+                data: []
             }],
         fields: [{
                 inputs: [{
@@ -9221,7 +9443,7 @@
                 // score | text | date
                 key: 'author',
                 // docPath, elastic key, ecc
-                direction: 'ASC',
+                direction: 'DESC',
             },
             fields: {
                 title: {
@@ -9229,16 +9451,187 @@
                     limit: 50,
                 }
             },
+            items: []
         },
-        page: null,
-        baseUrl: ''
+        page: { offset: 0, limit: 10 }
     };
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var fakeSearchRequest$ = (/**
+     * @param {?} params
+     * @param {?} configKeys
+     * @return {?}
+     */
+    function (params, configKeys) {
+        params.totalCount = Math.floor(Math.random() * 1000);
+        console.log('fake-search-request----------->', params);
+        var facets = params.facets;
+        // query links
+        _getFacet('query-links', facets).data = _getQueryLinksData(configKeys);
+        // entity types
+        _getFacet('entity-types', facets).data = _getEntityTypesData(configKeys);
+        // entity links
+        _getFacet('entity-links', facets).data = _getEntityLinksData();
+        // date from
+        _getFacet('date-from', facets).data = _getDateFromData();
+        // date to
+        _getFacet('date-to', facets).data = _getDateToData();
+        return rxjs.of(params);
+    });
     /** @type {?} */
-    var SEARCH_ID = 'search-facets';
+    var _getFacet = (/**
+     * @param {?} id
+     * @param {?} facets
+     * @return {?}
+     */
+    function (id, facets) {
+        return facets.filter((/**
+         * @param {?} f
+         * @return {?}
+         */
+        function (f) { return f.id === id; }))[0];
+    });
+    var ɵ0 = _getFacet;
+    /** @type {?} */
+    var _getQueryLinksData = (/**
+     * @param {?} configKeys
+     * @return {?}
+     */
+    function (configKeys) {
+        return Object.keys(configKeys).map((/**
+         * @param {?} key
+         * @return {?}
+         */
+        function (key) {
+            /** @type {?} */
+            var config = configKeys[key];
+            return {
+                value: key,
+                label: config.label,
+                counter: Math.floor(Math.random() * 100),
+                // questi vanno aggiunti a mano lato front-end
+                options: {
+                    icon: config.icon,
+                    classes: "color-" + key
+                }
+            };
+        }));
+    });
+    var ɵ1 = _getQueryLinksData;
+    /** @type {?} */
+    var _getEntityTypesData = (/**
+     * @param {?} configKeys
+     * @return {?}
+     */
+    function (configKeys) {
+        return Object.keys(configKeys).map((/**
+         * @param {?} key
+         * @return {?}
+         */
+        function (key) {
+            /** @type {?} */
+            var config = configKeys[key];
+            return {
+                value: key,
+                label: config.label,
+            };
+        }));
+    });
+    var ɵ2 = _getEntityTypesData;
+    /** @type {?} */
+    var _getDateFromData = (/**
+     * @return {?}
+     */
+    function () {
+        return ['1990', '1991', '1992', '1993'].map((/**
+         * @param {?} key
+         * @return {?}
+         */
+        function (key) {
+            return {
+                value: key,
+                label: key,
+            };
+        }));
+    });
+    var ɵ3 = _getDateFromData;
+    /** @type {?} */
+    var _getDateToData = (/**
+     * @return {?}
+     */
+    function () {
+        return ['2000', '2001', '2002', '2003'].map((/**
+         * @param {?} key
+         * @return {?}
+         */
+        function (key) {
+            return {
+                value: key,
+                label: key,
+            };
+        }));
+    });
+    var ɵ4 = _getDateToData;
+    /** @type {?} */
+    var _getEntityLinksData = (/**
+     * @return {?}
+     */
+    function () {
+        /** @type {?} */
+        var types = ['places', 'places', 'concepts', 'people', 'people'];
+        /** @type {?} */
+        var items = ['milano', 'roma', 'spazio', 'rodolfo-marna', 'alighiero-boetti'];
+        return items.map((/**
+         * @param {?} key
+         * @param {?} index
+         * @return {?}
+         */
+        function (key, index) {
+            /** @type {?} */
+            var label = key.replace('-', ' ');
+            return {
+                value: key,
+                label: label,
+                counter: Math.floor(Math.random() * 100),
+                metadata: {
+                    title: label,
+                    'entity-type': types[index]
+                }
+            };
+        }));
+    });
+    var ɵ5 = _getEntityLinksData;
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    /** @type {?} */
+    var SEARCH_MODEL_ID = 'aw-search-layout';
     var AwSearchLayoutDS = /** @class */ (function (_super) {
         __extends(AwSearchLayoutDS, _super);
         function AwSearchLayoutDS() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.currentPage = 1; // pagination value (url param)
+            // pagination value (url param)
+            _this.pageSize = 10; // linked objects page size
+            _this.orderByLabel = 'Ordina per';
+            _this.orderByOptions = [{
+                    value: 'text_DESC',
+                    label: 'Ordine alfabetico (DESC)'
+                }, {
+                    value: 'text_ASC',
+                    label: 'Ordine alfabetico (ASC)'
+                },
+            ];
+            _this.getSearchModelId = (/**
+             * @return {?}
+             */
+            function () { return SEARCH_MODEL_ID; });
+            return _this;
         }
         /**
          * @param {?} __0
@@ -9249,72 +9642,162 @@
          * @return {?}
          */
         function (_a) {
+            var _this = this;
             var configuration = _a.configuration, mainState = _a.mainState, options = _a.options, communication = _a.communication, search = _a.search;
             this.configuration = configuration;
             this.mainState = mainState;
             this.communication = communication;
             this.search = search;
             this.options = options;
-            // FIXME: togliere
+            this.pageTitle = this.configuration.get('search-layout').title;
+            if (!this.search.model(SEARCH_MODEL_ID))
+                this.search.add(SEARCH_MODEL_ID, facetsConfig);
+            this.searchModel = this.search.model(SEARCH_MODEL_ID);
+            this.doSearchRequest$().subscribe((/**
+             * @return {?}
+             */
+            function () {
+                _this.one('facets-wrapper').update({ searchModel: _this.searchModel });
+            }));
+        };
+        /**
+         * @param {?} payload
+         * @return {?}
+         */
+        AwSearchLayoutDS.prototype.onOrderByChange = /**
+         * @param {?} payload
+         * @return {?}
+         */
+        function (payload) {
+            var _a = __read(payload.split('_'), 2), orderBy = _a[0], direction = _a[1];
+            this.searchModel.setSearchConfigOrderBy(orderBy);
+            this.searchModel.setSearchConfigDirection(direction);
+        };
+        /**
+         * @param {?} payload
+         * @return {?}
+         */
+        AwSearchLayoutDS.prototype.onPaginationChange = /**
+         * @param {?} payload
+         * @return {?}
+         */
+        function (payload) {
+            /** @type {?} */
+            var page = payload.replace('page-', '');
+            return this._updateSearchPage(page);
+        };
+        /**
+         * @param {?} payload
+         * @return {?}
+         */
+        AwSearchLayoutDS.prototype.onPaginationGoToChange = /**
+         * @param {?} payload
+         * @return {?}
+         */
+        function (payload) {
+            /** @type {?} */
+            var page = payload.replace('goto-', '');
+            this._updateSearchPage(page);
+        };
+        /**
+         * @param {?} payload
+         * @return {?}
+         */
+        AwSearchLayoutDS.prototype.onResultsLimitChange = /**
+         * @param {?} payload
+         * @return {?}
+         */
+        function (payload) {
+            this.pageSize = payload;
+            this.searchModel.setPageConfigLimit(payload);
+            // reset page & offset
+            this.currentPage = 1;
+            this.searchModel.setPageConfigOffset(0);
+        };
+        /**
+         * @return {?}
+         */
+        AwSearchLayoutDS.prototype.doSearchRequest$ = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            // FIXME: togliere configKeys
+            // dovrebbe venire dall'API
             /** @type {?} */
             var configKeys = this.configuration.get('config-keys');
+            // FIXME: mettere logica definitiva 
+            // per la chiamata search
+            /*
+                this.communication.request$('search', {
+                  onError: error => console.error(error),
+                  params: requestParams
+                })
+                */
             /** @type {?} */
-            var queryLinksData = Object.keys(configKeys).map((/**
-             * @param {?} key
+            var requestParams = this.searchModel.getRequestParams();
+            /** @type {?} */
+            var fakeResultsRequest$ = this.communication.request$('getEntityDetails', {
+                onError: (/**
+                 * @param {?} error
+                 * @return {?}
+                 */
+                function (error) { return console.error(error); }),
+                params: { entityId: '55vf-entity-s3ar' }
+            });
+            return fakeResultsRequest$.pipe(operators.withLatestFrom(fakeSearchRequest$(requestParams, configKeys)), operators.tap((/**
+             * @param {?} __0
              * @return {?}
              */
-            function (key) {
+            function (_a) {
+                var _b = __read(_a, 2), resultsResponse = _b[0], searchResponse = _b[1];
+                _this.totalCount = searchResponse.totalCount;
                 /** @type {?} */
-                var config = configKeys[key];
-                return {
-                    value: key,
-                    label: config.label,
-                    count: 1,
-                    // questi vanno aggiunti a mano lato front-end
-                    icon: config.icon,
-                    classes: "color-" + key
-                };
-            }));
+                var resultsTitleIndex = 0;
+                // results title
+                if (_this.totalCount > 1) {
+                    resultsTitleIndex = 2;
+                }
+                else if (_this.totalCount === 1) {
+                    resultsTitleIndex = 1;
+                }
+                _this.resultsTitle = _this.configuration.get('search-layout').results[resultsTitleIndex];
+                _this.searchModel.updateFacets(searchResponse.facets);
+                _this.searchModel.updateTotalCount(searchResponse.totalCount);
+                _this.one('aw-linked-objects').updateOptions({
+                    context: 'search',
+                    config: _this.configuration,
+                    // todo: swap to next line after merge
+                    // config: this.configuration
+                    page: _this.currentPage,
+                    size: _this.pageSize,
+                });
+                _this.one('aw-linked-objects').update({ items: resultsResponse.items });
+            })));
+        };
+        /**
+         * @private
+         * @param {?} page
+         * @return {?}
+         */
+        AwSearchLayoutDS.prototype._updateSearchPage = /**
+         * @private
+         * @param {?} page
+         * @return {?}
+         */
+        function (page) {
+            if (+page === this.currentPage)
+                return rxjs.of(false);
+            this.currentPage = +page;
             /** @type {?} */
-            var entityTypesData = Object.keys(configKeys).map((/**
-             * @param {?} key
-             * @return {?}
-             */
-            function (key) {
-                /** @type {?} */
-                var config = configKeys[key];
-                return {
-                    value: key,
-                    label: config.label,
-                };
-            }));
-            SEARCH_CONFIG.facets.filter((/**
-             * @param {?} facet
-             * @return {?}
-             */
-            function (facet) { return facet.id === 'query-links'; })).forEach((/**
-             * @param {?} facet
-             * @return {?}
-             */
-            function (facet) {
-                facet.data = queryLinksData;
-            }));
-            SEARCH_CONFIG.facets.filter((/**
-             * @param {?} facet
-             * @return {?}
-             */
-            function (facet) { return facet.id === 'entity-types'; })).forEach((/**
-             * @param {?} facet
-             * @return {?}
-             */
-            function (facet) {
-                facet.data = entityTypesData;
-            }));
-            if (!this.search.model(SEARCH_ID))
-                this.search.add(SEARCH_ID, SEARCH_CONFIG);
+            var searchConfig = this.searchModel.getConfig();
             /** @type {?} */
-            var searchModel = this.search.model(SEARCH_ID);
-            this.one('facets-wrapper').update({ searchModel: searchModel });
+            var pageConfig = searchConfig.page;
+            var limit = pageConfig.limit;
+            /** @type {?} */
+            var newOffset = (this.currentPage - 1) * limit;
+            this.searchModel.setPageConfigOffset(newOffset);
+            return rxjs.of(true);
         };
         return AwSearchLayoutDS;
     }(core$1.LayoutDataSource));
@@ -9339,8 +9822,29 @@
          * @private
          */
         AwSearchLayoutDS.prototype.search;
+        /**
+         * @type {?}
+         * @private
+         */
+        AwSearchLayoutDS.prototype.searchModel;
+        /** @type {?} */
+        AwSearchLayoutDS.prototype.pageTitle;
+        /** @type {?} */
+        AwSearchLayoutDS.prototype.resultsTitle;
+        /** @type {?} */
+        AwSearchLayoutDS.prototype.totalCount;
+        /** @type {?} */
+        AwSearchLayoutDS.prototype.currentPage;
+        /** @type {?} */
+        AwSearchLayoutDS.prototype.pageSize;
         /** @type {?} */
         AwSearchLayoutDS.prototype.options;
+        /** @type {?} */
+        AwSearchLayoutDS.prototype.orderByLabel;
+        /** @type {?} */
+        AwSearchLayoutDS.prototype.orderByOptions;
+        /** @type {?} */
+        AwSearchLayoutDS.prototype.getSearchModelId;
     }
 
     /**
@@ -9350,7 +9854,9 @@
     var AwSearchLayoutEH = /** @class */ (function (_super) {
         __extends(AwSearchLayoutEH, _super);
         function AwSearchLayoutEH() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.facetsChange$ = new rxjs.Subject();
+            return _this;
         }
         /**
          * @return {?}
@@ -9369,6 +9875,11 @@
                 switch (type) {
                     case 'aw-search-layout.init':
                         _this.dataSource.onInit(payload);
+                        _this._listenToFacetsChange();
+                        break;
+                    case 'aw-search-layout.orderbychange':
+                        _this.dataSource.onOrderByChange(payload);
+                        _this.facetsChange$.next();
                         break;
                     default:
                         break;
@@ -9381,14 +9892,69 @@
             function (_a) {
                 var type = _a.type, payload = _a.payload;
                 switch (type) {
-                    // TODO
+                    case 'facets-wrapper.facetschange':
+                        _this.facetsChange$.next();
+                        break;
+                    case 'aw-linked-objects.pagination':
+                        _this.dataSource.onPaginationChange(payload).subscribe((/**
+                         * @param {?} changed
+                         * @return {?}
+                         */
+                        function (changed) {
+                            if (changed)
+                                _this.facetsChange$.next();
+                        }));
+                        break;
+                    case 'aw-linked-objects.change':
+                        _this.dataSource.onResultsLimitChange(payload);
+                        _this.facetsChange$.next();
+                        break;
+                    case 'aw-linked-objects.goto':
+                        _this.dataSource.onPaginationGoToChange(payload).subscribe((/**
+                         * @param {?} changed
+                         * @return {?}
+                         */
+                        function (changed) {
+                            if (changed)
+                                _this.facetsChange$.next();
+                        }));
+                        break;
                     default:
                         break;
                 }
             }));
         };
+        /**
+         * @private
+         * @return {?}
+         */
+        AwSearchLayoutEH.prototype._listenToFacetsChange = /**
+         * @private
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.facetsChange$.pipe(operators.debounceTime(500)).subscribe((/**
+             * @return {?}
+             */
+            function () {
+                _this.dataSource.doSearchRequest$().subscribe((/**
+                 * @return {?}
+                 */
+                function () {
+                    _this.emitGlobal('searchresponse', _this.dataSource.getSearchModelId());
+                }));
+            }));
+        };
         return AwSearchLayoutEH;
     }(core$1.EventHandler));
+    if (false) {
+        /**
+         * @type {?}
+         * @private
+         */
+        AwSearchLayoutEH.prototype.facetsChange$;
+    }
 
     /**
      * @fileoverview added by tsickle
@@ -9403,6 +9969,8 @@
          */
         widgets: [
             { id: 'facets-wrapper', dataSource: FacetsWrapperDS, eventHandler: FacetsWrapperEH },
+            { id: 'aw-linked-objects' },
+            { id: 'aw-search-layout-tabs', hasStaticData: true },
         ],
         layoutDS: AwSearchLayoutDS,
         layoutEH: AwSearchLayoutEH,
@@ -9477,7 +10045,7 @@
         AwSearchLayoutComponent.decorators = [
             { type: core.Component, args: [{
                         selector: 'aw-search-layout',
-                        template: "<div class=\"aw-search\" id=\"search-layout\">\n    <div class=\"aw-search__content\">\n\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-search__facets\">\n            <n7-facets-wrapper\n                [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                [emit]=\"lb.widgets['facets-wrapper'].emit\">\n            </n7-facets-wrapper>\n        </div>\n\n        <!-- Search details -->\n        <div class=\"aw-search__search-wrapper\">\n            #TODO: results\n        </div>\n    </div>\n</div>\n"
+                        template: "<div class=\"aw-search n7-side-auto-padding\" id=\"search-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>        \n        <!--\n        <div class=\"aw-search__header-right\">\n            <n7-nav\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\n            </n7-nav>\n        </div>\n        -->\n    </div>\n    <div class=\"aw-search__content-wrapper\">\n        <!-- Left sidebar: facets -->\n        <div class=\"aw-search__sidebar\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper\n                    [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>        \n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\" for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\" id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\" [value]=\"option.value\">{{ option.label }}</option>\n                    </select>\n                </div>     \n            </div>\n            <!-- Search details -->\n            <div class=\"aw-search__results-wrapper\">\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                    <n7-breadcrumbs [data]=\"preview.breadcrumbs\">\n                    </n7-breadcrumbs>\n                    <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n                <n7-pagination [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-pagination>\n            </div>\n        </div>\n    </div>\n</div>\n"
                     }] }
         ];
         /** @nocollapse */
@@ -9666,6 +10234,8 @@
     exports.AwSearchLayoutConfig = AwSearchLayoutConfig;
     exports.AwSearchLayoutDS = AwSearchLayoutDS;
     exports.AwSearchLayoutEH = AwSearchLayoutEH;
+    exports.AwSearchLayoutTabsDS = AwSearchLayoutTabsDS;
+    exports.AwSearchLayoutTabsEH = AwSearchLayoutTabsEH;
     exports.AwSidebarHeaderDS = AwSidebarHeaderDS;
     exports.AwSidebarHeaderEH = AwSidebarHeaderEH;
     exports.AwTableDS = AwTableDS;

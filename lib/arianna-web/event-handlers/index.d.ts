@@ -11,4 +11,5 @@ export * from './entita-nav.eh';
 export * from './scheda-breadcrumbs.eh';
 export * from './sidebar-header.eh';
 export * from './tree.eh';
+export * from './search-layout-tabs.eh';
 export * from './table.eh';

@@ -10,11 +10,22 @@ export declare const AwSearchLayoutConfig: {
      * Array of components you want to use
      * in this layout
      */
-    widgets: {
+    widgets: ({
         id: string;
         dataSource: typeof FacetsWrapperDS;
         eventHandler: typeof FacetsWrapperEH;
-    }[];
+        hasStaticData?: undefined;
+    } | {
+        id: string;
+        dataSource?: undefined;
+        eventHandler?: undefined;
+        hasStaticData?: undefined;
+    } | {
+        id: string;
+        hasStaticData: boolean;
+        dataSource?: undefined;
+        eventHandler?: undefined;
+    })[];
     layoutDS: typeof AwSearchLayoutDS;
     layoutEH: typeof AwSearchLayoutEH;
     widgetsDataSources: typeof DS;

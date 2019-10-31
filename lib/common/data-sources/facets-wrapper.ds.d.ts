@@ -13,6 +13,7 @@ export declare class FacetsWrapperDS extends DataSource {
         eventPayload: any;
     }): void;
     updateFilteredTarget(target: any): void;
+    updateInputLinks(): void;
     getRequestParams: () => {
         facets: import("../services/search.service").IFacet[];
         page: any;

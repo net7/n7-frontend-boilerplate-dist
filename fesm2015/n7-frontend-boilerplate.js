@@ -2,8 +2,8 @@ import { Injectable, Inject, ɵɵdefineInjectable, ɵɵinject, Component, Input,
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FOOTER_MOCK, DvComponentsLibModule, TABLE_MOCK } from '@n7-frontend/components';
-import { ReplaySubject, empty, Subject, fromEvent, interval, of } from 'rxjs';
-import { map, catchError, takeUntil, filter, first, debounce, tap, debounceTime } from 'rxjs/operators';
+import { ReplaySubject, empty, Subject, of, fromEvent, interval } from 'rxjs';
+import { map, catchError, tap, takeUntil, filter, first, debounce, debounceTime, withLatestFrom } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { LayoutBuilder, LayoutDataSource, EventHandler, DataSource } from '@n7-frontend/core';
@@ -482,6 +482,18 @@ const ApolloProviderConfig = {
             configKey
           }
         }
+      }
+    }`
+    },
+    'search': {
+        queryName: 'search',
+        queryBody: `{
+      search(__PARAMS__){
+        totalCount
+        facets
+        filters
+        results
+        page
       }
     }`
     }
@@ -1007,6 +1019,1146 @@ if (false) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+class JsonConfigService {
+    /**
+     * @param {?} http
+     * @param {?} config
+     */
+    constructor(http, config) {
+        this.http = http;
+        this.config = config;
+    }
+    /**
+     * @param {?} path
+     * @return {?}
+     */
+    load(path) {
+        return this.http.get(path).pipe(catchError((/**
+         * @param {?} error
+         * @return {?}
+         */
+        (error) => of({}))), tap((/**
+         * @param {?} response
+         * @return {?}
+         */
+        response => this._handleResponse(response)))).toPromise();
+    }
+    /**
+     * @private
+     * @param {?} response
+     * @return {?}
+     */
+    _handleResponse(response) {
+        if (response) {
+            Object.keys(response).forEach((/**
+             * @param {?} key
+             * @return {?}
+             */
+            key => this.config.set(key, response[key])));
+            // config keys colors
+            if (response['config-keys']) {
+                /** @type {?} */
+                const headTag = document.querySelector('head');
+                /** @type {?} */
+                const styleElement = document.createElement('style');
+                /** @type {?} */
+                let styles = [];
+                Object.keys(response['config-keys']).forEach((/**
+                 * @param {?} key
+                 * @return {?}
+                 */
+                key => {
+                    /** @type {?} */
+                    const configKey = response['config-keys'][key] || {};
+                    if (configKey.color && configKey.color.hex) {
+                        // add css class
+                        styles.push(`--color-${key}: ${configKey.color.hex};`);
+                    }
+                }));
+                if (styles.length) {
+                    styles.unshift(':root {');
+                    styles.push('}');
+                    styleElement.appendChild(document.createTextNode(styles.join('\n')));
+                    headTag.appendChild(styleElement);
+                }
+            }
+        }
+    }
+}
+JsonConfigService.decorators = [
+    { type: Injectable, args: [{
+                providedIn: 'root'
+            },] }
+];
+/** @nocollapse */
+JsonConfigService.ctorParameters = () => [
+    { type: HttpClient },
+    { type: ConfigurationService }
+];
+/** @nocollapse */ JsonConfigService.ngInjectableDef = ɵɵdefineInjectable({ factory: function JsonConfigService_Factory() { return new JsonConfigService(ɵɵinject(HttpClient), ɵɵinject(ConfigurationService)); }, token: JsonConfigService, providedIn: "root" });
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    JsonConfigService.prototype.http;
+    /**
+     * @type {?}
+     * @private
+     */
+    JsonConfigService.prototype.config;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/**
+ * @record
+ */
+function IFacetInputData() { }
+if (false) {
+    /** @type {?} */
+    IFacetInputData.prototype.value;
+    /** @type {?} */
+    IFacetInputData.prototype.label;
+    /** @type {?} */
+    IFacetInputData.prototype.counter;
+    /** @type {?|undefined} */
+    IFacetInputData.prototype.hidden;
+    /** @type {?|undefined} */
+    IFacetInputData.prototype.options;
+}
+/**
+ * @abstract
+ */
+class FacetInput {
+    /**
+     * @param {?} config
+     */
+    constructor(config) {
+        this.update = (/**
+         * @return {?}
+         */
+        () => this.output = this.transform());
+        this.getId = (/**
+         * @return {?}
+         */
+        () => this.id);
+        this.getData = (/**
+         * @return {?}
+         */
+        () => this.data);
+        this.getConfig = (/**
+         * @return {?}
+         */
+        () => this.config);
+        this.getFacetId = (/**
+         * @return {?}
+         */
+        () => this.config.facetId);
+        this.getInputIndex = (/**
+         * @return {?}
+         */
+        () => this.config.inputIndex);
+        this.getSectionIndex = (/**
+         * @return {?}
+         */
+        () => this.config.sectionIndex);
+        this.getContext = (/**
+         * @return {?}
+         */
+        () => this.config.filterConfig.context || 'external');
+        this.getTarget = (/**
+         * @return {?}
+         */
+        () => this.config.filterConfig.target || null);
+        this.getSearchIn = (/**
+         * @return {?}
+         */
+        () => this.config.filterConfig.searchIn || null);
+        this.getType = (/**
+         * @return {?}
+         */
+        () => this.config.type);
+        this.getOutput = (/**
+         * @return {?}
+         */
+        () => this.output);
+        this.setData = (/**
+         * @param {?} newData
+         * @return {?}
+         */
+        (newData) => this.data = newData);
+        this.config = config;
+        this._setId();
+        FacetInput.index++;
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    _setId() {
+        this.id = `facet-input-${this.getType()}-${FacetInput.index}`;
+    }
+    ;
+}
+FacetInput.index = 0;
+if (false) {
+    /** @type {?} */
+    FacetInput.index;
+    /**
+     * @type {?}
+     * @private
+     */
+    FacetInput.prototype.id;
+    /**
+     * @type {?}
+     * @protected
+     */
+    FacetInput.prototype.config;
+    /**
+     * @type {?}
+     * @protected
+     */
+    FacetInput.prototype.output;
+    /**
+     * @type {?}
+     * @protected
+     */
+    FacetInput.prototype.data;
+    /** @type {?} */
+    FacetInput.prototype.update;
+    /** @type {?} */
+    FacetInput.prototype.getId;
+    /** @type {?} */
+    FacetInput.prototype.getData;
+    /** @type {?} */
+    FacetInput.prototype.getConfig;
+    /** @type {?} */
+    FacetInput.prototype.getFacetId;
+    /** @type {?} */
+    FacetInput.prototype.getInputIndex;
+    /** @type {?} */
+    FacetInput.prototype.getSectionIndex;
+    /** @type {?} */
+    FacetInput.prototype.getContext;
+    /** @type {?} */
+    FacetInput.prototype.getTarget;
+    /** @type {?} */
+    FacetInput.prototype.getSearchIn;
+    /** @type {?} */
+    FacetInput.prototype.getType;
+    /** @type {?} */
+    FacetInput.prototype.getOutput;
+    /** @type {?} */
+    FacetInput.prototype.setData;
+    /* Skipping unhandled member: ;*/
+    /**
+     * @abstract
+     * @param {?} facetValue
+     * @return {?}
+     */
+    FacetInput.prototype.setActive = function (facetValue) { };
+    /**
+     * @abstract
+     * @protected
+     * @return {?}
+     */
+    FacetInput.prototype.transform = function () { };
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class FacetInputCheckbox extends FacetInput {
+    /**
+     * @protected
+     * @return {?}
+     */
+    transform() {
+        /** @type {?} */
+        const facetId = this.getFacetId();
+        return this.data.map((/**
+         * @param {?} __0
+         * @param {?} index
+         * @return {?}
+         */
+        ({ label, value }, index) => {
+            // normalize value
+            value = '' + value;
+            return {
+                type: 'checkbox',
+                id: this.getId() + '-' + index,
+                label: label,
+                payload: {
+                    facetId,
+                    source: 'input-checkbox',
+                    value
+                },
+                _meta: { facetId, value }
+            };
+        }));
+    }
+    /**
+     * @param {?} facetValue
+     * @return {?}
+     */
+    setActive(facetValue) {
+        const { isArray } = this.config.filterConfig;
+        this.output.forEach((/**
+         * @param {?} config
+         * @return {?}
+         */
+        config => {
+            if (isArray && Array.isArray(facetValue) && facetValue.indexOf(config._meta.value) !== -1) {
+                config.checked = true;
+            }
+            else if (facetValue === config._meta.value) {
+                config.checked = true;
+            }
+            else {
+                config.checked = false;
+            }
+        }));
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class FacetInputText extends FacetInput {
+    /**
+     * @protected
+     * @return {?}
+     */
+    transform() {
+        /** @type {?} */
+        const facetId = this.getFacetId();
+        /** @type {?} */
+        const payload = {
+            facetId,
+            source: 'input-text'
+        };
+        return {
+            type: 'text',
+            id: this.getId(),
+            label: this.config.label,
+            disabled: this.config.disabled,
+            placeholder: this.config.placeholder,
+            icon: this.config.icon,
+            inputPayload: Object.assign({}, payload, { trigger: 'input' }),
+            enterPayload: Object.assign({}, payload, { trigger: 'enter' }),
+            iconPayload: Object.assign({}, payload, { trigger: 'icon' }),
+            _meta: { facetId }
+        };
+    }
+    /**
+     * @param {?} facetValue
+     * @return {?}
+     */
+    setActive(facetValue) {
+        this.output.value = facetValue || null;
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class FacetInputLink extends FacetInput {
+    /**
+     * @protected
+     * @return {?}
+     */
+    transform() {
+        /** @type {?} */
+        const facetId = this.getFacetId();
+        return this.data.map((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ label, value, counter, hidden, options }) => {
+            // normalize value
+            value = '' + value;
+            options = options || {};
+            /** @type {?} */
+            let classes = [];
+            if (options.classes)
+                classes.push(options.classes);
+            if (hidden)
+                classes.push('is-hidden');
+            if (this._isActive(this.facetValue, value))
+                classes.push('is-active');
+            return {
+                type: 'link',
+                id: this.getId(),
+                text: label,
+                counter,
+                payload: {
+                    facetId,
+                    source: 'input-link',
+                    value
+                },
+                icon: options.icon || null,
+                classes: classes.join(' '),
+                _meta: { facetId, value }
+            };
+        }));
+    }
+    /**
+     * @param {?} facetValue
+     * @return {?}
+     */
+    setActive(facetValue) {
+        this.output.forEach((/**
+         * @param {?} config
+         * @return {?}
+         */
+        config => {
+            /** @type {?} */
+            let classes = config.classes ? config.classes.split(' ') : [];
+            /** @type {?} */
+            let isActive = this._isActive(facetValue, config._meta.value);
+            if (!isActive) {
+                classes = classes.filter((/**
+                 * @param {?} className
+                 * @return {?}
+                 */
+                className => className !== 'is-active'));
+            }
+            else if (classes.indexOf('is-active') === -1) {
+                classes.push('is-active');
+            }
+            config.classes = classes.join(' ');
+        }));
+    }
+    /**
+     * @private
+     * @param {?} facetValue
+     * @param {?} value
+     * @return {?}
+     */
+    _isActive(facetValue, value) {
+        this.facetValue = facetValue;
+        return ((Array.isArray(facetValue) && facetValue.indexOf(value) !== -1) ||
+            (facetValue === value));
+    }
+}
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    FacetInputLink.prototype.facetValue;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class FacetInputSelect extends FacetInput {
+    /**
+     * @protected
+     * @return {?}
+     */
+    transform() {
+        /** @type {?} */
+        const facetId = this.getFacetId();
+        return {
+            type: 'select',
+            id: this.getId(),
+            label: this.config.label,
+            disabled: this.config.disabled,
+            options: this.data.map((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            ({ value, label }) => ({
+                // normalize value
+                value: '' + value,
+                label
+            }))),
+            payload: {
+                facetId,
+                source: 'input-select',
+            },
+            _meta: { facetId }
+        };
+    }
+    /**
+     * @param {?} facetValue
+     * @return {?}
+     */
+    setActive(facetValue) {
+        this.output.options
+            .filter((/**
+         * @param {?} option
+         * @return {?}
+         */
+        option => option.value === facetValue))
+            .forEach((/**
+         * @param {?} option
+         * @return {?}
+         */
+        option => option.selected = true));
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/** @type {?} */
+const INPUTS_MAP = {
+    'checkbox': FacetInputCheckbox,
+    'text': FacetInputText,
+    'link': FacetInputLink,
+    'select': FacetInputSelect,
+};
+/**
+ * @record
+ */
+function ISearchConfig() { }
+if (false) {
+    /** @type {?} */
+    ISearchConfig.prototype.totalCount;
+    /** @type {?} */
+    ISearchConfig.prototype.facets;
+    /** @type {?} */
+    ISearchConfig.prototype.page;
+    /** @type {?} */
+    ISearchConfig.prototype.results;
+    /** @type {?} */
+    ISearchConfig.prototype.fields;
+}
+/**
+ * @record
+ */
+function IFacet() { }
+if (false) {
+    /** @type {?} */
+    IFacet.prototype.id;
+    /** @type {?} */
+    IFacet.prototype.type;
+    /** @type {?} */
+    IFacet.prototype.operator;
+    /** @type {?|undefined} */
+    IFacet.prototype.data;
+}
+/**
+ * @record
+ */
+function IFilter() { }
+if (false) {
+    /** @type {?} */
+    IFilter.prototype.facetId;
+    /** @type {?} */
+    IFilter.prototype.value;
+    /** @type {?} */
+    IFilter.prototype.searchIn;
+    /** @type {?|undefined} */
+    IFilter.prototype.isArray;
+    /** @type {?|undefined} */
+    IFilter.prototype.context;
+    /** @type {?|undefined} */
+    IFilter.prototype.target;
+}
+class SearchModel {
+    /**
+     * @param {?} id
+     * @param {?} config
+     */
+    constructor(id, config) {
+        this._filters = [];
+        this._facets = [];
+        this._inputs = [];
+        this._results$ = new Subject();
+        this.getId = (/**
+         * @return {?}
+         */
+        () => this._id);
+        this.getFilters = (/**
+         * @return {?}
+         */
+        () => this._filters);
+        this.getFacets = (/**
+         * @return {?}
+         */
+        () => this._facets);
+        this.getInputs = (/**
+         * @return {?}
+         */
+        () => this._inputs);
+        this.getConfig = (/**
+         * @return {?}
+         */
+        () => this._config);
+        this.getTotalCount = (/**
+         * @return {?}
+         */
+        () => this._totalCount);
+        this.getFields = (/**
+         * @return {?}
+         */
+        () => this._config.fields);
+        this.getResults$ = (/**
+         * @return {?}
+         */
+        () => this._results$);
+        this.setResults = (/**
+         * @param {?} results
+         * @return {?}
+         */
+        (results) => this._results$.next(results));
+        this._id = id;
+        this._config = config;
+        this._setFilters();
+        this._setFacets();
+        this._setPage();
+        this._setInputs();
+        this._setInputsData();
+        this._setTotalCount();
+    }
+    /**
+     * @param {?} facetId
+     * @param {?} value
+     * @param {?=} remove
+     * @return {?}
+     */
+    updateFilter(facetId, value, remove) {
+        /** @type {?} */
+        const selectedFilters = this.getFiltersByFacetId(facetId);
+        selectedFilters.forEach((/**
+         * @param {?} filter
+         * @return {?}
+         */
+        filter => {
+            if (Array.isArray(filter.value) && remove) {
+                filter.value = filter.value.filter((/**
+                 * @param {?} item
+                 * @return {?}
+                 */
+                item => item !== value));
+            }
+            else if (Array.isArray(filter.value) && filter.value.indexOf(value) === -1) {
+                filter.value.push(value);
+            }
+            else {
+                filter.value = !remove ? value : null;
+            }
+        }));
+    }
+    /**
+     * @param {?} queryParams
+     * @return {?}
+     */
+    updateFiltersFromQueryParams(queryParams) {
+        Object.keys(queryParams).forEach((/**
+         * @param {?} facetId
+         * @return {?}
+         */
+        facetId => {
+            /** @type {?} */
+            const selectedFilters = this.getFiltersByFacetId(facetId);
+            /** @type {?} */
+            const value = queryParams[facetId];
+            selectedFilters.forEach((/**
+             * @param {?} filter
+             * @return {?}
+             */
+            filter => {
+                filter.value = filter.isArray ? value.split(',') : value;
+            }));
+        }));
+    }
+    /**
+     * @return {?}
+     */
+    updateInputsFromFilters() {
+        this._filters.forEach((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ facetId, value }) => {
+            this.getInputByFacetId(facetId).setActive(value);
+        }));
+    }
+    /**
+     * @param {?} facets
+     * @return {?}
+     */
+    updateFacets(facets) {
+        facets.forEach((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ id, data }) => this.updateFacet(id, data)));
+        this._setInputsData();
+    }
+    /**
+     * @param {?} totalCount
+     * @return {?}
+     */
+    updateTotalCount(totalCount) {
+        this._totalCount = totalCount;
+    }
+    /**
+     * @param {?} facetId
+     * @param {?} data
+     * @return {?}
+     */
+    updateFacet(facetId, data) {
+        /** @type {?} */
+        let selectedFacets = this._facets.filter((/**
+         * @param {?} facet
+         * @return {?}
+         */
+        facet => facet.id === facetId));
+        if (!selectedFacets.length) {
+            throw Error(`Facet with id "${facetId}" does not exists`);
+        }
+        selectedFacets.forEach((/**
+         * @param {?} facet
+         * @return {?}
+         */
+        facet => facet.data = data));
+    }
+    /**
+     * @return {?}
+     */
+    reset() {
+        this._filters.forEach((/**
+         * @param {?} filter
+         * @return {?}
+         */
+        filter => filter.value = null));
+    }
+    /**
+     * @return {?}
+     */
+    getRequestParams() {
+        return {
+            facets: this._facets,
+            page: this._page,
+            results: this._config.results,
+            filters: this._filters
+                .filter((/**
+             * @param {?} filter
+             * @return {?}
+             */
+            filter => filter.context !== 'internal'))
+                .map((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            ({ facetId, value, searchIn }) => ({ facetId, value, searchIn })))
+        };
+    }
+    /**
+     * @return {?}
+     */
+    getInternalFilters() {
+        return this._filters
+            .filter((/**
+         * @param {?} filter
+         * @return {?}
+         */
+        filter => {
+            return (filter.context === 'internal') && ((Array.isArray(filter.value) && filter.value.length) ||
+                (!Array.isArray(filter.value) && filter.value));
+        }))
+            .map((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ facetId, value, searchIn }) => ({ facetId, value, searchIn })));
+    }
+    /**
+     * @param {?} filters
+     * @return {?}
+     */
+    filtersAsQueryParams(filters) {
+        /** @type {?} */
+        let queryParams = {};
+        filters.forEach((/**
+         * @param {?} filter
+         * @return {?}
+         */
+        filter => queryParams[filter.facetId] = Array.isArray(filter.value) ? filter.value.join(',') : filter.value));
+        return queryParams;
+    }
+    /**
+     * @param {?} facetId
+     * @return {?}
+     */
+    getFiltersByFacetId(facetId) {
+        return this._filters.filter((/**
+         * @param {?} filter
+         * @return {?}
+         */
+        filter => filter.facetId === facetId));
+    }
+    /**
+     * @param {?} facetId
+     * @return {?}
+     */
+    getInputByFacetId(facetId) {
+        return this._inputs.filter((/**
+         * @param {?} input
+         * @return {?}
+         */
+        input => input.getFacetId() === facetId))[0];
+    }
+    /**
+     * @param {?} facetId
+     * @param {?} data
+     * @return {?}
+     */
+    setInputData(facetId, data) {
+        this.getInputByFacetId(facetId).setData(data);
+    }
+    /**
+     * @param {?} target
+     * @return {?}
+     */
+    filterTarget(target) {
+        /** @type {?} */
+        const inputs = this._inputs.filter((/**
+         * @param {?} input
+         * @return {?}
+         */
+        input => input.getTarget() === target));
+        /** @type {?} */
+        const targetInput = this.getInputByFacetId(target);
+        /** @type {?} */
+        const facet = this._facets.filter((/**
+         * @param {?} facet
+         * @return {?}
+         */
+        facet => facet.id === target))[0];
+        /** @type {?} */
+        const facetData = facet.data;
+        /** @type {?} */
+        let searchIns = [];
+        inputs.forEach((/**
+         * @param {?} input
+         * @return {?}
+         */
+        input => {
+            /** @type {?} */
+            const filter = this.getFiltersByFacetId(input.getFacetId())[0];
+            /** @type {?} */
+            const searchIn = input.getSearchIn();
+            /** @type {?} */
+            const value = filter.value;
+            searchIns.push([searchIn, value]);
+        }));
+        // filter
+        facetData.forEach((/**
+         * @param {?} item
+         * @return {?}
+         */
+        item => this._filterData(searchIns, item)));
+        // update
+        targetInput.setData(facetData);
+        targetInput.update();
+    }
+    /**
+     * @param {?} orderBy
+     * @return {?}
+     */
+    setSearchConfigOrderBy(orderBy) {
+        this._config.results.order.type = orderBy;
+    }
+    /**
+     * @param {?} direction
+     * @return {?}
+     */
+    setSearchConfigDirection(direction) {
+        this._config.results.order.direction = direction;
+    }
+    /**
+     * @param {?} offset
+     * @return {?}
+     */
+    setPageConfigOffset(offset) {
+        this._config.page.offset = offset;
+    }
+    /**
+     * @param {?} limit
+     * @return {?}
+     */
+    setPageConfigLimit(limit) {
+        this._config.page.limit = limit;
+    }
+    /**
+     * @private
+     * @param {?} searchIns
+     * @param {?} item
+     * @return {?}
+     */
+    _filterData(searchIns, item) {
+        searchIns.forEach((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ([searchIn, value]) => {
+            searchIn.forEach((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            ({ key, operator }) => {
+                switch (operator) {
+                    // '=' EQUALS
+                    case '=':
+                        if (Array.isArray(value)) {
+                            item.hidden = !(!value.length || value.indexOf(item.metadata[key]) !== -1);
+                        }
+                        else {
+                            item.hidden = !(value && value === item.metadata[key]);
+                        }
+                        break;
+                    // '>' GREATER THAN
+                    case '>':
+                        if (!Array.isArray(value)) {
+                            item.hidden = !(value && value > item.metadata[key]);
+                        }
+                        break;
+                    // '<' LESS THAN
+                    case '<':
+                        if (!Array.isArray(value)) {
+                            item.hidden = !(value && value < item.metadata[key]);
+                        }
+                        break;
+                    // '>=' GREATER OR EQUALS
+                    case '>=':
+                        if (!Array.isArray(value)) {
+                            item.hidden = !(value && value >= item.metadata[key]);
+                        }
+                        break;
+                    // '<=' LESS OR EQUALS
+                    case '<=':
+                        if (!Array.isArray(value)) {
+                            item.hidden = !(value && value <= item.metadata[key]);
+                        }
+                        break;
+                    // '<>' NOT EQUAL
+                    case '<>':
+                        if (!Array.isArray(value)) {
+                            item.hidden = !(value && value !== item.metadata[key]);
+                        }
+                        break;
+                    //  'LIKE'
+                    case 'LIKE':
+                        if (value &&
+                            item.metadata[key] &&
+                            typeof value === 'string' &&
+                            typeof item.metadata[key] === 'string') {
+                            /** @type {?} */
+                            const haystack = item.metadata[key].toLowerCase();
+                            /** @type {?} */
+                            const needle = value.toLocaleLowerCase();
+                            item.hidden = !(haystack.indexOf(needle) !== -1);
+                        }
+                        break;
+                    default:
+                        console.warn(`SearchIn: operator ${operator} not supported`);
+                        break;
+                }
+            }));
+        }));
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    _setFilters() {
+        this._config.fields.forEach((/**
+         * @param {?} field
+         * @return {?}
+         */
+        field => {
+            field.inputs.forEach((/**
+             * @param {?} input
+             * @return {?}
+             */
+            input => this._filters.push(Object.assign({}, input.filterConfig, { facetId: input.facetId, value: input.filterConfig.isArray ? [] : null }))));
+        }));
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    _setFacets() {
+        this._facets = this._config.facets;
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    _setPage() {
+        this._page = this._config.page;
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    _setTotalCount() {
+        this._totalCount = this._config.totalCount;
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    _setInputs() {
+        this._config.fields.forEach((/**
+         * @param {?} sectionConfig
+         * @param {?} sectionIndex
+         * @return {?}
+         */
+        (sectionConfig, sectionIndex) => {
+            sectionConfig.inputs.forEach((/**
+             * @param {?} inputConfig
+             * @param {?} inputIndex
+             * @return {?}
+             */
+            (inputConfig, inputIndex) => {
+                /** @type {?} */
+                const inputModel = INPUTS_MAP[inputConfig.type];
+                if (!inputModel)
+                    throw Error(`Input type ${inputConfig.type} not supported`);
+                this._inputs.push(new inputModel(Object.assign({}, inputConfig, { inputIndex, sectionIndex })));
+            }));
+        }));
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    _setInputsData() {
+        this._facets.forEach((/**
+         * @param {?} facet
+         * @return {?}
+         */
+        facet => this.setInputData(facet.id, facet.data)));
+    }
+}
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchModel.prototype._id;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchModel.prototype._filters;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchModel.prototype._facets;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchModel.prototype._inputs;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchModel.prototype._page;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchModel.prototype._totalCount;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchModel.prototype._config;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchModel.prototype._results$;
+    /** @type {?} */
+    SearchModel.prototype.getId;
+    /** @type {?} */
+    SearchModel.prototype.getFilters;
+    /** @type {?} */
+    SearchModel.prototype.getFacets;
+    /** @type {?} */
+    SearchModel.prototype.getInputs;
+    /** @type {?} */
+    SearchModel.prototype.getConfig;
+    /** @type {?} */
+    SearchModel.prototype.getTotalCount;
+    /** @type {?} */
+    SearchModel.prototype.getFields;
+    /** @type {?} */
+    SearchModel.prototype.getResults$;
+    /** @type {?} */
+    SearchModel.prototype.setResults;
+}
+class SearchService {
+    constructor() {
+        this._models = {};
+    }
+    /**
+     * @param {?} id
+     * @param {?} config
+     * @return {?}
+     */
+    add(id, config) {
+        if (this._models[id])
+            throw Error(`Search model "${id}" already exists!`);
+        this._models[id] = new SearchModel(id, config);
+    }
+    /**
+     * @param {?} id
+     * @return {?}
+     */
+    model(id) {
+        return this._models[id] || null;
+    }
+}
+SearchService.queryParams = null;
+SearchService.decorators = [
+    { type: Injectable, args: [{
+                providedIn: 'root'
+            },] }
+];
+/** @nocollapse */ SearchService.ngInjectableDef = ɵɵdefineInjectable({ factory: function SearchService_Factory() { return new SearchService(); }, token: SearchService, providedIn: "root" });
+if (false) {
+    /** @type {?} */
+    SearchService.queryParams;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchService.prototype._models;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 class MainLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
@@ -1068,13 +2220,9 @@ class MainLayoutEH extends EventHandler {
          * @return {?}
          */
         params => {
-            // setTimeout for fixing route event timings
-            setTimeout((/**
-             * @return {?}
-             */
-            () => {
-                this.emitGlobal('queryparams', params);
-            }));
+            this.emitGlobal('queryparams', params);
+            // to use in searchs
+            SearchService.queryParams = params;
         }));
     }
 }
@@ -1257,14 +2405,15 @@ class FacetsWrapperDS extends DataSource {
      * @return {?}
      */
     transform(data) {
-        /** @type {?} */
-        let groups = [];
-        if (!this.searchModel)
+        if (!this.searchModel) {
             this.searchModel = data.searchModel;
+        }
         /** @type {?} */
         const id = this.searchModel.getId();
         /** @type {?} */
         const fields = this.searchModel.getFields();
+        /** @type {?} */
+        let groups = [];
         fields.forEach((/**
          * @param {?} fieldConfig
          * @param {?} fieldIndex
@@ -1320,6 +2469,13 @@ class FacetsWrapperDS extends DataSource {
                 }
             });
         }));
+        // query params control
+        if (SearchService.queryParams) {
+            this.searchModel.updateFiltersFromQueryParams(SearchService.queryParams);
+            this.searchModel.updateInputsFromFilters();
+            // reset queryparams
+            SearchService.queryParams = null;
+        }
         return {
             groups,
             classes: `n7-facets-wrapper__${this.searchModel.getId()}`
@@ -1400,6 +2556,54 @@ class FacetsWrapperDS extends DataSource {
              */
             section => {
                 if (section._meta.facetId === target) {
+                    /** @type {?} */
+                    const inputOutput = input.getOutput();
+                    section.inputs = Array.isArray(inputOutput) ? inputOutput : [inputOutput];
+                }
+            }));
+        }));
+    }
+    /**
+     * @return {?}
+     */
+    updateInputLinks() {
+        /** @type {?} */
+        const linksFacetIds = this.searchModel.getInputs()
+            .filter((/**
+         * @param {?} input
+         * @return {?}
+         */
+        input => input.getType() === 'link'))
+            .map((/**
+         * @param {?} input
+         * @return {?}
+         */
+        input => input.getFacetId()));
+        this.output.groups
+            .map((/**
+         * @param {?} group
+         * @return {?}
+         */
+        group => group.facet))
+            .map((/**
+         * @param {?} facet
+         * @return {?}
+         */
+        facet => facet.sections))
+            .map((/**
+         * @param {?} sections
+         * @return {?}
+         */
+        sections => {
+            sections.forEach((/**
+             * @param {?} section
+             * @return {?}
+             */
+            section => {
+                if (linksFacetIds.indexOf(section._meta.facetId) !== -1) {
+                    /** @type {?} */
+                    const input = this.searchModel.getInputByFacetId(section._meta.facetId);
+                    input.update();
                     /** @type {?} */
                     const inputOutput = input.getOutput();
                     section.inputs = Array.isArray(inputOutput) ? inputOutput : [inputOutput];
@@ -1656,6 +2860,9 @@ class FacetsWrapperEH extends EventHandler {
                          * @return {?}
                          */
                         key => queryParams[key] = queryParams[key] || null));
+                        // signal
+                        this.emitOuter('facetschange');
+                        // router signal
                         this.emitGlobal('navigate', {
                             handler: 'router',
                             path: [],
@@ -1670,17 +2877,16 @@ class FacetsWrapperEH extends EventHandler {
                     break;
             }
         }));
-        // listen to outer events
+        // listen to global events
         EventHandler.globalEvents$.subscribe((/**
          * @param {?} __0
          * @return {?}
          */
         ({ type, payload }) => {
             switch (type) {
-                case 'global.queryparams':
-                    if (!this._facetsChanged) {
-                        this.dataSource.updateFiltersFromQueryParams(payload);
-                        this.dataSource.updateInputsFromFilters();
+                case 'global.searchresponse':
+                    if (this.dataSource.searchModel.getId() === payload) {
+                        this.dataSource.updateInputLinks();
                     }
                     break;
                 default:
@@ -3893,6 +5099,53 @@ class AwSchedaInnerTitleDS extends DataSource {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+class AwSearchLayoutTabsDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.selected = 'list';
+    }
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        return {
+            items: [{
+                    text: 'LISTA',
+                    payload: 'list',
+                    classes: this.selected === 'list' ? 'is-selected' : ''
+                }, {
+                    text: 'GRAFICO',
+                    payload: 'chart',
+                    classes: this.selected === 'chart' ? 'is-selected' : ''
+                }, {
+                    text: 'TIMELINE',
+                    payload: 'timeline',
+                    classes: this.selected === 'timeline' ? 'is-selected' : ''
+                }]
+        };
+    }
+    /**
+     * @param {?} tabId
+     * @return {?}
+     */
+    setSelected(tabId) {
+        this.selected = tabId;
+    }
+}
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutTabsDS.prototype.selected;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 
 var DS$1 = /*#__PURE__*/Object.freeze({
     AwLinkedObjectsDS: AwLinkedObjectsDS,
@@ -3912,7 +5165,8 @@ var DS$1 = /*#__PURE__*/Object.freeze({
     AwSchedaBreadcrumbsDS: AwSchedaBreadcrumbsDS,
     AwSchedaMetadataDS: AwSchedaMetadataDS,
     AwSchedaImageDS: AwSchedaImageDS,
-    AwSchedaInnerTitleDS: AwSchedaInnerTitleDS
+    AwSchedaInnerTitleDS: AwSchedaInnerTitleDS,
+    AwSearchLayoutTabsDS: AwSearchLayoutTabsDS
 });
 
 /**
@@ -4434,6 +5688,19 @@ class AwTreeEH extends EventHandler {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+class AwSearchLayoutTabsEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        // TODO
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 class AwTableEH extends EventHandler {
     /**
      * @return {?}
@@ -4470,6 +5737,7 @@ var EH$1 = /*#__PURE__*/Object.freeze({
     AwSchedaSidebarEH: AwSchedaSidebarEH,
     AwSidebarHeaderEH: AwSidebarHeaderEH,
     AwTreeEH: AwTreeEH,
+    AwSearchLayoutTabsEH: AwSearchLayoutTabsEH,
     AwTableEH: AwTableEH
 });
 
@@ -4519,1066 +5787,6 @@ AwAboutLayoutComponent.decorators = [
 ];
 /** @nocollapse */
 AwAboutLayoutComponent.ctorParameters = () => [];
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class JsonConfigService {
-    /**
-     * @param {?} http
-     * @param {?} config
-     */
-    constructor(http, config) {
-        this.http = http;
-        this.config = config;
-    }
-    /**
-     * @param {?} path
-     * @return {?}
-     */
-    load(path) {
-        return this.http.get(path).pipe(catchError((/**
-         * @param {?} error
-         * @return {?}
-         */
-        (error) => of({}))), tap((/**
-         * @param {?} response
-         * @return {?}
-         */
-        response => this._handleResponse(response)))).toPromise();
-    }
-    /**
-     * @private
-     * @param {?} response
-     * @return {?}
-     */
-    _handleResponse(response) {
-        if (response) {
-            Object.keys(response).forEach((/**
-             * @param {?} key
-             * @return {?}
-             */
-            key => this.config.set(key, response[key])));
-            // config keys colors
-            if (response['config-keys']) {
-                /** @type {?} */
-                const headTag = document.querySelector('head');
-                /** @type {?} */
-                const styleElement = document.createElement('style');
-                /** @type {?} */
-                let styles = [];
-                Object.keys(response['config-keys']).forEach((/**
-                 * @param {?} key
-                 * @return {?}
-                 */
-                key => {
-                    /** @type {?} */
-                    const configKey = response['config-keys'][key] || {};
-                    if (configKey.color && configKey.color.hex) {
-                        // add css class
-                        styles.push(`--color-${key}: ${configKey.color.hex};`);
-                    }
-                }));
-                if (styles.length) {
-                    styles.unshift(':root {');
-                    styles.push('}');
-                    styleElement.appendChild(document.createTextNode(styles.join('\n')));
-                    headTag.appendChild(styleElement);
-                }
-            }
-        }
-    }
-}
-JsonConfigService.decorators = [
-    { type: Injectable, args: [{
-                providedIn: 'root'
-            },] }
-];
-/** @nocollapse */
-JsonConfigService.ctorParameters = () => [
-    { type: HttpClient },
-    { type: ConfigurationService }
-];
-/** @nocollapse */ JsonConfigService.ngInjectableDef = ɵɵdefineInjectable({ factory: function JsonConfigService_Factory() { return new JsonConfigService(ɵɵinject(HttpClient), ɵɵinject(ConfigurationService)); }, token: JsonConfigService, providedIn: "root" });
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    JsonConfigService.prototype.http;
-    /**
-     * @type {?}
-     * @private
-     */
-    JsonConfigService.prototype.config;
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @record
- */
-function IFacetInputData() { }
-if (false) {
-    /** @type {?} */
-    IFacetInputData.prototype.value;
-    /** @type {?} */
-    IFacetInputData.prototype.label;
-    /** @type {?} */
-    IFacetInputData.prototype.counter;
-    /** @type {?|undefined} */
-    IFacetInputData.prototype.hidden;
-    /** @type {?|undefined} */
-    IFacetInputData.prototype.options;
-}
-/**
- * @abstract
- */
-class FacetInput {
-    /**
-     * @param {?} config
-     */
-    constructor(config) {
-        this.update = (/**
-         * @return {?}
-         */
-        () => this.output = this.transform());
-        this.getId = (/**
-         * @return {?}
-         */
-        () => this.id);
-        this.getData = (/**
-         * @return {?}
-         */
-        () => this.data);
-        this.getConfig = (/**
-         * @return {?}
-         */
-        () => this.config);
-        this.getFacetId = (/**
-         * @return {?}
-         */
-        () => this.config.facetId);
-        this.getInputIndex = (/**
-         * @return {?}
-         */
-        () => this.config.inputIndex);
-        this.getSectionIndex = (/**
-         * @return {?}
-         */
-        () => this.config.sectionIndex);
-        this.getContext = (/**
-         * @return {?}
-         */
-        () => this.config.filterConfig.context || 'external');
-        this.getTarget = (/**
-         * @return {?}
-         */
-        () => this.config.filterConfig.target || null);
-        this.getSearchIn = (/**
-         * @return {?}
-         */
-        () => this.config.filterConfig.searchIn || null);
-        this.getType = (/**
-         * @return {?}
-         */
-        () => this.config.type);
-        this.getOutput = (/**
-         * @return {?}
-         */
-        () => this.output);
-        this.setData = (/**
-         * @param {?} newData
-         * @return {?}
-         */
-        (newData) => this.data = newData);
-        this.config = config;
-        this._setId();
-        FacetInput.index++;
-    }
-    /**
-     * @private
-     * @return {?}
-     */
-    _setId() {
-        this.id = `facet-input-${this.getType()}-${FacetInput.index}`;
-    }
-    ;
-}
-FacetInput.index = 0;
-if (false) {
-    /** @type {?} */
-    FacetInput.index;
-    /**
-     * @type {?}
-     * @private
-     */
-    FacetInput.prototype.id;
-    /**
-     * @type {?}
-     * @protected
-     */
-    FacetInput.prototype.config;
-    /**
-     * @type {?}
-     * @protected
-     */
-    FacetInput.prototype.output;
-    /**
-     * @type {?}
-     * @protected
-     */
-    FacetInput.prototype.data;
-    /** @type {?} */
-    FacetInput.prototype.update;
-    /** @type {?} */
-    FacetInput.prototype.getId;
-    /** @type {?} */
-    FacetInput.prototype.getData;
-    /** @type {?} */
-    FacetInput.prototype.getConfig;
-    /** @type {?} */
-    FacetInput.prototype.getFacetId;
-    /** @type {?} */
-    FacetInput.prototype.getInputIndex;
-    /** @type {?} */
-    FacetInput.prototype.getSectionIndex;
-    /** @type {?} */
-    FacetInput.prototype.getContext;
-    /** @type {?} */
-    FacetInput.prototype.getTarget;
-    /** @type {?} */
-    FacetInput.prototype.getSearchIn;
-    /** @type {?} */
-    FacetInput.prototype.getType;
-    /** @type {?} */
-    FacetInput.prototype.getOutput;
-    /** @type {?} */
-    FacetInput.prototype.setData;
-    /* Skipping unhandled member: ;*/
-    /**
-     * @abstract
-     * @param {?} facetValue
-     * @return {?}
-     */
-    FacetInput.prototype.setActive = function (facetValue) { };
-    /**
-     * @abstract
-     * @protected
-     * @return {?}
-     */
-    FacetInput.prototype.transform = function () { };
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class FacetInputCheckbox extends FacetInput {
-    /**
-     * @protected
-     * @return {?}
-     */
-    transform() {
-        /** @type {?} */
-        const facetId = this.getFacetId();
-        return this.data.map((/**
-         * @param {?} __0
-         * @param {?} index
-         * @return {?}
-         */
-        ({ label, value }, index) => {
-            // normalize value
-            value = '' + value;
-            return {
-                type: 'checkbox',
-                id: this.getId() + '-' + index,
-                label: label,
-                payload: {
-                    facetId,
-                    source: 'input-checkbox',
-                    value
-                },
-                _meta: { facetId, value }
-            };
-        }));
-    }
-    /**
-     * @param {?} facetValue
-     * @return {?}
-     */
-    setActive(facetValue) {
-        const { isArray } = this.config.filterConfig;
-        this.output.forEach((/**
-         * @param {?} config
-         * @return {?}
-         */
-        config => {
-            if (isArray && Array.isArray(facetValue) && facetValue.indexOf(config._meta.value) !== -1) {
-                config.checked = true;
-            }
-            else if (facetValue === config._meta.value) {
-                config.checked = true;
-            }
-            else {
-                config.checked = false;
-            }
-        }));
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class FacetInputText extends FacetInput {
-    /**
-     * @protected
-     * @return {?}
-     */
-    transform() {
-        /** @type {?} */
-        const facetId = this.getFacetId();
-        /** @type {?} */
-        const payload = {
-            facetId,
-            source: 'input-text'
-        };
-        return {
-            type: 'text',
-            id: this.getId(),
-            label: this.config.label,
-            disabled: this.config.disabled,
-            placeholder: this.config.placeholder,
-            icon: this.config.icon,
-            inputPayload: Object.assign({}, payload, { trigger: 'input' }),
-            enterPayload: Object.assign({}, payload, { trigger: 'enter' }),
-            iconPayload: Object.assign({}, payload, { trigger: 'icon' }),
-            _meta: { facetId }
-        };
-    }
-    /**
-     * @param {?} facetValue
-     * @return {?}
-     */
-    setActive(facetValue) {
-        this.output.value = facetValue || null;
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class FacetInputLink extends FacetInput {
-    /**
-     * @protected
-     * @return {?}
-     */
-    transform() {
-        /** @type {?} */
-        const facetId = this.getFacetId();
-        return this.data.map((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ label, value, counter, hidden }) => {
-            // normalize value
-            value = '' + value;
-            return {
-                type: 'link',
-                id: this.getId(),
-                text: label,
-                counter,
-                payload: {
-                    facetId,
-                    source: 'input-link',
-                    value
-                },
-                classes: hidden ? 'is-hidden' : '',
-                _meta: { facetId, value }
-            };
-        }));
-    }
-    /**
-     * @param {?} facetValue
-     * @return {?}
-     */
-    setActive(facetValue) {
-        const { isArray } = this.config.filterConfig;
-        this.output.forEach((/**
-         * @param {?} config
-         * @return {?}
-         */
-        config => {
-            if (isArray && Array.isArray(facetValue) && facetValue.indexOf(config._meta.value) !== -1) {
-                config.classes = 'is-active';
-            }
-            else if (facetValue === config._meta.value) {
-                config.classes = 'is-active';
-            }
-            else {
-                config.classes = null;
-            }
-        }));
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class FacetInputSelect extends FacetInput {
-    /**
-     * @protected
-     * @return {?}
-     */
-    transform() {
-        /** @type {?} */
-        const facetId = this.getFacetId();
-        return {
-            type: 'select',
-            id: this.getId(),
-            label: this.config.label,
-            disabled: this.config.disabled,
-            options: this.data.map((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ value, label }) => ({
-                // normalize value
-                value: '' + value,
-                label
-            }))),
-            payload: {
-                facetId,
-                source: 'input-select',
-            },
-            _meta: { facetId }
-        };
-    }
-    /**
-     * @param {?} facetValue
-     * @return {?}
-     */
-    setActive(facetValue) {
-        this.output.options
-            .filter((/**
-         * @param {?} option
-         * @return {?}
-         */
-        option => option.value === facetValue))
-            .forEach((/**
-         * @param {?} option
-         * @return {?}
-         */
-        option => option.selected = true));
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-const INPUTS_MAP = {
-    'checkbox': FacetInputCheckbox,
-    'text': FacetInputText,
-    'link': FacetInputLink,
-    'select': FacetInputSelect,
-};
-/**
- * @record
- */
-function ISearchConfig() { }
-if (false) {
-    /** @type {?} */
-    ISearchConfig.prototype.facets;
-    /** @type {?} */
-    ISearchConfig.prototype.page;
-    /** @type {?} */
-    ISearchConfig.prototype.results;
-    /** @type {?} */
-    ISearchConfig.prototype.fields;
-    /** @type {?} */
-    ISearchConfig.prototype.baseUrl;
-}
-/**
- * @record
- */
-function IFacet() { }
-if (false) {
-    /** @type {?} */
-    IFacet.prototype.id;
-    /** @type {?} */
-    IFacet.prototype.type;
-    /** @type {?} */
-    IFacet.prototype.operator;
-    /** @type {?|undefined} */
-    IFacet.prototype.data;
-}
-/**
- * @record
- */
-function IFilter() { }
-if (false) {
-    /** @type {?} */
-    IFilter.prototype.facetId;
-    /** @type {?} */
-    IFilter.prototype.value;
-    /** @type {?} */
-    IFilter.prototype.searchIn;
-    /** @type {?|undefined} */
-    IFilter.prototype.isArray;
-    /** @type {?|undefined} */
-    IFilter.prototype.context;
-    /** @type {?|undefined} */
-    IFilter.prototype.target;
-}
-class SearchModel {
-    /**
-     * @param {?} id
-     * @param {?} config
-     */
-    constructor(id, config) {
-        this._filters = [];
-        this._facets = [];
-        this._inputs = [];
-        this._results$ = new Subject();
-        this.getId = (/**
-         * @return {?}
-         */
-        () => this._id);
-        this.getFilters = (/**
-         * @return {?}
-         */
-        () => this._filters);
-        this.getFacets = (/**
-         * @return {?}
-         */
-        () => this._facets);
-        this.getInputs = (/**
-         * @return {?}
-         */
-        () => this._inputs);
-        this.getConfig = (/**
-         * @return {?}
-         */
-        () => this._config);
-        this.getFields = (/**
-         * @return {?}
-         */
-        () => this._config.fields);
-        this.getResults$ = (/**
-         * @return {?}
-         */
-        () => this._results$);
-        this.setResults = (/**
-         * @param {?} results
-         * @return {?}
-         */
-        (results) => this._results$.next(results));
-        this._id = id;
-        this._config = config;
-        this._setFilters();
-        this._setFacets();
-        this._setPage();
-        this._setInputs();
-        this._setInputsData();
-    }
-    /**
-     * @param {?} facetId
-     * @param {?} value
-     * @param {?=} remove
-     * @return {?}
-     */
-    updateFilter(facetId, value, remove) {
-        /** @type {?} */
-        const selectedFilters = this.getFiltersByFacetId(facetId);
-        selectedFilters.forEach((/**
-         * @param {?} filter
-         * @return {?}
-         */
-        filter => {
-            if (Array.isArray(filter.value) && remove) {
-                filter.value = filter.value.filter((/**
-                 * @param {?} item
-                 * @return {?}
-                 */
-                item => item !== value));
-            }
-            else if (Array.isArray(filter.value) && filter.value.indexOf(value) === -1) {
-                filter.value.push(value);
-            }
-            else {
-                filter.value = !remove ? value : null;
-            }
-        }));
-    }
-    /**
-     * @param {?} queryParams
-     * @return {?}
-     */
-    updateFiltersFromQueryParams(queryParams) {
-        Object.keys(queryParams).forEach((/**
-         * @param {?} facetId
-         * @return {?}
-         */
-        facetId => {
-            /** @type {?} */
-            const selectedFilters = this.getFiltersByFacetId(facetId);
-            /** @type {?} */
-            const value = queryParams[facetId];
-            selectedFilters.forEach((/**
-             * @param {?} filter
-             * @return {?}
-             */
-            filter => {
-                filter.value = filter.isArray ? value.split(',') : value;
-            }));
-        }));
-    }
-    /**
-     * @return {?}
-     */
-    updateInputsFromFilters() {
-        this._filters.forEach((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ facetId, value }) => {
-            this._inputs
-                .filter((/**
-             * @param {?} input
-             * @return {?}
-             */
-            input => input.getFacetId() === facetId))
-                .forEach((/**
-             * @param {?} input
-             * @return {?}
-             */
-            input => {
-                input.setActive(value);
-            }));
-        }));
-    }
-    /**
-     * @param {?} facetId
-     * @param {?} data
-     * @return {?}
-     */
-    updateFacet(facetId, data) {
-        /** @type {?} */
-        let selectedFacets = this._facets.filter((/**
-         * @param {?} facet
-         * @return {?}
-         */
-        facet => facet.id === facetId));
-        if (!selectedFacets.length) {
-            throw Error(`Facet with id "${facetId}" does not exists`);
-        }
-        selectedFacets.forEach((/**
-         * @param {?} facet
-         * @return {?}
-         */
-        facet => facet.data = data));
-    }
-    /**
-     * @return {?}
-     */
-    reset() {
-        this._filters.forEach((/**
-         * @param {?} filter
-         * @return {?}
-         */
-        filter => filter.value = null));
-    }
-    /**
-     * @return {?}
-     */
-    getRequestParams() {
-        return {
-            facets: this._facets,
-            page: this._page,
-            results: this._config.results,
-            filters: this._filters
-                .filter((/**
-             * @param {?} filter
-             * @return {?}
-             */
-            filter => filter.context !== 'internal'))
-                .map((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ facetId, value, searchIn }) => ({ facetId, value, searchIn })))
-        };
-    }
-    /**
-     * @return {?}
-     */
-    getInternalFilters() {
-        return this._filters
-            .filter((/**
-         * @param {?} filter
-         * @return {?}
-         */
-        filter => {
-            return (filter.context === 'internal') && ((Array.isArray(filter.value) && filter.value.length) ||
-                (!Array.isArray(filter.value) && filter.value));
-        }))
-            .map((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ facetId, value, searchIn }) => ({ facetId, value, searchIn })));
-    }
-    /**
-     * @param {?} filters
-     * @return {?}
-     */
-    filtersAsQueryParams(filters) {
-        /** @type {?} */
-        let queryParams = {};
-        filters.forEach((/**
-         * @param {?} filter
-         * @return {?}
-         */
-        filter => queryParams[filter.facetId] = Array.isArray(filter.value) ? filter.value.join(',') : filter.value));
-        return queryParams;
-    }
-    /**
-     * @param {?} facetId
-     * @return {?}
-     */
-    getFiltersByFacetId(facetId) {
-        return this._filters.filter((/**
-         * @param {?} filter
-         * @return {?}
-         */
-        filter => filter.facetId === facetId));
-    }
-    /**
-     * @param {?} facetId
-     * @return {?}
-     */
-    getInputByFacetId(facetId) {
-        return this._inputs.filter((/**
-         * @param {?} input
-         * @return {?}
-         */
-        input => input.getFacetId() === facetId))[0];
-    }
-    /**
-     * @param {?} facetId
-     * @param {?} data
-     * @return {?}
-     */
-    setInputData(facetId, data) {
-        this._inputs
-            .filter((/**
-         * @param {?} input
-         * @return {?}
-         */
-        input => input.getFacetId() === facetId))
-            .forEach((/**
-         * @param {?} input
-         * @return {?}
-         */
-        input => input.setData(data)));
-    }
-    /**
-     * @param {?} target
-     * @return {?}
-     */
-    filterTarget(target) {
-        /** @type {?} */
-        const inputs = this._inputs.filter((/**
-         * @param {?} input
-         * @return {?}
-         */
-        input => input.getTarget() === target));
-        /** @type {?} */
-        const targetInput = this.getInputByFacetId(target);
-        /** @type {?} */
-        const facet = this._facets.filter((/**
-         * @param {?} facet
-         * @return {?}
-         */
-        facet => facet.id === target))[0];
-        /** @type {?} */
-        const facetData = facet.data;
-        /** @type {?} */
-        let searchIns = [];
-        inputs.forEach((/**
-         * @param {?} input
-         * @return {?}
-         */
-        input => {
-            /** @type {?} */
-            const filter = this.getFiltersByFacetId(input.getFacetId())[0];
-            /** @type {?} */
-            const searchIn = input.getSearchIn();
-            /** @type {?} */
-            const value = filter.value;
-            searchIns.push([searchIn, value]);
-        }));
-        // filter
-        facetData.forEach((/**
-         * @param {?} item
-         * @return {?}
-         */
-        item => this._filterData(searchIns, item)));
-        // update
-        targetInput.setData(facetData);
-        targetInput.update();
-    }
-    /**
-     * @private
-     * @param {?} searchIns
-     * @param {?} item
-     * @return {?}
-     */
-    _filterData(searchIns, item) {
-        searchIns.forEach((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ([searchIn, value]) => {
-            searchIn.forEach((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ key, operator }) => {
-                switch (operator) {
-                    // '=' EQUALS
-                    case '=':
-                        if (Array.isArray(value)) {
-                            item.hidden = !(!value.length || value.indexOf(item.metadata[key]) !== -1);
-                        }
-                        else {
-                            item.hidden = !(value && value === item.metadata[key]);
-                        }
-                        break;
-                    // '>' GREATER THAN
-                    case '>':
-                        if (!Array.isArray(value)) {
-                            item.hidden = !(value && value > item.metadata[key]);
-                        }
-                        break;
-                    // '<' LESS THAN
-                    case '<':
-                        if (!Array.isArray(value)) {
-                            item.hidden = !(value && value < item.metadata[key]);
-                        }
-                        break;
-                    // '>=' GREATER OR EQUALS
-                    case '>=':
-                        if (!Array.isArray(value)) {
-                            item.hidden = !(value && value >= item.metadata[key]);
-                        }
-                        break;
-                    // '<=' LESS OR EQUALS
-                    case '<=':
-                        if (!Array.isArray(value)) {
-                            item.hidden = !(value && value <= item.metadata[key]);
-                        }
-                        break;
-                    // '<>' NOT EQUAL
-                    case '<>':
-                        if (!Array.isArray(value)) {
-                            item.hidden = !(value && value !== item.metadata[key]);
-                        }
-                        break;
-                    //  'LIKE'
-                    case 'LIKE':
-                        if (value &&
-                            item.metadata[key] &&
-                            typeof value === 'string' &&
-                            typeof item.metadata[key] === 'string') {
-                            /** @type {?} */
-                            const haystack = item.metadata[key].toLowerCase();
-                            /** @type {?} */
-                            const needle = value.toLocaleLowerCase();
-                            item.hidden = !(haystack.indexOf(needle) !== -1);
-                        }
-                        break;
-                    default:
-                        console.warn(`SearchIn: operator ${operator} not supported`);
-                        break;
-                }
-            }));
-        }));
-    }
-    /**
-     * @private
-     * @return {?}
-     */
-    _setFilters() {
-        this._config.fields.forEach((/**
-         * @param {?} field
-         * @return {?}
-         */
-        field => {
-            field.inputs.forEach((/**
-             * @param {?} input
-             * @return {?}
-             */
-            input => this._filters.push(Object.assign({}, input.filterConfig, { facetId: input.facetId, value: input.filterConfig.isArray ? [] : null }))));
-        }));
-    }
-    /**
-     * @private
-     * @return {?}
-     */
-    _setFacets() {
-        this._facets = this._config.facets;
-    }
-    /**
-     * @private
-     * @return {?}
-     */
-    _setPage() {
-        this._page = this._config.page;
-    }
-    /**
-     * @private
-     * @return {?}
-     */
-    _setInputs() {
-        this._config.fields.forEach((/**
-         * @param {?} sectionConfig
-         * @param {?} sectionIndex
-         * @return {?}
-         */
-        (sectionConfig, sectionIndex) => {
-            sectionConfig.inputs.forEach((/**
-             * @param {?} inputConfig
-             * @param {?} inputIndex
-             * @return {?}
-             */
-            (inputConfig, inputIndex) => {
-                /** @type {?} */
-                const inputModel = INPUTS_MAP[inputConfig.type];
-                if (!inputModel)
-                    throw Error(`Input type ${inputConfig.type} not supported`);
-                this._inputs.push(new inputModel(Object.assign({}, inputConfig, { inputIndex, sectionIndex })));
-            }));
-        }));
-    }
-    /**
-     * @private
-     * @return {?}
-     */
-    _setInputsData() {
-        this._facets.forEach((/**
-         * @param {?} facet
-         * @return {?}
-         */
-        facet => this.setInputData(facet.id, facet.data)));
-    }
-}
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchModel.prototype._id;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchModel.prototype._filters;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchModel.prototype._facets;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchModel.prototype._inputs;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchModel.prototype._page;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchModel.prototype._config;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchModel.prototype._results$;
-    /** @type {?} */
-    SearchModel.prototype.getId;
-    /** @type {?} */
-    SearchModel.prototype.getFilters;
-    /** @type {?} */
-    SearchModel.prototype.getFacets;
-    /** @type {?} */
-    SearchModel.prototype.getInputs;
-    /** @type {?} */
-    SearchModel.prototype.getConfig;
-    /** @type {?} */
-    SearchModel.prototype.getFields;
-    /** @type {?} */
-    SearchModel.prototype.getResults$;
-    /** @type {?} */
-    SearchModel.prototype.setResults;
-}
-class SearchService {
-    constructor() {
-        this._models = {};
-    }
-    /**
-     * @param {?} id
-     * @param {?} config
-     * @return {?}
-     */
-    add(id, config) {
-        if (this._models[id])
-            throw Error(`Search model "${id}" already exists!`);
-        this._models[id] = new SearchModel(id, config);
-    }
-    /**
-     * @param {?} id
-     * @return {?}
-     */
-    model(id) {
-        return this._models[id] || null;
-    }
-}
-SearchService.decorators = [
-    { type: Injectable, args: [{
-                providedIn: 'root'
-            },] }
-];
-/** @nocollapse */ SearchService.ngInjectableDef = ɵɵdefineInjectable({ factory: function SearchService_Factory() { return new SearchService(); }, token: SearchService, providedIn: "root" });
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchService.prototype._models;
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 
 /**
  * @fileoverview added by tsickle
@@ -7850,87 +8058,46 @@ AwWorksLayoutComponent.ctorParameters = () => [];
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-const ɵ0 = [], ɵ1 = [{
-        value: '1',
-        label: 'Cerca in tutti campi delle schede'
-    }], ɵ2 = [], ɵ3 = [], ɵ4 = [{
-        value: 'milano',
-        label: 'Milano',
-        count: 1,
-        metadata: {
-            title: 'Milano',
-            'entity-type': 'places'
-        }
-    }, {
-        value: 'roma',
-        label: 'Comune di Roma',
-        count: 2,
-        metadata: {
-            title: 'Comune di Roma',
-            'entity-type': 'places'
-        }
-    }, {
-        value: 'spazio',
-        label: 'Spazio',
-        count: 3,
-        metadata: {
-            title: 'Spazio',
-            'entity-type': 'concepts'
-        }
-    }, {
-        value: 'rodolfo-marna',
-        label: 'Rodolfo Marna',
-        count: 4,
-        metadata: {
-            title: 'Rodolfo Marna',
-            'entity-type': 'people'
-        }
-    }, {
-        value: 'alighiero-boetti',
-        label: 'Alighiero Boetti',
-        count: 5,
-        metadata: {
-            title: 'Alighiero Boetti',
-            'entity-type': 'people'
-        }
-    }], ɵ5 = [], ɵ6 = [];
-/** @type {?} */
-const SEARCH_CONFIG = {
+var facetsConfig = {
+    totalCount: 0,
     facets: [{
             id: 'query',
-            type: 'value',
-            data: ɵ0
+            type: 'value'
         }, {
             id: 'query-all',
             type: 'value',
-            data: ɵ1
+            data: [{
+                    value: '1',
+                    label: 'Cerca in tutti campi delle schede'
+                }]
         }, {
             id: 'query-links',
             type: 'value',
-            data: ɵ2
+            data: []
         }, {
             id: 'entity-types',
             type: 'value',
             operator: 'OR',
             limit: 10,
             order: 'count',
+            // count | text
+            data: []
         }, {
             id: 'entity-search',
-            type: 'value',
-            data: ɵ3
+            type: 'value'
         }, {
             id: 'entity-links',
             type: 'value',
             metadata: ['title', 'entity-type'],
-            data: ɵ4
+            data: []
         }, {
             id: 'date-from',
             type: 'value',
-            data: ɵ5
+            data: []
         }, {
             id: 'date-to',
             type: 'value',
-            data: ɵ6
+            data: []
         }],
     fields: [{
             inputs: [{
@@ -8042,7 +8209,7 @@ const SEARCH_CONFIG = {
             // score | text | date
             key: 'author',
             // docPath, elastic key, ecc
-            direction: 'ASC',
+            direction: 'DESC',
         },
         fields: {
             title: {
@@ -8050,13 +8217,186 @@ const SEARCH_CONFIG = {
                 limit: 50,
             }
         },
+        items: []
     },
-    page: null,
-    baseUrl: ''
+    page: { offset: 0, limit: 10 }
 };
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var fakeSearchRequest$ = (/**
+ * @param {?} params
+ * @param {?} configKeys
+ * @return {?}
+ */
+(params, configKeys) => {
+    params.totalCount = Math.floor(Math.random() * 1000);
+    console.log('fake-search-request----------->', params);
+    let { facets } = params;
+    // query links
+    _getFacet('query-links', facets).data = _getQueryLinksData(configKeys);
+    // entity types
+    _getFacet('entity-types', facets).data = _getEntityTypesData(configKeys);
+    // entity links
+    _getFacet('entity-links', facets).data = _getEntityLinksData();
+    // date from
+    _getFacet('date-from', facets).data = _getDateFromData();
+    // date to
+    _getFacet('date-to', facets).data = _getDateToData();
+    return of(params);
+});
 /** @type {?} */
-const SEARCH_ID = 'search-facets';
+const _getFacet = (/**
+ * @param {?} id
+ * @param {?} facets
+ * @return {?}
+ */
+(id, facets) => {
+    return facets.filter((/**
+     * @param {?} f
+     * @return {?}
+     */
+    f => f.id === id))[0];
+});
+const ɵ0 = _getFacet;
+/** @type {?} */
+const _getQueryLinksData = (/**
+ * @param {?} configKeys
+ * @return {?}
+ */
+(configKeys) => {
+    return Object.keys(configKeys).map((/**
+     * @param {?} key
+     * @return {?}
+     */
+    key => {
+        /** @type {?} */
+        const config = configKeys[key];
+        return {
+            value: key,
+            label: config.label,
+            counter: Math.floor(Math.random() * 100),
+            // questi vanno aggiunti a mano lato front-end
+            options: {
+                icon: config.icon,
+                classes: `color-${key}`
+            }
+        };
+    }));
+});
+const ɵ1 = _getQueryLinksData;
+/** @type {?} */
+const _getEntityTypesData = (/**
+ * @param {?} configKeys
+ * @return {?}
+ */
+(configKeys) => {
+    return Object.keys(configKeys).map((/**
+     * @param {?} key
+     * @return {?}
+     */
+    key => {
+        /** @type {?} */
+        const config = configKeys[key];
+        return {
+            value: key,
+            label: config.label,
+        };
+    }));
+});
+const ɵ2 = _getEntityTypesData;
+/** @type {?} */
+const _getDateFromData = (/**
+ * @return {?}
+ */
+() => {
+    return ['1990', '1991', '1992', '1993'].map((/**
+     * @param {?} key
+     * @return {?}
+     */
+    key => {
+        return {
+            value: key,
+            label: key,
+        };
+    }));
+});
+const ɵ3 = _getDateFromData;
+/** @type {?} */
+const _getDateToData = (/**
+ * @return {?}
+ */
+() => {
+    return ['2000', '2001', '2002', '2003'].map((/**
+     * @param {?} key
+     * @return {?}
+     */
+    key => {
+        return {
+            value: key,
+            label: key,
+        };
+    }));
+});
+const ɵ4 = _getDateToData;
+/** @type {?} */
+const _getEntityLinksData = (/**
+ * @return {?}
+ */
+() => {
+    /** @type {?} */
+    const types = ['places', 'places', 'concepts', 'people', 'people'];
+    /** @type {?} */
+    const items = ['milano', 'roma', 'spazio', 'rodolfo-marna', 'alighiero-boetti'];
+    return items.map((/**
+     * @param {?} key
+     * @param {?} index
+     * @return {?}
+     */
+    (key, index) => {
+        /** @type {?} */
+        const label = key.replace('-', ' ');
+        return {
+            value: key,
+            label: label,
+            counter: Math.floor(Math.random() * 100),
+            metadata: {
+                title: label,
+                'entity-type': types[index]
+            }
+        };
+    }));
+});
+const ɵ5 = _getEntityLinksData;
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/** @type {?} */
+const SEARCH_MODEL_ID = 'aw-search-layout';
 class AwSearchLayoutDS extends LayoutDataSource {
+    constructor() {
+        super(...arguments);
+        this.currentPage = 1; // pagination value (url param)
+        // pagination value (url param)
+        this.pageSize = 10; // linked objects page size
+        this.orderByLabel = 'Ordina per';
+        this.orderByOptions = [{
+                value: 'text_DESC',
+                label: 'Ordine alfabetico (DESC)'
+            }, {
+                value: 'text_ASC',
+                label: 'Ordine alfabetico (ASC)'
+            },
+        ];
+        this.getSearchModelId = (/**
+         * @return {?}
+         */
+        () => SEARCH_MODEL_ID);
+    }
     /**
      * @param {?} __0
      * @return {?}
@@ -8067,66 +8407,129 @@ class AwSearchLayoutDS extends LayoutDataSource {
         this.communication = communication;
         this.search = search;
         this.options = options;
-        // FIXME: togliere
+        this.pageTitle = this.configuration.get('search-layout').title;
+        if (!this.search.model(SEARCH_MODEL_ID))
+            this.search.add(SEARCH_MODEL_ID, facetsConfig);
+        this.searchModel = this.search.model(SEARCH_MODEL_ID);
+        this.doSearchRequest$().subscribe((/**
+         * @return {?}
+         */
+        () => {
+            this.one('facets-wrapper').update({ searchModel: this.searchModel });
+        }));
+    }
+    /**
+     * @param {?} payload
+     * @return {?}
+     */
+    onOrderByChange(payload) {
+        const [orderBy, direction] = payload.split('_');
+        this.searchModel.setSearchConfigOrderBy(orderBy);
+        this.searchModel.setSearchConfigDirection(direction);
+    }
+    /**
+     * @param {?} payload
+     * @return {?}
+     */
+    onPaginationChange(payload) {
+        /** @type {?} */
+        const page = payload.replace('page-', '');
+        return this._updateSearchPage(page);
+    }
+    /**
+     * @param {?} payload
+     * @return {?}
+     */
+    onPaginationGoToChange(payload) {
+        /** @type {?} */
+        const page = payload.replace('goto-', '');
+        this._updateSearchPage(page);
+    }
+    /**
+     * @param {?} payload
+     * @return {?}
+     */
+    onResultsLimitChange(payload) {
+        this.pageSize = payload;
+        this.searchModel.setPageConfigLimit(payload);
+        // reset page & offset
+        this.currentPage = 1;
+        this.searchModel.setPageConfigOffset(0);
+    }
+    /**
+     * @return {?}
+     */
+    doSearchRequest$() {
+        // FIXME: togliere configKeys
+        // dovrebbe venire dall'API
         /** @type {?} */
         const configKeys = this.configuration.get('config-keys');
+        // FIXME: mettere logica definitiva 
+        // per la chiamata search
+        /*
+            this.communication.request$('search', {
+              onError: error => console.error(error),
+              params: requestParams
+            })
+            */
         /** @type {?} */
-        const queryLinksData = Object.keys(configKeys).map((/**
-         * @param {?} key
+        const requestParams = this.searchModel.getRequestParams();
+        /** @type {?} */
+        const fakeResultsRequest$ = this.communication.request$('getEntityDetails', {
+            onError: (/**
+             * @param {?} error
+             * @return {?}
+             */
+            error => console.error(error)),
+            params: { entityId: '55vf-entity-s3ar' }
+        });
+        return fakeResultsRequest$.pipe(withLatestFrom(fakeSearchRequest$(requestParams, configKeys)), tap((/**
+         * @param {?} __0
          * @return {?}
          */
-        key => {
+        ([resultsResponse, searchResponse]) => {
+            this.totalCount = searchResponse.totalCount;
             /** @type {?} */
-            const config = configKeys[key];
-            return {
-                value: key,
-                label: config.label,
-                count: 1,
-                // questi vanno aggiunti a mano lato front-end
-                icon: config.icon,
-                classes: `color-${key}`
-            };
-        }));
+            let resultsTitleIndex = 0;
+            // results title
+            if (this.totalCount > 1) {
+                resultsTitleIndex = 2;
+            }
+            else if (this.totalCount === 1) {
+                resultsTitleIndex = 1;
+            }
+            this.resultsTitle = this.configuration.get('search-layout').results[resultsTitleIndex];
+            this.searchModel.updateFacets(searchResponse.facets);
+            this.searchModel.updateTotalCount(searchResponse.totalCount);
+            this.one('aw-linked-objects').updateOptions({
+                context: 'search',
+                config: this.configuration,
+                // todo: swap to next line after merge
+                // config: this.configuration
+                page: this.currentPage,
+                size: this.pageSize,
+            });
+            this.one('aw-linked-objects').update({ items: resultsResponse.items });
+        })));
+    }
+    /**
+     * @private
+     * @param {?} page
+     * @return {?}
+     */
+    _updateSearchPage(page) {
+        if (+page === this.currentPage)
+            return of(false);
+        this.currentPage = +page;
         /** @type {?} */
-        const entityTypesData = Object.keys(configKeys).map((/**
-         * @param {?} key
-         * @return {?}
-         */
-        key => {
-            /** @type {?} */
-            const config = configKeys[key];
-            return {
-                value: key,
-                label: config.label,
-            };
-        }));
-        SEARCH_CONFIG.facets.filter((/**
-         * @param {?} facet
-         * @return {?}
-         */
-        facet => facet.id === 'query-links')).forEach((/**
-         * @param {?} facet
-         * @return {?}
-         */
-        facet => {
-            facet.data = queryLinksData;
-        }));
-        SEARCH_CONFIG.facets.filter((/**
-         * @param {?} facet
-         * @return {?}
-         */
-        facet => facet.id === 'entity-types')).forEach((/**
-         * @param {?} facet
-         * @return {?}
-         */
-        facet => {
-            facet.data = entityTypesData;
-        }));
-        if (!this.search.model(SEARCH_ID))
-            this.search.add(SEARCH_ID, SEARCH_CONFIG);
+        const searchConfig = this.searchModel.getConfig();
         /** @type {?} */
-        const searchModel = this.search.model(SEARCH_ID);
-        this.one('facets-wrapper').update({ searchModel });
+        const pageConfig = searchConfig.page;
+        const { limit } = pageConfig;
+        /** @type {?} */
+        const newOffset = (this.currentPage - 1) * limit;
+        this.searchModel.setPageConfigOffset(newOffset);
+        return of(true);
     }
 }
 if (false) {
@@ -8150,8 +8553,29 @@ if (false) {
      * @private
      */
     AwSearchLayoutDS.prototype.search;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutDS.prototype.searchModel;
+    /** @type {?} */
+    AwSearchLayoutDS.prototype.pageTitle;
+    /** @type {?} */
+    AwSearchLayoutDS.prototype.resultsTitle;
+    /** @type {?} */
+    AwSearchLayoutDS.prototype.totalCount;
+    /** @type {?} */
+    AwSearchLayoutDS.prototype.currentPage;
+    /** @type {?} */
+    AwSearchLayoutDS.prototype.pageSize;
     /** @type {?} */
     AwSearchLayoutDS.prototype.options;
+    /** @type {?} */
+    AwSearchLayoutDS.prototype.orderByLabel;
+    /** @type {?} */
+    AwSearchLayoutDS.prototype.orderByOptions;
+    /** @type {?} */
+    AwSearchLayoutDS.prototype.getSearchModelId;
 }
 
 /**
@@ -8159,6 +8583,10 @@ if (false) {
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutEH extends EventHandler {
+    constructor() {
+        super(...arguments);
+        this.facetsChange$ = new Subject();
+    }
     /**
      * @return {?}
      */
@@ -8171,6 +8599,11 @@ class AwSearchLayoutEH extends EventHandler {
             switch (type) {
                 case 'aw-search-layout.init':
                     this.dataSource.onInit(payload);
+                    this._listenToFacetsChange();
+                    break;
+                case 'aw-search-layout.orderbychange':
+                    this.dataSource.onOrderByChange(payload);
+                    this.facetsChange$.next();
                     break;
                 default:
                     break;
@@ -8182,12 +8615,62 @@ class AwSearchLayoutEH extends EventHandler {
          */
         ({ type, payload }) => {
             switch (type) {
-                // TODO
+                case 'facets-wrapper.facetschange':
+                    this.facetsChange$.next();
+                    break;
+                case 'aw-linked-objects.pagination':
+                    this.dataSource.onPaginationChange(payload).subscribe((/**
+                     * @param {?} changed
+                     * @return {?}
+                     */
+                    changed => {
+                        if (changed)
+                            this.facetsChange$.next();
+                    }));
+                    break;
+                case 'aw-linked-objects.change':
+                    this.dataSource.onResultsLimitChange(payload);
+                    this.facetsChange$.next();
+                    break;
+                case 'aw-linked-objects.goto':
+                    this.dataSource.onPaginationGoToChange(payload).subscribe((/**
+                     * @param {?} changed
+                     * @return {?}
+                     */
+                    changed => {
+                        if (changed)
+                            this.facetsChange$.next();
+                    }));
+                    break;
                 default:
                     break;
             }
         }));
     }
+    /**
+     * @private
+     * @return {?}
+     */
+    _listenToFacetsChange() {
+        this.facetsChange$.pipe(debounceTime(500)).subscribe((/**
+         * @return {?}
+         */
+        () => {
+            this.dataSource.doSearchRequest$().subscribe((/**
+             * @return {?}
+             */
+            () => {
+                this.emitGlobal('searchresponse', this.dataSource.getSearchModelId());
+            }));
+        }));
+    }
+}
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutEH.prototype.facetsChange$;
 }
 
 /**
@@ -8203,6 +8686,8 @@ const AwSearchLayoutConfig = {
      */
     widgets: [
         { id: 'facets-wrapper', dataSource: FacetsWrapperDS, eventHandler: FacetsWrapperEH },
+        { id: 'aw-linked-objects' },
+        { id: 'aw-search-layout-tabs', hasStaticData: true },
     ],
     layoutDS: AwSearchLayoutDS,
     layoutEH: AwSearchLayoutEH,
@@ -8265,7 +8750,7 @@ class AwSearchLayoutComponent extends AbstractLayout {
 AwSearchLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-search-layout',
-                template: "<div class=\"aw-search\" id=\"search-layout\">\n    <div class=\"aw-search__content\">\n\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-search__facets\">\n            <n7-facets-wrapper\n                [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                [emit]=\"lb.widgets['facets-wrapper'].emit\">\n            </n7-facets-wrapper>\n        </div>\n\n        <!-- Search details -->\n        <div class=\"aw-search__search-wrapper\">\n            #TODO: results\n        </div>\n    </div>\n</div>\n"
+                template: "<div class=\"aw-search n7-side-auto-padding\" id=\"search-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>        \n        <!--\n        <div class=\"aw-search__header-right\">\n            <n7-nav\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\n            </n7-nav>\n        </div>\n        -->\n    </div>\n    <div class=\"aw-search__content-wrapper\">\n        <!-- Left sidebar: facets -->\n        <div class=\"aw-search__sidebar\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper\n                    [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>        \n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\" for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\" id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\" [value]=\"option.value\">{{ option.label }}</option>\n                    </select>\n                </div>     \n            </div>\n            <!-- Search details -->\n            <div class=\"aw-search__results-wrapper\">\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                    <n7-breadcrumbs [data]=\"preview.breadcrumbs\">\n                    </n7-breadcrumbs>\n                    <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n                <n7-pagination [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-pagination>\n            </div>\n        </div>\n    </div>\n</div>\n"
             }] }
 ];
 /** @nocollapse */
@@ -8419,5 +8904,5 @@ N7BoilerplateLibModule.decorators = [
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAboutLayoutComponent, AwAboutLayoutConfig, AwAboutLayoutDS, AwAboutLayoutEH, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeBubbleChartDS, AwHomeBubbleChartEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, AwWorksLayoutComponent, AwWorksLayoutConfig, AwWorksLayoutDS, AwWorksLayoutEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, CommunicationService, ConfigurationService, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsEH, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SearchModel, SearchService, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwAboutLayoutComponent as ɵk, AwEntitaLayoutComponent as ɵl, CommunicationService as ɵm, MainStateService as ɵn, AwHomeLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwWorksLayoutComponent as ɵq, AwSearchLayoutComponent as ɵr, ConfigurationService as ɵs, LayoutsConfigurationService as ɵt, SearchService as ɵu, BubbleChartWrapperComponent as ɵv };
+export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAboutLayoutComponent, AwAboutLayoutConfig, AwAboutLayoutDS, AwAboutLayoutEH, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeBubbleChartDS, AwHomeBubbleChartEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, AwWorksLayoutComponent, AwWorksLayoutConfig, AwWorksLayoutDS, AwWorksLayoutEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, CommunicationService, ConfigurationService, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsEH, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SearchModel, SearchService, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwAboutLayoutComponent as ɵk, AwEntitaLayoutComponent as ɵl, CommunicationService as ɵm, MainStateService as ɵn, AwHomeLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwWorksLayoutComponent as ɵq, AwSearchLayoutComponent as ɵr, ConfigurationService as ɵs, LayoutsConfigurationService as ɵt, SearchService as ɵu, BubbleChartWrapperComponent as ɵv };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

@@ -4,11 +4,11 @@ export declare type FilterOperators = '=' | '>' | '<' | '>=' | '<=' | '<>' | 'LI
 export declare type FacetTypes = 'value' | 'range';
 export declare type FacetOperators = 'OR' | 'AND';
 export interface ISearchConfig {
+    totalCount: number;
     facets: any;
     page: any;
     results: any;
     fields: any;
-    baseUrl: string;
 }
 export interface IFacet {
     id: string;
@@ -33,6 +33,7 @@ export declare class SearchModel {
     private _facets;
     private _inputs;
     private _page;
+    private _totalCount;
     private _config;
     private _results$;
     constructor(id: string, config: ISearchConfig);
@@ -41,12 +42,15 @@ export declare class SearchModel {
     getFacets: () => IFacet[];
     getInputs: () => FacetInput[];
     getConfig: () => ISearchConfig;
+    getTotalCount: () => number;
     getFields: () => any;
     getResults$: () => Subject<any[]>;
     setResults: (results: any) => void;
     updateFilter(facetId: any, value: any, remove?: boolean): void;
     updateFiltersFromQueryParams(queryParams: any): void;
     updateInputsFromFilters(): void;
+    updateFacets(facets: any): void;
+    updateTotalCount(totalCount: any): void;
     updateFacet(facetId: any, data: any): void;
     reset(): void;
     getRequestParams(): {
@@ -75,15 +79,21 @@ export declare class SearchModel {
     getInputByFacetId(facetId: string): FacetInput;
     setInputData(facetId: any, data: any): void;
     filterTarget(target: any): void;
+    setSearchConfigOrderBy(orderBy: any): void;
+    setSearchConfigDirection(direction: any): void;
+    setPageConfigOffset(offset: any): void;
+    setPageConfigLimit(limit: any): void;
     private _filterData;
     private _setFilters;
     private _setFacets;
     private _setPage;
+    private _setTotalCount;
     private _setInputs;
     private _setInputsData;
 }
 export declare class SearchService {
     private _models;
+    static queryParams: any;
     add(id: string, config: ISearchConfig): void;
     model(id: string): SearchModel;
 }

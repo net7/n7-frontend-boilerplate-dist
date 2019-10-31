@@ -1,5 +1,6 @@
 import { FacetInput } from './facet-input';
 export declare class FacetInputLink extends FacetInput {
+    private facetValue;
     protected transform(): {
         type: string;
         id: string;
@@ -10,6 +11,7 @@ export declare class FacetInputLink extends FacetInput {
             source: string;
             value: string;
         };
+        icon: any;
         classes: string;
         _meta: {
             facetId: any;
@@ -17,4 +19,5 @@ export declare class FacetInputLink extends FacetInput {
         };
     }[];
     setActive(facetValue: any): void;
+    private _isActive;
 }
