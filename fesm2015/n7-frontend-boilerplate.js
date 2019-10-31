@@ -415,7 +415,7 @@ const ApolloProviderConfig = {
             id
             icon
           }
-          similarItems {
+          items {
             thumbnail
               item {
                 label
@@ -890,8 +890,9 @@ class MainLayoutDS extends LayoutDataSource {
         this.route = route;
         this.titleService = titleService;
         this.options = options;
+        this.mainState.addCustom('currentNav', new Subject());
         // update header
-        this.one('header').update(this.configuration.get('header'));
+        this.one('header').update({ "items": this.configuration.get('header') });
         // main state updates
         this.mainState.get$('headTitle').subscribe((/**
          * @param {?} val
@@ -913,6 +914,11 @@ class MainLayoutDS extends LayoutDataSource {
          * @return {?}
          */
         val => this.one('breadcrumbs').update(val)));
+        this.mainState.getCustom$('currentNav').subscribe((/**
+         * @param {?} val
+         * @return {?}
+         */
+        val => this.one('header').update({ "items": this.configuration.get('header'), 'selected': val })));
         // mainState test
         /* this.mainState.addCustom('customNav', new Subject());
         this.mainState.get$('pageTitle').subscribe(val => console.log('pageTitle', val));
@@ -920,7 +926,7 @@ class MainLayoutDS extends LayoutDataSource {
     
         this.mainState.update('pageTitle', 'hola');
         this.mainState.updateCustom('customNav', {'hello': 'mundo!'});
-        
+    
         setTimeout(() => {
           this.mainState.update('pageTitle', 'chao');
           this.mainState.updateCustom('customNav', {'hello': 'world!'});
@@ -1101,7 +1107,27 @@ class HeaderDS extends DataSource {
      * @return {?}
      */
     transform(data) {
-        return data;
+        if (data.selected) {
+            this.selectNavItem(data.selected);
+        }
+        return data.items;
+    }
+    /**
+     * @param {?} selectedItem
+     * @return {?}
+     */
+    selectNavItem(selectedItem) {
+        this.output.nav.items.forEach((/**
+         * @param {?} item
+         * @return {?}
+         */
+        item => {
+            item.classes = "";
+            if (item.payload == selectedItem) {
+                item.classes = "is-current";
+            }
+        }));
+        this.update({ 'items': this.output });
     }
 }
 
@@ -1486,6 +1512,7 @@ class HeaderEH extends EventHandler {
                 case 'header.click':
                     // navigate control
                     // if(payload.source === 'navigate'){
+                    this.dataSource.selectNavItem(payload);
                     this.emitGlobal('navigate', {
                         handler: 'router',
                         path: [payload]
@@ -2089,179 +2116,237 @@ class AwAboutLayoutEH extends EventHandler {
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwLinkedObjectsDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.handleShowMoreClick = (/**
+         * @param {?} incomingData
+         * @return {?}
+         */
+        incomingData => {
+            /*
+              Called by button <Mostra Altri>, adds the incoming
+              data to the linked objects component.
+            */
+            console.log('showing more stuff');
+            // TODO
+        });
+        this.makePagination = (/**
+         * @param {?} totalPages
+         * @param {?} currentPage
+         * @return {?}
+         */
+        (totalPages, currentPage) => {
+            /*
+                  Called by this.unpackData() when this.options.page is defined.
+                  Returns the data for <n7-pagination> component.
+                */
+            /** @type {?} */
+            let result = []
+            // always push the first page
+            ;
+            // always push the first page
+            result.push({
+                text: '1',
+                payload: 'page-1',
+                classes: currentPage == 1 ? 'is-active' : ''
+            });
+            for (let i = 1; i < totalPages; i++) {
+                result.push({ text: String(i + 1), payload: 'page-' + String(i + 1), classes: currentPage == i + 1 ? 'is-active' : '' });
+            }
+            return result;
+        });
+        this.unpackData = (/**
+         * @param {?} data
+         * @return {?}
+         */
+        data => {
+            /*
+                  Dynamically returns the data object for each HTML component
+                  data: {
+                    previews: [ breadcrumbs: { items[] }, classes, image, metadata, payload, title ],
+                    pagination: { first, last, links, next, prev, select }
+                  }
+                */
+            /** @type {?} */
+            const config = this.options.config;
+            /** @type {?} */
+            const // app-config.json
+            totalCount = data.totalCount;
+            /** @type {?} */
+            const // total amount of items available on backend
+            totalPages = this.totalPages;
+            /** @type {?} */
+            const // calculated number of pages
+            page = this.currentPage;
+            /** @type {?} */
+            const // current page (if using pagination)
+            context = this.context;
+            /** @type {?} */
+            const // parent layout name
+            size = this.pageSize // items per page (if using pagination)
+            ;
+            // items per page (if using pagination)
+            /** @type {?} */
+            var d = data.items // items to iterate over
+            ;
+            if (config) {
+                /** @type {?} */
+                var keys = config.get('config-keys')
+                // dynamic search for max-item-length
+                ;
+                // dynamic search for max-item-length
+                if (config.get(context + '-layout')) {
+                    /** @type {?} */
+                    var lengthLimit = config.get(context + '-layout')['max-item-length'];
+                    /** @type {?} */
+                    var resultsLimit = config.get(context + '-layout')['results-limit'];
+                }
+            }
+            // resize data
+            if (size && page) {
+                d = d.slice(page * size - size, page * size);
+            }
+            else if (size) {
+                d = d.slice(0, size);
+            }
+            /** @type {?} */
+            var result = [];
+            d.forEach((/**
+             * @param {?} el
+             * @return {?}
+             */
+            el => {
+                /** @type {?} */
+                let item = {
+                    image: el.thumbnail,
+                    title: 
+                    // if there is a max string length in config, use it
+                    lengthLimit && el.item.label.length > lengthLimit ?
+                        el.item.label.slice(0, lengthLimit) + '...' : el.item.label,
+                    payload: el.item.id,
+                    classes: ['entita', 'search'].includes(context) ? 'is-fullwidth' : '',
+                    metadata: [
+                        {
+                            classes: 'n7-objects__metadata-artist',
+                            items: el.item.info.map((/**
+                             * @param {?} __0
+                             * @return {?}
+                             */
+                            ({ value, key }) => ({
+                                label: key === 'author' ? 'Artista' : null,
+                                value
+                            })))
+                        },
+                        {
+                            classes: 'n7-objects__metadata-linked',
+                            items: el.relatedTOEData.map((/**
+                             * @param {?} toe
+                             * @return {?}
+                             */
+                            toe => {
+                                return {
+                                    // Persone: 6, Organizz: 12, Luoghi: 2, Concetti: 32
+                                    value: toe.count,
+                                    // icon: 'n7-icon-bell' // TODO: link icon to config key
+                                    icon: keys[toe.type.configKey].icon,
+                                    classes: 'color-' + toe.type.configKey
+                                };
+                            }))
+                        }
+                    ]
+                };
+                if (el.breadcrumbs) {
+                    item['breadcrumbs'] = {
+                        // n7-breadcrumbs uses this as it's own data
+                        items: el.breadcrumbs.map((/**
+                         * @param {?} crumb
+                         * @return {?}
+                         */
+                        crumb => {
+                            return {
+                                label: crumb.label,
+                                payload: crumb.link,
+                            };
+                        }))
+                    };
+                }
+                result.push(item);
+            }));
+            if (page) { // if I'm on a page, render pagination data.
+                // if I'm on a page, render pagination data.
+                /** @type {?} */
+                let sizeOptions = [10, 25, 50];
+                return {
+                    pagination: {
+                        first: { payload: `goto-${1}`, classes: page == 1 ? 'is-disabled' : '' },
+                        prev: { payload: `goto-${page - 1}`, classes: page == 1 ? 'is-disabled' : '' },
+                        next: { payload: `goto-${page + 1}`, classes: page == totalPages ? 'is-disabled' : '' },
+                        last: { payload: `goto-${totalPages}`, classes: page == totalPages ? 'is-disabled' : '' },
+                        links: this.makePagination(totalPages, page),
+                        select: {
+                            label: 'Numero di risultati',
+                            options: sizeOptions.map((/**
+                             * @param {?} o
+                             * @return {?}
+                             */
+                            o => {
+                                return {
+                                    text: o,
+                                    selected: o == size,
+                                };
+                            })),
+                            payload: 'select-size'
+                        }
+                    },
+                    previews: result
+                };
+            }
+            if (context === 'home') {
+                return {
+                    result,
+                    actions: [
+                        { label: 'Mostra Tutti (' + totalCount + ')' },
+                        lengthLimit ?
+                            { label: 'Mostra Altri (' + resultsLimit + ')' } :
+                            null,
+                    ]
+                };
+            }
+            console.log('linked objects result', result);
+            return result;
+        });
+    }
     /**
      * @protected
      * @param {?} data
      * @return {?}
      */
     transform(data) {
-        /** @type {?} */
-        const CONFIG = this.options.config;
         this.pageSize = this.options.size;
-        this.currentPage = Number(this.options.page);
-        this.totalPages = Math.floor(data.length / Number(this.pageSize));
+        this.currentPage = (/** @type {?} */ (this.options.page));
+        this.totalPages = Math.floor(data.length / this.pageSize);
         this.context = this.options.context;
-        return unpackData(data, this.currentPage, this.pageSize, CONFIG, this.totalPages, this.context);
+        return this.unpackData(data);
     }
 }
 if (false) {
     /** @type {?} */
-    AwLinkedObjectsDS.prototype.totalPages;
-    /** @type {?} */
     AwLinkedObjectsDS.prototype.currentPage;
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.totalPages;
     /** @type {?} */
     AwLinkedObjectsDS.prototype.pageSize;
     /** @type {?} */
     AwLinkedObjectsDS.prototype.context;
-}
-/**
- * @param {?} data
- * @param {?} page
- * @param {?} size
- * @param {?} config
- * @param {?} totalPages
- * @param {?} context
- * @return {?}
- */
-function unpackData(data, page, size, config, totalPages, context) {
-    if (config) {
-        /** @type {?} */
-        var keys = config.get('config-keys');
-        switch (context) {
-            case 'home':
-                /** @type {?} */
-                var lengthLimit = config.get('home-layout')['max-item-length'];
-                break;
-            default:
-                break;
-        }
-    }
-    // resize data
-    if (size && page) {
-        data = data.slice(page * size - size, page * size);
-    }
-    else if (size) {
-        data = data.slice(0, size);
-    }
     /** @type {?} */
-    var result = [];
-    data.forEach((/**
-     * @param {?} el
-     * @return {?}
+    AwLinkedObjectsDS.prototype.handleShowMoreClick;
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.makePagination;
+    /**
+     * @type {?}
+     * @private
      */
-    el => {
-        /** @type {?} */
-        let item = {
-            image: el.thumbnail,
-            title: 
-            // if there is a max string length in config, use it
-            lengthLimit && el.item.label.length > lengthLimit ?
-                el.item.label.slice(0, lengthLimit) + '...' : el.item.label,
-            payload: el.item.id,
-            classes: context == 'entita' ? 'is-fullwidth' : '',
-            metadata: [
-                {
-                    classes: 'n7-objects__metadata-artist',
-                    items: el.item.info.map((/**
-                     * @param {?} __0
-                     * @return {?}
-                     */
-                    ({ value, key }) => ({
-                        label: key === 'author' ? 'Artista' : null,
-                        value
-                    })))
-                },
-                {
-                    classes: 'n7-objects__metadata-linked',
-                    items: el.relatedTOEData.map((/**
-                     * @param {?} toe
-                     * @return {?}
-                     */
-                    toe => {
-                        return {
-                            // Persone: 6, Organizz: 12, Luoghi: 2, Concetti: 32
-                            value: toe.count,
-                            // icon: 'n7-icon-bell' // TODO: link icon to config key
-                            icon: keys[toe.type.configKey].icon,
-                            classes: 'color-' + toe.type.configKey
-                        };
-                    }))
-                }
-            ]
-        };
-        if (el.breadcrumbs) {
-            item['breadcrumbs'] = {
-                // n7-breadcrumbs uses this as it's own data
-                items: el.breadcrumbs.map((/**
-                 * @param {?} crumb
-                 * @return {?}
-                 */
-                crumb => {
-                    return {
-                        label: crumb.label,
-                        payload: crumb.link,
-                    };
-                }))
-            };
-        }
-        result.push(item);
-    }));
-    if (page) { // if I'm on a page, render pagination data.
-        // if I'm on a page, render pagination data.
-        /** @type {?} */
-        let sizeOptions = [10, 25, 50];
-        return {
-            pagination: {
-                first: { payload: `goto-${1}`, classes: page == 1 ? "is-disabled" : '' },
-                prev: { payload: `goto-${page - 1}`, classes: page == 1 ? "is-disabled" : '' },
-                next: { payload: `goto-${page + 1}`, classes: page == totalPages ? "is-disabled" : '' },
-                last: { payload: `goto-${totalPages}`, classes: page == totalPages ? "is-disabled" : '' },
-                links: makePagination(totalPages, page),
-                select: {
-                    label: 'Numero di risultati',
-                    options: sizeOptions.map((/**
-                     * @param {?} o
-                     * @return {?}
-                     */
-                    o => {
-                        return {
-                            text: o,
-                            selected: o == size,
-                        };
-                    })),
-                    payload: 'select-size'
-                }
-            },
-            previews: result
-        };
-    }
-    if (context === 'home') {
-        return {
-            result,
-            actions: [
-                { label: 'Vedi Tutti 7805' },
-                { label: 'Vedi Altri 7795' }
-            ]
-        };
-    }
-    return result;
-}
-/**
- * @param {?} totalPages
- * @param {?} currentPage
- * @return {?}
- */
-function makePagination(totalPages, currentPage) {
-    /** @type {?} */
-    let result = []
-    // always push the first page
-    ;
-    // always push the first page
-    result.push({ text: '1', payload: 'page-1', classes: currentPage == 1 ? 'is-active' : '' });
-    for (let i = 1; i < totalPages; i++) {
-        result.push({ text: String(i + 1), payload: 'page-' + String(i + 1), classes: currentPage == i + 1 ? 'is-active' : '' });
-    }
-    return result;
+    AwLinkedObjectsDS.prototype.unpackData;
 }
 
 /**
@@ -2281,7 +2366,7 @@ class AwAutocompleteWrapperDS extends DataSource {
         ;
         // 'i' = case insensitive
         /** @type {?} */
-        const append = [];
+        const suggestion = [];
         /** @type {?} */
         const config = this.options.config;
         /** @type {?} */
@@ -2292,7 +2377,6 @@ class AwAutocompleteWrapperDS extends DataSource {
          */
         el => {
             // divide prefix and suffix
-            // let match = el.item.label.match(regex)
             /** @type {?} */
             let match = regex.exec(el.item.label);
             if (match) {
@@ -2309,10 +2393,15 @@ class AwAutocompleteWrapperDS extends DataSource {
                 if (maxLength && (suffix.length > maxLength)) {
                     suffix = suffix.slice(0, maxLength) + '...';
                 }
-                append.push({ prefix, suffix, payload: el.item.id });
+                suggestion.push({
+                    match: match.input.slice(match[1].length, match[1].length + key.length),
+                    prefix,
+                    suffix,
+                    payload: el.item.id
+                });
             }
         }));
-        return { typed: key, append };
+        return { suggestion };
     }
 }
 
@@ -2521,7 +2610,9 @@ class AwBubbleChartDS extends DataSource {
         else {
             for (let i = 0; i < response.connectedEntities.length; i++) {
                 /** @type {?} */
-                const color = this.options.configKeys[response.connectedEntities[i].entity.typeOfEntity.configKey] ? this.options.configKeys[response.connectedEntities[i].entity.typeOfEntity.configKey]['color']['hex'] : "";
+                const color = this.options.configKeys ?
+                    this.options.configKeys[response.connectedEntities[i].entity.typeOfEntity.configKey] ? this.options.configKeys[response.connectedEntities[i].entity.typeOfEntity.configKey]['color']['hex'] : "" :
+                    null;
                 this.allBubbles.push(Object.assign({ id: this.convertEntityIdToBubbleId(response.connectedEntities[i].entity.id) }, response.connectedEntities[i], { color: color }));
             }
         }
@@ -3204,7 +3295,15 @@ class AwHomeFacetsWrapperDS extends DataSource {
                 text: facet.label,
                 additionalText: facet.count,
                 iconRight: (facet.enabled ? 'n7-icon-eye' : 'n7-icon-eye-slash'),
-                classes: headerClasses.join(' ') + (facet.locked ? ' is-blocked' : ' not-blocked'),
+                classes: headerClasses.join(' ') + (facet.locked ? ' is-blocked' : (
+                // if every other facet is disabled → Lock this facet
+                facetData.every((/**
+                 * @param {?} f
+                 * @return {?}
+                 */
+                f => {
+                    return !f.enabled || (f.type.id === facet.type.id);
+                })) ? ' is-blocked' : ' not-blocked')),
                 payload: facet.type.id,
             });
             // make array of inputs data
@@ -3373,7 +3472,7 @@ class AwEntitaNavDS extends DataSource {
                 classes: selected == 'oggetti-collegati' ? 'is-selected' : ''
             });
         }
-        if (data.entities) {
+        if (data.entities && this.options['bubblesEnabled']) {
             navigation.items.push({
                 text: 'ENTITÀ COLLEGATE',
                 payload: 'entita-collegate',
@@ -3862,6 +3961,20 @@ class AwLinkedObjectsEH extends EventHandler {
                     break;
                 default:
                     console.warn('unhandled event type: ', type, ' with payload: ', payload);
+                    break;
+            }
+        }));
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-home-layout.viewmore':
+                    // this.dataSource.handleShowMoreClick()
+                    console.log('current page: ', this.dataSource.currentPage);
+                    break;
+                default:
                     break;
             }
         }));
@@ -5567,23 +5680,24 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         this.myResponse = res;
         this.navHeader = {
             // always render nav header
-            icon: this.configuration.get("config-keys")[this.myResponse.entity.typeOfEntity.configKey].icon,
+            icon: this.configuration.get('config-keys')[this.myResponse.entity.typeOfEntity.configKey].icon,
             text: this.myResponse.entity.label,
             color: this.myResponse.entity.typeOfEntity.configKey
         };
+        this.one('aw-entita-nav').updateOptions({ bubblesEnabled: this.bubblesEnabled });
         switch (this.selectedTab) { // make dynamic content depending on request
             case 'overview':
                 {
                     this.one('aw-bubble-chart').updateOptions({
                         context: 'scheda',
-                        configKeys: this.configuration.get("config-keys"),
+                        configKeys: this.configuration.get('config-keys'),
                         bubbleContainerId: 'overviewBubbleChartContainer',
                         containerId: 'bubble-chart-container-overview',
                     });
                     this.one('aw-entita-metadata-viewer').updateOptions({ context: this.selectedTab });
                     this.one('aw-entita-metadata-viewer').update(res.fieldsTab);
                     this.one('aw-linked-objects').updateOptions({ size: 3, config: this.configuration, context: 'entita' });
-                    this.one('aw-linked-objects').update(res.items);
+                    this.one('aw-linked-objects').update(res);
                 }
                 break;
             case 'campi':
@@ -5600,14 +5714,14 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                         page: this.currentPage,
                         size: this.pageSize,
                     });
-                    this.one('aw-linked-objects').update(res.items);
+                    this.one('aw-linked-objects').update(res);
                 }
                 break;
             case 'entita-collegate':
                 {
                     this.one('aw-bubble-chart').updateOptions({
                         context: 'scheda',
-                        configKeys: this.configuration.get("config-keys"),
+                        configKeys: this.configuration.get('config-keys'),
                         bubbleContainerId: 'bubbleChartContainer',
                         containerId: 'bubble-chart-container',
                     });
@@ -5813,7 +5927,7 @@ class AwEntitaLayoutEH extends EventHandler {
                         res['connectedEntities'] = res.entities;
                         /** @type {?} */
                         let connectedEntities = { source: res };
-                        if (this.dataSource.bubblesEnabled) {
+                        if (this.dataSource.bubblesEnabled && params.get('tab') === 'entita-collegate') {
                             this.emitOuter('filterbubbleresponse', connectedEntities);
                         }
                     }
@@ -5950,7 +6064,7 @@ class AwEntitaLayoutComponent extends AbstractLayout {
 AwEntitaLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-entita-layout',
-                template: "<div class=\"aw-entity\" *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <div class=\"aw-entity__content\" [ngSwitch]=\"lb.dataSource.selectedTab\">\n        <ng-container *ngSwitchCase=\"'overview'\">\n            <ng-container *ngTemplateOutlet=\"overview\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'campi'\">\n            <ng-container *ngTemplateOutlet=\"campi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'oggetti-collegati'\">\n            <ng-container *ngTemplateOutlet=\"oggetti\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'entita-collegate'\">\n            <ng-container *ngTemplateOutlet=\"entita\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'maxxi'\">\n            <ng-container *ngTemplateOutlet=\"maxxi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'wiki'\">\n            <ng-container *ngTemplateOutlet=\"wiki\"></ng-container>\n        </ng-container>\n    </div>\n</div>\n\n<!-- navigation page content templates -->\n<ng-template #overview>\n    <section>\n        <div class=\"aw-entity__content-section\">\n            <div class=\"aw-entity__overview-description\">\n                {{lb.dataSource.myResponse.extraTab}}\n            </div>\n            <div class=\"aw-entity-layout__button-wrapper\">\n                <button *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\n                    (click)=\"lb.eventHandler.emitInner('showmore', 'wiki')\">\n                    DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                </button>\n                <button *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\n                    (click)=\"lb.eventHandler.emitInner('showmore', 'maxxi')\">\n                    DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                </button>\n            </div>\n        </div>\n\n        <ng-container *ngIf=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async as data\">\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                    <button class=\"n7-btn n7-btn-light\" (click)=\"lb.eventHandler.emitInner('showmore', 'campi')\">\n                        TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n                <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\" [data]=\"data\">\n                </n7-metadata-viewer>\n            </div>\n        </ng-container>\n\n        <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n            <div class=\"aw-entity__content-section-header\">\n                <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n                <button class=\"n7-btn n7-btn-light\"\n                    (click)=\"lb.eventHandler.emitInner('showmore', 'oggetti-collegati')\">\n                    TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                </button>\n            </div>\n            <ng-container *ngFor=\"let preview of lb.widgets['aw-linked-objects'].ds.out$ | async\">\n                <n7-breadcrumbs [data]=\"preview.breadcrumbs\">\n                </n7-breadcrumbs>\n                <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-item-preview>\n            </ng-container>\n        </div>\n\n        <div\n            class=\"aw-entity__content-section aw-entity__content-section-overview\"\n            *ngIf=\"lb.dataSource.bubblesEnabled\"\n        >\n            <div class=\"aw-entity__content-section-header\">\n                <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                <button class=\"n7-btn n7-btn-light\" (click)=\"lb.eventHandler.emitInner('showmore', 'entita-collegate')\">\n                    TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                </button>\n            </div>\n            <div  [style.overflow]=\"'hidden'\">\n                <aw-bubble-chart-wrapper\n                [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                [container]=\"'bubble-chart-container-overview'\"\n                [buttons]=\"['goto']\"\n                >\n                    <n7-bubble-chart\n                    [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </div>\n        </div>\n    </section>\n</ng-template>\n\n<ng-template #campi>\n    <div class=\"aw-entity__content-section aw-entity__content-section-fields\">\n        <ng-container *ngIf=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async as data\">\n            <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n            </div>\n            <n7-metadata-viewer class=\"aw-entita-layout__metadata-viewer\" [data]=\"data\">\n            </n7-metadata-viewer>\n        </ng-container>\n    </div>\n</ng-template>\n\n<ng-template #oggetti>\n    <div class=\"aw-entity__content-section aw-entity__content-section-objects\">\n        <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n            <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n        </div>\n        <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n            <n7-breadcrumbs [data]=\"preview.breadcrumbs\">\n            </n7-breadcrumbs>\n            <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n            </n7-item-preview>\n        </ng-container>\n        <n7-pagination [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n            [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n        </n7-pagination>\n    </div>\n</ng-template>\n\n<ng-template #entita>\n    <div class=\"aw-entity__content-section aw-entity__content-section-entities\">\n        <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n            <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n        </div>\n        <div  [style.overflow]=\"'hidden'\">\n            <aw-bubble-chart-wrapper\n            [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n            [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n            [container]=\"'bubble-chart-container'\"\n            [buttons]=\"['goto']\"\n            >\n                <n7-bubble-chart\n                [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n    </div>\n</ng-template>\n\n<ng-template #maxxi>\n    <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\">\n        <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n            <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n        </div>\n        <div>\n            {{lb.dataSource.myResponse.extraTab}}\n        </div>\n    </div>\n</ng-template>\n\n<ng-template #wiki>\n    <div class=\"aw-entity__content-section aw-entity__content-section-wiki\">\n        <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n            <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n        </div>\n        <div>\n            {{lb.dataSource.myResponse.wikiTab.text}}\n        </div>\n        <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n            {{lb.dataSource.myResponse.wikiTab.url}}\n        </a>\n    </div>\n</ng-template>"
+                template: "<div class=\"aw-entity n7-side-auto-padding\" *ngIf=\"lb.dataSource\">\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <div class=\"aw-entity__content\" [ngSwitch]=\"lb.dataSource.selectedTab\">\n        <ng-container *ngSwitchCase=\"'overview'\">\n            <ng-container *ngTemplateOutlet=\"overview\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'campi'\">\n            <ng-container *ngTemplateOutlet=\"campi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'oggetti-collegati'\">\n            <ng-container *ngTemplateOutlet=\"oggetti\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'entita-collegate'\">\n            <ng-container *ngTemplateOutlet=\"entita\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'maxxi'\">\n            <ng-container *ngTemplateOutlet=\"maxxi\"></ng-container>\n        </ng-container>\n        <ng-container *ngSwitchCase=\"'wiki'\">\n            <ng-container *ngTemplateOutlet=\"wiki\"></ng-container>\n        </ng-container>\n    </div>\n</div>\n\n<!-- navigation page content templates -->\n<ng-template #overview>\n    <section>\n        <div class=\"aw-entity__content-section\">\n            <div class=\"aw-entity__overview-description\">\n                {{lb.dataSource.myResponse.extraTab}}\n            </div>\n            <div class=\"aw-entity-layout__button-wrapper\">\n                <button *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\n                    (click)=\"lb.eventHandler.emitInner('showmore', 'wiki')\">\n                    DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                </button>\n                <button *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\n                    (click)=\"lb.eventHandler.emitInner('showmore', 'maxxi')\">\n                    DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                </button>\n            </div>\n        </div>\n\n        <ng-container *ngIf=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async as data\">\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                    <button class=\"n7-btn n7-btn-light\" (click)=\"lb.eventHandler.emitInner('showmore', 'campi')\">\n                        TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n                <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\" [data]=\"data\">\n                </n7-metadata-viewer>\n            </div>\n        </ng-container>\n\n        <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n            <div class=\"aw-entity__content-section-header\">\n                <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n                <button class=\"n7-btn n7-btn-light\"\n                    (click)=\"lb.eventHandler.emitInner('showmore', 'oggetti-collegati')\">\n                    TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                </button>\n            </div>\n            <ng-container *ngFor=\"let preview of lb.widgets['aw-linked-objects'].ds.out$ | async\">\n                <n7-breadcrumbs [data]=\"preview.breadcrumbs\">\n                </n7-breadcrumbs>\n                <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-item-preview>\n            </ng-container>\n        </div>\n\n        <div\n            class=\"aw-entity__content-section aw-entity__content-section-overview\"\n            *ngIf=\"lb.dataSource.bubblesEnabled\"\n        >\n            <div class=\"aw-entity__content-section-header\">\n                <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                <button class=\"n7-btn n7-btn-light\" (click)=\"lb.eventHandler.emitInner('showmore', 'entita-collegate')\">\n                    TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                </button>\n            </div>\n            <div  [style.overflow]=\"'hidden'\">\n                <aw-bubble-chart-wrapper\n                [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                [container]=\"'bubble-chart-container-overview'\"\n                [buttons]=\"['goto']\"\n                >\n                    <n7-bubble-chart\n                    [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </div>\n        </div>\n    </section>\n</ng-template>\n\n<ng-template #campi>\n    <div class=\"aw-entity__content-section aw-entity__content-section-fields\">\n        <ng-container *ngIf=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async as data\">\n            <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n            </div>\n            <n7-metadata-viewer class=\"aw-entita-layout__metadata-viewer\" [data]=\"data\">\n            </n7-metadata-viewer>\n        </ng-container>\n    </div>\n</ng-template>\n\n<ng-template #oggetti>\n    <div class=\"aw-entity__content-section aw-entity__content-section-objects\">\n        <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n            <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n        </div>\n        <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n            <n7-breadcrumbs [data]=\"preview.breadcrumbs\">\n            </n7-breadcrumbs>\n            <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n            </n7-item-preview>\n        </ng-container>\n        <n7-pagination [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n            [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n        </n7-pagination>\n    </div>\n</ng-template>\n\n<ng-template #entita>\n    <div class=\"aw-entity__content-section aw-entity__content-section-entities\">\n        <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n            <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n        </div>\n        <div  [style.overflow]=\"'hidden'\">\n            <aw-bubble-chart-wrapper\n            [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n            [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n            [container]=\"'bubble-chart-container'\"\n            [buttons]=\"['goto']\"\n            >\n                <n7-bubble-chart\n                [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n    </div>\n</ng-template>\n\n<ng-template #maxxi>\n    <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\">\n        <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n            <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n        </div>\n        <div>\n            {{lb.dataSource.myResponse.extraTab}}\n        </div>\n    </div>\n</ng-template>\n\n<ng-template #wiki>\n    <div class=\"aw-entity__content-section aw-entity__content-section-wiki\">\n        <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n            <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n        </div>\n        <div>\n            {{lb.dataSource.myResponse.wikiTab.text}}\n        </div>\n        <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n            {{lb.dataSource.myResponse.wikiTab.url}}\n        </a>\n    </div>\n</ng-template>"
             }] }
 ];
 /** @nocollapse */
@@ -6070,6 +6184,7 @@ class AwHomeLayoutDS extends LayoutDataSource {
         // update streams
         this.mainState.update('headTitle', 'Arianna Web > Home');
         this.mainState.update('pageTitle', 'Arianna Web: Home Layout');
+        this.mainState.updateCustom('currentNav', 'aw/home');
         // listen autocomplete changes
         this._listenAutoCompleteChanges();
     }
@@ -6159,8 +6274,11 @@ class AwHomeLayoutDS extends LayoutDataSource {
         else {
             this.numOfItemsStr = null;
         }
-        this.one('aw-linked-objects').updateOptions({ context: 'home', config: this.configuration });
-        this.one('aw-linked-objects').update(response.itemsPagination.items);
+        this.one('aw-linked-objects').updateOptions({
+            context: 'home',
+            config: this.configuration,
+        });
+        this.one('aw-linked-objects').update(response.itemsPagination);
     }
     /**
      * @param {?} source
@@ -6620,6 +6738,7 @@ class AwHomeLayoutDS extends LayoutDataSource {
                 trigger: 'manual',
                 interactive: true,
                 arrow: false,
+                flip: false,
                 appendTo: 'parent',
                 theme: 'light-border',
                 placement: 'bottom-start',
@@ -7020,7 +7139,7 @@ class AwHomeLayoutComponent extends AbstractLayout {
 AwHomeLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-home-layout',
-                template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper\"\n        [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length > 0 }\"\n        *ngIf=\"lb.dataSource.bubblesEnabled\"\n    >\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n        <div\n            class=\"aw-home__bubble-chart-wrapper\"\n            [style.overflow]=\"lb.dataSource.loadingBubbles ? 'visible' : 'hidden'\"\n        >\n            <aw-bubble-chart-wrapper\n                [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                [container]=\"'bubble-chart-container'\"\n                [buttons]=\"['select', 'goto']\"\n            >\n                    <n7-bubble-chart\n                        [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n\n        <!-- Linked objects -->\n        <ng-container *ngIf=\"lb.dataSource.selectedBubbles.length > 0\" >\n            <div class=\"aw-home__bubble-results\"\n                id=\"home-bubble-results\"\n                [ngStyle]=\"{ 'display': 'flex' , 'flex-direction': 'column', 'transition': 'opacity 1s ease-in-out;' }\"\n                [style.opacity]=\"lb.dataSource.loadingBubbles ? '0' : '1'\"\n            >\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\">\n                    <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">\n                        {{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span>\n                    </h1>\n                </div>\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list-wrapper\" >\n                    <div class=\"aw-home__bubble-results-list\" [attr.id]=\"'bubble-results-list'\">\n                        <ng-container *ngFor=\"let widgetData of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.result;\">\n                            <n7-item-preview\n                                [data]=\"widgetData\"\n                                [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n                    </div>\n                    <div *ngIf=\"lb.dataSource.hasScrollBackground\" class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                    <!-- aw-linked-objects__actions -->\n                    <div *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.actions as action\" class=\"aw-home__bubble-results-list-actions\">\n                        <button class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\">\n                            {{action[0].label}}\n                        </button>\n                        <button class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-others\">\n                            {{action[1].label}}\n                        </button>\n                    </div>\n                </div>\n\n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Adavanced autocomplete popover  -->\n    <div id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <n7-advanced-autocomplete\n            [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n\n    <!-- Simple autocomplete popover. DO NOT CHANGE parent div class! -->\n    <!-- Creating one template for each facet -->\n    <div *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\"\n         class=\"aw-simple-autocomplete__{{widgetData.header.payload}}\"\n         style=\"display: none;\">\n         <n7-simple-autocomplete\n            [data]=\"lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-autocomplete-wrapper'].emit\">\n        </n7-simple-autocomplete>\n    </div>\n</div>"
+                template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper n7-side-auto-padding\"\n        [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length > 0 }\"\n        *ngIf=\"lb.dataSource.bubblesEnabled\"\n    >\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n        <div\n            class=\"aw-home__bubble-chart-wrapper\"\n            [style.overflow]=\"lb.dataSource.loadingBubbles ? 'visible' : 'hidden'\"\n        >\n            <aw-bubble-chart-wrapper\n                [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                [container]=\"'bubble-chart-container'\"\n                [buttons]=\"['select', 'goto']\"\n            >\n                    <n7-bubble-chart\n                        [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n\n        <!-- Linked objects -->\n        <ng-container *ngIf=\"lb.dataSource.selectedBubbles.length > 0\" >\n            <div class=\"aw-home__bubble-results\"\n                id=\"home-bubble-results\"\n                [ngStyle]=\"{ 'display': 'flex' , 'flex-direction': 'column', 'transition': 'opacity 1s ease-in-out;' }\"\n                [style.opacity]=\"lb.dataSource.loadingBubbles ? '0' : '1'\"\n            >\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\">\n                    <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">\n                        {{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span>\n                    </h1>\n                </div>\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list-wrapper\" >\n                    <div class=\"aw-home__bubble-results-list\" [attr.id]=\"'bubble-results-list'\">\n                        <ng-container *ngFor=\"let widgetData of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.result;\">\n                            <n7-item-preview\n                                [data]=\"widgetData\"\n                                [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n                    </div>\n                    <div *ngIf=\"lb.dataSource.hasScrollBackground\" class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                    <!-- aw-linked-objects__actions -->\n                    <div *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.actions as action\" class=\"aw-home__bubble-results-list-actions\">\n                        <button class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\">\n                            {{action[0].label}}\n                        </button>\n                        <button *ngIf=\"action[1]\" \n                                class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-others\"\n                                (click)=\"lb.eventHandler.emitOuter('viewmore', 'linked-objects')\">\n                            {{action[1].label}}\n                        </button>\n                    </div>\n                </div>\n\n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Adavanced autocomplete popover  -->\n    <div id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <n7-advanced-autocomplete\n            [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n\n    <!-- Simple autocomplete popover. DO NOT CHANGE parent div class! -->\n    <!-- Creating one template for each facet -->\n    <div *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\"\n         class=\"aw-simple-autocomplete__{{widgetData.header.payload}}\"\n         style=\"display: none;\">\n         <n7-simple-autocomplete\n            [data]=\"lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-autocomplete-wrapper'].emit\">\n        </n7-simple-autocomplete>\n    </div>\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -7083,6 +7202,9 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         this.metadataSectionTitle = this.configuration.get('scheda-layout')['metadata']['title'];
         this.hasSimilarItems = false;
         this.bubblesEnabled = this.configuration.get('features-enabled') ? this.configuration.get('features-enabled')['bubblechart'] : false;
+        this.mainState.update('headTitle', 'Arianna Web > Patrimonio');
+        this.mainState.update('pageTitle', 'Arianna Web: patrimonio Layout');
+        this.mainState.updateCustom('currentNav', 'aw/patrimonio');
     }
     /**
      * @param {?} id
@@ -7127,7 +7249,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
                  * @return {?}
                  */
                 (error) => console.error(error)),
-                params: { itemId: id, maxSimilarItems }
+                params: { itemId: id, maxSimilarItems: maxSimilarItems }
             });
         }
         else {
@@ -7159,6 +7281,8 @@ class AwSchedaLayoutDS extends LayoutDataSource {
      */
     loadContent(response) {
         if (response) {
+            console.log("apollo response: ");
+            console.log(response);
             this.contentParts = [];
             /** @type {?} */
             let content = {};
@@ -7209,8 +7333,8 @@ class AwSchedaLayoutDS extends LayoutDataSource {
             /*Metadata section*/
             /** @type {?} */
             let group = { group: [] };
-            if (response.fields) {
-                this.hasMetadata = true;
+            this.hasMetadata = response.fields != null;
+            if (this.hasMetadata) {
                 response.fields.forEach((/**
                  * @param {?} field
                  * @return {?}
@@ -7257,10 +7381,10 @@ class AwSchedaLayoutDS extends LayoutDataSource {
           this.one('aw-scheda-bubble-chart').update(null);
         }*/
         /* Similar item */
-        if (response.similarItems) {
+        if (response.items) {
             this.hasSimilarItems = true;
             this.one('aw-linked-objects').updateOptions({ context: 'scheda', config: this.configuration });
-            this.one('aw-linked-objects').update(response.similarItems);
+            this.one('aw-linked-objects').update(response);
         }
         else {
             this.hasSimilarItems = false;
@@ -7592,7 +7716,7 @@ class AwSchedaLayoutComponent extends AbstractLayout {
 AwSchedaLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-scheda-layout',
-                template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\n    <div class=\"aw-scheda__content\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n\n         <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree\">\n            <n7-sidebar-header\n                [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"\n            ></n7-sidebar-header>\n            <n7-tree\n                [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-tree'].emit\"\n                [hidden]=\"lb.dataSource.sidebarCollapsed\"\n            ></n7-tree>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper\">\n            <n7-breadcrumbs\n                [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\"\n            ></n7-breadcrumbs>\n\n            <n7-inner-title\n            [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\"\n            ></n7-inner-title>\n\n            <n7-image-viewer\n                [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\"\n            >\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\"\n                [hidden] = \"!lb.hasMetadata\"\n            >\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.metadataSectionTitle}}</div>\n                <n7-metadata-viewer\n                    [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section\n                class=\"aw-scheda__bubble-chart\"\n                *ngIf=\"lb.dataSource.bubblesEnabled\"\n            >\n                <div\n                    [hidden] = \"!lb.dataSource.hasBubbles\"\n                    class=\"aw-scheda__inner-title\">{{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <div  [style.overflow]=\"'hidden'\">\n                    <aw-bubble-chart-wrapper\n                    [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                    [container]=\"'bubble-chart-container'\"\n                    [buttons]=\"['goto']\"\n                    >\n                        <n7-bubble-chart\n                        [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </section>\n\n            <section\n                [hidden] = \"!lb.dataSource.hasSimilarItems\"\n                id=\"related-item-container\" class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.similarItemsSectionTitle}}</div>\n                <div class=\"aw-scheda__related-items\">\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">\n                        <n7-item-preview\n                            [data]=\"widgetData\"\n                            >\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n             </section>\n        </div>\n    </div>\n</div>\n"
+                template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n\n         <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree\">\n            <n7-sidebar-header\n                [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"\n            ></n7-sidebar-header>\n            <n7-tree\n                [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-tree'].emit\"\n                [hidden]=\"lb.dataSource.sidebarCollapsed\"\n            ></n7-tree>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper\">\n            <n7-breadcrumbs\n                [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\"\n            ></n7-breadcrumbs>\n\n            <n7-inner-title\n            [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\"\n            ></n7-inner-title>\n\n            <n7-image-viewer\n                [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\"\n            >\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\"\n                [hidden] = \"!lb.dataSource.hasMetadata\"\n            >\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.metadataSectionTitle}}</div>\n                <n7-metadata-viewer\n                    [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section\n                class=\"aw-scheda__bubble-chart\"\n                *ngIf=\"lb.dataSource.bubblesEnabled\"\n            >\n                <div\n                    [hidden] = \"!lb.dataSource.hasBubbles\"\n                    class=\"aw-scheda__inner-title\">{{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <div  [style.overflow]=\"'hidden'\">\n                    <aw-bubble-chart-wrapper\n                    [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                    [container]=\"'bubble-chart-container'\"\n                    [buttons]=\"['goto']\"\n                    >\n                        <n7-bubble-chart\n                        [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </section>\n\n            <section\n                [hidden] = \"!lb.dataSource.hasSimilarItems\"\n                id=\"related-item-container\" class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.similarItemsSectionTitle}}</div>\n                <div class=\"aw-scheda__related-items\">\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">\n                        <n7-item-preview\n                            [data]=\"widgetData\"\n                            >\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n             </section>\n        </div>\n    </div>\n</div>\n"
             }] }
 ];
 /** @nocollapse */

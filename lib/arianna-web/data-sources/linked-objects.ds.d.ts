@@ -1,7 +1,7 @@
 import { DataSource } from '@n7-frontend/core';
 export declare class AwLinkedObjectsDS extends DataSource {
-    totalPages: number;
     currentPage: number;
+    totalPages: number;
     pageSize: number;
     context: string;
     protected transform(data: any): any[] | {
@@ -43,4 +43,7 @@ export declare class AwLinkedObjectsDS extends DataSource {
         pagination?: undefined;
         previews?: undefined;
     };
+    handleShowMoreClick: (incomingData: any) => void;
+    makePagination: (totalPages: any, currentPage: any) => any[];
+    private unpackData;
 }
