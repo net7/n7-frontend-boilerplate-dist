@@ -6,6 +6,7 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     private configuration;
     private facetData;
     private lockedFacets;
+    private lockLastFacet;
     private facetInputs;
     private allBubbles;
     private autocompletePopover;
@@ -22,6 +23,8 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     hasScrollBackground: boolean;
     loadingBubbles: boolean;
     bubblesEnabled: boolean;
+    resultsLimit: number;
+    selectedEntitiesIds: any[];
     onInit({ communication, mainState, configuration, tippy }: {
         communication: any;
         mainState: any;

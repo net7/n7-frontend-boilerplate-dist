@@ -3,6 +3,7 @@
  */
 export * from './public-api';
 export { BubbleChartWrapperComponent as ɵv } from './lib/arianna-web/components/bubble-chart-wrapper/bubble-chart-wrapper';
+export { SmartBreadcrumbsComponent as ɵw } from './lib/arianna-web/components/smart-breadcrumbs/smart-breadcrumbs';
 export { AwAboutLayoutComponent as ɵk } from './lib/arianna-web/layouts/about-layout/about-layout';
 export { AwEntitaLayoutComponent as ɵl } from './lib/arianna-web/layouts/entita-layout/entita-layout';
 export { AwHomeLayoutComponent as ɵo } from './lib/arianna-web/layouts/home-layout/home-layout';

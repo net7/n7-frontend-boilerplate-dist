@@ -6,7 +6,7 @@
  * - search inpout with label;
  * - list of results.
  */
- 
+
 /* ------------------------------------ *\
    #FACET
 \* ------------------------------------ */
@@ -23,11 +23,11 @@
 \* ------------------------------------ */
 .n7-facet {
     &__section-input-checkbox {
-     
+
     }
 
     &__input-checkbox-input {
-       
+
     }
 
     &__input-checkbox-label {
@@ -91,28 +91,35 @@
             }
         }
 
-        &.color-people {
+        &.color-persona {
             .n7-facet__input-link-icon,
             .n7-facet__input-link-text {
                 color: $color-people;
             }
         }
 
-        &.color-places {
+        &.color-luogo {
             .n7-facet__input-link-icon,
             .n7-facet__input-link-text {
                 color: $color-places;
             }
         }
 
-        &.color-concepts {
+        &.color-concetto {
             .n7-facet__input-link-icon,
             .n7-facet__input-link-text {
                 color: $color-concepts;
             }
         }
 
-        &.color-organizations {
+        &.color-cosa-notevole {
+            .n7-facet__input-link-icon,
+            .n7-facet__input-link-text {
+                color: $color-concepts;
+            }
+        }
+
+        &.color-organizzazione {
             .n7-facet__input-link-icon,
             .n7-facet__input-link-text {
                 color: $color-organizations;
@@ -135,7 +142,7 @@
     /* Hover */
     .n7-facet__input-link:hover {
         .n7-facet__input-link-text {
-           
+
         }
     }
 
@@ -149,7 +156,7 @@
         }
 
         .n7-facet__input-link-text {
-           
+
         }
     }
 }

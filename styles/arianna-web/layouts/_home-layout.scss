@@ -193,28 +193,35 @@
             }
         }
 
-        &.color-people {
+        &.color-persona {
             .n7-facet-header__icon-left,
             .n7-facet-header__text {
                 color: $color-people;
             }
         }
 
-        &.color-places {
+        &.color-luogo {
             .n7-facet-header__icon-left,
             .n7-facet-header__text {
                 color: $color-places;
             }
         }
 
-        &.color-concepts {
+        &.color-concetto {
             .n7-facet-header__icon-left,
             .n7-facet-header__text {
                 color: $color-concepts;
             }
         }
 
-        &.color-organizations {
+        &.color-cosa-notevole {
+            .n7-facet-header__icon-left,
+            .n7-facet-header__text {
+                color: $color-concepts;
+            }
+        }
+
+        &.color-organizzazione {
             .n7-facet-header__icon-left,
             .n7-facet-header__text {
                 color: $color-organizations;
@@ -264,7 +271,7 @@
 
         .aw-home__facet-tippy-theme {
             padding: 0;
-            
+
             .tippy-content {
                 padding: 0;
             }
@@ -296,10 +303,15 @@
             &-actions {
                 display: flex;
                 justify-content: center;
+                border-top: 1px solid $color-border-normal;
 
                 .n7-btn {
                     font-weight: $font-weight-bold;
                 }
+            }
+
+            .n7-item-preview {
+                border-bottom: 1px solid $color-border-normal;
             }
 
             > *:last-child {
@@ -309,7 +321,7 @@
                     border-bottom: none;
                 }
             }
-            
+
         }
 
         &-list-wrapper {

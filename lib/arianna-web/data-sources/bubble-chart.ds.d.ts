@@ -13,6 +13,9 @@ export declare class AwBubbleChartDS extends DataSource {
     private maxBubblesSelectable;
     private tippy;
     private windowResizeSet;
+    private maxBubbleRadius;
+    private minBubbleRadius;
+    private maxBubbleTextRadiusRatio;
     protected transform(data: any): {
         containerId: any;
         containerWidth: any;

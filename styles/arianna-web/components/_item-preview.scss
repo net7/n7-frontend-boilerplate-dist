@@ -3,14 +3,14 @@
  *
  * Component used to preview any kind of element with image, title, text, metadata and icons.
  */
- 
+
 /* ------------------------------------ *\
    #ITEM-PREVIEW
 \* ------------------------------------ */
 .n7-item-preview {
-    margin: $space*1.5 0;
-    padding-bottom: $space*1.5;
-    border-bottom: 1px solid $color-border-normal;
+    margin: $space*1.5 0 $space 0;
+    padding-bottom: $space*2;
+    border-bottom: 1px solid $color-border-light;
 
     &__title {
         margin-bottom: $space/2;
@@ -23,32 +23,32 @@
             align-items: baseline;
             padding-right: $space;
             border-right: 1px solid $color-border-normal;
-    
+
             &:last-of-type {
                 border-right: none;
             }
-    
-            &.color-people {
+
+            &.color-persona {
                 color: $color-people;
             }
-    
-            &.color-places {
+
+            &.color-luogo {
                 color: $color-places;
             }
-    
-            &.color-organizations {
+
+            &.color-organizzazione {
                 color: $color-organizations;
             }
-    
-            &.color-concepts {
+
+            &.color-concetto {
                 color: $color-concepts;
             }
-    
+
             &-icon {
                 font-size: $font-size-m;
                 font-weight: $font-weight-bold;
             }
-    
+
             &-value {
                 font-size: $font-size-s;
             }

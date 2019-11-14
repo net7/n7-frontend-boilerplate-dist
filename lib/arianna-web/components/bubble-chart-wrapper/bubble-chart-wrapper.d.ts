@@ -4,4 +4,6 @@ export declare class BubbleChartWrapperComponent {
     container: string;
     buttons: any;
     onClick(type: any, payload: any): void;
+    onMouseOut(type: any): void;
+    onDestroy(): void;
 }

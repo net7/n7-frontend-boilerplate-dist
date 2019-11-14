@@ -15,7 +15,7 @@ export declare const ApolloProviderConfig: {
         queryName: string;
         queryBody: string;
     };
-    'getItemDetails': {
+    'getItem': {
         queryName: string;
         queryBody: string;
     };
