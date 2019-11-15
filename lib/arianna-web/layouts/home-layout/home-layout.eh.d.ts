@@ -5,4 +5,5 @@ export declare class AwHomeLayoutEH extends EventHandler {
     private route;
     listen(): void;
     private loadFilters;
+    handleSimpleAutocompleteClick: (payload: any) => void;
 }
