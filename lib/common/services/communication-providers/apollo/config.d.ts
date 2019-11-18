@@ -19,6 +19,10 @@ export declare const ApolloProviderConfig: {
         queryName: string;
         queryBody: string;
     };
+    'getNode': {
+        queryName: string;
+        queryBody: string;
+    };
     'autoComplete': {
         queryName: string;
         queryBody: string;

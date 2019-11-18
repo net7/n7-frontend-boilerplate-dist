@@ -481,6 +481,84 @@ const ApolloProviderConfig = {
       }
     }`
     },
+    'getNode': {
+        queryName: 'getNode',
+        queryBody: `{
+      getNode(__PARAMS__) {
+        ... on Item {
+          id
+          label
+          icon
+          title
+          subTitle
+          image
+          text
+          fields {
+            ...
+            on KeyValueField {
+              key
+              value
+            }
+            ... on KeyValueFieldGroup {
+              label
+              fields {
+                ...
+                on KeyValueField {
+                  key
+                  value
+                }
+              }
+            }
+          }
+          relatedEntities {
+              count
+              entity{
+                id
+                label
+                typeOfEntity
+              }
+          }
+          relatedItems {
+              thumbnail
+              item {
+                label
+                id
+            }
+            relatedTypesOfEntity {
+              type
+              count
+            }
+          }
+          breadcrumbs {
+            label
+            link
+          }
+        }
+        ... on Node {
+          id
+          label
+          img
+          fields {
+            ...
+            on KeyValueField {
+              key
+              value
+            }
+            ... on KeyValueFieldGroup {
+              label
+              fields {
+                ...
+                on KeyValueField {
+                  key
+                  value
+                }
+              }
+            }
+          }
+        }
+      }
+    }`
+    },
     'autoComplete': {
         queryName: 'autoComplete',
         queryBody: `{
@@ -4470,22 +4548,31 @@ class AwHomeFacetsWrapperDS extends DataSource {
          * @return {?}
          */
         (res, id) => {
+            id = id.replace(/ /g, '-');
             // create data for this facet
             if (!this.autoComplete[id]) {
                 this.autoComplete[id] = {
-                    // data: [],         // array of suggestions
-                    template: undefined,
                     tippy: undefined,
                     // tippy data / config
-                    open: true,
+                    open: true // show or hide tippy
                 };
                 /** @type {?} */
                 const ac = this.autoComplete[id];
+                /** @type {?} */
+                const getContent = (/**
+                 * @return {?}
+                 */
+                () => {
+                    /** @type {?} */
+                    const contentNode = document.getElementsByClassName('aw-simple-autocomplete__' + id.replace(/-search/, ''))[0];
+                    contentNode.setAttribute('style', 'display: block');
+                    return contentNode;
+                });
                 if (!ac.tippy) {
                     /** @type {?} */
                     const target = '.' + id;
                     ac.tippy = tippy(target, {
-                        content: '<span>Loading results</span>',
+                        content: getContent(),
                         trigger: 'manual',
                         interactive: true,
                         arrow: false,
@@ -4494,37 +4581,19 @@ class AwHomeFacetsWrapperDS extends DataSource {
                         theme: 'light-border aw-home__facet-tippy',
                         placement: 'bottom-start',
                         maxWidth: '100%',
-                        onHidden: (/**
-                         * @return {?}
-                         */
-                        () => {
-                            ac.open = false;
-                        }),
-                        onShow: (/**
-                         * @return {?}
-                         */
-                        () => {
-                            /** @type {?} */
-                            let node = document.getElementsByClassName('aw-simple-autocomplete__' + id.replace('-search', ''))[0]
-                            // after I use this node, it becomes undefined
-                            ;
-                            // after I use this node, it becomes undefined
-                            if (node) { // if I have the node, don't try to get it again
-                                node.setAttribute('style', 'display: block');
-                                ac.tippy.setContent(node);
-                            }
-                        }),
-                    })[0];
+                    })[1]; // attach tippy to input type text
                 }
             }
             /** @type {?} */
-            let ac = this.autoComplete[id];
-            if (res.totalCount > 0) {
+            const ac = this.autoComplete[id];
+            console.log({ res });
+            if (res.entities.length > 0 && ac.tippy) {
                 ac.tippy.show();
             }
             else {
                 ac.tippy.hide();
             }
+            console.log(this.autoComplete);
         });
     }
     /**
@@ -4534,9 +4603,9 @@ class AwHomeFacetsWrapperDS extends DataSource {
      */
     transform({ facetData, lockedFacets }) {
         /** @type {?} */
-        var headers = [];
+        const headers = [];
         /** @type {?} */
-        var inputs = [];
+        const inputs = [];
         facetData.forEach((/**
          * @param {?} facet
          * @return {?}
@@ -4556,11 +4625,12 @@ class AwHomeFacetsWrapperDS extends DataSource {
                 }
             }
             /** @type {?} */
-            let headerClasses = [];
+            const headerClasses = [];
             /** @type {?} */
-            let iconClasses = [facet.icon];
-            if (!facet.enabled)
+            const iconClasses = [facet.icon];
+            if (!facet.enabled) {
                 headerClasses.push('is-disabled');
+            }
             if (facet.configKey) {
                 headerClasses.push(`color-${facet.configKey}`);
                 iconClasses.push(`color-${facet.configKey}`);
@@ -4570,22 +4640,28 @@ class AwHomeFacetsWrapperDS extends DataSource {
                 iconLeft: iconClasses.join(' '),
                 text: facet.label,
                 additionalText: facet.count,
-                iconRight: (facet.enabled ? 'n7-icon-eye' : 'n7-icon-eye-slash'),
-                classes: headerClasses.join(' ') + (facet.locked ? ' is-blocked' : (
-                // if every other facet is disabled → Lock this facet
-                facetData.every((/**
-                 * @param {?} f
-                 * @return {?}
-                 */
-                f => {
-                    return !f.enabled || (f.type === facet.type);
-                })) ? ' is-blocked' : ' not-blocked')),
-                payload: facet.type,
+                iconRight: facet.enabled ? 'n7-icon-eye' : 'n7-icon-eye-slash',
+                classes: headerClasses.join(' ') +
+                    (facet.locked
+                        ? ' is-blocked'
+                        : // if every other facet is disabled → Lock this facet
+                            facetData.every((/**
+                             * @param {?} f
+                             * @return {?}
+                             */
+                            f => {
+                                return !f.enabled || f.type === facet.type;
+                            }))
+                                ? ' is-blocked'
+                                : ' not-blocked'),
+                payload: facet.type.replace(' ', '-')
             });
             // make array of inputs data
             inputs.push({
-                sections: [{
-                        inputs: [{
+                sections: [
+                    {
+                        inputs: [
+                            {
                                 type: 'text',
                                 placeholder: facet['input-placeholder'],
                                 icon: 'n7-icon-search',
@@ -4593,14 +4669,16 @@ class AwHomeFacetsWrapperDS extends DataSource {
                                 inputPayload: String(facet.type) + '-search',
                                 iconPayload: String(facet.type) + '-search',
                                 enterPayload: String(facet.type) + '-search',
-                                classes: String(facet.type) + '-search',
-                            }]
-                    }]
+                                classes: String(facet.type.replace(' ', '-')) + '-search'
+                            }
+                        ]
+                    }
+                ]
             });
         }));
         // zipping arrays to render widgets with separate data (see home-layout.html)
         /** @type {?} */
-        var widgetData = [];
+        const widgetData = [];
         headers.map((/**
          * @param {?} h
          * @param {?} i
@@ -4739,7 +4817,7 @@ class AwEntitaNavDS extends DataSource {
             payload: 'overview',
             classes: selected == 'overview' ? 'is-selected' : ''
         });
-        if (data.fields) {
+        if (data.fields && data.fields.length > 0) {
             navigation.items.push({
                 text: 'CAMPI',
                 payload: 'campi',
@@ -4893,6 +4971,18 @@ class AwTreeDS extends DataSource {
      * @return {?}
      */
     updateTree(data, parents, id) {
+        /** @type {?} */
+        const tree = this.updateTreeData(data, parents, id);
+        this.update(tree);
+    }
+    /**
+     * @private
+     * @param {?} data
+     * @param {?} parents
+     * @param {?} id
+     * @return {?}
+     */
+    updateTreeData(data, parents, id) {
         if (!data) {
             data = this.output;
         }
@@ -4918,13 +5008,16 @@ class AwTreeDS extends DataSource {
                 }
             }
             else if (parents && parents.indexOf(it['_meta']) >= 0) {
-                it['classes'] = classes + ' is-expanded';
+                it['classes'] = classes.replace(/is-collapsed/g, 'is-expanded');
+                if (it['toggle']) {
+                    it['toggle']['icon'] = 'n7-icon-angle-down';
+                }
             }
             if (typeof it['items'] != 'undefined' && it['items'].length > 0) {
-                this.updateTree(it, parents, id);
+                this.updateTreeData(it, parents, id);
             }
         }));
-        this.update(data);
+        return data;
     }
     /**
      * @param {?} id
@@ -4973,14 +5066,16 @@ class AwTreeDS extends DataSource {
         this.update(sidebarData);
     }
     /**
-     * @param {?} data
+     * @param {?} response
      * @return {?}
      */
-    parseData(data) {
+    parseData(response) {
         /** @type {?} */
         let treeObj = {
             items: []
         };
+        /** @type {?} */
+        var data = response['tree'];
         if (data['branches'] && data['branches'].length > 0) {
             data['branches'].forEach((/**
              * @param {?} item
@@ -4991,6 +5086,11 @@ class AwTreeDS extends DataSource {
             }));
         }
         this.update(treeObj);
+        if (response['currentItem'] == response['currentItem'] != null) {
+            //this.currentItem = response['currentItem'];
+            this.selectTreeItem(response['currentItem'], null);
+            this.updateTree(null, this.currentItem.parents, response['currentItem']);
+        }
     }
     /**
      * @private
@@ -5049,6 +5149,7 @@ class AwTreeDS extends DataSource {
                         break;
                 }
                 treeItem['classes'] = 'is-collapsed';
+                treeItem['parents'] = currParents;
             }
             else if (data['branches'] != null) {
                 currParents.push(data['id']);
@@ -5274,7 +5375,7 @@ class AwLinkedObjectsEH extends EventHandler {
               Check if the target element is scrolled near the end while data is not already loading.
               If the condition is met, a request for more data is sent.
             */
-            if (target.scrollTop > target.scrollTopMax - 150 && this.dataSource.loadedData.isLoading == false) {
+            if (target.scrollTop + target.clientHeight >= target.scrollHeight - 150 && this.dataSource.loadedData.isLoading == false) {
                 this.dataSource.loadedData.isLoading = true;
                 this.emitOuter('datarequest', {
                     currentPage: this.dataSource.currentPage
@@ -5558,6 +5659,7 @@ class AwHomeFacetsWrapperEH extends EventHandler {
                 // press return while typing in search
                 case 'aw-home-facets-wrapper.enter':
                     this.emitOuter('enter', payload);
+                    break;
                 default:
                     console.warn('unhandled inner event of type:', type);
                     break;
@@ -5792,7 +5894,7 @@ class AwTreeEH extends EventHandler {
                 case 'aw-scheda-layout.selectItem':
                     this.dataSource.selectTreeItem(payload);
                     if (typeof this.dataSource.currentItem !== 'undefined') {
-                        this.dataSource.updateTree(null, this.dataSource.currentItem.payload.parents, payload);
+                        this.dataSource.updateTree(null, this.dataSource.currentItem.payload.toggle.parents, payload);
                     }
                     else {
                         console.warn('The object in the URL does not exist.');
@@ -6426,7 +6528,7 @@ class AwEntitaLayoutComponent extends AbstractLayout {
 AwEntitaLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-entita-layout',
-                template: "<div class=\"aw-entity n7-side-auto-padding\" *ngIf=\"lb.dataSource\">\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <n7-nav\n            [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" \n            [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n    <!-- lb.dataSource.selectedTab -->\n    <div class=\"aw-entity__content\">\n        <section>\n            <div class=\"aw-entity__content-section\" [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <button *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'wiki')\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                    <button *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'maxxi')\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n            </div>\n\n            <ng-container *ngIf=\"lb.dataSource.myResponse.fields\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                    [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'campi'\">\n                    <div class=\"aw-entity__content-section-header\">\n                        <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                        <button\n                            class=\"n7-btn n7-btn-light\" (click)=\"lb.eventHandler.emitInner('showmore', 'campi')\">\n                            TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\n                        </button>\n                    </div>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async \">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <button class=\"n7-btn n7-btn-light\"\n                    *ngIf=\"lb.dataSource.selectedTab == 'overview'\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'oggetti-collegati')\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n                <div class=\"aw-entity__content-item-previews\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>    \n                </div>\n                <n7-pagination [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                *ngIf=\"lb.dataSource.bubblesEnabled\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <button class=\"n7-btn n7-btn-light\"\n                    (click)=\"lb.eventHandler.emitInner('showmore', 'entita-collegate')\"\n                    *ngIf=\"lb.dataSource.selectedTab == 'overview'\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n                <div [style.overflow]=\"'hidden'\">\n                    <aw-bubble-chart-wrapper [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\" [container]=\"'bubble-chart-container-overview'\"\n                        [buttons]=\"['goto']\">\n                        <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                *ngIf=\"lb.dataSource.myResponse.extraTab\"\n                [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n            *ngIf=\"lb.dataSource.myResponse.wikiTab\"\n            [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{lb.dataSource.myResponse.wikiTab.url}}\n                </a>\n            </div>\n        </section>\n    </div>\n</div>"
+                template: "<div class=\"aw-entity n7-side-auto-padding\" *ngIf=\"lb.dataSource\">\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <n7-nav\n            [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" \n            [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n    <!-- lb.dataSource.selectedTab -->\n    <div class=\"aw-entity__content\">\n        <section>\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\" class=\"aw-entity__content-section\" [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <button *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'wiki')\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                    <button *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'maxxi')\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n            </div>\n\n            <ng-container *ngIf=\"lb.dataSource.myResponse.fields && lb.dataSource.myResponse.fields.length > 0\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                    [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'campi'\">\n                    <div class=\"aw-entity__content-section-header\">\n                        <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                        <button\n                            class=\"n7-btn n7-btn-light\" (click)=\"lb.eventHandler.emitInner('showmore', 'campi')\">\n                            TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\n                        </button>\n                    </div>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async \">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <button class=\"n7-btn n7-btn-light\"\n                    *ngIf=\"lb.dataSource.selectedTab == 'overview'\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'oggetti-collegati')\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n                <div class=\"aw-entity__content-item-previews\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>    \n                </div>\n                <n7-pagination [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                *ngIf=\"lb.dataSource.bubblesEnabled\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <button class=\"n7-btn n7-btn-light\"\n                    (click)=\"lb.eventHandler.emitInner('showmore', 'entita-collegate')\"\n                    *ngIf=\"lb.dataSource.selectedTab == 'overview'\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n                <div [style.overflow]=\"'hidden'\">\n                    <aw-bubble-chart-wrapper [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\" [container]=\"'bubble-chart-container-overview'\"\n                        [buttons]=\"['goto']\">\n                        <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                *ngIf=\"lb.dataSource.myResponse.extraTab\"\n                [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n            *ngIf=\"lb.dataSource.myResponse.wikiTab\"\n            [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{lb.dataSource.myResponse.wikiTab.url}}\n                </a>\n            </div>\n        </section>\n    </div>\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -7723,13 +7825,13 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         if (id) {
             /** @type {?} */
             const maxSimilarItems = this.configuration.get('scheda-layout')['related-items']['max-related-items'];
-            return this.communication.request$('getItem', {
+            return this.communication.request$('getNode', {
                 onError: (/**
                  * @param {?} error
                  * @return {?}
                  */
                 (error) => console.error(error)),
-                params: { itemId: id, maxSimilarItems: maxSimilarItems }
+                params: { id: id, maxSimilarItems: maxSimilarItems }
             });
         }
         else {
@@ -7804,7 +7906,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
                 icon: response.icon,
                 title: {
                     main: {
-                        text: response.title,
+                        text: response.title || response.label,
                         classes: 'bold',
                     }
                 },
@@ -7872,7 +7974,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         }
         else {
             this.hasSimilarItems = false;
-            this.one('aw-linked-objects').update([]);
+            //this.one('aw-linked-objects').update([]);
         }
     }
     /**
@@ -7888,6 +7990,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
      */
     setAllBubblesFromApolloQuery(response, reset) {
         if (!response || !response.relatedEntities) {
+            this.hasBubbles = false;
             return;
         }
         this.allBubbles = [];
@@ -8055,7 +8158,7 @@ class AwSchedaLayoutEH extends EventHandler {
                  * @return {?}
                  */
                 (response) => {
-                    console.log('getItem() res: ', response);
+                    console.log('getNode() res: ', response);
                     if (response) {
                         this.dataSource.loadContent(response);
                         if (response.relatedEntities) {
@@ -8088,11 +8191,11 @@ class AwSchedaLayoutEH extends EventHandler {
             if (response) {
                 console.log("Apollo responded with tree:", response);
                 this.dataSource.updateNavigation(response);
-                this.emitOuter('navigationresponse', response);
+                this.emitOuter('navigationresponse', { tree: response, currentItem: selectedItem });
             }
-            if (selectedItem) {
-                this.emitOuter('selectItem', selectedItem);
-            }
+            /*if (selectedItem) {
+              this.emitOuter('selectItem', selectedItem);
+            }*/
         }));
     }
 }
