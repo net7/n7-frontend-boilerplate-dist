@@ -26,6 +26,7 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
         titleService: any;
         communication: any;
     }): void;
+    updateComponent: (id: any, data: any, options?: any) => void;
     getNavigation(id: any): any;
     handlePageNavigation: () => void;
     handleNavUpdate: (tab: any) => void;

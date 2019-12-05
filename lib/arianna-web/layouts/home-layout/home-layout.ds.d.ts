@@ -25,6 +25,9 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     bubblesEnabled: boolean;
     resultsLimit: number;
     selectedEntitiesIds: any[];
+    outerLinks: any;
+    outerLinksTitle: string;
+    homeAutocompleteQuery: string;
     onInit({ communication, mainState, configuration, tippy }: {
         communication: any;
         mainState: any;
@@ -32,7 +35,7 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
         tippy: any;
     }): void;
     makeRequest$(query: any, params: any): any;
-    updateComponent: (id: any, data: any, options: any) => void;
+    updateComponent: (id: any, data: any, options?: any) => void;
     initialFilterRequest(): any;
     parseInitialRequest(response: any): void;
     renderPreviewsFromApolloQuery(response: any): void;

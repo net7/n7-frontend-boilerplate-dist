@@ -225,6 +225,20 @@
             }
         }
 
+        &.color-oggetto-culturale {
+            .n7-facet-header__icon-left,
+            .n7-facet-header__text {
+                color: $color-oggetto-culturale;
+            }
+        }
+
+        &.color-aggregazione {
+            .n7-facet-header__icon-left,
+            .n7-facet-header__text {
+                color: $color-aggregazione;
+            }
+        }
+
         /* Blocked */
         &.is-blocked {
             .n7-facet-header__icon-right {
@@ -396,24 +410,32 @@
     }
 
     /* Tag colors */
-    .tag-toe-people {
+    .tag-persona {
         background-color: $color-people;
     }
 
-    .tag-toe-organizations {
+    .tag-organizzazione {
         background-color: $color-organizations;
     }
 
-    .tag-toe-concepts {
+    .tag-concetto {
         background-color: $color-concepts;
     }
 
-    .tag-toe-places {
+    .tag-luogo {
         background-color: $color-places;
     }
 
-    .tag-toe-cosa-notevole {
-        background-color: $color-places;
+    .tag-cosa-notevole {
+        background-color: $color-things;
+    }
+
+    .tag-oggetto-culturale {
+        background-color: $color-oggetto-culturale;
+    }
+
+    .tag-aggregazione {
+        background-color: $color-aggregazione;
     }
 }
 
@@ -422,26 +444,47 @@
     OUTER-LINKS
 \* ------------------------------------ */
 .aw-home__outer-links {
-    padding: $space*4 0;
+    padding: $space*6 0;
     background-color: $color-background-base;
 }
 
-.aw-home__outer-links-wrapper {
+.aw-home__outer-links-title {
+    margin-bottom: $space*3;
+    text-align: center;
+    font-size: $font-size-xxl;
+    font-weight: $font-weight-bold;
+    color: $color-text;
+}
+
+.aw-home__outer-links-items {
+    display: flex;
     max-width: $page-max-width;
     margin: 0 auto;
 
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-column-gap: $grid-gutter-h;
-
     .n7-item-preview.is-vertical.has-image {
         border-bottom: 0;
-        margin-bottom: 0;
+        margin: 0 $grid-gutter-h/2;
         padding-bottom: 0;
 
         .n7-item-preview__image {
             height: 200px;
             border-radius: $border-radius;
+        }
+    }
+
+    > * {
+        flex: 1;
+    }
+
+    > *:first-child {
+        .n7-item-preview.is-vertical.has-image {
+            margin-left: 0;
+        }
+    }
+
+    > *:last-child {
+        .n7-item-preview.is-vertical.has-image {
+            margin-right: 0;
         }
     }
 }

@@ -1,4 +1,6 @@
-import { DataSource } from '@n7-frontend/core';
+import { DataSource } from "@n7-frontend/core";
 export declare class AwSchedaMetadataDS extends DataSource {
-    protected transform(data: any): any;
+    protected transform(data: any): {
+        group: any[];
+    };
 }

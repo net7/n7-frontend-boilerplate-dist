@@ -6,4 +6,5 @@ export declare class AwHomeLayoutEH extends EventHandler {
     listen(): void;
     private loadFilters;
     handleSimpleAutocompleteClick: (payload: any) => void;
+    outerLinkClick(type: any, payload: any): void;
 }

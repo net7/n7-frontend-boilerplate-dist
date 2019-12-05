@@ -21,3 +21,5 @@ export { CommunicationService as ɵh } from './lib/common/services/communication
 export { ConfigurationService as ɵc } from './lib/common/services/configuration.service';
 export { LayoutsConfigurationService as ɵd } from './lib/common/services/layouts-configuration.service';
 export { MainStateService as ɵe } from './lib/common/services/main-state.service';
+export { DataWidgetWrapperComponent as ɵx } from './lib/data-viz/components/data-widget-wrapper/data-widget-wrapper';
+export { DvExampleLayoutComponent as ɵy } from './lib/data-viz/layout/example-layout/example-layout';

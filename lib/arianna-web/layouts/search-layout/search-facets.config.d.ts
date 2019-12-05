@@ -156,12 +156,10 @@ declare const _default: {
             direction: string;
         };
         fields: {
-            title: {
-                highlight: boolean;
-                limit: number;
-            };
-        };
-        items: any[];
+            id: string;
+            highlight: boolean;
+            limit: number;
+        }[];
     };
     page: {
         offset: number;
