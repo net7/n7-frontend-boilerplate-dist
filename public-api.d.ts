@@ -6,6 +6,7 @@ export * from './lib/common/data-sources';
 export * from './lib/common/event-handlers';
 export * from './lib/common/layouts';
 export * from './lib/common/components';
+export * from './lib/common/helpers';
 export * from './lib/arianna-web/n7-boilerplate-arianna-web.module';
 export * from './lib/arianna-web/data-sources';
 export * from './lib/arianna-web/event-handlers';
