@@ -10,7 +10,6 @@ import { Title } from '@angular/platform-browser';
 import { LayoutBuilder, LayoutDataSource, EventHandler, DataSource } from '@n7-frontend/core';
 import tippy from 'tippy.js';
 import { get } from 'lodash';
-import helpers$1 from 'n7-boilerplate-lib/lib/common/helpers';
 
 /**
  * @fileoverview added by tsickle
@@ -10332,7 +10331,7 @@ var AwSearchLayoutDS = /** @class */ (function (_super) {
             function (dataItem) {
                 /** @type {?} */
                 var key = dataItem.label;
-                dataItem.label = helpers$1.prettifySnakeCase(key, _this.prettifyLabels[key]);
+                dataItem.label = helpers.prettifySnakeCase(key, _this.prettifyLabels[key]);
             }));
         }));
     };

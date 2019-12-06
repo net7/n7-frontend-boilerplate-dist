@@ -9,7 +9,6 @@ import { Title } from '@angular/platform-browser';
 import { LayoutBuilder, LayoutDataSource, EventHandler, DataSource } from '@n7-frontend/core';
 import tippy from 'tippy.js';
 import { get } from 'lodash';
-import helpers$1 from 'n7-boilerplate-lib/lib/common/helpers';
 
 /**
  * @fileoverview added by tsickle
@@ -9391,7 +9390,7 @@ class AwSearchLayoutDS extends LayoutDataSource {
             dataItem => {
                 /** @type {?} */
                 const key = dataItem.label;
-                dataItem.label = helpers$1.prettifySnakeCase(key, this.prettifyLabels[key]);
+                dataItem.label = helpers.prettifySnakeCase(key, this.prettifyLabels[key]);
             }));
         }));
     }
