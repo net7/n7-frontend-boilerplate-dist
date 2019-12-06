@@ -1,10 +1,11 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('@angular/common'), require('@angular/common/http'), require('@n7-frontend/components'), require('rxjs'), require('rxjs/operators'), require('@angular/router'), require('@angular/platform-browser'), require('@n7-frontend/core'), require('tippy.js'), require('lodash')) :
-    typeof define === 'function' && define.amd ? define('@n7-frontend/boilerplate', ['exports', '@angular/core', '@angular/common', '@angular/common/http', '@n7-frontend/components', 'rxjs', 'rxjs/operators', '@angular/router', '@angular/platform-browser', '@n7-frontend/core', 'tippy.js', 'lodash'], factory) :
-    (global = global || self, factory((global['n7-frontend'] = global['n7-frontend'] || {}, global['n7-frontend'].boilerplate = {}), global.ng.core, global.ng.common, global.ng.common.http, global.components, global.rxjs, global.rxjs.operators, global.ng.router, global.ng.platformBrowser, global.core$1, global.tippy, global.lodash));
-}(this, (function (exports, core, common, http, components, rxjs, operators, router, platformBrowser, core$1, tippy, lodash) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('@angular/common'), require('@angular/common/http'), require('@n7-frontend/components'), require('rxjs'), require('rxjs/operators'), require('@angular/router'), require('@angular/platform-browser'), require('@n7-frontend/core'), require('tippy.js'), require('lodash'), require('n7-boilerplate-lib/lib/common/helpers')) :
+    typeof define === 'function' && define.amd ? define('@n7-frontend/boilerplate', ['exports', '@angular/core', '@angular/common', '@angular/common/http', '@n7-frontend/components', 'rxjs', 'rxjs/operators', '@angular/router', '@angular/platform-browser', '@n7-frontend/core', 'tippy.js', 'lodash', 'n7-boilerplate-lib/lib/common/helpers'], factory) :
+    (global = global || self, factory((global['n7-frontend'] = global['n7-frontend'] || {}, global['n7-frontend'].boilerplate = {}), global.ng.core, global.ng.common, global.ng.common.http, global.components, global.rxjs, global.rxjs.operators, global.ng.router, global.ng.platformBrowser, global.core$1, global.tippy, global.lodash, global.helpers$1));
+}(this, (function (exports, core, common, http, components, rxjs, operators, router, platformBrowser, core$1, tippy, lodash, helpers$1) { 'use strict';
 
     tippy = tippy && tippy.hasOwnProperty('default') ? tippy['default'] : tippy;
+    helpers$1 = helpers$1 && helpers$1.hasOwnProperty('default') ? helpers$1['default'] : helpers$1;
 
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation. All rights reserved.
@@ -499,7 +500,7 @@
         },
         'search': {
             queryName: 'search',
-            queryBody: "{\n      search(__PARAMS__){\n        totalCount\n        facets\n        filters\n        results\n        page\n      }\n    }"
+            queryBody: "{\n      search(__PARAMS__){\n        totalCount\n        facets {\n          id\n          type\n          operator\n          limit\n          order\n          data {\n            label\n            value\n            counter\n            searchData {\n              key\n              value\n            }\n          }\n        }\n        results {\n          order{\n            type\n            key\n            direction\n          }\n          fields\n          {\n            id\n            highlight\n            limit\n          }\n          items {\n            ... on Entity {\n              id\n              label\n              typeOfEntity\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n                ... on\n                KeyValueFieldGroup {\n                  label\n                  fields\n                  {\n                    ...\n                    on KeyValueField {\n                      key\n                      value\n                    }\n                  }\n                }\n              }\n            }\n            ... on Item {\n              id\n              label\n              icon\n              title\n              subTitle\n              image\n              text\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n                ... on KeyValueFieldGroup {\n                  label\n                  fields {\n                    ...\n                    on KeyValueField {\n                      key\n                      value\n                    }\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    }"
         }
     };
 
@@ -537,10 +538,12 @@
                 query = this.providerConfig.config[requestId];
             }
             query = query || {};
-            var queryName = query.queryName, queryBody = query.queryBody;
+            var queryName = query.queryName;
+            var queryBody = query.queryBody;
             // config query control
-            if (!queryName || !queryBody)
-                throw Error("No config found for requestId \"" + requestId + "\"");
+            if (!queryName || !queryBody) {
+                throw Error("No config found for requestId '" + requestId + "'");
+            }
             if (params) {
                 /** @type {?} */
                 var paramsStr = this.makeParamsStr(params);
@@ -590,33 +593,37 @@
                      * @return {?}
                      */
                     function (val) {
-                        if (typeof (val) === 'object') {
+                        if (typeof val === 'object') {
                             /** @type {?} */
                             var subParamsStr = _this.makeParamsStr(val);
                             arrStr_1.push("{ " + subParamsStr + " }");
                         }
                         else {
-                            if (!isNaN(val))
+                            if (typeof val === 'number' || typeof val === 'boolean' || val === null) {
                                 arrStr_1.push("" + val);
-                            else
+                            }
+                            else {
                                 arrStr_1.push("\"" + val + "\"");
+                            }
                         }
                     }));
                     paramsStr.push(key + ": [" + arrStr_1.join(',') + "]");
                 }
-                else if (typeof (params[key]) === 'object' && params[key]) {
+                else if (typeof params[key] === 'object' && params[key]) {
                     /** @type {?} */
                     var subParamsStr = _this.makeParamsStr(params[key]);
                     paramsStr.push(key + ": { " + subParamsStr + " }");
                 }
-                else if (typeof (params[key]) === 'string' && key.indexOf('$') === 0) {
+                else if (typeof params[key] === 'string' && key.indexOf('$') === 0) {
                     paramsStr.push(key.replace('$', '') + ": " + params[key]);
                 }
                 else {
-                    if (!isNaN(params[key]))
+                    if (typeof params[key] === 'number' || typeof params[key] === 'boolean' || params[key] === null) {
                         paramsStr.push(key + ": " + params[key]);
-                    else
+                    }
+                    else {
                         paramsStr.push(key + ": \"" + params[key] + "\"");
+                    }
                 }
             }));
             return paramsStr.join(' ');
@@ -1617,7 +1624,7 @@
                 id: this.getId(),
                 label: this.config.label,
                 disabled: this.config.disabled,
-                options: this.data.map((/**
+                options: this.data ? this.data.map((/**
                  * @param {?} __0
                  * @return {?}
                  */
@@ -1628,7 +1635,7 @@
                         value: '' + value,
                         label: label
                     });
-                })),
+                })) : [],
                 payload: {
                     facetId: facetId,
                     source: 'input-select',
@@ -1673,10 +1680,20 @@
      */
     /** @type {?} */
     var INPUTS_MAP = {
-        'checkbox': FacetInputCheckbox,
-        'text': FacetInputText,
-        'link': FacetInputLink,
-        'select': FacetInputSelect,
+        checkbox: FacetInputCheckbox,
+        text: FacetInputText,
+        link: FacetInputLink,
+        select: FacetInputSelect
+    };
+    /** @type {?} */
+    var FILTERS_MAP = {
+        '=': '_filterDataEquals',
+        '>': '_filterDataGreaterThan',
+        '<': '_filterDataLessThan',
+        '>=': '_filterDataGreaterOrEquals',
+        '<=': '_filterDataLessOrEquals',
+        '<>': '_filterDataNotEqual',
+        'LIKE': '_filterDataLike'
     };
     /**
      * @record
@@ -1705,6 +1722,10 @@
         IFacet.prototype.type;
         /** @type {?} */
         IFacet.prototype.operator;
+        /** @type {?|undefined} */
+        IFacet.prototype.hasStaticData;
+        /** @type {?|undefined} */
+        IFacet.prototype.searchData;
         /** @type {?|undefined} */
         IFacet.prototype.data;
     }
@@ -1806,7 +1827,8 @@
                      */
                     function (item) { return item !== value; }));
                 }
-                else if (Array.isArray(filter.value) && filter.value.indexOf(value) === -1) {
+                else if (Array.isArray(filter.value) &&
+                    filter.value.indexOf(value) === -1) {
                     filter.value.push(value);
                 }
                 else {
@@ -1908,13 +1930,13 @@
              */
             function (facet) { return facet.id === facetId; }));
             if (!selectedFacets.length) {
-                throw Error("Facet with id \"" + facetId + "\" does not exists");
+                throw Error("Facet with id '" + facetId + "' does not exists");
             }
             selectedFacets.forEach((/**
              * @param {?} facet
              * @return {?}
              */
-            function (facet) { return facet.data = data; }));
+            function (facet) { return (facet.data = data); }));
         };
         /**
          * @return {?}
@@ -1927,7 +1949,7 @@
              * @param {?} filter
              * @return {?}
              */
-            function (filter) { return filter.value = null; }));
+            function (filter) { return (filter.value = null); }));
         };
         /**
          * @return {?}
@@ -1937,7 +1959,7 @@
          */
         function () {
             return {
-                facets: this._facets,
+                facets: this._getRequestFacets(),
                 page: this._page,
                 results: this._config.results,
                 filters: this._filters
@@ -1969,8 +1991,9 @@
              * @return {?}
              */
             function (filter) {
-                return (filter.context === 'internal') && ((Array.isArray(filter.value) && filter.value.length) ||
-                    (!Array.isArray(filter.value) && filter.value));
+                return (filter.context === 'internal' &&
+                    ((Array.isArray(filter.value) && filter.value.length) ||
+                        (!Array.isArray(filter.value) && filter.value)));
             }))
                 .map((/**
              * @param {?} __0
@@ -1996,7 +2019,11 @@
              * @param {?} filter
              * @return {?}
              */
-            function (filter) { return queryParams[filter.facetId] = Array.isArray(filter.value) ? filter.value.join(',') : filter.value; }));
+            function (filter) {
+                return (queryParams[filter.facetId] = Array.isArray(filter.value)
+                    ? filter.value.join(',')
+                    : filter.value);
+            }));
             return queryParams;
         };
         /**
@@ -2062,10 +2089,10 @@
             var targetInput = this.getInputByFacetId(target);
             /** @type {?} */
             var facet = this._facets.filter((/**
-             * @param {?} facet
+             * @param {?} f
              * @return {?}
              */
-            function (facet) { return facet.id === target; }))[0];
+            function (f) { return f.id === target; }))[0];
             /** @type {?} */
             var facetData = facet.data;
             /** @type {?} */
@@ -2150,6 +2177,9 @@
          * @return {?}
          */
         function (searchIns, item) {
+            var _this = this;
+            // reset
+            item.hidden = false;
             searchIns.forEach((/**
              * @param {?} __0
              * @return {?}
@@ -2162,65 +2192,192 @@
                  */
                 function (_a) {
                     var key = _a.key, operator = _a.operator;
-                    switch (operator) {
-                        // '=' EQUALS
-                        case '=':
-                            if (Array.isArray(value)) {
-                                item.hidden = !(!value.length || value.indexOf(item.metadata[key]) !== -1);
+                    if (item.hidden) {
+                        return;
+                    }
+                    /** @type {?} */
+                    var refValue = lodash.get(item, key, null);
+                    if (key.indexOf('searchData') !== -1 && Array.isArray(item.searchData)) {
+                        /** @type {?} */
+                        var searchDataKey_1 = key.replace('searchData.', '');
+                        item.searchData.forEach((/**
+                         * @param {?} __0
+                         * @return {?}
+                         */
+                        function (_a) {
+                            var dataKey = _a.key, dataValue = _a.value;
+                            if (dataKey === searchDataKey_1) {
+                                refValue = dataValue;
                             }
-                            else {
-                                item.hidden = !(value && value === item.metadata[key]);
-                            }
-                            break;
-                        // '>' GREATER THAN
-                        case '>':
-                            if (!Array.isArray(value)) {
-                                item.hidden = !(value && value > item.metadata[key]);
-                            }
-                            break;
-                        // '<' LESS THAN
-                        case '<':
-                            if (!Array.isArray(value)) {
-                                item.hidden = !(value && value < item.metadata[key]);
-                            }
-                            break;
-                        // '>=' GREATER OR EQUALS
-                        case '>=':
-                            if (!Array.isArray(value)) {
-                                item.hidden = !(value && value >= item.metadata[key]);
-                            }
-                            break;
-                        // '<=' LESS OR EQUALS
-                        case '<=':
-                            if (!Array.isArray(value)) {
-                                item.hidden = !(value && value <= item.metadata[key]);
-                            }
-                            break;
-                        // '<>' NOT EQUAL
-                        case '<>':
-                            if (!Array.isArray(value)) {
-                                item.hidden = !(value && value !== item.metadata[key]);
-                            }
-                            break;
-                        //  'LIKE'
-                        case 'LIKE':
-                            if (value &&
-                                item.metadata[key] &&
-                                typeof value === 'string' &&
-                                typeof item.metadata[key] === 'string') {
-                                /** @type {?} */
-                                var haystack = item.metadata[key].toLowerCase();
-                                /** @type {?} */
-                                var needle = value.toLocaleLowerCase();
-                                item.hidden = !(haystack.indexOf(needle) !== -1);
-                            }
-                            break;
-                        default:
-                            console.warn("SearchIn: operator " + operator + " not supported");
-                            break;
+                        }));
+                    }
+                    if (refValue === null) {
+                        item.hidden = true;
+                    }
+                    else if (FILTERS_MAP[operator]) {
+                        item.hidden = _this[FILTERS_MAP[operator]](value, refValue);
+                    }
+                    else {
+                        console.warn("SearchIn: operator " + operator + " not supported");
                     }
                 }));
             }));
+        };
+        /**
+         * @private
+         * @param {?} value
+         * @param {?} refValue
+         * @return {?}
+         */
+        SearchModel.prototype._filterDataEquals = /**
+         * @private
+         * @param {?} value
+         * @param {?} refValue
+         * @return {?}
+         */
+        function (value, refValue) {
+            if (Array.isArray(refValue)) {
+                if (Array.isArray(value)) {
+                    /** @type {?} */
+                    var inArray_1 = value.length === 0 ? true : false;
+                    refValue.forEach((/**
+                     * @param {?} rv
+                     * @return {?}
+                     */
+                    function (rv) {
+                        if (value.indexOf(rv) !== -1) {
+                            inArray_1 = true;
+                        }
+                    }));
+                    return !(inArray_1);
+                }
+                else {
+                    return !(value && refValue.indexOf(value) !== -1);
+                }
+            }
+            else {
+                if (Array.isArray(value)) {
+                    return !(!value.length || value.indexOf(refValue) !== -1);
+                }
+                else {
+                    return !(value && value === refValue);
+                }
+            }
+        };
+        /**
+         * @private
+         * @param {?} value
+         * @param {?} refValue
+         * @return {?}
+         */
+        SearchModel.prototype._filterDataGreaterThan = /**
+         * @private
+         * @param {?} value
+         * @param {?} refValue
+         * @return {?}
+         */
+        function (value, refValue) {
+            if (!Array.isArray(value)) {
+                return !(value && value > refValue);
+            }
+            return false;
+        };
+        /**
+         * @private
+         * @param {?} value
+         * @param {?} refValue
+         * @return {?}
+         */
+        SearchModel.prototype._filterDataLessThan = /**
+         * @private
+         * @param {?} value
+         * @param {?} refValue
+         * @return {?}
+         */
+        function (value, refValue) {
+            if (!Array.isArray(value)) {
+                return !(value && value < refValue);
+            }
+            return false;
+        };
+        /**
+         * @private
+         * @param {?} value
+         * @param {?} refValue
+         * @return {?}
+         */
+        SearchModel.prototype._filterDataGreaterOrEquals = /**
+         * @private
+         * @param {?} value
+         * @param {?} refValue
+         * @return {?}
+         */
+        function (value, refValue) {
+            if (!Array.isArray(value)) {
+                return !(value && value >= refValue);
+            }
+            return false;
+        };
+        /**
+         * @private
+         * @param {?} value
+         * @param {?} refValue
+         * @return {?}
+         */
+        SearchModel.prototype._filterDataLessOrEquals = /**
+         * @private
+         * @param {?} value
+         * @param {?} refValue
+         * @return {?}
+         */
+        function (value, refValue) {
+            if (!Array.isArray(value)) {
+                return !(value && value <= refValue);
+            }
+            return false;
+        };
+        /**
+         * @private
+         * @param {?} value
+         * @param {?} refValue
+         * @return {?}
+         */
+        SearchModel.prototype._filterDataNotEqual = /**
+         * @private
+         * @param {?} value
+         * @param {?} refValue
+         * @return {?}
+         */
+        function (value, refValue) {
+            if (!Array.isArray(value)) {
+                return !(value && value !== refValue);
+            }
+            return false;
+        };
+        /**
+         * @private
+         * @param {?} value
+         * @param {?} refValue
+         * @return {?}
+         */
+        SearchModel.prototype._filterDataLike = /**
+         * @private
+         * @param {?} value
+         * @param {?} refValue
+         * @return {?}
+         */
+        function (value, refValue) {
+            if (value &&
+                refValue &&
+                typeof value === 'string' &&
+                typeof refValue === 'string') {
+                /** @type {?} */
+                var haystack = refValue.toLowerCase();
+                /** @type {?} */
+                var needle = value.toLocaleLowerCase();
+                return !(haystack.indexOf(needle) !== -1);
+            }
+            return false;
         };
         /**
          * @private
@@ -2241,7 +2398,9 @@
                  * @param {?} input
                  * @return {?}
                  */
-                function (input) { return _this._filters.push(__assign({}, input.filterConfig, { facetId: input.facetId, value: input.filterConfig.isArray ? [] : null })); }));
+                function (input) {
+                    return _this._filters.push(__assign({}, input.filterConfig, { facetId: input.facetId, value: input.filterConfig.isArray ? [] : null }));
+                }));
             }));
         };
         /**
@@ -2301,8 +2460,9 @@
                 function (inputConfig, inputIndex) {
                     /** @type {?} */
                     var inputModel = INPUTS_MAP[inputConfig.type];
-                    if (!inputModel)
+                    if (!inputModel) {
                         throw Error("Input type " + inputConfig.type + " not supported");
+                    }
                     _this._inputs.push(new inputModel(__assign({}, inputConfig, { inputIndex: inputIndex, sectionIndex: sectionIndex })));
                 }));
             }));
@@ -2322,6 +2482,48 @@
              * @return {?}
              */
             function (facet) { return _this.setInputData(facet.id, facet.data); }));
+        };
+        /**
+         * @private
+         * @return {?}
+         */
+        SearchModel.prototype._getRequestFacets = /**
+         * @private
+         * @return {?}
+         */
+        function () {
+            /** @type {?} */
+            var results = [];
+            this._facets.forEach((/**
+             * @param {?} f
+             * @return {?}
+             */
+            function (f) {
+                /** @type {?} */
+                var facetConfig = __assign({}, f);
+                if (!f.hasStaticData) {
+                    delete facetConfig.data;
+                }
+                delete facetConfig.hasStaticData;
+                // searchData control
+                if (Array.isArray(facetConfig.data)) {
+                    facetConfig.data
+                        .filter((/**
+                     * @param {?} dataItem
+                     * @return {?}
+                     */
+                    function (dataItem) { return typeof dataItem.searchData !== 'undefined'; }))
+                        .forEach((/**
+                     * @param {?} dataItem
+                     * @return {?}
+                     */
+                    function (dataItem) {
+                        delete dataItem.searchData;
+                    }));
+                }
+                results.push(facetConfig);
+            }));
+            return results;
         };
         return SearchModel;
     }());
@@ -2400,8 +2602,9 @@
          * @return {?}
          */
         function (id, config) {
-            if (this._models[id])
-                throw Error("Search model \"" + id + "\" already exists!");
+            if (this._models[id]) {
+                throw Error("Search model '" + id + "' already exists!");
+            }
             this._models[id] = new SearchModel(id, config);
         };
         /**
@@ -3283,6 +3486,7 @@
         function FacetsWrapperEH() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this._facetsChanged = false;
+            _this.internalFacetsChange$ = new rxjs.Subject();
             return _this;
         }
         /**
@@ -3312,8 +3516,7 @@
                         _this.dataSource.onFacetChange(payload);
                         // internal
                         if (context === 'internal') {
-                            _this.dataSource.filterTarget(input.getTarget());
-                            _this.dataSource.updateFilteredTarget(input.getTarget());
+                            _this.internalFacetsChange$.next(input.getTarget());
                             // external
                         }
                         else {
@@ -3360,6 +3563,15 @@
                         break;
                 }
             }));
+            // internal facets change
+            this.internalFacetsChange$.pipe(operators.debounceTime(500)).subscribe((/**
+             * @param {?} target
+             * @return {?}
+             */
+            function (target) {
+                _this.dataSource.filterTarget(target);
+                _this.dataSource.updateFilteredTarget(target);
+            }));
         };
         return FacetsWrapperEH;
     }(core$1.EventHandler));
@@ -3369,6 +3581,11 @@
          * @private
          */
         FacetsWrapperEH.prototype._facetsChanged;
+        /**
+         * @type {?}
+         * @private
+         */
+        FacetsWrapperEH.prototype.internalFacetsChange$;
     }
 
     /**
@@ -4083,6 +4300,7 @@
                 /** @type {?} */
                 var // items per page (if using pagination)
                 labels = config.get("labels");
+                var dynamicPagination = _this.options.dynamicPagination;
                 /** @type {?} */
                 var d = data.items ? data.items : data.relatedItems // items to iterate over
                 ;
@@ -4100,7 +4318,7 @@
                     }
                 }
                 // resize data
-                if (size && page) {
+                if (!dynamicPagination && size && page) {
                     d = d.slice(page * size - size, page * size);
                 }
                 else if (size) {
@@ -4222,7 +4440,10 @@
             this.pageSize = this.options.size;
             this.totalObjects = data.totalCount;
             this.currentPage = this.options.page ? (/** @type {?} */ (this.options.page)) : 1;
-            if (data.items) {
+            if (this.options.dynamicPagination && this.options.dynamicPagination.total) {
+                this.totalPages = Math.ceil(this.options.dynamicPagination.total / this.pageSize);
+            }
+            else if (data.items) {
                 this.totalPages = Math.ceil(data.items.length / this.pageSize);
             }
             else if (data.relatedItems) {
@@ -6295,11 +6516,7 @@
                                 _this.emitOuter('goto', payload);
                         }
                         else {
-                            // navigate to the patrimonio page of this item
-                            _this.emitGlobal('navigate', {
-                                handler: 'router',
-                                path: ["aw/patrimonio/" + payload]
-                            });
+                            _this.emitOuter('click', payload);
                         }
                         break;
                     case 'aw-linked-objects.change': // changed page size value (pagination)
@@ -7493,6 +7710,14 @@
                             //this.dataSource.updateBubbes(payload);
                         }
                         break;
+                    case 'aw-linked-objects.click':
+                        /** @type {?} */
+                        var paths = _this.configuration.get('paths');
+                        _this.emitGlobal('navigate', {
+                            handler: 'router',
+                            path: [paths.schedaBasePath, payload]
+                        });
+                        break;
                     default:
                         break;
                 }
@@ -8650,7 +8875,7 @@
                 function (b) {
                     /** @type {?} */
                     var s = 'B_' + payload.replace(/-/g, '_');
-                    return b.id == s;
+                    return b.id === s;
                 }));
                 if (thebubble) {
                     _this.dataSource.onBubbleSelected(thebubble);
@@ -8794,18 +9019,19 @@
                     case 'aw-home-facets-wrapper.enter':
                         _this.dataSource.handleFacetSearchEnter(payload);
                         break;
-                    case "aw-bubble-chart.bubble-tooltip-close-click":
+                    case 'aw-bubble-chart.bubble-tooltip-close-click':
                         _this.dataSource.onBubbleTooltipClick('close', payload);
                         break;
-                    case "aw-bubble-chart.bubble-tooltip-goto-click":
-                        if (!payload || !payload.entityId)
+                    case 'aw-bubble-chart.bubble-tooltip-goto-click':
+                        if (!payload || !payload.entityId) {
                             return;
+                        }
                         _this.emitGlobal('navigate', {
                             handler: 'router',
                             path: ["aw/entita/" + payload.entityId]
                         });
                         break;
-                    case "aw-bubble-chart.bubble-tooltip-select-click":
+                    case 'aw-bubble-chart.bubble-tooltip-select-click':
                         payload._bubbleChart = _this.dataSource._bubbleChart;
                         _this.emitOuter('bubble-tooltip-select-click', payload);
                         break;
@@ -8902,23 +9128,31 @@
                         var source = payload.source;
                         /** @type {?} */
                         var basePath = void 0;
-                        if (source === "item") {
-                            basePath = _this.configuration.get("paths").entitaBasePath;
+                        if (source === 'item') {
+                            basePath = _this.configuration.get('paths').entitaBasePath;
                             _this.emitGlobal('navigate', {
                                 handler: 'router',
                                 path: [basePath, payload.id]
                             });
                         }
-                        else if (source === "showMore") {
+                        else if (source === 'showMore') {
                             /** @type {?} */
                             var query = _this.dataSource.homeAutocompleteQuery;
-                            basePath = _this.configuration.get("paths").searchBasePath;
+                            basePath = _this.configuration.get('paths').searchBasePath;
                             _this.emitGlobal('navigate', {
                                 handler: 'router',
                                 path: [basePath],
                                 queryParams: { query: query }
                             });
                         }
+                        break;
+                    case 'aw-linked-objects.click':
+                        /** @type {?} */
+                        var paths = _this.configuration.get('paths');
+                        _this.emitGlobal('navigate', {
+                            handler: 'router',
+                            path: [paths.schedaBasePath, payload]
+                        });
                         break;
                     default:
                         break;
@@ -8971,7 +9205,7 @@
          * @return {?}
          */
         function (type, payload) {
-            window.open(payload, "_blank");
+            window.open(payload, '_blank');
         };
         return AwHomeLayoutEH;
     }(core$1.EventHandler));
@@ -9526,6 +9760,16 @@
                             path: ["aw/entita/" + payload.entityId + "/overview"]
                         });
                         break;
+                    case 'aw-linked-objects.click':
+                        /** @type {?} */
+                        var paths = _this.configuration.get('paths');
+                        _this.emitGlobal('navigate', {
+                            handler: 'router',
+                            path: [paths.schedaBasePath, payload]
+                        });
+                        break;
+                    default:
+                        break;
                 }
             }));
         };
@@ -9884,47 +10128,47 @@
      */
     var facetsConfig = {
         totalCount: 0,
-        facets: [{
+        facets: [
+            {
                 id: 'query',
                 type: 'value'
-            }, {
+            },
+            {
                 id: 'query-all',
                 type: 'value',
-                data: [{
+                hasStaticData: true,
+                data: [
+                    {
                         value: '1',
                         label: 'Cerca in tutti campi delle schede'
-                    }]
-            }, {
+                    }
+                ]
+            },
+            {
                 id: 'query-links',
-                type: 'value',
-                data: []
-            }, {
+                type: 'value'
+            },
+            {
                 id: 'entity-types',
                 type: 'value',
                 operator: 'OR',
                 limit: 10,
-                order: 'count',
-                // count | text
-                data: []
-            }, {
+                order: 'count'
+            },
+            {
                 id: 'entity-search',
                 type: 'value'
-            }, {
+            },
+            {
                 id: 'entity-links',
                 type: 'value',
-                metadata: ['title', 'entity-type'],
-                data: []
-            }, {
-                id: 'date-from',
-                type: 'value',
-                data: []
-            }, {
-                id: 'date-to',
-                type: 'value',
-                data: []
-            }],
-        fields: [{
-                inputs: [{
+                searchData: ['entity-type']
+            },
+        ],
+        fields: [
+            {
+                inputs: [
+                    {
                         type: 'text',
                         facetId: 'query',
                         placeholder: 'Cerca...',
@@ -9932,49 +10176,63 @@
                         filterConfig: {
                             delay: 500,
                             minChars: 3,
-                            searchIn: [{
-                                    key: 'source.title',
+                            searchIn: [
+                                {
+                                    key: 'label',
                                     operator: 'LIKE'
-                                }]
+                                }
+                            ]
                         }
-                    }, {
+                    },
+                    {
                         type: 'checkbox',
                         facetId: 'query-all',
                         filterConfig: {
-                            searchIn: [{
+                            searchIn: [
+                                {
                                     key: 'query-all',
                                     operator: '='
-                                }]
+                                }
+                            ]
                         }
-                    }, {
+                    },
+                    {
                         type: 'link',
                         facetId: 'query-links',
                         filterConfig: {
                             isArray: true,
-                            searchIn: [{
+                            searchIn: [
+                                {
                                     key: 'source.entityType',
                                     operator: '='
-                                }]
+                                }
+                            ]
                         }
-                    }]
-            }, {
+                    }
+                ]
+            },
+            {
                 header: {
                     label: 'Relazione con',
                     classes: 'related-class'
                 },
-                inputs: [{
+                inputs: [
+                    {
                         type: 'checkbox',
                         facetId: 'entity-types',
                         filterConfig: {
                             isArray: true,
                             context: 'internal',
                             target: 'entity-links',
-                            searchIn: [{
-                                    key: 'entity-type',
+                            searchIn: [
+                                {
+                                    key: 'searchData.entity-type',
                                     operator: '='
-                                }]
+                                }
+                            ]
                         }
-                    }, {
+                    },
+                    {
                         type: 'text',
                         facetId: 'entity-search',
                         placeholder: 'Cerca entità',
@@ -9984,220 +10242,48 @@
                             minChars: 3,
                             context: 'internal',
                             target: 'entity-links',
-                            searchIn: [{
-                                    key: 'title',
+                            searchIn: [
+                                {
+                                    key: 'label',
                                     operator: 'LIKE'
-                                }]
+                                }
+                            ]
                         }
-                    }, {
+                    },
+                    {
                         type: 'link',
                         facetId: 'entity-links',
                         filterConfig: {
                             limit: 20,
-                            searchIn: [{
+                            searchIn: [
+                                {
                                     key: 'source.id',
                                     operator: '='
-                                }]
+                                }
+                            ]
                         }
-                    }]
-            }, {
-                header: {
-                    label: 'Data',
-                    classes: 'date-class'
-                },
-                inputs: [{
-                        type: 'select',
-                        facetId: 'date-from',
-                        label: 'Dal',
-                        filterConfig: {
-                            searchIn: [{
-                                    key: 'source.dateStart',
-                                    operator: '>='
-                                }]
-                        }
-                    }, {
-                        type: 'select',
-                        facetId: 'date-to',
-                        label: 'Al',
-                        filterConfig: {
-                            searchIn: [{
-                                    key: 'source.dateEnd',
-                                    operator: '<='
-                                }]
-                        }
-                    }]
-            }],
+                    }
+                ]
+            },
+        ],
         results: {
             order: {
                 type: 'score',
                 // score | text | date
                 key: 'author',
                 // docPath, elastic key, ecc
-                direction: 'DESC',
+                direction: 'DESC' // ASC | DESC
             },
-            // FIXME: collegare API
-            // e controllare nuovo formato results.fields
-            fields: [{
-                    id: 'title',
+            fields: [
+                {
+                    id: 'description',
                     highlight: true,
-                    limit: 50,
-                }]
+                    limit: 200
+                }
+            ]
         },
         page: { offset: 0, limit: 10 }
     };
-
-    /**
-     * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/search-layout/search-mock-request.ts
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-    var fakeSearchRequest$ = (/**
-     * @param {?} params
-     * @param {?} configKeys
-     * @param {?} enabledEntities
-     * @return {?}
-     */
-    function (params, configKeys, enabledEntities) {
-        params.totalCount = Math.floor(Math.random() * 1000);
-        console.log('fake-search-request----------->', params);
-        var facets = params.facets;
-        // query links
-        _getFacet('query-links', facets).data = _getQueryLinksData(configKeys, enabledEntities);
-        // entity types
-        _getFacet('entity-types', facets).data = _getEntityTypesData(configKeys, enabledEntities);
-        // entity links
-        _getFacet('entity-links', facets).data = _getEntityLinksData();
-        // date from
-        _getFacet('date-from', facets).data = _getDateFromData();
-        // date to
-        _getFacet('date-to', facets).data = _getDateToData();
-        return rxjs.of(params);
-    });
-    /** @type {?} */
-    var _getFacet = (/**
-     * @param {?} id
-     * @param {?} facets
-     * @return {?}
-     */
-    function (id, facets) {
-        return facets.filter((/**
-         * @param {?} f
-         * @return {?}
-         */
-        function (f) { return f.id === id; }))[0];
-    });
-    var ɵ0 = _getFacet;
-    /** @type {?} */
-    var _getQueryLinksData = (/**
-     * @param {?} configKeys
-     * @param {?} enabledEntities
-     * @return {?}
-     */
-    function (configKeys, enabledEntities) {
-        return enabledEntities.map((/**
-         * @param {?} key
-         * @return {?}
-         */
-        function (key) {
-            /** @type {?} */
-            var config = configKeys[key];
-            return {
-                value: key,
-                label: config.label,
-                counter: Math.floor(Math.random() * 100),
-                // questi vanno aggiunti a mano lato front-end
-                options: {
-                    icon: config.icon,
-                    classes: "color-" + key
-                }
-            };
-        }));
-    });
-    var ɵ1 = _getQueryLinksData;
-    /** @type {?} */
-    var _getEntityTypesData = (/**
-     * @param {?} configKeys
-     * @param {?} enabledEntities
-     * @return {?}
-     */
-    function (configKeys, enabledEntities) {
-        return enabledEntities.map((/**
-         * @param {?} key
-         * @return {?}
-         */
-        function (key) {
-            /** @type {?} */
-            var config = configKeys[key];
-            return {
-                value: key,
-                label: config.label,
-            };
-        }));
-    });
-    var ɵ2 = _getEntityTypesData;
-    /** @type {?} */
-    var _getDateFromData = (/**
-     * @return {?}
-     */
-    function () {
-        return ['1990', '1991', '1992', '1993'].map((/**
-         * @param {?} key
-         * @return {?}
-         */
-        function (key) {
-            return {
-                value: key,
-                label: key,
-            };
-        }));
-    });
-    var ɵ3 = _getDateFromData;
-    /** @type {?} */
-    var _getDateToData = (/**
-     * @return {?}
-     */
-    function () {
-        return ['2000', '2001', '2002', '2003'].map((/**
-         * @param {?} key
-         * @return {?}
-         */
-        function (key) {
-            return {
-                value: key,
-                label: key,
-            };
-        }));
-    });
-    var ɵ4 = _getDateToData;
-    /** @type {?} */
-    var _getEntityLinksData = (/**
-     * @return {?}
-     */
-    function () {
-        /** @type {?} */
-        var types = ['places', 'places', 'concepts', 'people', 'people'];
-        /** @type {?} */
-        var items = ['milano', 'roma', 'spazio', 'rodolfo-marna', 'alighiero-boetti'];
-        return items.map((/**
-         * @param {?} key
-         * @param {?} index
-         * @return {?}
-         */
-        function (key, index) {
-            /** @type {?} */
-            var label = key.replace('-', ' ');
-            return {
-                value: key,
-                label: label,
-                counter: Math.floor(Math.random() * 100),
-                metadata: {
-                    title: label,
-                    'entity-type': types[index]
-                }
-            };
-        }));
-    });
-    var ɵ5 = _getEntityLinksData;
 
     /**
      * @fileoverview added by tsickle
@@ -10214,13 +10300,27 @@
             // pagination value (url param)
             _this.pageSize = 10; // linked objects page size
             _this.orderByLabel = 'Ordina per';
-            _this.orderByOptions = [{
+            _this.orderByOptions = [
+                {
                     value: 'text_DESC',
                     label: 'Ordine alfabetico (DESC)'
-                }, {
+                },
+                {
                     value: 'text_ASC',
                     label: 'Ordine alfabetico (ASC)'
-                },
+                } /* {
+                value: 'score_DESC',
+                label: 'Ordine per rilevanza (DESC)'
+              }, {
+                value: 'score_ASC',
+                label: 'Ordine per rilevanza (ASC)'
+              }, {
+                value: 'date_DESC',
+                label: 'Ordina per data (DESC)'
+              }, {
+                value: 'date_ASC',
+                label: 'Ordina per data (ASC)'
+              } */
             ];
             _this.getSearchModelId = (/**
              * @return {?}
@@ -10244,9 +10344,12 @@
             this.communication = communication;
             this.search = search;
             this.options = options;
+            this.prettifyLabels = this.configuration.get('labels');
+            this.configKeys = this.configuration.get('config-keys');
             this.pageTitle = this.configuration.get('search-layout').title;
-            if (!this.search.model(SEARCH_MODEL_ID))
+            if (!this.search.model(SEARCH_MODEL_ID)) {
                 this.search.add(SEARCH_MODEL_ID, facetsConfig);
+            }
             this.searchModel = this.search.model(SEARCH_MODEL_ID);
             this.doSearchRequest$().subscribe((/**
              * @return {?}
@@ -10292,7 +10395,7 @@
         function (payload) {
             /** @type {?} */
             var page = payload.replace('goto-', '');
-            this._updateSearchPage(page);
+            return this._updateSearchPage(page);
         };
         /**
          * @param {?} payload
@@ -10318,37 +10421,25 @@
         function () {
             var _this = this;
             /** @type {?} */
-            var enabledEntities = this.configuration.get('search-layout').enabledEntities;
-            // FIXME: togliere configKeys
-            // dovrebbe venire dall'API
-            /** @type {?} */
-            var configKeys = this.configuration.get('config-keys');
-            // FIXME: mettere logica definitiva 
-            // per la chiamata search
-            /*
-                this.communication.request$('search', {
-                  onError: error => console.error(error),
-                  params: requestParams
-                })
-                */
-            /** @type {?} */
             var requestParams = this.searchModel.getRequestParams();
             /** @type {?} */
-            var fakeResultsRequest$ = this.communication.request$('getEntityDetails', {
+            var requestPayload = {
+                searchParameters: __assign({ totalCount: 100 }, requestParams)
+            };
+            return this.communication.request$('search', {
                 onError: (/**
                  * @param {?} error
                  * @return {?}
                  */
                 function (error) { return console.error(error); }),
-                params: { entityId: '0263a407-d0dd-4647-98e2-109b0b0c05f3' }
-            });
-            return fakeResultsRequest$.pipe(operators.withLatestFrom(fakeSearchRequest$(requestParams, configKeys, enabledEntities)), operators.tap((/**
+                params: requestPayload
+            }).pipe(operators.tap((/**
              * @param {?} __0
              * @return {?}
              */
             function (_a) {
-                var _b = __read(_a, 2), resultsResponse = _b[0], searchResponse = _b[1];
-                _this.totalCount = searchResponse.totalCount;
+                var totalCount = _a.totalCount, results = _a.results, facets = _a.facets;
+                _this.totalCount = totalCount;
                 /** @type {?} */
                 var resultsTitleIndex = 0;
                 // results title
@@ -10359,17 +10450,23 @@
                     resultsTitleIndex = 1;
                 }
                 _this.resultsTitle = _this.configuration.get('search-layout').results[resultsTitleIndex];
-                _this.searchModel.updateFacets(searchResponse.facets);
-                _this.searchModel.updateTotalCount(searchResponse.totalCount);
+                // facets labels
+                _this._addFacetsLabels(facets);
+                // facets options
+                _this._addFacetsOptions(facets);
+                _this.searchModel.updateFacets(facets);
+                _this.searchModel.updateTotalCount(totalCount);
                 _this.one('aw-linked-objects').updateOptions({
                     context: 'search',
                     config: _this.configuration,
-                    // todo: swap to next line after merge
-                    // config: this.configuration
                     page: _this.currentPage,
-                    size: _this.pageSize,
+                    pagination: true,
+                    dynamicPagination: {
+                        total: totalCount
+                    },
+                    size: _this.pageSize
                 });
-                _this.one('aw-linked-objects').update({ items: resultsResponse.items });
+                _this.one('aw-linked-objects').update({ items: _this._normalizeItems(results.items) });
             })));
         };
         /**
@@ -10383,8 +10480,9 @@
          * @return {?}
          */
         function (page) {
-            if (+page === this.currentPage)
+            if (+page === this.currentPage) {
                 return rxjs.of(false);
+            }
             this.currentPage = +page;
             /** @type {?} */
             var searchConfig = this.searchModel.getConfig();
@@ -10395,6 +10493,98 @@
             var newOffset = (this.currentPage - 1) * limit;
             this.searchModel.setPageConfigOffset(newOffset);
             return rxjs.of(true);
+        };
+        /**
+         * @private
+         * @param {?} facets
+         * @return {?}
+         */
+        AwSearchLayoutDS.prototype._addFacetsLabels = /**
+         * @private
+         * @param {?} facets
+         * @return {?}
+         */
+        function (facets) {
+            var _this = this;
+            facets
+                .filter((/**
+             * @param {?} f
+             * @return {?}
+             */
+            function (f) { return Array.isArray(f.data); }))
+                .forEach((/**
+             * @param {?} f
+             * @return {?}
+             */
+            function (f) {
+                f.data.forEach((/**
+                 * @param {?} dataItem
+                 * @return {?}
+                 */
+                function (dataItem) {
+                    /** @type {?} */
+                    var key = dataItem.label;
+                    dataItem.label = helpers$1.prettifySnakeCase(key, _this.prettifyLabels[key]);
+                }));
+            }));
+        };
+        /**
+         * @private
+         * @param {?} facets
+         * @return {?}
+         */
+        AwSearchLayoutDS.prototype._addFacetsOptions = /**
+         * @private
+         * @param {?} facets
+         * @return {?}
+         */
+        function (facets) {
+            var _this = this;
+            facets
+                .filter((/**
+             * @param {?} f
+             * @return {?}
+             */
+            function (f) { return f.id === 'query-links'; }))
+                .forEach((/**
+             * @param {?} f
+             * @return {?}
+             */
+            function (f) {
+                f.data.forEach((/**
+                 * @param {?} dataItem
+                 * @return {?}
+                 */
+                function (dataItem) {
+                    /** @type {?} */
+                    var key = dataItem.value.replace(' ', '-');
+                    /** @type {?} */
+                    var config = _this.configKeys[key];
+                    if (config) {
+                        dataItem.options = {
+                            icon: config.icon,
+                            classes: "color-" + key
+                        };
+                    }
+                }));
+            }));
+        };
+        /**
+         * @private
+         * @param {?} items
+         * @return {?}
+         */
+        AwSearchLayoutDS.prototype._normalizeItems = /**
+         * @private
+         * @param {?} items
+         * @return {?}
+         */
+        function (items) {
+            return items.map((/**
+             * @param {?} singleItem
+             * @return {?}
+             */
+            function (singleItem) { return ({ item: __assign({}, singleItem) }); }));
         };
         return AwSearchLayoutDS;
     }(core$1.LayoutDataSource));
@@ -10424,6 +10614,16 @@
          * @private
          */
         AwSearchLayoutDS.prototype.searchModel;
+        /**
+         * @type {?}
+         * @private
+         */
+        AwSearchLayoutDS.prototype.prettifyLabels;
+        /**
+         * @type {?}
+         * @private
+         */
+        AwSearchLayoutDS.prototype.configKeys;
         /** @type {?} */
         AwSearchLayoutDS.prototype.pageTitle;
         /** @type {?} */
@@ -10499,8 +10699,9 @@
                          * @return {?}
                          */
                         function (changed) {
-                            if (changed)
+                            if (changed) {
                                 _this.facetsChange$.next();
+                            }
                         }));
                         break;
                     case 'aw-linked-objects.change':
@@ -10513,9 +10714,18 @@
                          * @return {?}
                          */
                         function (changed) {
-                            if (changed)
+                            if (changed) {
                                 _this.facetsChange$.next();
+                            }
                         }));
+                        break;
+                    case 'aw-linked-objects.click':
+                        /** @type {?} */
+                        var paths = _this.dataSource.configuration.get('paths');
+                        _this.emitGlobal('navigate', {
+                            handler: 'router',
+                            path: [paths.entitaBasePath, payload]
+                        });
                         break;
                     default:
                         break;

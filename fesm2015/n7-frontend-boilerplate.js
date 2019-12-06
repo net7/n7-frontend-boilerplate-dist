@@ -3,12 +3,13 @@ import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK } from '@n7-frontend/components';
 import { ReplaySubject, empty, Subject, of, fromEvent, interval } from 'rxjs';
-import { map, catchError, tap, takeUntil, filter, debounce, debounceTime, withLatestFrom } from 'rxjs/operators';
+import { map, catchError, tap, takeUntil, filter, debounceTime, debounce } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { LayoutBuilder, LayoutDataSource, EventHandler, DataSource } from '@n7-frontend/core';
 import tippy from 'tippy.js';
 import { get } from 'lodash';
+import helpers$1 from 'n7-boilerplate-lib/lib/common/helpers';
 
 /**
  * @fileoverview added by tsickle
@@ -630,10 +631,87 @@ const ApolloProviderConfig = {
         queryBody: `{
       search(__PARAMS__){
         totalCount
-        facets
-        filters
-        results
-        page
+        facets {
+          id
+          type
+          operator
+          limit
+          order
+          data {
+            label
+            value
+            counter
+            searchData {
+              key
+              value
+            }
+          }
+        }
+        results {
+          order{
+            type
+            key
+            direction
+          }
+          fields
+          {
+            id
+            highlight
+            limit
+          }
+          items {
+            ... on Entity {
+              id
+              label
+              typeOfEntity
+              fields {
+                ...
+                on KeyValueField {
+                  key
+                  value
+                }
+                ... on
+                KeyValueFieldGroup {
+                  label
+                  fields
+                  {
+                    ...
+                    on KeyValueField {
+                      key
+                      value
+                    }
+                  }
+                }
+              }
+            }
+            ... on Item {
+              id
+              label
+              icon
+              title
+              subTitle
+              image
+              text
+              fields {
+                ...
+                on KeyValueField {
+                  key
+                  value
+                }
+                ... on KeyValueFieldGroup {
+                  label
+                  fields {
+                    ...
+                    on KeyValueField {
+                      key
+                      value
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }`
     }
@@ -672,13 +750,15 @@ class ApolloProvider {
             query = this.providerConfig.config[requestId];
         }
         query = query || {};
-        let { queryName, queryBody } = query;
+        const { queryName } = query;
+        let { queryBody } = query;
         // config query control
-        if (!queryName || !queryBody)
-            throw Error(`No config found for requestId "${requestId}"`);
+        if (!queryName || !queryBody) {
+            throw Error(`No config found for requestId '${requestId}'`);
+        }
         if (params) {
             /** @type {?} */
-            let paramsStr = this.makeParamsStr(params);
+            const paramsStr = this.makeParamsStr(params);
             queryBody = queryBody.replace('__PARAMS__', paramsStr);
         }
         else {
@@ -705,7 +785,7 @@ class ApolloProvider {
      */
     makeParamsStr(params) {
         /** @type {?} */
-        let paramsStr = [];
+        const paramsStr = [];
         Object.keys(params).forEach((/**
          * @param {?} key
          * @return {?}
@@ -713,39 +793,43 @@ class ApolloProvider {
         key => {
             if (Array.isArray(params[key])) {
                 /** @type {?} */
-                let arrStr = [];
+                const arrStr = [];
                 params[key].forEach((/**
                  * @param {?} val
                  * @return {?}
                  */
                 val => {
-                    if (typeof (val) === 'object') {
+                    if (typeof val === 'object') {
                         /** @type {?} */
-                        let subParamsStr = this.makeParamsStr(val);
+                        const subParamsStr = this.makeParamsStr(val);
                         arrStr.push(`{ ${subParamsStr} }`);
                     }
                     else {
-                        if (!isNaN(val))
+                        if (typeof val === 'number' || typeof val === 'boolean' || val === null) {
                             arrStr.push(`${val}`);
-                        else
+                        }
+                        else {
                             arrStr.push(`"${val}"`);
+                        }
                     }
                 }));
                 paramsStr.push(`${key}: [${arrStr.join(',')}]`);
             }
-            else if (typeof (params[key]) === 'object' && params[key]) {
+            else if (typeof params[key] === 'object' && params[key]) {
                 /** @type {?} */
-                let subParamsStr = this.makeParamsStr(params[key]);
+                const subParamsStr = this.makeParamsStr(params[key]);
                 paramsStr.push(`${key}: { ${subParamsStr} }`);
             }
-            else if (typeof (params[key]) === 'string' && key.indexOf('$') === 0) {
+            else if (typeof params[key] === 'string' && key.indexOf('$') === 0) {
                 paramsStr.push(`${key.replace('$', '')}: ${params[key]}`);
             }
             else {
-                if (!isNaN(params[key]))
+                if (typeof params[key] === 'number' || typeof params[key] === 'boolean' || params[key] === null) {
                     paramsStr.push(`${key}: ${params[key]}`);
-                else
+                }
+                else {
                     paramsStr.push(`${key}: "${params[key]}"`);
+                }
             }
         }));
         return paramsStr.join(' ');
@@ -1631,7 +1715,7 @@ class FacetInputSelect extends FacetInput {
             id: this.getId(),
             label: this.config.label,
             disabled: this.config.disabled,
-            options: this.data.map((/**
+            options: this.data ? this.data.map((/**
              * @param {?} __0
              * @return {?}
              */
@@ -1639,7 +1723,7 @@ class FacetInputSelect extends FacetInput {
                 // normalize value
                 value: '' + value,
                 label
-            }))),
+            }))) : [],
             payload: {
                 facetId,
                 source: 'input-select',
@@ -1679,10 +1763,20 @@ class FacetInputSelect extends FacetInput {
  */
 /** @type {?} */
 const INPUTS_MAP = {
-    'checkbox': FacetInputCheckbox,
-    'text': FacetInputText,
-    'link': FacetInputLink,
-    'select': FacetInputSelect,
+    checkbox: FacetInputCheckbox,
+    text: FacetInputText,
+    link: FacetInputLink,
+    select: FacetInputSelect
+};
+/** @type {?} */
+const FILTERS_MAP = {
+    '=': '_filterDataEquals',
+    '>': '_filterDataGreaterThan',
+    '<': '_filterDataLessThan',
+    '>=': '_filterDataGreaterOrEquals',
+    '<=': '_filterDataLessOrEquals',
+    '<>': '_filterDataNotEqual',
+    'LIKE': '_filterDataLike'
 };
 /**
  * @record
@@ -1711,6 +1805,10 @@ if (false) {
     IFacet.prototype.type;
     /** @type {?} */
     IFacet.prototype.operator;
+    /** @type {?|undefined} */
+    IFacet.prototype.hasStaticData;
+    /** @type {?|undefined} */
+    IFacet.prototype.searchData;
     /** @type {?|undefined} */
     IFacet.prototype.data;
 }
@@ -1778,7 +1876,7 @@ class SearchModel {
          * @param {?} results
          * @return {?}
          */
-        (results) => this._results$.next(results));
+        results => this._results$.next(results));
         this._id = id;
         this._config = config;
         this._setFilters();
@@ -1809,7 +1907,8 @@ class SearchModel {
                  */
                 item => item !== value));
             }
-            else if (Array.isArray(filter.value) && filter.value.indexOf(value) === -1) {
+            else if (Array.isArray(filter.value) &&
+                filter.value.indexOf(value) === -1) {
                 filter.value.push(value);
             }
             else {
@@ -1878,19 +1977,19 @@ class SearchModel {
      */
     updateFacet(facetId, data) {
         /** @type {?} */
-        let selectedFacets = this._facets.filter((/**
+        const selectedFacets = this._facets.filter((/**
          * @param {?} facet
          * @return {?}
          */
         facet => facet.id === facetId));
         if (!selectedFacets.length) {
-            throw Error(`Facet with id "${facetId}" does not exists`);
+            throw Error(`Facet with id '${facetId}' does not exists`);
         }
         selectedFacets.forEach((/**
          * @param {?} facet
          * @return {?}
          */
-        facet => facet.data = data));
+        facet => (facet.data = data)));
     }
     /**
      * @return {?}
@@ -1900,14 +1999,14 @@ class SearchModel {
          * @param {?} filter
          * @return {?}
          */
-        filter => filter.value = null));
+        filter => (filter.value = null)));
     }
     /**
      * @return {?}
      */
     getRequestParams() {
         return {
-            facets: this._facets,
+            facets: this._getRequestFacets(),
             page: this._page,
             results: this._config.results,
             filters: this._filters
@@ -1933,8 +2032,9 @@ class SearchModel {
          * @return {?}
          */
         filter => {
-            return (filter.context === 'internal') && ((Array.isArray(filter.value) && filter.value.length) ||
-                (!Array.isArray(filter.value) && filter.value));
+            return (filter.context === 'internal' &&
+                ((Array.isArray(filter.value) && filter.value.length) ||
+                    (!Array.isArray(filter.value) && filter.value)));
         }))
             .map((/**
          * @param {?} __0
@@ -1948,12 +2048,14 @@ class SearchModel {
      */
     filtersAsQueryParams(filters) {
         /** @type {?} */
-        let queryParams = {};
+        const queryParams = {};
         filters.forEach((/**
          * @param {?} filter
          * @return {?}
          */
-        filter => queryParams[filter.facetId] = Array.isArray(filter.value) ? filter.value.join(',') : filter.value));
+        filter => (queryParams[filter.facetId] = Array.isArray(filter.value)
+            ? filter.value.join(',')
+            : filter.value)));
         return queryParams;
     }
     /**
@@ -2001,14 +2103,14 @@ class SearchModel {
         const targetInput = this.getInputByFacetId(target);
         /** @type {?} */
         const facet = this._facets.filter((/**
-         * @param {?} facet
+         * @param {?} f
          * @return {?}
          */
-        facet => facet.id === target))[0];
+        f => f.id === target))[0];
         /** @type {?} */
         const facetData = facet.data;
         /** @type {?} */
-        let searchIns = [];
+        const searchIns = [];
         inputs.forEach((/**
          * @param {?} input
          * @return {?}
@@ -2067,6 +2169,8 @@ class SearchModel {
      * @return {?}
      */
     _filterData(searchIns, item) {
+        // reset
+        item.hidden = false;
         searchIns.forEach((/**
          * @param {?} __0
          * @return {?}
@@ -2077,65 +2181,149 @@ class SearchModel {
              * @return {?}
              */
             ({ key, operator }) => {
-                switch (operator) {
-                    // '=' EQUALS
-                    case '=':
-                        if (Array.isArray(value)) {
-                            item.hidden = !(!value.length || value.indexOf(item.metadata[key]) !== -1);
+                if (item.hidden) {
+                    return;
+                }
+                /** @type {?} */
+                let refValue = get(item, key, null);
+                if (key.indexOf('searchData') !== -1 && Array.isArray(item.searchData)) {
+                    /** @type {?} */
+                    const searchDataKey = key.replace('searchData.', '');
+                    item.searchData.forEach((/**
+                     * @param {?} __0
+                     * @return {?}
+                     */
+                    ({ key: dataKey, value: dataValue }) => {
+                        if (dataKey === searchDataKey) {
+                            refValue = dataValue;
                         }
-                        else {
-                            item.hidden = !(value && value === item.metadata[key]);
-                        }
-                        break;
-                    // '>' GREATER THAN
-                    case '>':
-                        if (!Array.isArray(value)) {
-                            item.hidden = !(value && value > item.metadata[key]);
-                        }
-                        break;
-                    // '<' LESS THAN
-                    case '<':
-                        if (!Array.isArray(value)) {
-                            item.hidden = !(value && value < item.metadata[key]);
-                        }
-                        break;
-                    // '>=' GREATER OR EQUALS
-                    case '>=':
-                        if (!Array.isArray(value)) {
-                            item.hidden = !(value && value >= item.metadata[key]);
-                        }
-                        break;
-                    // '<=' LESS OR EQUALS
-                    case '<=':
-                        if (!Array.isArray(value)) {
-                            item.hidden = !(value && value <= item.metadata[key]);
-                        }
-                        break;
-                    // '<>' NOT EQUAL
-                    case '<>':
-                        if (!Array.isArray(value)) {
-                            item.hidden = !(value && value !== item.metadata[key]);
-                        }
-                        break;
-                    //  'LIKE'
-                    case 'LIKE':
-                        if (value &&
-                            item.metadata[key] &&
-                            typeof value === 'string' &&
-                            typeof item.metadata[key] === 'string') {
-                            /** @type {?} */
-                            const haystack = item.metadata[key].toLowerCase();
-                            /** @type {?} */
-                            const needle = value.toLocaleLowerCase();
-                            item.hidden = !(haystack.indexOf(needle) !== -1);
-                        }
-                        break;
-                    default:
-                        console.warn(`SearchIn: operator ${operator} not supported`);
-                        break;
+                    }));
+                }
+                if (refValue === null) {
+                    item.hidden = true;
+                }
+                else if (FILTERS_MAP[operator]) {
+                    item.hidden = this[FILTERS_MAP[operator]](value, refValue);
+                }
+                else {
+                    console.warn(`SearchIn: operator ${operator} not supported`);
                 }
             }));
         }));
+    }
+    /**
+     * @private
+     * @param {?} value
+     * @param {?} refValue
+     * @return {?}
+     */
+    _filterDataEquals(value, refValue) {
+        if (Array.isArray(refValue)) {
+            if (Array.isArray(value)) {
+                /** @type {?} */
+                let inArray = value.length === 0 ? true : false;
+                refValue.forEach((/**
+                 * @param {?} rv
+                 * @return {?}
+                 */
+                rv => {
+                    if (value.indexOf(rv) !== -1) {
+                        inArray = true;
+                    }
+                }));
+                return !(inArray);
+            }
+            else {
+                return !(value && refValue.indexOf(value) !== -1);
+            }
+        }
+        else {
+            if (Array.isArray(value)) {
+                return !(!value.length || value.indexOf(refValue) !== -1);
+            }
+            else {
+                return !(value && value === refValue);
+            }
+        }
+    }
+    /**
+     * @private
+     * @param {?} value
+     * @param {?} refValue
+     * @return {?}
+     */
+    _filterDataGreaterThan(value, refValue) {
+        if (!Array.isArray(value)) {
+            return !(value && value > refValue);
+        }
+        return false;
+    }
+    /**
+     * @private
+     * @param {?} value
+     * @param {?} refValue
+     * @return {?}
+     */
+    _filterDataLessThan(value, refValue) {
+        if (!Array.isArray(value)) {
+            return !(value && value < refValue);
+        }
+        return false;
+    }
+    /**
+     * @private
+     * @param {?} value
+     * @param {?} refValue
+     * @return {?}
+     */
+    _filterDataGreaterOrEquals(value, refValue) {
+        if (!Array.isArray(value)) {
+            return !(value && value >= refValue);
+        }
+        return false;
+    }
+    /**
+     * @private
+     * @param {?} value
+     * @param {?} refValue
+     * @return {?}
+     */
+    _filterDataLessOrEquals(value, refValue) {
+        if (!Array.isArray(value)) {
+            return !(value && value <= refValue);
+        }
+        return false;
+    }
+    /**
+     * @private
+     * @param {?} value
+     * @param {?} refValue
+     * @return {?}
+     */
+    _filterDataNotEqual(value, refValue) {
+        if (!Array.isArray(value)) {
+            return !(value && value !== refValue);
+        }
+        return false;
+    }
+    /**
+     * @private
+     * @param {?} value
+     * @param {?} refValue
+     * @return {?}
+     */
+    _filterDataLike(value, refValue) {
+        if (value &&
+            refValue &&
+            typeof value === 'string' &&
+            typeof refValue === 'string') {
+            /** @type {?} */
+            const haystack = refValue.toLowerCase();
+            /** @type {?} */
+            const needle = value.toLocaleLowerCase();
+            return !(haystack.indexOf(needle) !== -1);
+        }
+        return false;
     }
     /**
      * @private
@@ -2194,8 +2382,9 @@ class SearchModel {
             (inputConfig, inputIndex) => {
                 /** @type {?} */
                 const inputModel = INPUTS_MAP[inputConfig.type];
-                if (!inputModel)
+                if (!inputModel) {
                     throw Error(`Input type ${inputConfig.type} not supported`);
+                }
                 this._inputs.push(new inputModel(Object.assign({}, inputConfig, { inputIndex, sectionIndex })));
             }));
         }));
@@ -2210,6 +2399,44 @@ class SearchModel {
          * @return {?}
          */
         facet => this.setInputData(facet.id, facet.data)));
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    _getRequestFacets() {
+        /** @type {?} */
+        const results = [];
+        this._facets.forEach((/**
+         * @param {?} f
+         * @return {?}
+         */
+        f => {
+            /** @type {?} */
+            const facetConfig = Object.assign({}, f);
+            if (!f.hasStaticData) {
+                delete facetConfig.data;
+            }
+            delete facetConfig.hasStaticData;
+            // searchData control
+            if (Array.isArray(facetConfig.data)) {
+                facetConfig.data
+                    .filter((/**
+                 * @param {?} dataItem
+                 * @return {?}
+                 */
+                dataItem => typeof dataItem.searchData !== 'undefined'))
+                    .forEach((/**
+                 * @param {?} dataItem
+                 * @return {?}
+                 */
+                dataItem => {
+                    delete dataItem.searchData;
+                }));
+            }
+            results.push(facetConfig);
+        }));
+        return results;
     }
 }
 if (false) {
@@ -2282,8 +2509,9 @@ class SearchService {
      * @return {?}
      */
     add(id, config) {
-        if (this._models[id])
-            throw Error(`Search model "${id}" already exists!`);
+        if (this._models[id]) {
+            throw Error(`Search model '${id}' already exists!`);
+        }
         this._models[id] = new SearchModel(id, config);
     }
     /**
@@ -3002,6 +3230,7 @@ class FacetsWrapperEH extends EventHandler {
     constructor() {
         super(...arguments);
         this._facetsChanged = false;
+        this.internalFacetsChange$ = new Subject();
     }
     /**
      * @return {?}
@@ -3025,8 +3254,7 @@ class FacetsWrapperEH extends EventHandler {
                     this.dataSource.onFacetChange(payload);
                     // internal
                     if (context === 'internal') {
-                        this.dataSource.filterTarget(input.getTarget());
-                        this.dataSource.updateFilteredTarget(input.getTarget());
+                        this.internalFacetsChange$.next(input.getTarget());
                         // external
                     }
                     else {
@@ -3072,6 +3300,15 @@ class FacetsWrapperEH extends EventHandler {
                     break;
             }
         }));
+        // internal facets change
+        this.internalFacetsChange$.pipe(debounceTime(500)).subscribe((/**
+         * @param {?} target
+         * @return {?}
+         */
+        target => {
+            this.dataSource.filterTarget(target);
+            this.dataSource.updateFilteredTarget(target);
+        }));
     }
 }
 if (false) {
@@ -3080,6 +3317,11 @@ if (false) {
      * @private
      */
     FacetsWrapperEH.prototype._facetsChanged;
+    /**
+     * @type {?}
+     * @private
+     */
+    FacetsWrapperEH.prototype.internalFacetsChange$;
 }
 
 /**
@@ -3712,6 +3954,7 @@ class AwLinkedObjectsDS extends DataSource {
             /** @type {?} */
             const // items per page (if using pagination)
             labels = config.get("labels");
+            const { dynamicPagination } = this.options;
             /** @type {?} */
             var d = data.items ? data.items : data.relatedItems // items to iterate over
             ;
@@ -3729,7 +3972,7 @@ class AwLinkedObjectsDS extends DataSource {
                 }
             }
             // resize data
-            if (size && page) {
+            if (!dynamicPagination && size && page) {
                 d = d.slice(page * size - size, page * size);
             }
             else if (size) {
@@ -3843,7 +4086,10 @@ class AwLinkedObjectsDS extends DataSource {
         this.pageSize = this.options.size;
         this.totalObjects = data.totalCount;
         this.currentPage = this.options.page ? (/** @type {?} */ (this.options.page)) : 1;
-        if (data.items) {
+        if (this.options.dynamicPagination && this.options.dynamicPagination.total) {
+            this.totalPages = Math.ceil(this.options.dynamicPagination.total / this.pageSize);
+        }
+        else if (data.items) {
             this.totalPages = Math.ceil(data.items.length / this.pageSize);
         }
         else if (data.relatedItems) {
@@ -5640,11 +5886,7 @@ class AwLinkedObjectsEH extends EventHandler {
                             this.emitOuter('goto', payload);
                     }
                     else {
-                        // navigate to the patrimonio page of this item
-                        this.emitGlobal('navigate', {
-                            handler: 'router',
-                            path: [`aw/patrimonio/${payload}`]
-                        });
+                        this.emitOuter('click', payload);
                     }
                     break;
                 case 'aw-linked-objects.change': // changed page size value (pagination)
@@ -6639,6 +6881,14 @@ class AwEntitaLayoutEH extends EventHandler {
                         this.emitOuter('filterbubbleresponse', payload);
                         //this.dataSource.updateBubbes(payload);
                     }
+                    break;
+                case 'aw-linked-objects.click':
+                    /** @type {?} */
+                    const paths = this.configuration.get('paths');
+                    this.emitGlobal('navigate', {
+                        handler: 'router',
+                        path: [paths.schedaBasePath, payload]
+                    });
                     break;
                 default:
                     break;
@@ -7650,14 +7900,14 @@ class AwHomeLayoutEH extends EventHandler {
          */
         payload => {
             /** @type {?} */
-            let thebubble = this.dataSource.allBubbles.find((/**
+            const thebubble = this.dataSource.allBubbles.find((/**
              * @param {?} b
              * @return {?}
              */
             b => {
                 /** @type {?} */
-                let s = 'B_' + payload.replace(/-/g, '_');
-                return b.id == s;
+                const s = 'B_' + payload.replace(/-/g, '_');
+                return b.id === s;
             }));
             if (thebubble) {
                 this.dataSource.onBubbleSelected(thebubble);
@@ -7749,7 +7999,7 @@ class AwHomeLayoutEH extends EventHandler {
                 case 'aw-home-facets-wrapper.change':
                     if (payload.value) {
                         /** @type {?} */
-                        let params = {
+                        const params = {
                             input: payload.value,
                             typeOfEntity: payload.inputPayload.replace('-search', ''),
                             itemsPagination: {
@@ -7764,7 +8014,7 @@ class AwHomeLayoutEH extends EventHandler {
                         response => {
                             if (response.results.length < 1) {
                                 /** @type {?} */
-                                let fallback = {
+                                const fallback = {
                                     totalcount: 0,
                                     entities: [
                                         {
@@ -7794,18 +8044,19 @@ class AwHomeLayoutEH extends EventHandler {
                 case 'aw-home-facets-wrapper.enter':
                     this.dataSource.handleFacetSearchEnter(payload);
                     break;
-                case "aw-bubble-chart.bubble-tooltip-close-click":
+                case 'aw-bubble-chart.bubble-tooltip-close-click':
                     this.dataSource.onBubbleTooltipClick('close', payload);
                     break;
-                case "aw-bubble-chart.bubble-tooltip-goto-click":
-                    if (!payload || !payload.entityId)
+                case 'aw-bubble-chart.bubble-tooltip-goto-click':
+                    if (!payload || !payload.entityId) {
                         return;
+                    }
                     this.emitGlobal('navigate', {
                         handler: 'router',
                         path: [`aw/entita/${payload.entityId}`]
                     });
                     break;
-                case "aw-bubble-chart.bubble-tooltip-select-click":
+                case 'aw-bubble-chart.bubble-tooltip-select-click':
                     payload._bubbleChart = this.dataSource._bubbleChart;
                     this.emitOuter('bubble-tooltip-select-click', payload);
                     break;
@@ -7873,9 +8124,9 @@ class AwHomeLayoutEH extends EventHandler {
                     }));
                     break;
                 case 'aw-linked-objects.datarequest':
-                    let { currentPage } = payload;
+                    const { currentPage } = payload;
                     /** @type {?} */
-                    let params = {
+                    const params = {
                         selectedEntitiesIds: this.dataSource.selectedEntitiesIds,
                         itemsPagination: {
                             offset: currentPage * this.dataSource.resultsLimit,
@@ -7902,23 +8153,31 @@ class AwHomeLayoutEH extends EventHandler {
                     const { source } = payload;
                     /** @type {?} */
                     let basePath;
-                    if (source === "item") {
-                        basePath = this.configuration.get("paths").entitaBasePath;
+                    if (source === 'item') {
+                        basePath = this.configuration.get('paths').entitaBasePath;
                         this.emitGlobal('navigate', {
                             handler: 'router',
                             path: [basePath, payload.id]
                         });
                     }
-                    else if (source === "showMore") {
+                    else if (source === 'showMore') {
                         /** @type {?} */
                         const query = this.dataSource.homeAutocompleteQuery;
-                        basePath = this.configuration.get("paths").searchBasePath;
+                        basePath = this.configuration.get('paths').searchBasePath;
                         this.emitGlobal('navigate', {
                             handler: 'router',
                             path: [basePath],
                             queryParams: { query }
                         });
                     }
+                    break;
+                case 'aw-linked-objects.click':
+                    /** @type {?} */
+                    const paths = this.configuration.get('paths');
+                    this.emitGlobal('navigate', {
+                        handler: 'router',
+                        path: [paths.schedaBasePath, payload]
+                    });
                     break;
                 default:
                     break;
@@ -7940,7 +8199,7 @@ class AwHomeLayoutEH extends EventHandler {
                 this.dataSource.parseInitialRequest(response);
                 if (this.dataSource.bubblesEnabled) {
                     /** @type {?} */
-                    let bubblePayload = {
+                    const bubblePayload = {
                         setBubbleChart: (/**
                          * @param {?} bubbleCref
                          * @return {?}
@@ -7961,7 +8220,7 @@ class AwHomeLayoutEH extends EventHandler {
      * @return {?}
      */
     outerLinkClick(type, payload) {
-        window.open(payload, "_blank");
+        window.open(payload, '_blank');
     }
 }
 if (false) {
@@ -8457,6 +8716,16 @@ class AwSchedaLayoutEH extends EventHandler {
                         path: [`aw/entita/${payload.entityId}/overview`]
                     });
                     break;
+                case 'aw-linked-objects.click':
+                    /** @type {?} */
+                    const paths = this.configuration.get('paths');
+                    this.emitGlobal('navigate', {
+                        handler: 'router',
+                        path: [paths.schedaBasePath, payload]
+                    });
+                    break;
+                default:
+                    break;
             }
         }));
     }
@@ -8766,47 +9035,47 @@ AwWorksLayoutComponent.ctorParameters = () => [];
  */
 var facetsConfig = {
     totalCount: 0,
-    facets: [{
+    facets: [
+        {
             id: 'query',
             type: 'value'
-        }, {
+        },
+        {
             id: 'query-all',
             type: 'value',
-            data: [{
+            hasStaticData: true,
+            data: [
+                {
                     value: '1',
                     label: 'Cerca in tutti campi delle schede'
-                }]
-        }, {
+                }
+            ]
+        },
+        {
             id: 'query-links',
-            type: 'value',
-            data: []
-        }, {
+            type: 'value'
+        },
+        {
             id: 'entity-types',
             type: 'value',
             operator: 'OR',
             limit: 10,
-            order: 'count',
-            // count | text
-            data: []
-        }, {
+            order: 'count'
+        },
+        {
             id: 'entity-search',
             type: 'value'
-        }, {
+        },
+        {
             id: 'entity-links',
             type: 'value',
-            metadata: ['title', 'entity-type'],
-            data: []
-        }, {
-            id: 'date-from',
-            type: 'value',
-            data: []
-        }, {
-            id: 'date-to',
-            type: 'value',
-            data: []
-        }],
-    fields: [{
-            inputs: [{
+            searchData: ['entity-type']
+        },
+    ],
+    fields: [
+        {
+            inputs: [
+                {
                     type: 'text',
                     facetId: 'query',
                     placeholder: 'Cerca...',
@@ -8814,49 +9083,63 @@ var facetsConfig = {
                     filterConfig: {
                         delay: 500,
                         minChars: 3,
-                        searchIn: [{
-                                key: 'source.title',
+                        searchIn: [
+                            {
+                                key: 'label',
                                 operator: 'LIKE'
-                            }]
+                            }
+                        ]
                     }
-                }, {
+                },
+                {
                     type: 'checkbox',
                     facetId: 'query-all',
                     filterConfig: {
-                        searchIn: [{
+                        searchIn: [
+                            {
                                 key: 'query-all',
                                 operator: '='
-                            }]
+                            }
+                        ]
                     }
-                }, {
+                },
+                {
                     type: 'link',
                     facetId: 'query-links',
                     filterConfig: {
                         isArray: true,
-                        searchIn: [{
+                        searchIn: [
+                            {
                                 key: 'source.entityType',
                                 operator: '='
-                            }]
+                            }
+                        ]
                     }
-                }]
-        }, {
+                }
+            ]
+        },
+        {
             header: {
                 label: 'Relazione con',
                 classes: 'related-class'
             },
-            inputs: [{
+            inputs: [
+                {
                     type: 'checkbox',
                     facetId: 'entity-types',
                     filterConfig: {
                         isArray: true,
                         context: 'internal',
                         target: 'entity-links',
-                        searchIn: [{
-                                key: 'entity-type',
+                        searchIn: [
+                            {
+                                key: 'searchData.entity-type',
                                 operator: '='
-                            }]
+                            }
+                        ]
                     }
-                }, {
+                },
+                {
                     type: 'text',
                     facetId: 'entity-search',
                     placeholder: 'Cerca entità',
@@ -8866,220 +9149,48 @@ var facetsConfig = {
                         minChars: 3,
                         context: 'internal',
                         target: 'entity-links',
-                        searchIn: [{
-                                key: 'title',
+                        searchIn: [
+                            {
+                                key: 'label',
                                 operator: 'LIKE'
-                            }]
+                            }
+                        ]
                     }
-                }, {
+                },
+                {
                     type: 'link',
                     facetId: 'entity-links',
                     filterConfig: {
                         limit: 20,
-                        searchIn: [{
+                        searchIn: [
+                            {
                                 key: 'source.id',
                                 operator: '='
-                            }]
+                            }
+                        ]
                     }
-                }]
-        }, {
-            header: {
-                label: 'Data',
-                classes: 'date-class'
-            },
-            inputs: [{
-                    type: 'select',
-                    facetId: 'date-from',
-                    label: 'Dal',
-                    filterConfig: {
-                        searchIn: [{
-                                key: 'source.dateStart',
-                                operator: '>='
-                            }]
-                    }
-                }, {
-                    type: 'select',
-                    facetId: 'date-to',
-                    label: 'Al',
-                    filterConfig: {
-                        searchIn: [{
-                                key: 'source.dateEnd',
-                                operator: '<='
-                            }]
-                    }
-                }]
-        }],
+                }
+            ]
+        },
+    ],
     results: {
         order: {
             type: 'score',
             // score | text | date
             key: 'author',
             // docPath, elastic key, ecc
-            direction: 'DESC',
+            direction: 'DESC' // ASC | DESC
         },
-        // FIXME: collegare API
-        // e controllare nuovo formato results.fields
-        fields: [{
-                id: 'title',
+        fields: [
+            {
+                id: 'description',
                 highlight: true,
-                limit: 50,
-            }]
+                limit: 200
+            }
+        ]
     },
     page: { offset: 0, limit: 10 }
 };
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/search-layout/search-mock-request.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-var fakeSearchRequest$ = (/**
- * @param {?} params
- * @param {?} configKeys
- * @param {?} enabledEntities
- * @return {?}
- */
-(params, configKeys, enabledEntities) => {
-    params.totalCount = Math.floor(Math.random() * 1000);
-    console.log('fake-search-request----------->', params);
-    let { facets } = params;
-    // query links
-    _getFacet('query-links', facets).data = _getQueryLinksData(configKeys, enabledEntities);
-    // entity types
-    _getFacet('entity-types', facets).data = _getEntityTypesData(configKeys, enabledEntities);
-    // entity links
-    _getFacet('entity-links', facets).data = _getEntityLinksData();
-    // date from
-    _getFacet('date-from', facets).data = _getDateFromData();
-    // date to
-    _getFacet('date-to', facets).data = _getDateToData();
-    return of(params);
-});
-/** @type {?} */
-const _getFacet = (/**
- * @param {?} id
- * @param {?} facets
- * @return {?}
- */
-(id, facets) => {
-    return facets.filter((/**
-     * @param {?} f
-     * @return {?}
-     */
-    f => f.id === id))[0];
-});
-const ɵ0 = _getFacet;
-/** @type {?} */
-const _getQueryLinksData = (/**
- * @param {?} configKeys
- * @param {?} enabledEntities
- * @return {?}
- */
-(configKeys, enabledEntities) => {
-    return enabledEntities.map((/**
-     * @param {?} key
-     * @return {?}
-     */
-    key => {
-        /** @type {?} */
-        const config = configKeys[key];
-        return {
-            value: key,
-            label: config.label,
-            counter: Math.floor(Math.random() * 100),
-            // questi vanno aggiunti a mano lato front-end
-            options: {
-                icon: config.icon,
-                classes: `color-${key}`
-            }
-        };
-    }));
-});
-const ɵ1 = _getQueryLinksData;
-/** @type {?} */
-const _getEntityTypesData = (/**
- * @param {?} configKeys
- * @param {?} enabledEntities
- * @return {?}
- */
-(configKeys, enabledEntities) => {
-    return enabledEntities.map((/**
-     * @param {?} key
-     * @return {?}
-     */
-    key => {
-        /** @type {?} */
-        const config = configKeys[key];
-        return {
-            value: key,
-            label: config.label,
-        };
-    }));
-});
-const ɵ2 = _getEntityTypesData;
-/** @type {?} */
-const _getDateFromData = (/**
- * @return {?}
- */
-() => {
-    return ['1990', '1991', '1992', '1993'].map((/**
-     * @param {?} key
-     * @return {?}
-     */
-    key => {
-        return {
-            value: key,
-            label: key,
-        };
-    }));
-});
-const ɵ3 = _getDateFromData;
-/** @type {?} */
-const _getDateToData = (/**
- * @return {?}
- */
-() => {
-    return ['2000', '2001', '2002', '2003'].map((/**
-     * @param {?} key
-     * @return {?}
-     */
-    key => {
-        return {
-            value: key,
-            label: key,
-        };
-    }));
-});
-const ɵ4 = _getDateToData;
-/** @type {?} */
-const _getEntityLinksData = (/**
- * @return {?}
- */
-() => {
-    /** @type {?} */
-    const types = ['places', 'places', 'concepts', 'people', 'people'];
-    /** @type {?} */
-    const items = ['milano', 'roma', 'spazio', 'rodolfo-marna', 'alighiero-boetti'];
-    return items.map((/**
-     * @param {?} key
-     * @param {?} index
-     * @return {?}
-     */
-    (key, index) => {
-        /** @type {?} */
-        const label = key.replace('-', ' ');
-        return {
-            value: key,
-            label: label,
-            counter: Math.floor(Math.random() * 100),
-            metadata: {
-                title: label,
-                'entity-type': types[index]
-            }
-        };
-    }));
-});
-const ɵ5 = _getEntityLinksData;
 
 /**
  * @fileoverview added by tsickle
@@ -9095,13 +9206,27 @@ class AwSearchLayoutDS extends LayoutDataSource {
         // pagination value (url param)
         this.pageSize = 10; // linked objects page size
         this.orderByLabel = 'Ordina per';
-        this.orderByOptions = [{
+        this.orderByOptions = [
+            {
                 value: 'text_DESC',
                 label: 'Ordine alfabetico (DESC)'
-            }, {
+            },
+            {
                 value: 'text_ASC',
                 label: 'Ordine alfabetico (ASC)'
-            },
+            } /* {
+            value: 'score_DESC',
+            label: 'Ordine per rilevanza (DESC)'
+          }, {
+            value: 'score_ASC',
+            label: 'Ordine per rilevanza (ASC)'
+          }, {
+            value: 'date_DESC',
+            label: 'Ordina per data (DESC)'
+          }, {
+            value: 'date_ASC',
+            label: 'Ordina per data (ASC)'
+          } */
         ];
         this.getSearchModelId = (/**
          * @return {?}
@@ -9118,9 +9243,12 @@ class AwSearchLayoutDS extends LayoutDataSource {
         this.communication = communication;
         this.search = search;
         this.options = options;
+        this.prettifyLabels = this.configuration.get('labels');
+        this.configKeys = this.configuration.get('config-keys');
         this.pageTitle = this.configuration.get('search-layout').title;
-        if (!this.search.model(SEARCH_MODEL_ID))
+        if (!this.search.model(SEARCH_MODEL_ID)) {
             this.search.add(SEARCH_MODEL_ID, facetsConfig);
+        }
         this.searchModel = this.search.model(SEARCH_MODEL_ID);
         this.doSearchRequest$().subscribe((/**
          * @return {?}
@@ -9154,7 +9282,7 @@ class AwSearchLayoutDS extends LayoutDataSource {
     onPaginationGoToChange(payload) {
         /** @type {?} */
         const page = payload.replace('goto-', '');
-        this._updateSearchPage(page);
+        return this._updateSearchPage(page);
     }
     /**
      * @param {?} payload
@@ -9172,36 +9300,24 @@ class AwSearchLayoutDS extends LayoutDataSource {
      */
     doSearchRequest$() {
         /** @type {?} */
-        const enabledEntities = this.configuration.get('search-layout').enabledEntities;
-        // FIXME: togliere configKeys
-        // dovrebbe venire dall'API
-        /** @type {?} */
-        const configKeys = this.configuration.get('config-keys');
-        // FIXME: mettere logica definitiva 
-        // per la chiamata search
-        /*
-            this.communication.request$('search', {
-              onError: error => console.error(error),
-              params: requestParams
-            })
-            */
-        /** @type {?} */
         const requestParams = this.searchModel.getRequestParams();
         /** @type {?} */
-        const fakeResultsRequest$ = this.communication.request$('getEntityDetails', {
+        const requestPayload = {
+            searchParameters: Object.assign({ totalCount: 100 }, requestParams)
+        };
+        return this.communication.request$('search', {
             onError: (/**
              * @param {?} error
              * @return {?}
              */
             error => console.error(error)),
-            params: { entityId: '0263a407-d0dd-4647-98e2-109b0b0c05f3' }
-        });
-        return fakeResultsRequest$.pipe(withLatestFrom(fakeSearchRequest$(requestParams, configKeys, enabledEntities)), tap((/**
+            params: requestPayload
+        }).pipe(tap((/**
          * @param {?} __0
          * @return {?}
          */
-        ([resultsResponse, searchResponse]) => {
-            this.totalCount = searchResponse.totalCount;
+        ({ totalCount, results, facets }) => {
+            this.totalCount = totalCount;
             /** @type {?} */
             let resultsTitleIndex = 0;
             // results title
@@ -9212,17 +9328,23 @@ class AwSearchLayoutDS extends LayoutDataSource {
                 resultsTitleIndex = 1;
             }
             this.resultsTitle = this.configuration.get('search-layout').results[resultsTitleIndex];
-            this.searchModel.updateFacets(searchResponse.facets);
-            this.searchModel.updateTotalCount(searchResponse.totalCount);
+            // facets labels
+            this._addFacetsLabels(facets);
+            // facets options
+            this._addFacetsOptions(facets);
+            this.searchModel.updateFacets(facets);
+            this.searchModel.updateTotalCount(totalCount);
             this.one('aw-linked-objects').updateOptions({
                 context: 'search',
                 config: this.configuration,
-                // todo: swap to next line after merge
-                // config: this.configuration
                 page: this.currentPage,
-                size: this.pageSize,
+                pagination: true,
+                dynamicPagination: {
+                    total: totalCount
+                },
+                size: this.pageSize
             });
-            this.one('aw-linked-objects').update({ items: resultsResponse.items });
+            this.one('aw-linked-objects').update({ items: this._normalizeItems(results.items) });
         })));
     }
     /**
@@ -9231,8 +9353,9 @@ class AwSearchLayoutDS extends LayoutDataSource {
      * @return {?}
      */
     _updateSearchPage(page) {
-        if (+page === this.currentPage)
+        if (+page === this.currentPage) {
             return of(false);
+        }
         this.currentPage = +page;
         /** @type {?} */
         const searchConfig = this.searchModel.getConfig();
@@ -9243,6 +9366,81 @@ class AwSearchLayoutDS extends LayoutDataSource {
         const newOffset = (this.currentPage - 1) * limit;
         this.searchModel.setPageConfigOffset(newOffset);
         return of(true);
+    }
+    /**
+     * @private
+     * @param {?} facets
+     * @return {?}
+     */
+    _addFacetsLabels(facets) {
+        facets
+            .filter((/**
+         * @param {?} f
+         * @return {?}
+         */
+        f => Array.isArray(f.data)))
+            .forEach((/**
+         * @param {?} f
+         * @return {?}
+         */
+        f => {
+            f.data.forEach((/**
+             * @param {?} dataItem
+             * @return {?}
+             */
+            dataItem => {
+                /** @type {?} */
+                const key = dataItem.label;
+                dataItem.label = helpers$1.prettifySnakeCase(key, this.prettifyLabels[key]);
+            }));
+        }));
+    }
+    /**
+     * @private
+     * @param {?} facets
+     * @return {?}
+     */
+    _addFacetsOptions(facets) {
+        facets
+            .filter((/**
+         * @param {?} f
+         * @return {?}
+         */
+        f => f.id === 'query-links'))
+            .forEach((/**
+         * @param {?} f
+         * @return {?}
+         */
+        f => {
+            f.data.forEach((/**
+             * @param {?} dataItem
+             * @return {?}
+             */
+            dataItem => {
+                /** @type {?} */
+                const key = dataItem.value.replace(' ', '-');
+                /** @type {?} */
+                const config = this.configKeys[key];
+                if (config) {
+                    dataItem.options = {
+                        icon: config.icon,
+                        classes: `color-${key}`
+                    };
+                }
+            }));
+        }));
+    }
+    /**
+     * @private
+     * @param {?} items
+     * @return {?}
+     */
+    _normalizeItems(items) {
+        return items.map((/**
+         * @param {?} singleItem
+         * @return {?}
+         */
+        singleItem => ({ item: Object.assign({}, singleItem) })));
     }
 }
 if (false) {
@@ -9271,6 +9469,16 @@ if (false) {
      * @private
      */
     AwSearchLayoutDS.prototype.searchModel;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutDS.prototype.prettifyLabels;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutDS.prototype.configKeys;
     /** @type {?} */
     AwSearchLayoutDS.prototype.pageTitle;
     /** @type {?} */
@@ -9338,8 +9546,9 @@ class AwSearchLayoutEH extends EventHandler {
                      * @return {?}
                      */
                     changed => {
-                        if (changed)
+                        if (changed) {
                             this.facetsChange$.next();
+                        }
                     }));
                     break;
                 case 'aw-linked-objects.change':
@@ -9352,9 +9561,18 @@ class AwSearchLayoutEH extends EventHandler {
                      * @return {?}
                      */
                     changed => {
-                        if (changed)
+                        if (changed) {
                             this.facetsChange$.next();
+                        }
                     }));
+                    break;
+                case 'aw-linked-objects.click':
+                    /** @type {?} */
+                    const paths = this.dataSource.configuration.get('paths');
+                    this.emitGlobal('navigate', {
+                        handler: 'router',
+                        path: [paths.entitaBasePath, payload]
+                    });
                     break;
                 default:
                     break;

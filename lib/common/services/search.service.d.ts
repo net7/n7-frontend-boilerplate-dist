@@ -14,6 +14,8 @@ export interface IFacet {
     id: string;
     type: FacetTypes;
     operator: FacetOperators;
+    hasStaticData?: boolean;
+    searchData?: string[];
     data?: any;
 }
 export interface IFilter {
@@ -84,16 +86,24 @@ export declare class SearchModel {
     setPageConfigOffset(offset: any): void;
     setPageConfigLimit(limit: any): void;
     private _filterData;
+    private _filterDataEquals;
+    private _filterDataGreaterThan;
+    private _filterDataLessThan;
+    private _filterDataGreaterOrEquals;
+    private _filterDataLessOrEquals;
+    private _filterDataNotEqual;
+    private _filterDataLike;
     private _setFilters;
     private _setFacets;
     private _setPage;
     private _setTotalCount;
     private _setInputs;
     private _setInputsData;
+    private _getRequestFacets;
 }
 export declare class SearchService {
-    private _models;
     static queryParams: any;
+    private _models;
     add(id: string, config: ISearchConfig): void;
     model(id: string): SearchModel;
 }

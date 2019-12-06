@@ -6,6 +6,8 @@ export declare class AwSearchLayoutDS extends LayoutDataSource {
     private mainState;
     private search;
     private searchModel;
+    private prettifyLabels;
+    private configKeys;
     pageTitle: string;
     resultsTitle: string;
     totalCount: number;
@@ -23,9 +25,12 @@ export declare class AwSearchLayoutDS extends LayoutDataSource {
     }): void;
     onOrderByChange(payload: any): void;
     onPaginationChange(payload: any): Observable<boolean>;
-    onPaginationGoToChange(payload: any): void;
+    onPaginationGoToChange(payload: any): Observable<boolean>;
     onResultsLimitChange(payload: any): void;
     getSearchModelId: () => string;
     doSearchRequest$(): Observable<any>;
     private _updateSearchPage;
+    private _addFacetsLabels;
+    private _addFacetsOptions;
+    private _normalizeItems;
 }

@@ -3,14 +3,16 @@ declare const _default: {
     facets: ({
         id: string;
         type: string;
+        hasStaticData?: undefined;
         data?: undefined;
         operator?: undefined;
         limit?: undefined;
         order?: undefined;
-        metadata?: undefined;
+        searchData?: undefined;
     } | {
         id: string;
         type: string;
+        hasStaticData: boolean;
         data: {
             value: string;
             label: string;
@@ -18,20 +20,22 @@ declare const _default: {
         operator?: undefined;
         limit?: undefined;
         order?: undefined;
-        metadata?: undefined;
+        searchData?: undefined;
     } | {
         id: string;
         type: string;
         operator: string;
         limit: number;
         order: string;
-        data: any[];
-        metadata?: undefined;
+        hasStaticData?: undefined;
+        data?: undefined;
+        searchData?: undefined;
     } | {
         id: string;
         type: string;
-        metadata: string[];
-        data: any[];
+        searchData: string[];
+        hasStaticData?: undefined;
+        data?: undefined;
         operator?: undefined;
         limit?: undefined;
         order?: undefined;
@@ -132,22 +136,6 @@ declare const _default: {
             };
             placeholder?: undefined;
         })[];
-    } | {
-        header: {
-            label: string;
-            classes: string;
-        };
-        inputs: {
-            type: string;
-            facetId: string;
-            label: string;
-            filterConfig: {
-                searchIn: {
-                    key: string;
-                    operator: string;
-                }[];
-            };
-        }[];
     })[];
     results: {
         order: {
