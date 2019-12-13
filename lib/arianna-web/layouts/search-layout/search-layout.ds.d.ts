@@ -13,6 +13,7 @@ export declare class AwSearchLayoutDS extends LayoutDataSource {
     totalCount: number;
     currentPage: any;
     pageSize: number;
+    sidebarIsSticky: boolean;
     options: any;
     orderByLabel: string;
     orderByOptions: any;
@@ -33,4 +34,5 @@ export declare class AwSearchLayoutDS extends LayoutDataSource {
     private _addFacetsLabels;
     private _addFacetsOptions;
     private _normalizeItems;
+    private _sidebarStickyControl;
 }

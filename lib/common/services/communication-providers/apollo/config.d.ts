@@ -31,4 +31,8 @@ export declare const ApolloProviderConfig: {
         queryName: string;
         queryBody: string;
     };
+    'getMissingBubble': {
+        queryName: string;
+        queryBody: string;
+    };
 };

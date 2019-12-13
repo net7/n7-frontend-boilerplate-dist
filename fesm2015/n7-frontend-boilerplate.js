@@ -2,17 +2,16 @@ import { Injectable, Inject, ɵɵdefineInjectable, ɵɵinject, Component, Input,
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK } from '@n7-frontend/components';
-import { ReplaySubject, empty, Subject, of, fromEvent, interval } from 'rxjs';
-import { map, catchError, tap, takeUntil, filter, debounceTime, debounce } from 'rxjs/operators';
+import { ReplaySubject, empty, Subject, of, forkJoin, fromEvent } from 'rxjs';
+import { map, catchError, tap, takeUntil, filter, debounceTime } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { LayoutBuilder, LayoutDataSource, EventHandler, DataSource } from '@n7-frontend/core';
-import tippy from 'tippy.js';
+import tippy, { hideAll } from 'tippy.js';
 import { get } from 'lodash';
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/configuration.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class ConfigurationService {
@@ -73,7 +72,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/layouts-configuration.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class LayoutsConfigurationService {
@@ -134,7 +132,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/main-state.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainStateService {
@@ -253,7 +250,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/communication-providers/apollo/config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -713,12 +709,21 @@ const ApolloProviderConfig = {
         }
       }
     }`
+    },
+    'getMissingBubble': {
+        queryName: 'getEntity',
+        queryBody: `{
+      getEntity(__PARAMS__){
+        label
+        id
+        typeOfEntity
+      }
+    }`
     }
 };
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/communication-providers/apollo/apollo.provider.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class ApolloProvider {
@@ -865,7 +870,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/communication-providers/rest/config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -875,7 +879,6 @@ const RestProviderConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/communication-providers/rest/rest.provider.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class RestProvider {
@@ -955,7 +958,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/communication.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class CommunicationService {
@@ -1051,7 +1053,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/abstract-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -1118,7 +1119,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/main-layout/main-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainLayoutDS extends LayoutDataSource {
@@ -1216,7 +1216,7 @@ class MainLayoutDS extends LayoutDataSource {
      */
     _onRouterNavigate() {
         // hide tippy
-        tippy.hideAll();
+        hideAll();
     }
 }
 if (false) {
@@ -1253,7 +1253,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/json-config.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class JsonConfigService {
@@ -1348,7 +1347,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/facet-inputs/facet-input.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -1508,7 +1506,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/facet-inputs/facet-input-checkbox.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetInputCheckbox extends FacetInput {
@@ -1566,7 +1563,6 @@ class FacetInputCheckbox extends FacetInput {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/facet-inputs/facet-input-text.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetInputText extends FacetInput {
@@ -1606,7 +1602,6 @@ class FacetInputText extends FacetInput {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/facet-inputs/facet-input-link.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetInputLink extends FacetInput {
@@ -1626,13 +1621,16 @@ class FacetInputLink extends FacetInput {
             value = '' + value;
             options = options || {};
             /** @type {?} */
-            let classes = [];
-            if (options.classes)
+            const classes = [];
+            if (options.classes) {
                 classes.push(options.classes);
-            if (hidden)
+            }
+            if (hidden) {
                 classes.push('is-hidden');
-            if (this._isActive(this.facetValue, value))
+            }
+            if (this._isActive(this.facetValue, value)) {
                 classes.push('is-active');
+            }
             return {
                 type: 'link',
                 id: this.getId(),
@@ -1660,9 +1658,9 @@ class FacetInputLink extends FacetInput {
          */
         config => {
             /** @type {?} */
-            let classes = config.classes ? config.classes.split(' ') : [];
+            const isActive = this._isActive(facetValue, config._meta.value);
             /** @type {?} */
-            let isActive = this._isActive(facetValue, config._meta.value);
+            let classes = config.classes ? config.classes.split(' ') : [];
             if (!isActive) {
                 classes = classes.filter((/**
                  * @param {?} className
@@ -1698,7 +1696,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/facet-inputs/facet-input-select.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetInputSelect extends FacetInput {
@@ -1751,13 +1748,11 @@ class FacetInputSelect extends FacetInput {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/search.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -1884,6 +1879,11 @@ class SearchModel {
         this._setInputs();
         this._setInputsData();
         this._setTotalCount();
+        // query params control
+        if (SearchService.queryParams) {
+            this.updateFiltersFromQueryParams(SearchService.queryParams);
+            SearchService.queryParams = null;
+        }
     }
     /**
      * @param {?} facetId
@@ -1920,21 +1920,26 @@ class SearchModel {
      * @return {?}
      */
     updateFiltersFromQueryParams(queryParams) {
-        Object.keys(queryParams).forEach((/**
-         * @param {?} facetId
+        this._facets.forEach((/**
+         * @param {?} __0
          * @return {?}
          */
-        facetId => {
+        ({ id }) => {
             /** @type {?} */
-            const selectedFilters = this.getFiltersByFacetId(facetId);
+            const selectedFilters = this.getFiltersByFacetId(id);
             /** @type {?} */
-            const value = queryParams[facetId];
+            const value = queryParams[id];
             selectedFilters.forEach((/**
              * @param {?} filter
              * @return {?}
              */
             filter => {
-                filter.value = filter.isArray ? value.split(',') : value;
+                if (filter.isArray) {
+                    filter.value = value ? value.split(',') : [];
+                }
+                else {
+                    filter.value = value ? value : null;
+                }
             }));
         }));
     }
@@ -2138,7 +2143,7 @@ class SearchModel {
      * @return {?}
      */
     setSearchConfigOrderBy(orderBy) {
-        this._config.results.order.type = orderBy;
+        this._config.results.order.key = orderBy;
     }
     /**
      * @param {?} direction
@@ -2540,13 +2545,11 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/main-layout/main-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainLayoutEH extends EventHandler {
@@ -2636,7 +2639,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/header.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class HeaderDS extends DataSource {
@@ -2672,7 +2674,6 @@ class HeaderDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/subnav.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SubnavDS extends DataSource {
@@ -2721,7 +2722,6 @@ class SubnavDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/breadcrumbs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class BreadcrumbsDS extends DataSource {
@@ -2737,7 +2737,6 @@ class BreadcrumbsDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/facets.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetsDS extends DataSource {
@@ -2759,7 +2758,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/facets-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -2793,6 +2791,10 @@ class FacetsWrapperDS extends DataSource {
          * @return {?}
          */
         (target) => this.searchModel.filterTarget(target));
+        this.updateInputsFromFilters = (/**
+         * @return {?}
+         */
+        () => this.searchModel.updateInputsFromFilters());
     }
     /**
      * @protected
@@ -2864,13 +2866,6 @@ class FacetsWrapperDS extends DataSource {
                 }
             });
         }));
-        // query params control
-        if (SearchService.queryParams) {
-            this.searchModel.updateFiltersFromQueryParams(SearchService.queryParams);
-            this.searchModel.updateInputsFromFilters();
-            // reset queryparams
-            SearchService.queryParams = null;
-        }
         return {
             groups,
             classes: `n7-facets-wrapper__${this.searchModel.getId()}`
@@ -3007,12 +3002,6 @@ class FacetsWrapperDS extends DataSource {
         }));
     }
     /**
-     * @return {?}
-     */
-    updateInputsFromFilters() {
-        this.searchModel.updateInputsFromFilters();
-    }
-    /**
      * @private
      * @param {?} type
      * @return {?}
@@ -3062,11 +3051,12 @@ if (false) {
     FacetsWrapperDS.prototype.getInputByFacetId;
     /** @type {?} */
     FacetsWrapperDS.prototype.filterTarget;
+    /** @type {?} */
+    FacetsWrapperDS.prototype.updateInputsFromFilters;
 }
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/footer.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FooterDS extends DataSource {
@@ -3085,12 +3075,10 @@ class FooterDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     HeaderDS: HeaderDS,
     SubnavDS: SubnavDS,
     BreadcrumbsDS: BreadcrumbsDS,
@@ -3101,7 +3089,6 @@ var DS = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/header.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class HeaderEH extends EventHandler {
@@ -3136,7 +3123,6 @@ class HeaderEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/subnav.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SubnavEH extends EventHandler {
@@ -3167,7 +3153,6 @@ class SubnavEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/breadcrumbs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class BreadcrumbsEH extends EventHandler {
@@ -3198,7 +3183,6 @@ class BreadcrumbsEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/facets.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetsEH extends EventHandler {
@@ -3222,7 +3206,6 @@ class FacetsEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/facets-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetsWrapperEH extends EventHandler {
@@ -3230,6 +3213,7 @@ class FacetsWrapperEH extends EventHandler {
         super(...arguments);
         this._facetsChanged = false;
         this.internalFacetsChange$ = new Subject();
+        this.externalFacetsChange$ = new Subject();
     }
     /**
      * @return {?}
@@ -3257,23 +3241,7 @@ class FacetsWrapperEH extends EventHandler {
                         // external
                     }
                     else {
-                        /** @type {?} */
-                        const requestParams = this.dataSource.getRequestParams();
-                        /** @type {?} */
-                        const queryParams = this.dataSource.filtersAsQueryParams(requestParams.filters);
-                        Object.keys(queryParams).forEach((/**
-                         * @param {?} key
-                         * @return {?}
-                         */
-                        key => queryParams[key] = queryParams[key] || null));
-                        // signal
-                        this.emitOuter('facetschange');
-                        // router signal
-                        this.emitGlobal('navigate', {
-                            handler: 'router',
-                            path: [],
-                            queryParams
-                        });
+                        this.externalFacetsChange$.next();
                     }
                     break;
                 case 'facets-wrapper.facetheader':
@@ -3281,6 +3249,16 @@ class FacetsWrapperEH extends EventHandler {
                     break;
                 default:
                     break;
+            }
+        }));
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            if (type.indexOf('queryparamschange') !== -1 && this.dataSource.searchModel) {
+                this.dataSource.updateFiltersFromQueryParams(payload);
+                this.dataSource.updateInputsFromFilters();
             }
         }));
         // listen to global events
@@ -3308,6 +3286,29 @@ class FacetsWrapperEH extends EventHandler {
             this.dataSource.filterTarget(target);
             this.dataSource.updateFilteredTarget(target);
         }));
+        // internal facets change
+        this.externalFacetsChange$.pipe(debounceTime(500)).subscribe((/**
+         * @return {?}
+         */
+        () => {
+            /** @type {?} */
+            const requestParams = this.dataSource.getRequestParams();
+            /** @type {?} */
+            const queryParams = this.dataSource.filtersAsQueryParams(requestParams.filters);
+            Object.keys(queryParams).forEach((/**
+             * @param {?} key
+             * @return {?}
+             */
+            key => queryParams[key] = queryParams[key] || null));
+            // signal
+            this.emitOuter('facetschange');
+            // router signal
+            this.emitGlobal('navigate', {
+                handler: 'router',
+                path: [],
+                queryParams
+            });
+        }));
     }
 }
 if (false) {
@@ -3321,11 +3322,15 @@ if (false) {
      * @private
      */
     FacetsWrapperEH.prototype.internalFacetsChange$;
+    /**
+     * @type {?}
+     * @private
+     */
+    FacetsWrapperEH.prototype.externalFacetsChange$;
 }
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/footer.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FooterEH extends EventHandler {
@@ -3349,12 +3354,10 @@ class FooterEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     HeaderEH: HeaderEH,
     SubnavEH: SubnavEH,
     BreadcrumbsEH: BreadcrumbsEH,
@@ -3365,7 +3368,6 @@ var EH = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/main-layout/main-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -3391,7 +3393,6 @@ const MainLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/main-layout/main-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainLayoutComponent extends AbstractLayout {
@@ -3489,7 +3490,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/page404-layout/page404-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class Page404LayoutDS extends LayoutDataSource {
@@ -3508,7 +3508,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/page404-layout/page404-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class Page404LayoutEH extends EventHandler {
@@ -3561,7 +3560,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/page404-layout/page404-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -3579,7 +3577,6 @@ const Page404LayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/page404-layout/page404-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class Page404LayoutComponent extends AbstractLayout {
@@ -3624,7 +3621,6 @@ Page404LayoutComponent.ctorParameters = () => [
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/components/facets-wrapper/facets-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetsWrapperComponent {
@@ -3668,7 +3664,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/n7-boilerplate-common.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -3711,2796 +3706,6 @@ N7BoilerplateCommonModule.decorators = [
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/about-layout/about-layout.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwAboutLayoutDS extends LayoutDataSource {
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
-    onInit(payload) {
-        // TODO
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/about-layout/about-layout.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwAboutLayoutEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        /* this.innerEvents$.subscribe(({ type, payload }) => {
-          
-        }); */
-        /* this.outerEvents$.subscribe(({ type, payload }) => {
-          
-        }); */
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/common/helpers.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-var helpers = {
-    /**
-     * @param {?} key
-     * @param {?=} label
-     * @return {?}
-     */
-    prettifySnakeCase(key, label) {
-        if (label) {
-            return label;
-        }
-        return key.split('_').map((/**
-         * @param {?} word
-         * @param {?} index
-         * @return {?}
-         */
-        (word, index) => index === 0 ? this.ucFirst(word) : word)).join(' ');
-    },
-    /**
-     * @param {?} str
-     * @return {?}
-     */
-    ucFirst(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-};
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/linked-objects.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-// used for cherry-picking object keys from app-config.json
-class AwLinkedObjectsDS extends DataSource {
-    constructor() {
-        super(...arguments);
-        this.loadingData = false;
-        this.checkForMore = (/**
-         * @param {?=} force
-         * @return {?}
-         */
-        (force) => {
-            /*
-              Checks if it is possible to load more item previews.
-              Can receive a boolean argument to force the button to be
-              enabled or disabled. (Used while data is loading)
-            */
-            if (!this.loadedData.actions) {
-                // if not using actions, don't check
-                return;
-            }
-            if (typeof force !== 'undefined') {
-                this.loadedData.actions[1].disabled = !force;
-                return;
-            }
-            if (this.loadedData.result.length >= this.totalObjects) {
-                this.loadedData.actions[1].disabled = true;
-            }
-            else {
-                this.loadedData.actions[1].disabled = false;
-            }
-            return;
-        });
-        this.handleIncomingData = (/**
-         * @param {?} incomingData
-         * @return {?}
-         */
-        incomingData => {
-            /*
-              Called by button <Mostra Altri>, adds the incoming
-              data to the linked objects component.
-            */
-            this.currentPage += 1;
-            /** @type {?} */
-            let newData = this.unpackData(incomingData.itemsPagination);
-            this.loadedData.result = this.loadedData.result.concat(newData.result);
-            this.checkForMore();
-            this.loadedData.isLoading = false;
-        });
-        this.addPagination = (/**
-         * @param {?} page
-         * @param {?} totalPages
-         * @param {?} size
-         * @return {?}
-         */
-        (page, totalPages, size) => {
-            /** @type {?} */
-            let sizeOptions = [10, 25, 50];
-            this.loadedData.pagination = {
-                first: { payload: `goto-${1}`, classes: page == 1 ? 'is-disabled' : '' },
-                prev: { payload: `goto-${page / 1 - 1}`, classes: page == 1 ? 'is-disabled' : '' },
-                next: { payload: `goto-${page / 1 + 1}`, classes: page == totalPages ? 'is-disabled' : '' },
-                last: { payload: `goto-${totalPages}`, classes: page == totalPages ? 'is-disabled' : '' },
-                links: this.makePagination(totalPages, page),
-                select: {
-                    label: 'Numero di risultati',
-                    options: sizeOptions.map((/**
-                     * @param {?} o
-                     * @return {?}
-                     */
-                    o => {
-                        return {
-                            text: o,
-                            selected: o == size,
-                        };
-                    })),
-                    payload: 'select-size'
-                },
-            };
-        });
-        this.makePagination = (/**
-         * @param {?} totalPages
-         * @param {?} currentPage
-         * @return {?}
-         */
-        (totalPages, currentPage) => {
-            /*
-                  Called by this.unpackData() when this.options.page is defined.
-                  Returns the data for <n7-pagination> component.
-                */
-            /** @type {?} */
-            let result = [];
-            /** @type {?} */
-            let limit = this.paths.paginationLimit - 1
-            // always push the first page
-            ;
-            // always push the first page
-            if (limit) {
-                /** @type {?} */
-                let lastPage;
-                /** @type {?} */
-                let firstPage;
-                if (currentPage > Math.floor(limit / 2)) {
-                    // when currentPage is after half-point
-                    // (example: [ 14 ][ 15 ][!16!][ 17 ][ 18 ])
-                    if (currentPage < (totalPages - Math.floor(limit / 2))) {
-                        lastPage = currentPage / 1 + Math.floor(limit / 2);
-                        firstPage = currentPage / 1 - Math.floor(limit / 2);
-                    }
-                    else {
-                        lastPage = totalPages;
-                        firstPage = currentPage - limit + (totalPages - currentPage);
-                    }
-                }
-                else {
-                    // when currentPage is before half-point
-                    // (example: [ 1 ][!2!][ 3 ][ 4 ][ 5 ])
-                    lastPage = limit + 1;
-                    firstPage = 1;
-                }
-                // console.log({ currentPage, limit, lastPage, firstPage })
-                for (let i = firstPage; i <= lastPage; i++) {
-                    result.push({
-                        text: String(i),
-                        payload: 'page-' + String(i),
-                        classes: currentPage == i ? 'is-active' : ''
-                    });
-                }
-            }
-            else {
-                result.push({
-                    text: '1',
-                    payload: 'page-1',
-                    classes: currentPage == 1 ? 'is-active' : ''
-                });
-                for (let i = 1; i < totalPages; i++) {
-                    result.push({ text: String(i + 1), payload: 'page-' + String(i + 1), classes: currentPage == i + 1 ? 'is-active' : '' });
-                }
-            }
-            return result;
-        });
-        this.unpackData = (/**
-         * @param {?} data
-         * @return {?}
-         */
-        data => {
-            /*
-                  Dynamically returns the data object for each HTML component
-                  data: {
-                    previews: [ breadcrumbs: { items[] }, classes, image, metadata, payload, title ],
-                    pagination: { first, last, links, next, prev, select }
-                  }
-                */
-            /** @type {?} */
-            const config = this.options.config;
-            /** @type {?} */
-            const // app-config.json
-            paths = config.get('item-preview');
-            /** @type {?} */
-            const // item preview dynamic paths
-            totalCount = data.totalCount;
-            /** @type {?} */
-            const // total amount of items available on backend
-            totalPages = this.totalPages;
-            /** @type {?} */
-            const // calculated number of pages
-            page = this.currentPage;
-            /** @type {?} */
-            const // current page (if using pagination)
-            context = this.context;
-            /** @type {?} */
-            const // parent layout name
-            size = this.pageSize;
-            /** @type {?} */
-            const // items per page (if using pagination)
-            labels = config.get("labels");
-            const { dynamicPagination } = this.options;
-            /** @type {?} */
-            var d = data.items ? data.items : data.relatedItems // items to iterate over
-            ;
-            if (config) {
-                /** @type {?} */
-                var keys = config.get('config-keys')
-                // dynamic search for max-item-length
-                ;
-                // dynamic search for max-item-length
-                if (config.get(context + '-layout')) {
-                    /** @type {?} */
-                    var lengthLimit = config.get(context + '-layout')['max-item-length'];
-                    /** @type {?} */
-                    var resultsLimit = config.get(context + '-layout')['results-limit'];
-                }
-            }
-            // resize data
-            if (!dynamicPagination && size && page) {
-                d = d.slice(page * size - size, page * size);
-            }
-            else if (size) {
-                d = d.slice(0, size);
-            }
-            /** @type {?} */
-            var result = [];
-            d.forEach((/**
-             * @param {?} el
-             * @return {?}
-             */
-            el => {
-                /** @type {?} */
-                let item = {
-                    image: get(el, paths.image, el.image),
-                    title: 
-                    // if there is a max string length in config, use it
-                    +paths.title.maxLength && get(el, paths.title, el.item.label).length > +paths.title.maxLength ?
-                        get(el, paths.title, el.item.label).slice(0, +paths.title.maxLength) + '…' :
-                        get(el, paths.title, el.item.label),
-                    text: !paths.text ? null : // make text block (in config) optional
-                        +paths.text.maxLength && get(el, paths.text.data, el.item.text).length > +paths.text.maxLength ?
-                            get(el, paths.text.data, el.item.text).slice(0, +paths.text.maxLength) + '…' :
-                            get(el, paths.text.data, el.item.text),
-                    payload: get(el, paths.payload, el.item.id),
-                    classes: ['entita', 'search'].includes(context) ? 'is-fullwidth' : '',
-                    metadata: [
-                        get(el, paths.metadata.info.data, el.item.fields) ? {
-                            classes: 'n7-objects__metadata-artist',
-                            items: get(el, paths.metadata.info.data, el.item.fields).map((/**
-                             * @param {?} data
-                             * @return {?}
-                             */
-                            data => {
-                                for (let i = 0; i < paths.metadata.info.selection.length; i++) {
-                                    if (data.key == paths.metadata.info.selection[i].key) { // if the selected key (config) is in data, use it
-                                        return ({
-                                            label: helpers.prettifySnakeCase(data.key, labels[data.key]),
-                                            value: data.value
-                                        });
-                                    }
-                                }
-                                return {}; // if no data was found for this key, return empty object.
-                            }))
-                        } : {},
-                        {
-                            classes: 'n7-objects__metadata-linked',
-                            items: get(el, paths.metadata.toe.data, el.relatedTypesOfEntity) ?
-                                get(el, paths.metadata.toe.data, el.relatedTypesOfEntity).map((/**
-                                 * @param {?} toe
-                                 * @return {?}
-                                 */
-                                toe => {
-                                    return {
-                                        // persona: 6, Organizz: 12, Luoghi: 2, Concetti: 32
-                                        value: get(toe, paths.metadata.toe.value, toe.count),
-                                        // icon: 'n7-icon-bell' // TODO: link icon to config key
-                                        icon: keys[get(toe, paths.metadata.toe.icon, toe.type).replace(" ", "-")] ? keys[get(toe, paths.metadata.toe.icon, toe.type).replace(" ", "-")].icon : "",
-                                        classes: 'color-' + get(toe, paths.metadata.toe.icon, toe.type).replace(" ", "-")
-                                    };
-                                })) : null
-                        }
-                    ]
-                };
-                if (get(el, paths.metadata.breadcrumbs.data, el.breadcrumbs)) {
-                    item['breadcrumbs'] = {
-                        // n7-breadcrumbs uses this as it's own data
-                        items: get(el, paths.metadata.breadcrumbs.data, el.breadcrumbs).map((/**
-                         * @param {?} crumb
-                         * @return {?}
-                         */
-                        crumb => {
-                            return {
-                                label: get(crumb, paths.metadata.breadcrumbs.label, crumb.label),
-                                payload: get(crumb, paths.metadata.breadcrumbs.payload, crumb.link),
-                            };
-                        }))
-                    };
-                }
-                result.push(item);
-            }));
-            if (context === 'home') {
-                /** @type {?} */
-                let actions = [
-                    {
-                        label: 'Mostra Tutti (' + totalCount + ')'
-                    },
-                    lengthLimit ?
-                        {
-                            label: 'Mostra Altri (' + resultsLimit + ')',
-                            disabled: false,
-                        } : null,
-                ];
-                return {
-                    result,
-                    actions,
-                    isLoading: false,
-                };
-            }
-            return { previews: result };
-        });
-    }
-    // use dynamic object paths from config
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        this.paths = this.options.config.get('item-preview');
-        this.pageSize = this.options.size;
-        this.totalObjects = data.totalCount;
-        this.currentPage = this.options.page ? (/** @type {?} */ (this.options.page)) : 1;
-        if (this.options.dynamicPagination && this.options.dynamicPagination.total) {
-            this.totalPages = Math.ceil(this.options.dynamicPagination.total / this.pageSize);
-        }
-        else if (data.items) {
-            this.totalPages = Math.ceil(data.items.length / this.pageSize);
-        }
-        else if (data.relatedItems) {
-            this.totalPages = Math.ceil(data.relatedItems.length / this.pageSize);
-        }
-        this.context = this.options.context;
-        this.loadedData = this.unpackData(data);
-        if (this.options.pagination) {
-            this.addPagination(this.currentPage, this.totalPages, this.pageSize);
-        }
-        this.checkForMore(); // checks if <Show More> button should be enabled
-        this.loadedData.loaderData = {};
-        return this.loadedData;
-    }
-}
-if (false) {
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.currentPage;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.totalPages;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.totalObjects;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.pageSize;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.context;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.loadedData;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.loadingData;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.paths;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.checkForMore;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.handleIncomingData;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.addPagination;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.makePagination;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwLinkedObjectsDS.prototype.unpackData;
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/autocomplete-wrapper.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwAutocompleteWrapperDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        const { key, response } = data;
-        /** @type {?} */
-        const regex = new RegExp('(.*?)' + key + '(.*)', 'i') // 'i' = case insensitive
-        ;
-        // 'i' = case insensitive
-        /** @type {?} */
-        const suggestion = [];
-        /** @type {?} */
-        const config = this.options.config;
-        /** @type {?} */
-        const maxLength = config.get('home-layout')['max-item-length'] / 2;
-        /** @type {?} */
-        const fResults = response.results.filter((/**
-         * @param {?} el
-         * @return {?}
-         */
-        el => typeof el.entity == 'object')) // filter only entities (no cultural objects)
-        ;
-        fResults.forEach((/**
-         * @param {?} el
-         * @return {?}
-         */
-        el => {
-            if (el.entity.id == 'fallback') { // build and return fallback data
-                suggestion.push({
-                    match: '',
-                    payload: 'fallback-simple-autocomplete',
-                    prefix: el.entity.label,
-                    suffix: ''
-                });
-                return { suggestion };
-            }
-            // divide prefix and suffix
-            // let match = el.item.label.match(regex)
-            /** @type {?} */
-            let match = regex.exec(el.entity.label);
-            if (match) {
-                /** @type {?} */
-                let prefix = match[1];
-                /** @type {?} */
-                let suffix = match[2]
-                // string manipulation
-                ;
-                // string manipulation
-                if (maxLength && (prefix.length > maxLength)) {
-                    prefix = '...' + prefix.slice(prefix.length - maxLength, prefix.length);
-                }
-                if (maxLength && (suffix.length > maxLength)) {
-                    suffix = suffix.slice(0, maxLength) + '...';
-                }
-                suggestion.push({
-                    match: match.input.slice(match[1].length, match[1].length + key.length),
-                    prefix,
-                    suffix,
-                    payload: el.entity.id
-                });
-            }
-        }));
-        return { suggestion };
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/bubble-chart.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwBubbleChartDS extends DataSource {
-    constructor() {
-        super(...arguments);
-        this.thresholdShowTitle = 50;
-        this.thresholdShowValue = 60;
-        this.allBubbles = null;
-        this.entityBubbleIdMap = {};
-        this.selectedBubbles = [];
-        this.facetData = null;
-        this.bubblePopup = null;
-        this.currentHoverEntity = null;
-        this._bubbleChart = null;
-        this.maxBubblesSelectable = 3;
-        this.windowResizeSet = false;
-        this.maxBubbleRadius = 100;
-        this.minBubbleRadius = 10;
-        this.maxBubbleTextRadiusRatio = 6;
-    }
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        if (!data) {
-            return null;
-        }
-        this.destroyTooltip();
-        this.facetData = data.facetData ? data.facetData : [];
-        this.tippy = tippy;
-        data.bubbles = this.filterBubblesBasedOnFacetsEnabled();
-        /** @type {?} */
-        let bubbleCointainer = document.getElementById(this.options.containerId);
-        /** @type {?} */
-        const cWidth = data.width ? data.width : bubbleCointainer.offsetWidth;
-        // TODO: think of a good way to pass/compute cHeight
-        /** @type {?} */
-        const cHeight = 700;
-        // bubbleCointainer.offsetHeight
-        /** @type {?} */
-        const containerSize = cWidth * cHeight;
-        /** @type {?} */
-        let bubblesData = {
-            containerId: this.options.bubbleContainerId,
-            containerWidth: cWidth,
-            containerHeight: cHeight,
-            isForceSimulationEnabled: true,
-            maxBubblesSelected: 3
-        };
-        bubblesData['bubblesData'] = [];
-        /** @type {?} */
-        let maxBubbleCount = -1;
-        /** @type {?} */
-        let minBubbleCount = -1;
-        /** @type {?} */
-        let numOfBubbles = 0;
-        /** @type {?} */
-        let totalCount = 0;
-        /** @type {?} */
-        let numOfSelectedBubbles = 0;
-        data.bubbles.forEach((/**
-         * @param {?} bubble
-         * @return {?}
-         */
-        bubble => {
-            if (maxBubbleCount < bubble.count)
-                maxBubbleCount = bubble.count;
-            if (minBubbleCount < 0 || minBubbleCount > bubble.count)
-                minBubbleCount = bubble.count;
-            numOfBubbles++;
-            totalCount += bubble.count;
-            if (bubble.selected)
-                numOfSelectedBubbles++;
-        }));
-        data.bubbles.forEach((/**
-         * @param {?} bubble
-         * @return {?}
-         */
-        bubble => {
-            /** @type {?} */
-            let bId = bubble.id;
-            /** @type {?} */
-            let bubbleAverage = totalCount / numOfBubbles;
-            /** @type {?} */
-            let bubblePercentage = (bubble.count - (minBubbleCount / 3)) / ((maxBubbleCount * 3) - (minBubbleCount / 3));
-            //to understand if there is a large difference of count between bubbles
-            /** @type {?} */
-            let coeff = maxBubbleCount / bubbleAverage;
-            /* if ( coeff > 20 ) {
-              if ( bubble.count - coeff >= 0 ){
-                bubblePercentage = ( (bubble.count) - (minBubbleCount/3) )/( (maxBubbleCount*3) - (minBubbleCount/3) )
-              } else {
-              }
-              bubblePercentage = ( (bubble.count - (minBubbleCount/3)) - (minBubbleCount/3) )/( ((maxBubbleCount - coeff) *3) - (minBubbleCount/3) )
-            }*/
-            /* In case of few bubbles */
-            if (coeff > 1) {
-                bubblePercentage = (bubble.count * (coeff / 3) - (minBubbleCount / 3)) / ((maxBubbleCount * 3) - (minBubbleCount / 3));
-            }
-            /** @type {?} */
-            let bubbleRadius = (Math.log(containerSize) / 10) * (bubblePercentage * 3) * (70 - Math.sqrt(numOfBubbles));
-            if (bubbleRadius > this.maxBubbleRadius) {
-                bubbleRadius = this.maxBubbleRadius;
-            }
-            else if (bubbleRadius < this.minBubbleRadius) {
-                bubbleRadius = this.minBubbleRadius;
-            }
-            //console.log("bubble text " +  bubble.entity.label +" bubble length " +  bubble.entity.label.length + " radius: " + bubbleRadius + " limit: " + this.thresholdShowTitle  )
-            /** @type {?} */
-            let label = bubble.entity.label;
-            /** @type {?} */
-            let texts = [];
-            // check if text is larger than radius
-            if (bubbleRadius / bubble.entity.label.length < this.maxBubbleTextRadiusRatio) {
-                /** @type {?} */
-                const index = bubbleRadius / this.maxBubbleTextRadiusRatio;
-                /** @type {?} */
-                const spaceIndex = bubble.entity.label.indexOf(" ", index - 5);
-                /** @type {?} */
-                const label1 = bubble.entity.label.slice(0, spaceIndex);
-                /** @type {?} */
-                const label2 = bubble.entity.label.slice(spaceIndex, index * 2);
-                //label = [bubble.entity.label.slice(0, index), "\n", bubble.entity.label.slice(index)].join('');
-                texts.push({
-                    id: bId + "_label0",
-                    label: (/**
-                     * @param {?} d
-                     * @return {?}
-                     */
-                    (d) => { if (d.radius < this.thresholdShowTitle)
-                        return null; return label1; }),
-                    x_function: (/**
-                     * @param {?} d
-                     * @return {?}
-                     */
-                    (d) => d.x),
-                    y_function: (/**
-                     * @param {?} d
-                     * @return {?}
-                     */
-                    (d) => {
-                        /** @type {?} */
-                        let mNum = (d.radius / 9);
-                        if (d.radius < this.thresholdShowValue)
-                            mNum = 0;
-                        return d.y - mNum - 20;
-                    }),
-                    "user_select": "none",
-                    fontSize_function: (/**
-                     * @param {?} d
-                     * @return {?}
-                     */
-                    (d) => d.radius / 5),
-                    color: "white",
-                    "classes": ""
-                }, {
-                    id: bId + "_label01",
-                    label: (/**
-                     * @param {?} d
-                     * @return {?}
-                     */
-                    (d) => { if (d.radius < this.thresholdShowTitle)
-                        return null; return label2; }),
-                    x_function: (/**
-                     * @param {?} d
-                     * @return {?}
-                     */
-                    (d) => d.x),
-                    y_function: (/**
-                     * @param {?} d
-                     * @return {?}
-                     */
-                    (d) => {
-                        /** @type {?} */
-                        let mNum = (d.radius / 9);
-                        if (d.radius < this.thresholdShowValue)
-                            mNum = 0;
-                        return d.y - mNum;
-                    }),
-                    "user_select": "none",
-                    fontSize_function: (/**
-                     * @param {?} d
-                     * @return {?}
-                     */
-                    (d) => d.radius / 5),
-                    color: "white",
-                    "classes": ""
-                });
-            }
-            else {
-                texts.push({
-                    id: bId + "_label0",
-                    label: (/**
-                     * @param {?} d
-                     * @return {?}
-                     */
-                    (d) => { if (d.radius < this.thresholdShowTitle)
-                        return null; return label; }),
-                    x_function: (/**
-                     * @param {?} d
-                     * @return {?}
-                     */
-                    (d) => d.x),
-                    y_function: (/**
-                     * @param {?} d
-                     * @return {?}
-                     */
-                    (d) => {
-                        /** @type {?} */
-                        let mNum = (d.radius / 9);
-                        if (d.radius < this.thresholdShowValue)
-                            mNum = 0;
-                        return d.y - mNum;
-                    }),
-                    "user_select": "none",
-                    fontSize_function: (/**
-                     * @param {?} d
-                     * @return {?}
-                     */
-                    (d) => d.radius / 5),
-                    color: "white",
-                    "classes": ""
-                });
-            }
-            /** @type {?} */
-            let bubbleData = {
-                id: bId,
-                texts: [
-                    ...texts,
-                    {
-                        id: bId + "_label1",
-                        label: (/**
-                         * @param {?} d
-                         * @return {?}
-                         */
-                        (d) => { if (d.radius < this.thresholdShowValue)
-                            return null; return bubble.count; }),
-                        x_function: (/**
-                         * @param {?} d
-                         * @return {?}
-                         */
-                        (d) => d.x),
-                        y_function: (/**
-                         * @param {?} d
-                         * @return {?}
-                         */
-                        (d) => d.y + (d.radius / 9)),
-                        "user_select": "none",
-                        //fontSize_function: (d) => d.radius/3,
-                        color: "white",
-                        "classes": "aw-bubble-num"
-                    }
-                ],
-                x: cWidth / 2 + 50,
-                y: cHeight / 2 + 50,
-                "radius": bubbleRadius,
-                color: bubble.color,
-                hasCloseIcon: (bubble.selected ? bubble.selected : false),
-                payload: {
-                    id: bId
-                },
-            };
-            bubblesData['bubblesData'].push(bubbleData);
-        }));
-        bubblesData['forceSimulationData'] = {
-            xPull: cWidth / 2,
-            xPullStrength: -0.01,
-            yPull: cHeight / 2,
-            yPullStrength: -0.01,
-            collisionStrengh: 0.99,
-            collisionIterations: 1,
-            velocityDecay: 0.65
-        };
-        if (data.reset)
-            bubblesData['reset'] = data.reset;
-        if (data.setUpdateReference)
-            bubblesData['setUpdateReference'] = data.setUpdateReference;
-        if (data.setBubbleChart)
-            bubblesData['setBubbleChart'] = data.setBubbleChart;
-        this.setWindowResize();
-        return bubblesData;
-    }
-    /**
-     * @param {?} data
-     * @param {?=} reset
-     * @return {?}
-     */
-    setAllBubblesFromApolloQuery(data, reset = true) {
-        /** @type {?} */
-        const response = data.source;
-        // if ( !response || !response.entitiesData ) {return; }
-        this.allBubbles = [];
-        if (data.selectedBubbles) {
-            this.selectedBubbles = data.selectedBubbles;
-        }
-        if (response.entitiesData) {
-            for (let i = 0; i < response.entitiesData.length; i++) {
-                this.allBubbles.push(Object.assign({}, response.entitiesData[i], { color: this.options.configKeys[response.entitiesData[i].entity.typeOfEntity.replace(" ", "-")] ? this.options.configKeys[response.entitiesData[i].entity.typeOfEntity.replace(" ", "-")]['color']['hex'] : "" }));
-            }
-        }
-        else {
-            for (let i = 0; i < response.relatedEntities.length; i++) {
-                /** @type {?} */
-                const color = this.options.configKeys ?
-                    this.options.configKeys[response.relatedEntities[i].entity.typeOfEntity.replace(" ", "-")] ? this.options.configKeys[response.relatedEntities[i].entity.typeOfEntity.replace(" ", "-")]['color']['hex'] : "" :
-                    null;
-                this.allBubbles.push(Object.assign({ id: this.convertEntityIdToBubbleId(response.relatedEntities[i].entity.id) }, response.relatedEntities[i], { color: color }));
-            }
-        }
-        this.entityBubbleIdMap = {};
-        this.allBubbles.forEach((/**
-         * @param {?} bubble
-         * @return {?}
-         */
-        (bubble) => {
-            // d3/svg does not allow Number as beginning of ID.
-            // d3/svg does not allow '-' as part of ID.
-            bubble.id = this.convertEntityIdToBubbleId(bubble.entity.id);
-            this.entityBubbleIdMap[bubble.id] = bubble.entity.id;
-            return bubble;
-        }));
-        this.allBubbles.forEach((/**
-         * @param {?} bubble
-         * @return {?}
-         */
-        (bubble) => {
-            bubble.selected = false;
-            for (var i = 0; i < this.selectedBubbles.length; i++) {
-                if (this.selectedBubbles[i].id === bubble.id) {
-                    bubble.selected = true;
-                }
-            }
-        }));
-        if (reset) {
-            this.update(data);
-        }
-    }
-    /**
-     * @private
-     * @param {?} entityId
-     * @return {?}
-     */
-    convertEntityIdToBubbleId(entityId) {
-        if (!entityId) {
-            return null;
-        }
-        return ('B_' + entityId.replace(/-/g, '_'));
-    }
-    /**
-     * @return {?}
-     */
-    filterBubblesBasedOnFacetsEnabled() {
-        /** @type {?} */
-        var count = 0;
-        /** @type {?} */
-        let result = this.allBubbles.filter((/**
-         * @param {?} bubble
-         * @return {?}
-         */
-        (bubble) => {
-            for (var i = 0; i < this.facetData.length; i++) {
-                if (bubble.entity.typeOfEntity.replace(/ /g, '-') === this.facetData[i].type.replace(/ /g, '-')) {
-                    if (!this.facetData[i].enabled) {
-                        return false;
-                    }
-                }
-            }
-            if (count > this.options.maxNumber) {
-                return false;
-            }
-            count++;
-            return true;
-        }));
-        return result;
-    }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
-    onBubbleMouseEnter(payload) {
-        if (!payload || !payload.bubble)
-            return;
-        /** @type {?} */
-        const bubbleId = payload.bubble.id;
-        /** @type {?} */
-        let hoverEntityId = this.entityBubbleIdMap[payload.bubble.id];
-        for (var i = 0; i < this.allBubbles.length; i++) {
-            /** @type {?} */
-            let bubble = this.allBubbles[i];
-            if (bubble.entity.id === hoverEntityId) {
-                this.currentHoverEntity = bubble.entity;
-                this.currentHoverEntity.count = bubble.count;
-                break;
-            }
-        }
-        if (this.bubblePopup) {
-            this.bubblePopup.hide();
-            this.bubblePopup.destroy();
-            this.bubblePopup = null;
-        }
-        setTimeout((/**
-         * @return {?}
-         */
-        () => {
-            /** @type {?} */
-            let template = document.getElementById("bubble-popup-menu");
-            /** @type {?} */
-            let templateClone = template.cloneNode(true);
-            templateClone['style'].display = "inline-block";
-            this.bubblePopup = this.tippy(`#${bubbleId}`, {
-                content: templateClone,
-                allowHTML: true,
-                trigger: 'manual',
-                interactive: true,
-                arrow: true,
-                theme: 'light-border no-padding',
-                placement: 'top',
-                maxWidth: 500,
-            })[0];
-            setTimeout((/**
-             * @return {?}
-             */
-            () => { if (this.bubblePopup)
-                this.bubblePopup.show(); }), 800);
-        }));
-    }
-    /**
-     * @return {?}
-     */
-    destroyTooltip() {
-        if (this.bubblePopup) {
-            this.bubblePopup.hide();
-            this.bubblePopup.destroy();
-            this.bubblePopup = null;
-        }
-    }
-    /**
-     * @param {?} source
-     * @param {?} payload
-     * @return {?}
-     */
-    onBubbleTooltipClick(source, payload) {
-        switch (source) {
-            case 'select':
-                if (!payload)
-                    return;
-                /** @type {?} */
-                const bubbleId = this.convertEntityIdToBubbleId(payload.entityId);
-                if (!bubbleId)
-                    return;
-                /** @type {?} */
-                let bubble = null;
-                if (payload._bubbleChart) {
-                    payload._bubbleChart.selectAll(`g`).each((/**
-                     * @param {?} b
-                     * @return {?}
-                     */
-                    b => {
-                        if (b.id === bubbleId)
-                            bubble = b;
-                    }));
-                    if (bubble)
-                        return bubble;
-                }
-                break;
-            default:
-                break;
-        }
-    }
-    /**
-     * @param {?} bubble
-     * @return {?}
-     */
-    onBubbleSelected(bubble) {
-        if (bubble) {
-            if (!this.selectedBubbles.includes(bubble)) {
-                if (this.selectedBubbles.length < this.maxBubblesSelectable) {
-                    this.selectedBubbles.push(bubble);
-                    //return this.filterRequest();
-                }
-            }
-        }
-    }
-    /**
-     * @param {?} id
-     * @return {?}
-     */
-    getBubbleFromId(id) {
-        /** @type {?} */
-        const bubbleId = this.convertEntityIdToBubbleId(id);
-        if (!bubbleId)
-            return;
-        /** @type {?} */
-        let bubble = null;
-        if (this._bubbleChart) {
-            this._bubbleChart.selectAll(`g`).each((/**
-             * @param {?} b
-             * @return {?}
-             */
-            b => {
-                if (b.id === bubbleId)
-                    bubble = b;
-            }));
-            if (bubble)
-                return bubble;
-        }
-    }
-    /**
-     * @return {?}
-     */
-    getSelectedBubbles() {
-        return this.selectedBubbles;
-    }
-    /**
-     * @return {?}
-     */
-    getAllBubbles() {
-        return this.allBubbles;
-    }
-    /**
-     * @return {?}
-     */
-    getEntityIdMap() {
-        return this.entityBubbleIdMap;
-    }
-    /**
-     * @return {?}
-     */
-    setWindowResize() {
-        if (!this.windowResizeSet) {
-            fromEvent(window, "resize").pipe(debounce((/**
-             * @return {?}
-             */
-            () => interval(200)))).
-                subscribe((/**
-             * @return {?}
-             */
-            () => {
-                // only resets the bubbles if the window's width has changed
-                // (if the resize only effects the window's hight then the bubble chart
-                // doesn't get reset)
-                /** @type {?} */
-                const container = document.getElementById(this.options.containerId);
-                //check if element is visible on page
-                if (container.offsetParent != null) {
-                    /** @type {?} */
-                    let bubblePayload = {
-                        width: container.offsetWidth,
-                        reset: true
-                    };
-                    this.update(bubblePayload);
-                }
-            }));
-            this.windowResizeSet = true;
-        }
-    }
-}
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwBubbleChartDS.prototype.thresholdShowTitle;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwBubbleChartDS.prototype.thresholdShowValue;
-    /** @type {?} */
-    AwBubbleChartDS.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwBubbleChartDS.prototype.allBubbles;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwBubbleChartDS.prototype.entityBubbleIdMap;
-    /** @type {?} */
-    AwBubbleChartDS.prototype.selectedBubbles;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwBubbleChartDS.prototype.facetData;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwBubbleChartDS.prototype.bubblePopup;
-    /** @type {?} */
-    AwBubbleChartDS.prototype.currentHoverEntity;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwBubbleChartDS.prototype._bubbleChart;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwBubbleChartDS.prototype.maxBubblesSelectable;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwBubbleChartDS.prototype.tippy;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwBubbleChartDS.prototype.windowResizeSet;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwBubbleChartDS.prototype.maxBubbleRadius;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwBubbleChartDS.prototype.minBubbleRadius;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwBubbleChartDS.prototype.maxBubbleTextRadiusRatio;
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/hero.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwHeroDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        const { title, text, button, backgroundImage, input } = data;
-        return {
-            title,
-            text,
-            backgroundImage,
-            button: {
-                text: button.text,
-                payload: "cerca"
-            },
-            input: {
-                placeholder: input.placeholder,
-                payload: "cerca-in-maxxi"
-            }
-        };
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/table.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwTableDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        return TABLE_MOCK;
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/home-hero-patrimonio.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwHomeHeroPatrimonioDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        const { title, backgroundImage, image, text, button } = data;
-        return {
-            title,
-            backgroundImage,
-            image,
-            text,
-            button: {
-                text: button.text,
-                payload: "naviga-patrimonio"
-            }
-        };
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/home-facets-wrapper.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwHomeFacetsWrapperDS extends DataSource {
-    constructor() {
-        super(...arguments);
-        this.autoComplete = {};
-        this.tippyMaker = (/**
-         * @param {?} res
-         * @param {?} id
-         * @return {?}
-         */
-        (res, id) => {
-            id = id.replace(/ /g, '-');
-            // create data for this facet
-            if (!this.autoComplete[id]) {
-                this.autoComplete[id] = {
-                    tippy: undefined,
-                    // tippy data / config
-                    open: true // show or hide tippy
-                };
-                /** @type {?} */
-                const ac = this.autoComplete[id];
-                /** @type {?} */
-                const getContent = (/**
-                 * @return {?}
-                 */
-                () => {
-                    /** @type {?} */
-                    const contentNode = document.getElementsByClassName('aw-simple-autocomplete__' + id.replace(/-search/, ''))[0];
-                    contentNode.setAttribute('style', 'display: block');
-                    return contentNode;
-                });
-                if (!ac.tippy) {
-                    /** @type {?} */
-                    const target = '.' + id;
-                    ac.tippy = tippy(target, {
-                        content: getContent(),
-                        trigger: 'manual',
-                        interactive: true,
-                        arrow: false,
-                        flip: false,
-                        appendTo: 'parent',
-                        theme: 'light-border aw-home__facet-tippy',
-                        placement: 'bottom-start',
-                        maxWidth: '100%',
-                    })[1]; // attach tippy to input type text
-                }
-            }
-            /** @type {?} */
-            const ac = this.autoComplete[id];
-            if (res.results.length > 0 && ac.tippy) {
-                ac.tippy.show();
-            }
-            else {
-                ac.tippy.hide();
-            }
-        });
-    }
-    /**
-     * @protected
-     * @param {?} __0
-     * @return {?}
-     */
-    transform({ facetData, lockedFacets }) {
-        /** @type {?} */
-        const headers = [];
-        /** @type {?} */
-        const inputs = [];
-        // when facet data changes, destroy every tippy and reset autocomplete data.
-        Object.keys(this.autoComplete).forEach((/**
-         * @param {?} id
-         * @return {?}
-         */
-        id => {
-            if (this.autoComplete[id] && this.autoComplete[id].tippy) {
-                this.autoComplete[id].tippy.destroy();
-            }
-        }));
-        this.autoComplete = {}; // reset
-        facetData.forEach((/**
-         * @param {?} facet
-         * @return {?}
-         */
-        facet => {
-            /*
-             For each facet on back-end, push a header-component
-             and a facet-component (search input only) to each array.
-             */
-            if (Object.keys(lockedFacets).length) {
-                if (lockedFacets[facet.type]) {
-                    // if bubble chart say lock this facet, lock it
-                    facet.locked = true;
-                }
-                else {
-                    facet.locked = false;
-                }
-            }
-            /** @type {?} */
-            const headerClasses = [];
-            /** @type {?} */
-            const iconClasses = [facet.icon];
-            if (!facet.enabled) {
-                headerClasses.push('is-disabled');
-            }
-            if (facet.configKey) {
-                headerClasses.push(`color-${facet.configKey}`);
-                iconClasses.push(`color-${facet.configKey}`);
-            }
-            // make array of headers data
-            headers.push({
-                iconLeft: iconClasses.join(' '),
-                text: facet.label,
-                additionalText: facet.count,
-                iconRight: facet.enabled ? 'n7-icon-eye' : 'n7-icon-eye-slash',
-                classes: headerClasses.join(' ') +
-                    (facet.locked
-                        ? ' is-blocked'
-                        : // if every other facet is disabled → Lock this facet
-                            facetData.every((/**
-                             * @param {?} f
-                             * @return {?}
-                             */
-                            f => {
-                                return !f.enabled || f.type === facet.type;
-                            }))
-                                ? ' is-blocked'
-                                : ' not-blocked'),
-                payload: facet.type.replace(/ /g, '-')
-            });
-            // make array of inputs data
-            inputs.push({
-                sections: [
-                    {
-                        inputs: [
-                            {
-                                type: 'text',
-                                placeholder: facet['input-placeholder'],
-                                icon: 'n7-icon-search',
-                                disabled: !facet.enabled,
-                                inputPayload: String(facet.type) + '-search',
-                                iconPayload: String(facet.type) + '-search',
-                                enterPayload: String(facet.type) + '-search',
-                                classes: String(facet.type.replace(' ', '-')) + '-search'
-                            }
-                        ]
-                    }
-                ]
-            });
-        }));
-        // zipping arrays to render widgets with separate data (see home-layout.html)
-        /** @type {?} */
-        const widgetData = [];
-        headers.map((/**
-         * @param {?} h
-         * @param {?} i
-         * @return {?}
-         */
-        (h, i) => {
-            widgetData.push({ header: h, input: inputs[i] });
-        }));
-        return widgetData;
-    }
-}
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeFacetsWrapperDS.prototype.autoComplete;
-    /** @type {?} */
-    AwHomeFacetsWrapperDS.prototype.tippyMaker;
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/home-item-tags-wrapper.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwHomeItemTagsWrapperDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        return data;
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/home-autocomplete.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwHomeAutocompleteDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        const { results, totalCount } = data;
-        const { config } = this.options;
-        /** @type {?} */
-        const labels = this.options.labels || {};
-        /** @type {?} */
-        const itemIds = [];
-        /** @type {?} */
-        const groups = {};
-        results.forEach((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ item, entity }) => {
-            /** @type {?} */
-            const groupId = entity ? entity.typeOfEntity.replace(' ', '-') : 'oggetto-culturale';
-            /** @type {?} */
-            const groupConfig = config[groupId];
-            /** @type {?} */
-            const mainMetadata = groupConfig['main-metadata'];
-            /** @type {?} */
-            const currentItem = item || entity;
-            if (!groups[groupId]) {
-                const { label, icon } = groupConfig;
-                groups[groupId] = {
-                    title: label,
-                    icon,
-                    classes: `color-${groupId}`,
-                    items: []
-                };
-            }
-            if (itemIds.indexOf(currentItem.id) === -1) {
-                /** @type {?} */
-                const metadata = [];
-                if (currentItem.fields) {
-                    currentItem.fields.forEach((/**
-                     * @param {?} __0
-                     * @return {?}
-                     */
-                    ({ key, value }) => {
-                        if (mainMetadata && key === mainMetadata) {
-                            metadata.push({ key: helpers.prettifySnakeCase(key, labels[key]), value });
-                        }
-                    }));
-                }
-                groups[groupId].items.push({
-                    title: currentItem.label,
-                    metadata,
-                    payload: {
-                        source: 'item',
-                        id: currentItem.id
-                    }
-                });
-            }
-        }));
-        return {
-            results: Object.keys(groups).map((/**
-             * @param {?} key
-             * @return {?}
-             */
-            key => ({
-                group: {
-                    title: groups[key].title,
-                    icon: groups[key].icon,
-                    classes: groups[key].classes
-                },
-                items: groups[key].items
-            }))),
-            actions: {
-                showMore: {
-                    text: `Visualizza tutti i ${totalCount} risultati`,
-                    payload: {
-                        source: 'showMore'
-                    }
-                }
-            },
-            fallback: 'Spiacenti, non è stato trovato nessun risultato. <br> Riprova con una nuova ricerca.'
-        };
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/entita-nav.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwEntitaNavDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} param
-     * @return {?}
-     */
-    transform(param) {
-        if (!param)
-            return;
-        /** @type {?} */
-        const data = param.data;
-        /** @type {?} */
-        const selected = param.selected;
-        /** @type {?} */
-        const navigation = { items: [], payload: 'entita-nav' };
-        navigation.items.push({
-            text: 'OVERVIEW',
-            payload: 'overview',
-            classes: selected == 'overview' ? 'is-selected' : ''
-        });
-        if (data.fields && data.fields.length > 0) {
-            navigation.items.push({
-                text: 'CAMPI',
-                payload: 'campi',
-                classes: selected == 'campi' ? 'is-selected' : ''
-            });
-        }
-        if (data.relatedItems) {
-            navigation.items.push({
-                text: 'OGGETTI-COLLEGATI',
-                payload: 'oggetti-collegati',
-                classes: selected == 'oggetti-collegati' ? 'is-selected' : ''
-            });
-        }
-        if (data.relatedEntities && this.options['bubblesEnabled']) {
-            navigation.items.push({
-                text: 'ENTITÀ COLLEGATE',
-                payload: 'entita-collegate',
-                classes: selected == 'entita-collegate' ? 'is-selected' : ''
-            });
-        }
-        if (data.extraTab) {
-            navigation.items.push({
-                text: 'MAXXI',
-                payload: 'maxxi',
-                classes: selected == 'maxxi' ? 'is-selected' : ''
-            });
-        }
-        if (data.wikiTab) {
-            navigation.items.push({
-                text: 'WIKIPEDIA',
-                payload: 'wiki',
-                classes: selected == 'wiki' ? 'is-selected' : ''
-            });
-        }
-        return navigation;
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/entita-metadata-viewer.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwEntitaMetadataViewerDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        /*
-          Access and use this.options if the rendering
-          changes based on context.
-        */
-        /*
-              Access and use this.options if the rendering
-              changes based on context.
-            */
-        let { labels } = this.options;
-        labels = labels || {};
-        /** @type {?} */
-        const unpackedData = AwEntitaMetadataViewerDS.unpackFields(data);
-        // prettify labels
-        unpackedData.forEach((/**
-         * @param {?} section
-         * @return {?}
-         */
-        section => {
-            section.items
-                .filter((/**
-             * @param {?} item
-             * @return {?}
-             */
-            item => item.label))
-                .forEach((/**
-             * @param {?} item
-             * @return {?}
-             */
-            item => item.label = helpers.prettifySnakeCase(item.label, labels[item.label])));
-        }));
-        return {
-            group: unpackedData
-        };
-    }
-    /**
-     * @param {?} fields
-     * @return {?}
-     */
-    static unpackFields(fields) {
-        /*
-              Recursive unpacking for rendering res.fields
-              - - -
-              This function transforms the response object tree
-              into an array, usable by metadata-viewer-component
-            */
-        /** @type {?} */
-        var extracted = [];
-        // if the server returns an array of key-value tuples
-        if (fields instanceof Array) {
-            extracted = fields.map((/**
-             * @param {?} el
-             * @return {?}
-             */
-            el => {
-                return { label: el.key, value: el.value };
-            }));
-            return [{ items: extracted }];
-        }
-        if (!fields)
-            return []; // if is empty → quit
-        for (let i = 0; i < fields.length; i++) {
-            /** @type {?} */
-            var thisField = fields[i];
-            // rename current field
-            /** @type {?} */
-            var title = thisField.label;
-            // field title
-            /** @type {?} */
-            var label = thisField.key;
-            // item label
-            /** @type {?} */
-            var value = thisField.value;
-            // item value
-            /** @type {?} */
-            var group = thisField.fields;
-            // child group
-            /** @type {?} */
-            var temp = {};
-            if (title) {
-                // if there is a title, use it
-                temp.title = title;
-            }
-            if (label && value) {
-                // if there are a lable and value, use them
-                temp.label = label;
-                temp.value = value;
-            }
-            if (group) {
-                // if there is a child group
-                if (group[0].key) {
-                    // if this group has a tuple of (label, value)
-                    temp.items = AwEntitaMetadataViewerDS.unpackFields(group); // make items array
-                }
-                else {
-                    temp.group = AwEntitaMetadataViewerDS.unpackFields(group); // make child group array
-                }
-            }
-            extracted.push(temp); // add this object to the new array
-        }
-        return extracted;
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/tree.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwTreeDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        this.icons = this.options.icons;
-        return data;
-    }
-    /**
-     * @param {?} data
-     * @param {?} parents
-     * @param {?} id
-     * @return {?}
-     */
-    updateTree(data, parents, id) {
-        /** @type {?} */
-        const tree = this.updateTreeData(data, parents, id);
-        this.update(tree);
-    }
-    /**
-     * @private
-     * @param {?} data
-     * @param {?} parents
-     * @param {?} id
-     * @return {?}
-     */
-    updateTreeData(data, parents, id) {
-        if (!data) {
-            data = this.output;
-        }
-        data.items.forEach((/**
-         * @param {?} it
-         * @return {?}
-         */
-        (it) => {
-            /** @type {?} */
-            const classes = it['classes'];
-            if (it['_meta'] == id) {
-                if (classes && classes.indexOf('is-expanded') > -1) {
-                    it['classes'] = classes.replace(/is-expanded/g, 'is-collapsed');
-                    if (it['toggle']) {
-                        it['toggle']['icon'] = 'n7-icon-angle-right';
-                    }
-                }
-                else {
-                    it['classes'] = classes.replace(/is-collapsed/g, 'is-expanded');
-                    if (it['toggle']) {
-                        it['toggle']['icon'] = 'n7-icon-angle-down';
-                    }
-                }
-            }
-            else if (parents && parents.indexOf(it['_meta']) >= 0) {
-                it['classes'] = classes.replace(/is-collapsed/g, 'is-expanded');
-                if (it['toggle']) {
-                    it['toggle']['icon'] = 'n7-icon-angle-down';
-                }
-            }
-            if (typeof it['items'] != 'undefined' && it['items'].length > 0) {
-                this.updateTreeData(it, parents, id);
-            }
-        }));
-        return data;
-    }
-    /**
-     * @param {?} id
-     * @param {?} data
-     * @return {?}
-     */
-    selectTreeItem(id, data) {
-        if (!data) {
-            data = this.output;
-        }
-        if (this.currentItem && this.currentItem["_meta"] == id) {
-            return;
-        }
-        data.items.forEach((/**
-         * @param {?} it
-         * @return {?}
-         */
-        (it) => {
-            if (it['_meta'] == id && it['classes'].indexOf('is-active') < 0) {
-                it['classes'] = it['classes'] + ' is-active';
-                this.currentItem = it;
-            }
-            else {
-                /** @type {?} */
-                const classes = it['classes'];
-                it['classes'] = classes.replace("is-active", "");
-            }
-            if (typeof it['items'] != "undefined" && it['items'].length > 0) {
-                this.selectTreeItem(id, it);
-            }
-        }));
-        this.update(data);
-    }
-    /**
-     * @return {?}
-     */
-    toggleSidebar() {
-        /** @type {?} */
-        let sidebarData = this.output;
-        if (sidebarData.classes == "is-expanded") {
-            sidebarData.classes = "is-collapsed";
-        }
-        else {
-            sidebarData.classes = "is-expanded";
-        }
-        this.update(sidebarData);
-    }
-    /**
-     * @param {?} response
-     * @return {?}
-     */
-    parseData(response) {
-        /** @type {?} */
-        let treeObj = {
-            items: []
-        };
-        /** @type {?} */
-        var data = response['tree'];
-        if (data['branches'] && data['branches'].length > 0) {
-            data['branches'].forEach((/**
-             * @param {?} item
-             * @return {?}
-             */
-            item => {
-                treeObj['items'].push(this.parseTree(item, false, []));
-            }));
-        }
-        this.update(treeObj);
-        if (response['currentItem'] == response['currentItem'] != null) {
-            //this.currentItem = response['currentItem'];
-            this.selectTreeItem(response['currentItem'], null);
-            this.updateTree(null, this.currentItem.parents, response['currentItem']);
-        }
-    }
-    /**
-     * @private
-     * @param {?} data
-     * @param {?} toggle
-     * @param {?} parents
-     * @return {?}
-     */
-    parseTree(data, toggle, parents) {
-        /** @type {?} */
-        var currParents = [...parents];
-        /** @type {?} */
-        let treeItem = {};
-        /** @type {?} */
-        const showToggle = toggle && data['branches'] != null && data['branches'].length > 0;
-        if (showToggle) {
-            treeItem['toggle'] = {
-                icon: 'n7-icon-angle-right',
-                payload: {
-                    source: "toggle",
-                    id: data['id'],
-                    parents: currParents,
-                }
-            };
-        }
-        Object.keys(data).forEach((/**
-         * @param {?} key
-         * @return {?}
-         */
-        key => {
-            if (key != "branches") {
-                switch (key) {
-                    case "label":
-                        treeItem['text'] = data[key];
-                        break;
-                    case "img":
-                        treeItem['img'] = data[key];
-                        break;
-                    case "icon":
-                        if (showToggle && data[key] != null) {
-                            treeItem['toggle']['icon'] = data[key];
-                        }
-                        else {
-                            treeItem['icon'] = data[key];
-                        }
-                        break;
-                    case "id":
-                        treeItem['_meta'] = data[key];
-                        treeItem['payload'] = {
-                            source: "menuItem",
-                            id: data['id']
-                        };
-                        break;
-                    default:
-                        data[key];
-                        break;
-                }
-                treeItem['classes'] = 'is-collapsed';
-                treeItem['parents'] = currParents;
-            }
-            else if (data['branches'] != null) {
-                currParents.push(data['id']);
-                /*Handle cases with menu item with children but without toggle*/
-                if (!toggle) {
-                    treeItem['payload']['source'] = "ToggleMenuItem";
-                    treeItem['payload']['parents'] = currParents;
-                }
-                treeItem['items'] = [];
-                data[key].forEach((/**
-                 * @param {?} item
-                 * @return {?}
-                 */
-                item => {
-                    if (item['img'] != "" && item['img'] != null) {
-                        treeItem['iconright'] = "n7-icon-images";
-                    }
-                    treeItem['items'].push(this.parseTree(item, true, currParents));
-                }));
-            }
-        }));
-        return treeItem;
-    }
-}
-if (false) {
-    /** @type {?} */
-    AwTreeDS.prototype.currentItem;
-    /** @type {?} */
-    AwTreeDS.prototype.icons;
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/sidebar-header.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwSidebarHeaderDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        return data;
-    }
-    /**
-     * @return {?}
-     */
-    toggleSidebar() {
-        /** @type {?} */
-        let sidebarData = this.output;
-        if (sidebarData.classes == 'is-expanded') {
-            sidebarData.classes = 'is-collapsed';
-            sidebarData.iconRight = 'n7-icon-tree-icon';
-        }
-        else {
-            sidebarData.classes = 'is-expanded';
-            sidebarData.iconRight = 'n7-icon-angle-left';
-        }
-        this.update(sidebarData);
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/scheda-breadcrumbs.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwSchedaBreadcrumbsDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        return data;
-    }
-    /**
-     * @return {?}
-     */
-    toggleSidebar() {
-        /** @type {?} */
-        let sidebarData = this.output;
-        if (sidebarData.classes == "is-expanded") {
-            sidebarData.classes = "is-collapsed";
-        }
-        else {
-            sidebarData.classes = "is-expanded";
-        }
-        this.update(sidebarData);
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/scheda-metadata.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwSchedaMetadataDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        let { labels } = this.options;
-        labels = labels || {};
-        /** @type {?} */
-        let group = { group: [] };
-        if (data.fields) {
-            data.fields.forEach((/**
-             * @param {?} field
-             * @return {?}
-             */
-            field => {
-                /** @type {?} */
-                let items = [];
-                if (field.fields) {
-                    field.fields.forEach((/**
-                     * @param {?} item
-                     * @return {?}
-                     */
-                    item => {
-                        items.push({ label: helpers.prettifySnakeCase(item.key, labels[item.key]), value: item.value });
-                    }));
-                    group.group.push({
-                        title: field.label,
-                        items: items
-                    });
-                }
-                else {
-                    items.push({ label: helpers.prettifySnakeCase(field.key, labels[field.key]), value: field.value });
-                    group.group.push({
-                        items: items
-                    });
-                }
-            }));
-        }
-        return group;
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/scheda-image.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwSchedaImageDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        return data;
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/scheda-inner-title.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwSchedaInnerTitleDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        return data;
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/search-layout-tabs.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwSearchLayoutTabsDS extends DataSource {
-    constructor() {
-        super(...arguments);
-        this.selected = 'list';
-    }
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        return {
-            items: [{
-                    text: 'LISTA',
-                    payload: 'list',
-                    classes: this.selected === 'list' ? 'is-selected' : ''
-                }, {
-                    text: 'GRAFICO',
-                    payload: 'chart',
-                    classes: this.selected === 'chart' ? 'is-selected' : ''
-                }, {
-                    text: 'TIMELINE',
-                    payload: 'timeline',
-                    classes: this.selected === 'timeline' ? 'is-selected' : ''
-                }]
-        };
-    }
-    /**
-     * @param {?} tabId
-     * @return {?}
-     */
-    setSelected(tabId) {
-        this.selected = tabId;
-    }
-}
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutTabsDS.prototype.selected;
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/index.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-var DS$1 = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    AwLinkedObjectsDS: AwLinkedObjectsDS,
-    AwAutocompleteWrapperDS: AwAutocompleteWrapperDS,
-    AwBubbleChartDS: AwBubbleChartDS,
-    AwHeroDS: AwHeroDS,
-    AwTableDS: AwTableDS,
-    AwHomeHeroPatrimonioDS: AwHomeHeroPatrimonioDS,
-    AwHomeFacetsWrapperDS: AwHomeFacetsWrapperDS,
-    AwHomeItemTagsWrapperDS: AwHomeItemTagsWrapperDS,
-    AwHomeAutocompleteDS: AwHomeAutocompleteDS,
-    AwEntitaNavDS: AwEntitaNavDS,
-    AwEntitaMetadataViewerDS: AwEntitaMetadataViewerDS,
-    AwTreeDS: AwTreeDS,
-    AwSidebarHeaderDS: AwSidebarHeaderDS,
-    AwSchedaBreadcrumbsDS: AwSchedaBreadcrumbsDS,
-    AwSchedaMetadataDS: AwSchedaMetadataDS,
-    AwSchedaImageDS: AwSchedaImageDS,
-    AwSchedaInnerTitleDS: AwSchedaInnerTitleDS,
-    AwSearchLayoutTabsDS: AwSearchLayoutTabsDS
-});
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/linked-objects.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwLinkedObjectsEH extends EventHandler {
-    constructor() {
-        super(...arguments);
-        this.handleScroll = (/**
-         * @param {?} target
-         * @return {?}
-         */
-        target => {
-            /*
-              Check if the target element is scrolled near the end while data is not already loading.
-              If the condition is met, a request for more data is sent.
-            */
-            if (target.scrollTop + target.clientHeight >= target.scrollHeight - 150 && this.dataSource.loadedData.isLoading == false) {
-                this.dataSource.loadedData.isLoading = true;
-                this.emitOuter('datarequest', {
-                    currentPage: this.dataSource.currentPage
-                });
-            }
-        });
-    }
-    /**
-     * @return {?}
-     */
-    listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                case 'aw-linked-objects.click':
-                    if (payload.startsWith('page')) {
-                        // pagination routing is handled by the parent layout
-                        this.emitOuter('pagination', payload);
-                    }
-                    else if (payload.startsWith('goto')) {
-                        /** @type {?} */
-                        let targetPage = Number(payload.replace('goto-', ''))
-                        // kill impossible page navigations
-                        ;
-                        // kill impossible page navigations
-                        if (targetPage > this.dataSource.totalPages)
-                            return;
-                        else if (targetPage < 1 || targetPage === this.dataSource.currentPage)
-                            return;
-                        else
-                            this.emitOuter('goto', payload);
-                    }
-                    else {
-                        this.emitOuter('click', payload);
-                    }
-                    break;
-                case 'aw-linked-objects.change': // changed page size value (pagination)
-                    this.emitOuter('change', +payload.value);
-                    break;
-                default:
-                    console.warn('unhandled event type: ', type, ' with payload: ', payload);
-                    break;
-            }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                case 'aw-home-layout.viewmore':
-                    // ask home-layout for more data
-                    this.dataSource.checkForMore(false);
-                    this.emitOuter('datarequest', {
-                        currentPage: this.dataSource.currentPage
-                    });
-                    break;
-                case 'aw-home-layout.dataresponse':
-                    // handle incoming data from home-layout
-                    let { res } = payload;
-                    this.dataSource.handleIncomingData(res);
-                case 'aw-home-layout.scroll':
-                    this.handleScroll(payload);
-                    break;
-                default:
-                    break;
-            }
-        }));
-    }
-}
-if (false) {
-    /** @type {?} */
-    AwLinkedObjectsEH.prototype.handleScroll;
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/autocomplete-wrapper.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwAutocompleteWrapperEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                case 'aw-autocomplete-wrapper.click':
-                    if (payload != 'fallback-simple-autocomplete') { // if this is the fallback item, kill the event.
-                        this.emitOuter('clickresult', payload);
-                    }
-                    break;
-                default:
-                    console.warn('unhandled event of type:', type);
-                    break;
-            }
-        }));
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/bubble-chart.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwBubbleChartEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} event
-         * @return {?}
-         */
-        event => {
-            switch (event.type) {
-                case 'aw-bubble-chart.init':
-                    break;
-                case 'aw-bubble-chart.click':
-                    event.payload.entityIdmap = this.dataSource.getEntityIdMap();
-                    event.payload.allBubbles = this.dataSource.getAllBubbles();
-                    this.emitOuter('click', event.payload);
-                    break;
-                case 'aw-bubble-chart.mouseenter':
-                    /** @type {?} */
-                    const currBubble = this.dataSource.onBubbleMouseEnter({
-                        bubblePayload: event.payload.bubblePayload,
-                        bubble: event.payload.bubble
-                    });
-                    event.payload.currBubble = currBubble;
-                    this.emitOuter('mouseenter', event.payload);
-                    break;
-                case 'aw-bubble-chart.mouseleave':
-                    this.emitOuter('mouseleave', event.payload);
-                    break;
-                case "aw-bubble-chart.bubble-tooltip-close-click":
-                    this.emitOuter('bubble-tooltip-close-click', event.payload);
-                    break;
-                case "aw-bubble-chart.bubble-tooltip-goto-click":
-                    this.emitOuter('bubble-tooltip-goto-click', event.payload);
-                    break;
-                case "aw-bubble-chart.bubble-tooltip-select-click":
-                    this.emitOuter('bubble-tooltip-select-click', event.payload);
-                    break;
-                default:
-                    console.warn('unhandled inner event of type', event.type);
-                    break;
-            }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                case "aw-home-layout.bubble-tooltip-select-click":
-                    /** @type {?} */
-                    let selectData = {
-                        'bubble': this.dataSource.onBubbleTooltipClick('select', payload),
-                        'entityIdmap': this.dataSource.getEntityIdMap(),
-                        'allBubbles': this.dataSource.getAllBubbles(),
-                        'source': 'bubble'
-                    };
-                    this.emitOuter('click', selectData);
-                    break;
-                case 'aw-home-layout.bubble-filter':
-                    this.emitOuter('bubble-filtered', {
-                        'allBubbles': this.dataSource.getAllBubbles(),
-                        'selected': this.dataSource.getSelectedBubbles()
-                    });
-                    break;
-                case 'aw-scheda-layout.filterbubbleresponse':
-                case 'aw-entita-layout.filterbubbleresponse':
-                case 'aw-home-layout.filterbubbleresponse':
-                    if (payload.source) {
-                        this.dataSource.setAllBubblesFromApolloQuery(payload, payload.reload);
-                        this.emitOuter('bubble-filtered', {
-                            'allBubbles': this.dataSource.getAllBubbles(),
-                            'selected': this.dataSource.getSelectedBubbles(),
-                            'entityIdmap': this.dataSource.getEntityIdMap()
-                        });
-                    }
-                    else {
-                        this.dataSource.update(payload);
-                    }
-                    break;
-            }
-        }));
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/hero.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwHeroEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                case 'aw-hero.click':
-                    // TODO
-                    break;
-                case 'aw-hero.change':
-                    this.emitOuter('change', payload);
-                    break;
-                default:
-                    break;
-            }
-        }));
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/home-bubble-chart.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwHomeBubbleChartEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} event
-         * @return {?}
-         */
-        event => {
-            switch (event.type) {
-                case 'aw-home-bubble-chart.click':
-                    this.emitOuter('click', event.payload);
-                    break;
-                case 'aw-home-bubble-chart.mouseenter':
-                    this.emitOuter('mouseenter', event.payload);
-                    break;
-                case 'aw-home-bubble-chart.mouseleave':
-                    this.emitOuter('mouseleave', event.payload);
-                    break;
-                default:
-                    break;
-            }
-        }));
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/home-facets-wrapper.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwHomeFacetsWrapperEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                // toggle visibility from facet header
-                case 'aw-home-facets-wrapper.click':
-                    this.emitOuter('click', payload);
-                    break;
-                // change search input text
-                case 'aw-home-facets-wrapper.change':
-                    this.emitOuter('change', payload);
-                    break;
-                // press return while typing in search
-                case 'aw-home-facets-wrapper.enter':
-                    this.emitOuter('enter', payload);
-                    break;
-                default:
-                    console.warn('unhandled inner event of type:', type);
-                    break;
-            }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                case 'aw-home-layout.facetswrapperresponse': // incoming autocomplete response
-                    this.dataSource.tippyMaker(payload.response, payload.facetId.inputPayload);
-                    break;
-                default:
-                    // console.warn('unhandled outer event of type', type)
-                    // silent ignore
-                    break;
-            }
-        }));
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/home-hero-patrimonio.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwHomeHeroPatrimonioEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                case 'aw-home-hero-patrimonio.click':
-                    this.emitGlobal('navigate', {
-                        handler: 'router',
-                        path: ['aw/patrimonio']
-                    });
-                    break;
-                default:
-                    break;
-            }
-        }));
-        /*
-        this.outerEvents$.subscribe(event => {
-          
-        });
-        */
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/home-item-tags-wrapper.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwHomeItemTagsWrapperEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} event
-         * @return {?}
-         */
-        (event) => {
-            switch (event.type) {
-                case "aw-home-item-tags-wrapper.click":
-                    this.emitOuter('click', event.payload);
-                    break;
-                default:
-                    break;
-            }
-        }));
-        /* this.outerEvents$.subscribe(event => {
-        
-        }); */
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/home-autocomplete.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwHomeAutocompleteEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                case "aw-home-autocomplete.click":
-                    this.emitOuter('click', payload);
-                    break;
-                default:
-                    break;
-            }
-        }));
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/entita-nav.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwEntitaNavEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                case 'aw-entita-nav.click':
-                    this.emitOuter('click', payload);
-                    break;
-                default:
-                    console.warn('unhandled event type');
-                    break;
-            }
-        }));
-        /*
-    
-        this.outerEvents$.subscribe(event => {
-          
-        });
-        */
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/scheda-breadcrumbs.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwSchedaSidebarEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            if (type == 'aw-sidebar-header.click') {
-                this.dataSource.toggleSidebar();
-                this.emitOuter(type, payload);
-            }
-        }));
-        /* this.outerEvents$.subscribe(event => {
-        
-        }); */
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/sidebar-header.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwSidebarHeaderEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            if (type == 'aw-sidebar-header.click') {
-                this.dataSource.toggleSidebar();
-                this.emitOuter('click', payload);
-            }
-        }));
-        /* this.outerEvents$.subscribe(event => {
-        
-        }); */
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/tree.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwTreeEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            if (payload && typeof payload.source != 'undefined') {
-                switch (payload.source) {
-                    case 'toggle':
-                        this.dataSource.updateTree(null, payload.parents, payload.id);
-                        break;
-                    case 'ToggleMenuItem': this.dataSource.updateTree(null, payload.parents, payload.id); //no break, I want to execute also the following instruction
-                    case 'menuItem':
-                        this.dataSource.selectTreeItem(payload.id);
-                        this.emitOuter('click', payload.id);
-                        break;
-                }
-            }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                case 'aw-sidebar-header.click':
-                    this.dataSource.toggleSidebar();
-                    break;
-                case 'aw-scheda-layout.selectItem':
-                    this.dataSource.selectTreeItem(payload);
-                    if (typeof this.dataSource.currentItem !== 'undefined') {
-                        this.dataSource.updateTree(null, this.dataSource.currentItem.payload.toggle.parents, payload);
-                    }
-                    else {
-                        console.warn('The object in the URL does not exist.');
-                        // Maybe navigate to 404 here.
-                    }
-                    break;
-                case 'aw-scheda-layout.navigationresponse':
-                    this.dataSource.parseData(payload);
-                    break;
-            }
-        }));
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/search-layout-tabs.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwSearchLayoutTabsEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        // TODO
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/table.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwTableEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        /*
-        this.innerEvents$.subscribe(event => {
-          
-        });
-    
-        this.outerEvents$.subscribe(event => {
-          
-        });
-        */
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/index.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-var EH$1 = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    AwLinkedObjectsEH: AwLinkedObjectsEH,
-    AwAutocompleteWrapperEH: AwAutocompleteWrapperEH,
-    AwBubbleChartEH: AwBubbleChartEH,
-    AwHeroEH: AwHeroEH,
-    AwHomeBubbleChartEH: AwHomeBubbleChartEH,
-    AwHomeFacetsWrapperEH: AwHomeFacetsWrapperEH,
-    AwHomeHeroPatrimonioEH: AwHomeHeroPatrimonioEH,
-    AwHomeItemTagsWrapperEH: AwHomeItemTagsWrapperEH,
-    AwHomeAutocompleteEH: AwHomeAutocompleteEH,
-    AwEntitaNavEH: AwEntitaNavEH,
-    AwSchedaSidebarEH: AwSchedaSidebarEH,
-    AwSidebarHeaderEH: AwSidebarHeaderEH,
-    AwTreeEH: AwTreeEH,
-    AwSearchLayoutTabsEH: AwSearchLayoutTabsEH,
-    AwTableEH: AwTableEH
-});
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/about-layout/about-layout.config.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-const AwAboutLayoutConfig = {
-    layoutId: 'aw-about-layout',
-    widgets: [],
-    layoutDS: AwAboutLayoutDS,
-    layoutEH: AwAboutLayoutEH,
-    widgetsDataSources: DS$1,
-    widgetsEventHandlers: EH$1,
-    layoutOptions: {
-    // TODO
-    }
-};
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/about-layout/about-layout.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwAboutLayoutComponent extends AbstractLayout {
-    constructor() {
-        super(AwAboutLayoutConfig);
-    }
-    /**
-     * @return {?}
-     */
-    ngOnInit() {
-        this.onInit();
-    }
-    /**
-     * @return {?}
-     */
-    ngOnDestroy() {
-        this.onDestroy();
-    }
-}
-AwAboutLayoutComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'aw-about-layout',
-                template: "<div class=\"\" *ngIf=\"lb.dataSource\">\n    About page!\n</div>"
-            }] }
-];
-/** @nocollapse */
-AwAboutLayoutComponent.ctorParameters = () => [];
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaLayoutDS extends LayoutDataSource {
@@ -6773,7 +3978,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaLayoutEH extends EventHandler {
@@ -6965,7 +4169,2397 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.config.ts
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var helpers = {
+    /**
+     * @param {?} key
+     * @param {?=} label
+     * @return {?}
+     */
+    prettifySnakeCase(key, label) {
+        if (label) {
+            return label;
+        }
+        return key.split('_').map((/**
+         * @param {?} word
+         * @param {?} index
+         * @return {?}
+         */
+        (word, index) => index === 0 ? this.ucFirst(word) : word)).join(' ');
+    },
+    /**
+     * @param {?} str
+     * @return {?}
+     */
+    ucFirst(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+};
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+// used for cherry-picking object keys from app-config.json
+class AwLinkedObjectsDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.loadingData = false;
+        this.checkForMore = (/**
+         * @param {?=} force
+         * @return {?}
+         */
+        (force) => {
+            /*
+              Checks if it is possible to load more item previews.
+              Can receive a boolean argument to force the button to be
+              enabled or disabled. (Used while data is loading)
+            */
+            if (!this.loadedData.actions) {
+                // if not using actions, don't check
+                return;
+            }
+            if (typeof force !== 'undefined') {
+                this.loadedData.actions[1].disabled = !force;
+                return;
+            }
+            if (this.loadedData.result.length >= this.totalObjects) {
+                this.loadedData.actions[1].disabled = true;
+            }
+            else {
+                this.loadedData.actions[1].disabled = false;
+            }
+            return;
+        });
+        this.handleIncomingData = (/**
+         * @param {?} incomingData
+         * @return {?}
+         */
+        incomingData => {
+            /*
+              Called by button <Mostra Altri>, adds the incoming
+              data to the linked objects component.
+            */
+            this.currentPage += 1;
+            /** @type {?} */
+            const newData = this.unpackData(incomingData.itemsPagination);
+            this.loadedData.result = this.loadedData.result.concat(newData.result);
+            this.checkForMore();
+            this.loadedData.isLoading = false;
+        });
+        this.addPagination = (/**
+         * @param {?} page
+         * @param {?} totalPages
+         * @param {?} size
+         * @return {?}
+         */
+        (page, totalPages, size) => {
+            /** @type {?} */
+            const sizeOptions = [10, 25, 50];
+            this.loadedData.pagination = {
+                first: { payload: `goto-${1}`, classes: page === 1 ? 'is-disabled' : '' },
+                prev: { payload: `goto-${page / 1 - 1}`, classes: page === 1 ? 'is-disabled' : '' },
+                next: { payload: `goto-${page / 1 + 1}`, classes: page === totalPages ? 'is-disabled' : '' },
+                last: { payload: `goto-${totalPages}`, classes: page === totalPages ? 'is-disabled' : '' },
+                links: this.makePagination(totalPages, page),
+                select: {
+                    label: 'Numero di risultati',
+                    options: sizeOptions.map((/**
+                     * @param {?} o
+                     * @return {?}
+                     */
+                    o => {
+                        return {
+                            text: o,
+                            selected: o === size,
+                        };
+                    })),
+                    payload: 'select-size'
+                },
+            };
+        });
+        this.makePagination = (/**
+         * @param {?} totalPages
+         * @param {?} currentPage
+         * @return {?}
+         */
+        (totalPages, currentPage) => {
+            /*
+                  Called by this.unpackData() when this.options.page is defined.
+                  Returns the data for <n7-pagination> component.
+                */
+            /** @type {?} */
+            const result = [];
+            /** @type {?} */
+            const limit = this.paths.paginationLimit - 1;
+            // always push the first page
+            if (limit) {
+                /** @type {?} */
+                let lastPage;
+                /** @type {?} */
+                let firstPage;
+                if (currentPage > Math.floor(limit / 2)) {
+                    // when currentPage is after half-point
+                    // (example: [ 14 ][ 15 ][!16!][ 17 ][ 18 ])
+                    if (currentPage < (totalPages - Math.floor(limit / 2))) {
+                        lastPage = currentPage / 1 + Math.floor(limit / 2);
+                        firstPage = currentPage / 1 - Math.floor(limit / 2);
+                    }
+                    else {
+                        lastPage = totalPages;
+                        firstPage = currentPage - limit + (totalPages - currentPage);
+                    }
+                }
+                else {
+                    // when currentPage is before half-point
+                    // (example: [ 1 ][!2!][ 3 ][ 4 ][ 5 ])
+                    lastPage = limit + 1;
+                    firstPage = 1;
+                }
+                // console.log({ currentPage, limit, lastPage, firstPage })
+                for (let i = firstPage; i <= lastPage; i++) {
+                    result.push({
+                        text: String(i),
+                        payload: 'page-' + String(i),
+                        classes: currentPage === i ? 'is-active' : ''
+                    });
+                }
+            }
+            else {
+                result.push({
+                    text: '1',
+                    payload: 'page-1',
+                    classes: currentPage === 1 ? 'is-active' : ''
+                });
+                for (let i = 1; i < totalPages; i++) {
+                    result.push({ text: String(i + 1), payload: 'page-' + String(i + 1), classes: currentPage === i + 1 ? 'is-active' : '' });
+                }
+            }
+            return result;
+        });
+        this.unpackData = (/**
+         * @param {?} data
+         * @return {?}
+         */
+        data => {
+            /*
+                  Dynamically returns the data object for each HTML component
+                  data: {
+                    previews: [ breadcrumbs: { items[] }, classes, image, metadata, payload, title ],
+                    pagination: { first, last, links, next, prev, select }
+                  }
+                */
+            /** @type {?} */
+            const config = this.options.config;
+            /** @type {?} */
+            const // app-config.json
+            paths = config.get('item-preview');
+            /** @type {?} */
+            const // item preview dynamic paths
+            totalCount = data.totalCount;
+            /** @type {?} */
+            const // total amount of items available on backend
+            totalPages = this.totalPages;
+            /** @type {?} */
+            const // calculated number of pages
+            page = this.currentPage;
+            /** @type {?} */
+            const // current page (if using pagination)
+            context = this.context;
+            /** @type {?} */
+            const // parent layout name
+            size = this.pageSize;
+            /** @type {?} */
+            const // items per page (if using pagination)
+            labels = config.get('labels');
+            const { dynamicPagination } = this.options;
+            /** @type {?} */
+            const keys = config ? config.get('config-keys') : {};
+            /** @type {?} */
+            let lengthLimit;
+            /** @type {?} */
+            let resultsLimit;
+            /** @type {?} */
+            let d = data.items ? data.items : data.relatedItems;
+            if (config) {
+                // dynamic search for max-item-length
+                if (config.get(context + '-layout')) {
+                    lengthLimit = config.get(context + '-layout')['max-item-length'];
+                    resultsLimit = config.get(context + '-layout')['results-limit'];
+                }
+            }
+            // resize data
+            if (!dynamicPagination && size && page) {
+                d = d.slice(page * size - size, page * size);
+            }
+            else if (size) {
+                d = d.slice(0, size);
+            }
+            /** @type {?} */
+            const result = [];
+            /** @type {?} */
+            const enabledKeys = paths.metadata.info.selection.map((/**
+             * @param {?} info
+             * @return {?}
+             */
+            info => info.key));
+            d.forEach((/**
+             * @param {?} el
+             * @return {?}
+             */
+            el => {
+                /** @type {?} */
+                const item = {
+                    image: get(el, paths.image, el.image),
+                    title: 
+                    // if there is a max string length in config, use it
+                    +paths.title.maxLength && get(el, paths.title, el.item.label).length > +paths.title.maxLength ?
+                        get(el, paths.title, el.item.label).slice(0, +paths.title.maxLength) + '…' :
+                        get(el, paths.title, el.item.label),
+                    text: !paths.text ? null : // make text block (in config) optional
+                        +paths.text.maxLength && get(el, paths.text.data, el.item.text).length > +paths.text.maxLength ?
+                            get(el, paths.text.data, el.item.text).slice(0, +paths.text.maxLength) + '…' :
+                            get(el, paths.text.data, el.item.text),
+                    payload: get(el, paths.payload, el.item.id),
+                    classes: ['entita', 'search'].includes(context) ? 'is-fullwidth' : '',
+                    metadata: [
+                        get(el, paths.metadata.info.data, el.item.fields) ? {
+                            classes: 'n7-objects__metadata-artist',
+                            items: get(el, paths.metadata.info.data, el.item.fields)
+                                .filter((/**
+                             * @param {?} data
+                             * @return {?}
+                             */
+                            data => enabledKeys.indexOf(data.keys) !== -1))
+                                .map((/**
+                             * @param {?} data
+                             * @return {?}
+                             */
+                            data => ({
+                                label: helpers.prettifySnakeCase(data.key, labels[data.key]),
+                                value: data.value
+                            })))
+                        } : {},
+                        {
+                            classes: 'n7-objects__metadata-linked',
+                            items: get(el, paths.metadata.toe.data, el.relatedTypesOfEntity) ?
+                                get(el, paths.metadata.toe.data, el.relatedTypesOfEntity).map((/**
+                                 * @param {?} toe
+                                 * @return {?}
+                                 */
+                                toe => {
+                                    return {
+                                        // persona: 6, Organizz: 12, Luoghi: 2, Concetti: 32
+                                        value: get(toe, paths.metadata.toe.value, toe.count),
+                                        // icon: 'n7-icon-bell' // TODO: link icon to config key
+                                        icon: keys[get(toe, paths.metadata.toe.icon, toe.type).replace(' ', '-')]
+                                            ? keys[get(toe, paths.metadata.toe.icon, toe.type).replace(' ', '-')].icon
+                                            : '',
+                                        classes: 'color-' + get(toe, paths.metadata.toe.icon, toe.type).replace(' ', '-')
+                                    };
+                                })) : null
+                        }
+                    ]
+                };
+                if (get(el, paths.metadata.breadcrumbs.data, el.breadcrumbs)) {
+                    item['breadcrumbs'] = {
+                        // n7-breadcrumbs uses this as it's own data
+                        items: get(el, paths.metadata.breadcrumbs.data, el.breadcrumbs).map((/**
+                         * @param {?} crumb
+                         * @return {?}
+                         */
+                        crumb => {
+                            return {
+                                label: get(crumb, paths.metadata.breadcrumbs.label, crumb.label),
+                                payload: get(crumb, paths.metadata.breadcrumbs.payload, crumb.link),
+                            };
+                        }))
+                    };
+                }
+                result.push(item);
+            }));
+            if (context === 'home') {
+                /** @type {?} */
+                const actions = [
+                    {
+                        label: 'Mostra Tutti (' + totalCount + ')'
+                    },
+                    lengthLimit ?
+                        {
+                            label: 'Mostra Altri (' + resultsLimit + ')',
+                            disabled: false,
+                        } : null,
+                ];
+                return {
+                    result,
+                    actions,
+                    isLoading: false,
+                };
+            }
+            return { previews: result };
+        });
+    }
+    // use dynamic object paths from config
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        this.paths = this.options.config.get('item-preview');
+        this.pageSize = this.options.size;
+        this.totalObjects = data.totalCount;
+        this.currentPage = this.options.page ? (/** @type {?} */ (this.options.page)) : 1;
+        if (this.options.dynamicPagination && this.options.dynamicPagination.total) {
+            this.totalPages = Math.ceil(this.options.dynamicPagination.total / this.pageSize);
+        }
+        else if (data.items) {
+            this.totalPages = Math.ceil(data.items.length / this.pageSize);
+        }
+        else if (data.relatedItems) {
+            this.totalPages = Math.ceil(data.relatedItems.length / this.pageSize);
+        }
+        this.context = this.options.context;
+        this.loadedData = this.unpackData(data);
+        if (this.options.pagination) {
+            this.addPagination(this.currentPage, this.totalPages, this.pageSize);
+        }
+        this.checkForMore(); // checks if <Show More> button should be enabled
+        this.loadedData.loaderData = {};
+        return this.loadedData;
+    }
+}
+if (false) {
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.currentPage;
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.totalPages;
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.totalObjects;
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.pageSize;
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.context;
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.loadedData;
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.loadingData;
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.paths;
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.checkForMore;
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.handleIncomingData;
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.addPagination;
+    /** @type {?} */
+    AwLinkedObjectsDS.prototype.makePagination;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwLinkedObjectsDS.prototype.unpackData;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwAutocompleteWrapperDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        const { key, response } = data;
+        /** @type {?} */
+        const regex = new RegExp('(.*?)' + key + '(.*)', 'i') // 'i' = case insensitive
+        ;
+        // 'i' = case insensitive
+        /** @type {?} */
+        const suggestion = [];
+        /** @type {?} */
+        const config = this.options.config;
+        /** @type {?} */
+        const maxLength = config.get('home-layout')['max-item-length'] / 2;
+        /** @type {?} */
+        const fResults = response.results.filter((/**
+         * @param {?} el
+         * @return {?}
+         */
+        el => typeof el.entity == 'object'));
+        fResults.forEach((/**
+         * @param {?} el
+         * @return {?}
+         */
+        el => {
+            if (el.entity.id == 'fallback') { // build and return fallback data
+                suggestion.push({
+                    match: '',
+                    payload: 'fallback-simple-autocomplete',
+                    prefix: el.entity.label,
+                    suffix: ''
+                });
+                return { suggestion };
+            }
+            // divide prefix and suffix
+            /** @type {?} */
+            let match = regex.exec(el.entity.label);
+            if (match) {
+                /** @type {?} */
+                let prefix = match[1];
+                /** @type {?} */
+                let suffix = match[2]
+                // string manipulation
+                ;
+                // string manipulation
+                if (maxLength && (prefix.length > maxLength)) {
+                    prefix = '...' + prefix.slice(prefix.length - maxLength, prefix.length);
+                }
+                if (maxLength && (suffix.length > maxLength)) {
+                    suffix = suffix.slice(0, maxLength) + '...';
+                }
+                suggestion.push({
+                    match: match.input.slice(match[1].length, match[1].length + key.length),
+                    prefix,
+                    suffix,
+                    payload: el.entity.id
+                });
+            }
+        }));
+        return { suggestion };
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+// import tippy from 'tippy.js/dist/tippy-bundle.esm';
+class AwBubbleChartDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.chartData = []; // data rendered into the graph
+        // data rendered into the graph
+        this.draw = null; // exposed component draw function to update the view
+        // exposed component draw function to update the view
+        this.selected = []; // list of selected bubbles
+        // list of selected bubbles
+        this.filters = []; // list of active filters to show only some TypeOfEntity(s)
+        // list of active filters to show only some TypeOfEntity(s)
+        this.closedEyes = [];
+        this.tippyList = []; // list of tippy instances
+        this.updateChart = (/**
+         * @param {?} res
+         * @return {?}
+         */
+        res => {
+            /*
+              Redraws the graph with the incoming data.
+              "res" should be Apollo's "response.entitiesData"
+            */
+            if (res) {
+                this.chartData = res;
+            }
+            else if (res === null) {
+                res = this.chartData;
+            }
+            if (this.filters.length > 0) { // apply filters to the response before redrawing the graph
+                res = this.chartData.filter((/**
+                 * @param {?} el
+                 * @return {?}
+                 */
+                el => !this.filters.includes(el.entity.typeOfEntity.replace(/ /g, '-'))));
+            }
+            if (!this.draw) {
+                this.update(res); // component self-update
+            }
+            else {
+                this.output.data = res;
+                this.output.selected = this.selected;
+                this.draw();
+            }
+        });
+        this.handleBubbleClick = (/**
+         * @param {?} payload
+         * @return {?}
+         */
+        payload => {
+            /*
+                  Toggles the selection of the clicked bubble.
+                */
+            /** @type {?} */
+            const id = payload;
+            if (this.selected.includes(id)) {
+                this.selected.splice(this.selected.indexOf(id), 1); // remove selection
+            }
+            else {
+                this.selected.push(id); // add selection
+            }
+        });
+        this.tippyMaker = (/**
+         * @param {?} bubbles
+         * @return {?}
+         */
+        bubbles => {
+            // flush existing tooltips
+            this.tippyList.forEach((/**
+             * @param {?} t
+             * @return {?}
+             */
+            t => { if (t) {
+                t.destroy();
+            } }));
+            this.tippyList = [];
+            /** @type {?} */
+            const buildTooltip = (/**
+             * @param {?} bubble
+             * @return {?}
+             */
+            bubble => {
+                /** @type {?} */
+                let element = document.getElementsByClassName('bubble-chart__tippy-template')[0];
+                element.getElementsByClassName('aw-bubble-popup-menu__text')[0].innerHTML =
+                    `È collegato a ${bubble.count} entità`;
+                element.getElementsByClassName('aw-bubble-popup-menu__title')[0].innerHTML =
+                    `${bubble.entity.label}`;
+                /** @type {?} */
+                let toggleBubbleText = this.selected.includes(bubble.entity.id) ? `Deseleziona` : `Seleziona`;
+                element.getElementsByClassName('aw-bubble-popup-menu__link')[1].innerHTML = toggleBubbleText;
+                return element.innerHTML;
+            });
+            /** @type {?} */
+            const focusBubble = (/**
+             * @param {?} id
+             * @return {?}
+             */
+            id => {
+                this.focusedBubble = id;
+            });
+            if (this.filters.length > 0) { // apply filters to the data before adding tooltips
+                bubbles = bubbles.filter((/**
+                 * @param {?} el
+                 * @return {?}
+                 */
+                el => !this.filters.includes(el.entity.typeOfEntity.replace(/ /g, '-'))));
+            }
+            // make new tooltips
+            bubbles.forEach((/**
+             * @param {?} b
+             * @return {?}
+             */
+            b => {
+                /** @type {?} */
+                let el = document.getElementById(b.entity.id).parentElement // selects a <g> element
+                ;
+                this.tippyList.push(// add this tippy to the array of instances
+                tippy(el, {
+                    content: buildTooltip(b),
+                    interactive: true,
+                    appendTo: document.body,
+                    // suppress interactive warning
+                    arrow: true,
+                    flip: false,
+                    theme: 'light-border no-padding',
+                    placement: 'top',
+                    delay: [150, 30],
+                    updateDuration: 400,
+                    /**
+                     * @return {?}
+                     */
+                    onMount() {
+                        focusBubble(b.entity.id);
+                    }
+                }));
+            }));
+            // createSingleton(this.tippyList, {
+            //   interactive: true,
+            //   appendTo: document.body, // suppress interactive warning
+            //   arrow: true,
+            //   flip: false,
+            //   theme: 'light-border no-padding',
+            //   placement: 'top',
+            //   delay: [150, 30],
+            //   updateDuration: 400,
+            // onTrigger(ref) {
+            //   console.log({ref})
+            //   console.log('fired')
+            // }
+            // })
+        });
+    }
+    // id of the focused bubble
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        if (data.response && data.response.entitiesData) {
+            this.chartData = data.response.entitiesData;
+        }
+        return {
+            containerId: 'bubbleChartContainer',
+            width: 500,
+            height: 500,
+            transition: 750,
+            sizeRange: [.5, 500],
+            selected: this.selected,
+            colorMatch: {
+                domain: ['persona', 'luogo', 'organizzazione', 'cosa notevole'],
+                range: ['#4d8df3', '#f2d04c', '#c99245', '#6cb286']
+            },
+            data: this.chartData,
+            setDraw: (/**
+             * @param {?} draw
+             * @return {?}
+             */
+            draw => this.draw = draw)
+        };
+    }
+}
+if (false) {
+    /** @type {?} */
+    AwBubbleChartDS.prototype.chartData;
+    /** @type {?} */
+    AwBubbleChartDS.prototype.draw;
+    /** @type {?} */
+    AwBubbleChartDS.prototype.selected;
+    /** @type {?} */
+    AwBubbleChartDS.prototype.filters;
+    /** @type {?} */
+    AwBubbleChartDS.prototype.closedEyes;
+    /** @type {?} */
+    AwBubbleChartDS.prototype.tippyList;
+    /** @type {?} */
+    AwBubbleChartDS.prototype.focusedBubble;
+    /** @type {?} */
+    AwBubbleChartDS.prototype.updateChart;
+    /** @type {?} */
+    AwBubbleChartDS.prototype.handleBubbleClick;
+    /** @type {?} */
+    AwBubbleChartDS.prototype.tippyMaker;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwHeroDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        const { title, text, button, backgroundImage, input } = data;
+        return {
+            title,
+            text,
+            backgroundImage,
+            button: {
+                text: button.text,
+                payload: "cerca"
+            },
+            input: {
+                placeholder: input.placeholder,
+                payload: "cerca-in-maxxi"
+            }
+        };
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwTableDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        return TABLE_MOCK;
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwHomeHeroPatrimonioDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        const { title, backgroundImage, image, text, button } = data;
+        return {
+            title,
+            backgroundImage,
+            image,
+            text,
+            button: {
+                text: button.text,
+                payload: "naviga-patrimonio"
+            }
+        };
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwHomeFacetsWrapperDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.autoComplete = {}; // autocomplete data for each facet
+        // autocomplete data for each facet
+        this.lockedFacets = {}; // locked means that the eye cannot be closed
+        // locked means that the eye cannot be closed
+        this.lastData = {}; // store the last response so the component can be rendered again with the same data
+        // store the last response so the component can be rendered again with the same data
+        this.closedEyes = []; // list of closed eyes
+        this.tippyMaker = (/**
+         * @param {?} res
+         * @param {?} id
+         * @return {?}
+         */
+        (res, id) => {
+            /*
+              Builds or updates Tippy for the input in use (id)
+            */
+            id = id.replace(/ /g, '-');
+            // create data for this facet
+            if (!this.autoComplete[id]) {
+                this.autoComplete[id] = {
+                    tippy: undefined,
+                    // tippy data / config
+                    open: true // show or hide tippy
+                };
+                /** @type {?} */
+                const ac = this.autoComplete[id];
+                /** @type {?} */
+                const getContent = (/**
+                 * @return {?}
+                 */
+                () => {
+                    /** @type {?} */
+                    const contentNode = document.getElementsByClassName('aw-simple-autocomplete__template')[0];
+                    contentNode.setAttribute('style', 'display: block');
+                    return contentNode;
+                });
+                if (!ac.tippy) {
+                    /** @type {?} */
+                    const target = document.getElementsByClassName(id)[1];
+                    ac.tippy = tippy(target, {
+                        content: getContent(),
+                        trigger: 'manual',
+                        interactive: true,
+                        arrow: false,
+                        flip: false,
+                        appendTo: 'parent',
+                        theme: 'light-border aw-home__facet-tippy',
+                        placement: 'bottom-start',
+                        maxWidth: '100%',
+                    }); // attach tippy to input type text
+                }
+            }
+            /** @type {?} */
+            const ac = this.autoComplete[id];
+            if (res.results.length > 0 && ac.tippy) {
+                ac.tippy.show();
+            }
+            else {
+                ac.tippy.hide();
+            }
+        });
+    }
+    // list of closed eyes
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        this.lastData = data;
+        /** @type {?} */
+        const headers = [];
+        /** @type {?} */
+        const inputs = [];
+        /** @type {?} */
+        const facetData = data;
+        /** @type {?} */
+        const lockedFacets = this.lockedFacets // locked means that the eye cannot be closed
+        ;
+        // locked means that the eye cannot be closed
+        /** @type {?} */
+        const closedEyes = this.closedEyes // list of closed eyes
+        // when facet data changes, destroy every tippy and reset autocomplete data.
+        ;
+        // when facet data changes, destroy every tippy and reset autocomplete data.
+        Object.keys(this.autoComplete).forEach((/**
+         * @param {?} id
+         * @return {?}
+         */
+        id => {
+            if (this.autoComplete[id] && this.autoComplete[id].tippy) {
+                this.autoComplete[id].tippy.destroy(); // destroy
+            }
+        }));
+        this.autoComplete = {}; // reset data
+        facetData.forEach((/**
+         * @param {?} facet
+         * @return {?}
+         */
+        facet => {
+            /*
+             For each facet on back-end, push a header-component
+             and a facet-component (search input only) to each array.
+            */
+            if (Object.keys(lockedFacets).length) { // check if bubble chart wants to lock this facet
+                if (lockedFacets[facet.type] && lockedFacets[facet.type].length > 0) {
+                    // if bubble chart say lock this facet, lock it
+                    facet.locked = true;
+                }
+                else {
+                    facet.locked = false;
+                }
+            }
+            if (closedEyes) {
+                if (closedEyes.includes(facet.type.replace(/ /g, '-'))) { // check if the eyes are open
+                    facet.enabled = false;
+                }
+                else {
+                    facet.enabled = true;
+                    if (facetData.length == closedEyes.length + 1) { // if there is only 1 eye open, lock it
+                        facet.locked = true;
+                    }
+                }
+            }
+            /** @type {?} */
+            const headerClasses = [];
+            /** @type {?} */
+            const iconClasses = [facet.icon];
+            if (!facet.enabled) {
+                headerClasses.push('is-disabled');
+            }
+            if (facet.configKey) {
+                headerClasses.push(`color-${facet.configKey}`);
+                iconClasses.push(`color-${facet.configKey}`);
+            }
+            // make array of headers data
+            headers.push({
+                iconLeft: iconClasses.join(' '),
+                text: facet.label,
+                additionalText: facet.count,
+                iconRight: facet.enabled ? 'n7-icon-eye' : 'n7-icon-eye-slash',
+                classes: headerClasses.join(' ') +
+                    (facet.locked
+                        ? ' is-blocked'
+                        : // if every other facet is disabled → Lock this facet
+                            facetData.every((/**
+                             * @param {?} f
+                             * @return {?}
+                             */
+                            f => {
+                                return !f.enabled || f.type === facet.type;
+                            }))
+                                ? ' is-blocked'
+                                : ' not-blocked'),
+                payload: facet.locked ? null : facet.type.replace(/ /g, '-')
+            });
+            // make array of inputs data
+            inputs.push({
+                sections: [
+                    {
+                        inputs: [
+                            {
+                                type: 'text',
+                                placeholder: facet['input-placeholder'],
+                                icon: 'n7-icon-search',
+                                disabled: !facet.enabled,
+                                inputPayload: String(facet.type) + '-search',
+                                iconPayload: String(facet.type) + '-search',
+                                enterPayload: String(facet.type) + '-search',
+                                classes: String(facet.type.replace(' ', '-')) + '-search'
+                            }
+                        ]
+                    }
+                ]
+            });
+        }));
+        // zipping arrays to render widgets with separate data (see home-layout.html)
+        /** @type {?} */
+        const widgetData = [];
+        headers.map((/**
+         * @param {?} h
+         * @param {?} i
+         * @return {?}
+         */
+        (h, i) => {
+            widgetData.push({ header: h, input: inputs[i] });
+        }));
+        return widgetData;
+    }
+}
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwHomeFacetsWrapperDS.prototype.autoComplete;
+    /** @type {?} */
+    AwHomeFacetsWrapperDS.prototype.lockedFacets;
+    /** @type {?} */
+    AwHomeFacetsWrapperDS.prototype.lastData;
+    /** @type {?} */
+    AwHomeFacetsWrapperDS.prototype.closedEyes;
+    /** @type {?} */
+    AwHomeFacetsWrapperDS.prototype.tippyMaker;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwHomeItemTagsWrapperDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        return data;
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwHomeAutocompleteDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        const { results, totalCount } = data;
+        const { config } = this.options;
+        /** @type {?} */
+        const labels = this.options.labels || {};
+        /** @type {?} */
+        const itemIds = [];
+        /** @type {?} */
+        const groups = {};
+        results.forEach((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ item, entity }) => {
+            /** @type {?} */
+            const groupId = entity ? entity.typeOfEntity.replace(' ', '-') : 'oggetto-culturale';
+            /** @type {?} */
+            const groupConfig = config[groupId];
+            /** @type {?} */
+            const mainMetadata = groupConfig['main-metadata'];
+            /** @type {?} */
+            const currentItem = item || entity;
+            if (!groups[groupId]) {
+                const { label, icon } = groupConfig;
+                groups[groupId] = {
+                    title: label,
+                    icon,
+                    classes: `color-${groupId}`,
+                    items: []
+                };
+            }
+            if (itemIds.indexOf(currentItem.id) === -1) {
+                /** @type {?} */
+                const metadata = [];
+                if (currentItem.fields) {
+                    currentItem.fields.forEach((/**
+                     * @param {?} __0
+                     * @return {?}
+                     */
+                    ({ key, value }) => {
+                        if (mainMetadata && key === mainMetadata) {
+                            metadata.push({ key: helpers.prettifySnakeCase(key, labels[key]), value });
+                        }
+                    }));
+                }
+                groups[groupId].items.push({
+                    title: currentItem.label,
+                    metadata,
+                    payload: {
+                        source: 'item',
+                        id: currentItem.id
+                    }
+                });
+            }
+        }));
+        return {
+            results: Object.keys(groups).map((/**
+             * @param {?} key
+             * @return {?}
+             */
+            key => ({
+                group: {
+                    title: groups[key].title,
+                    icon: groups[key].icon,
+                    classes: groups[key].classes
+                },
+                items: groups[key].items
+            }))),
+            actions: {
+                showMore: {
+                    text: `Visualizza tutti i ${totalCount} risultati`,
+                    payload: {
+                        source: 'showMore'
+                    }
+                }
+            },
+            fallback: 'Spiacenti, non è stato trovato nessun risultato. <br> Riprova con una nuova ricerca.'
+        };
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwEntitaNavDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} param
+     * @return {?}
+     */
+    transform(param) {
+        if (!param)
+            return;
+        /** @type {?} */
+        const data = param.data;
+        /** @type {?} */
+        const selected = param.selected;
+        /** @type {?} */
+        const navigation = { items: [], payload: 'entita-nav' };
+        navigation.items.push({
+            text: 'OVERVIEW',
+            payload: 'overview',
+            classes: selected == 'overview' ? 'is-selected' : ''
+        });
+        if (data.fields && data.fields.length > 0) {
+            navigation.items.push({
+                text: 'CAMPI',
+                payload: 'campi',
+                classes: selected == 'campi' ? 'is-selected' : ''
+            });
+        }
+        if (data.relatedItems) {
+            navigation.items.push({
+                text: 'OGGETTI-COLLEGATI',
+                payload: 'oggetti-collegati',
+                classes: selected == 'oggetti-collegati' ? 'is-selected' : ''
+            });
+        }
+        if (data.relatedEntities && this.options['bubblesEnabled']) {
+            navigation.items.push({
+                text: 'ENTITÀ COLLEGATE',
+                payload: 'entita-collegate',
+                classes: selected == 'entita-collegate' ? 'is-selected' : ''
+            });
+        }
+        if (data.extraTab) {
+            navigation.items.push({
+                text: 'MAXXI',
+                payload: 'maxxi',
+                classes: selected == 'maxxi' ? 'is-selected' : ''
+            });
+        }
+        if (data.wikiTab) {
+            navigation.items.push({
+                text: 'WIKIPEDIA',
+                payload: 'wiki',
+                classes: selected == 'wiki' ? 'is-selected' : ''
+            });
+        }
+        return navigation;
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwEntitaMetadataViewerDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        /*
+          Access and use this.options if the rendering
+          changes based on context.
+        */
+        /*
+              Access and use this.options if the rendering
+              changes based on context.
+            */
+        let { labels } = this.options;
+        labels = labels || {};
+        /** @type {?} */
+        const unpackedData = AwEntitaMetadataViewerDS.unpackFields(data);
+        // prettify labels
+        unpackedData.forEach((/**
+         * @param {?} section
+         * @return {?}
+         */
+        section => {
+            section.items
+                .filter((/**
+             * @param {?} item
+             * @return {?}
+             */
+            item => item.label))
+                .forEach((/**
+             * @param {?} item
+             * @return {?}
+             */
+            item => item.label = helpers.prettifySnakeCase(item.label, labels[item.label])));
+        }));
+        return {
+            group: unpackedData
+        };
+    }
+    // tslint:disable-next-line: member-ordering
+    /**
+     * @param {?} fields
+     * @return {?}
+     */
+    static unpackFields(fields) {
+        /*
+              Recursive unpacking for rendering res.fields
+              - - -
+              This function transforms the response object tree
+              into an array, usable by metadata-viewer-component
+            */
+        /** @type {?} */
+        let extracted = [];
+        // if the server returns an array of key-value tuples
+        if (fields instanceof Array) {
+            extracted = fields.map((/**
+             * @param {?} el
+             * @return {?}
+             */
+            el => {
+                return { label: el.key, value: el.value };
+            }));
+            return [{ items: extracted }];
+        }
+        if (!fields) {
+            return [];
+        } // if is empty → quit
+        for (let i = 0; i < fields.length; i++) {
+            /** @type {?} */
+            const thisField = fields[i];
+            // rename current field
+            /** @type {?} */
+            const title = thisField.label;
+            // field title
+            /** @type {?} */
+            const label = thisField.key;
+            // item label
+            /** @type {?} */
+            const value = thisField.value;
+            // item value
+            /** @type {?} */
+            const group = thisField.fields;
+            // child group
+            /** @type {?} */
+            const temp = {};
+            if (title) {
+                // if there is a title, use it
+                temp.title = title;
+            }
+            if (label && value) {
+                // if there are a lable and value, use them
+                temp.label = label;
+                temp.value = value;
+            }
+            if (group) {
+                // if there is a child group
+                if (group[0].key) {
+                    // if this group has a tuple of (label, value)
+                    temp.items = AwEntitaMetadataViewerDS.unpackFields(group); // make items array
+                }
+                else {
+                    temp.group = AwEntitaMetadataViewerDS.unpackFields(group); // make child group array
+                }
+            }
+            extracted.push(temp); // add this object to the new array
+        }
+        return extracted;
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwTreeDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        this.icons = this.options.icons;
+        return data;
+    }
+    /**
+     * @param {?} data
+     * @param {?} parents
+     * @param {?} id
+     * @return {?}
+     */
+    updateTree(data, parents, id) {
+        /** @type {?} */
+        const tree = this.updateTreeData(data, parents, id);
+        this.update(tree);
+    }
+    /**
+     * @private
+     * @param {?} data
+     * @param {?} parents
+     * @param {?} id
+     * @return {?}
+     */
+    updateTreeData(data, parents, id) {
+        if (!data) {
+            data = this.output;
+        }
+        data.items.forEach((/**
+         * @param {?} it
+         * @return {?}
+         */
+        (it) => {
+            /** @type {?} */
+            const classes = it['classes'];
+            if (it['_meta'] == id) {
+                if (classes && classes.indexOf('is-expanded') > -1) {
+                    it['classes'] = classes.replace(/is-expanded/g, 'is-collapsed');
+                    if (it['toggle']) {
+                        it['toggle']['icon'] = 'n7-icon-angle-right';
+                    }
+                }
+                else {
+                    it['classes'] = classes.replace(/is-collapsed/g, 'is-expanded');
+                    if (it['toggle']) {
+                        it['toggle']['icon'] = 'n7-icon-angle-down';
+                    }
+                }
+            }
+            else if (parents && parents.indexOf(it['_meta']) >= 0) {
+                it['classes'] = classes.replace(/is-collapsed/g, 'is-expanded');
+                if (it['toggle']) {
+                    it['toggle']['icon'] = 'n7-icon-angle-down';
+                }
+            }
+            if (typeof it['items'] != 'undefined' && it['items'].length > 0) {
+                this.updateTreeData(it, parents, id);
+            }
+        }));
+        return data;
+    }
+    /**
+     * @param {?} id
+     * @param {?} data
+     * @return {?}
+     */
+    selectTreeItem(id, data) {
+        if (!data) {
+            data = this.output;
+        }
+        if (this.currentItem && this.currentItem["_meta"] == id) {
+            return;
+        }
+        data.items.forEach((/**
+         * @param {?} it
+         * @return {?}
+         */
+        (it) => {
+            if (it['_meta'] == id && it['classes'].indexOf('is-active') < 0) {
+                it['classes'] = it['classes'] + ' is-active';
+                this.currentItem = it;
+            }
+            else {
+                /** @type {?} */
+                const classes = it['classes'];
+                it['classes'] = classes.replace("is-active", "");
+            }
+            if (typeof it['items'] != "undefined" && it['items'].length > 0) {
+                this.selectTreeItem(id, it);
+            }
+        }));
+        this.update(data);
+    }
+    /**
+     * @return {?}
+     */
+    toggleSidebar() {
+        /** @type {?} */
+        let sidebarData = this.output;
+        if (sidebarData.classes == "is-expanded") {
+            sidebarData.classes = "is-collapsed";
+        }
+        else {
+            sidebarData.classes = "is-expanded";
+        }
+        this.update(sidebarData);
+    }
+    /**
+     * @param {?} response
+     * @return {?}
+     */
+    parseData(response) {
+        /** @type {?} */
+        let treeObj = {
+            items: []
+        };
+        /** @type {?} */
+        var data = response['tree'];
+        if (data['branches'] && data['branches'].length > 0) {
+            data['branches'].forEach((/**
+             * @param {?} item
+             * @return {?}
+             */
+            item => {
+                treeObj['items'].push(this.parseTree(item, false, []));
+            }));
+        }
+        this.update(treeObj);
+        if (response['currentItem'] == response['currentItem'] != null) {
+            //this.currentItem = response['currentItem'];
+            this.selectTreeItem(response['currentItem'], null);
+            this.updateTree(null, this.currentItem.parents, response['currentItem']);
+        }
+    }
+    /**
+     * @private
+     * @param {?} data
+     * @param {?} toggle
+     * @param {?} parents
+     * @return {?}
+     */
+    parseTree(data, toggle, parents) {
+        /** @type {?} */
+        var currParents = [...parents];
+        /** @type {?} */
+        let treeItem = {};
+        /** @type {?} */
+        const showToggle = toggle && data['branches'] != null && data['branches'].length > 0;
+        if (showToggle) {
+            treeItem['toggle'] = {
+                icon: 'n7-icon-angle-right',
+                payload: {
+                    source: "toggle",
+                    id: data['id'],
+                    parents: currParents,
+                }
+            };
+        }
+        Object.keys(data).forEach((/**
+         * @param {?} key
+         * @return {?}
+         */
+        key => {
+            if (key != "branches") {
+                switch (key) {
+                    case "label":
+                        treeItem['text'] = data[key];
+                        break;
+                    case "img":
+                        treeItem['img'] = data[key];
+                        break;
+                    case "icon":
+                        if (showToggle && data[key] != null) {
+                            treeItem['toggle']['icon'] = data[key];
+                        }
+                        else {
+                            treeItem['icon'] = data[key];
+                        }
+                        break;
+                    case "id":
+                        treeItem['_meta'] = data[key];
+                        treeItem['payload'] = {
+                            source: "menuItem",
+                            id: data['id']
+                        };
+                        break;
+                    default:
+                        data[key];
+                        break;
+                }
+                treeItem['classes'] = 'is-collapsed';
+                treeItem['parents'] = currParents;
+            }
+            else if (data['branches'] != null) {
+                currParents.push(data['id']);
+                /*Handle cases with menu item with children but without toggle*/
+                if (!toggle) {
+                    treeItem['payload']['source'] = "ToggleMenuItem";
+                    treeItem['payload']['parents'] = currParents;
+                }
+                treeItem['items'] = [];
+                data[key].forEach((/**
+                 * @param {?} item
+                 * @return {?}
+                 */
+                item => {
+                    if (item['img'] != "" && item['img'] != null) {
+                        treeItem['iconright'] = "n7-icon-images";
+                    }
+                    treeItem['items'].push(this.parseTree(item, true, currParents));
+                }));
+            }
+        }));
+        return treeItem;
+    }
+}
+if (false) {
+    /** @type {?} */
+    AwTreeDS.prototype.currentItem;
+    /** @type {?} */
+    AwTreeDS.prototype.icons;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwSidebarHeaderDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        return data;
+    }
+    /**
+     * @return {?}
+     */
+    toggleSidebar() {
+        /** @type {?} */
+        let sidebarData = this.output;
+        if (sidebarData.classes == 'is-expanded') {
+            sidebarData.classes = 'is-collapsed';
+            sidebarData.iconRight = 'n7-icon-tree-icon';
+        }
+        else {
+            sidebarData.classes = 'is-expanded';
+            sidebarData.iconRight = 'n7-icon-angle-left';
+        }
+        this.update(sidebarData);
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwSchedaBreadcrumbsDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        return data;
+    }
+    /**
+     * @return {?}
+     */
+    toggleSidebar() {
+        /** @type {?} */
+        let sidebarData = this.output;
+        if (sidebarData.classes == "is-expanded") {
+            sidebarData.classes = "is-collapsed";
+        }
+        else {
+            sidebarData.classes = "is-expanded";
+        }
+        this.update(sidebarData);
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwSchedaMetadataDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        let { labels } = this.options;
+        labels = labels || {};
+        /** @type {?} */
+        let group = { group: [] };
+        if (data.fields) {
+            data.fields.forEach((/**
+             * @param {?} field
+             * @return {?}
+             */
+            field => {
+                /** @type {?} */
+                let items = [];
+                if (field.fields) {
+                    field.fields.forEach((/**
+                     * @param {?} item
+                     * @return {?}
+                     */
+                    item => {
+                        items.push({ label: helpers.prettifySnakeCase(item.key, labels[item.key]), value: item.value });
+                    }));
+                    group.group.push({
+                        title: field.label,
+                        items: items
+                    });
+                }
+                else {
+                    items.push({ label: helpers.prettifySnakeCase(field.key, labels[field.key]), value: field.value });
+                    group.group.push({
+                        items: items
+                    });
+                }
+            }));
+        }
+        return group;
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwSchedaImageDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        return data;
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwSchedaInnerTitleDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        return data;
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwSearchLayoutTabsDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.selected = 'list';
+    }
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        return {
+            items: [{
+                    text: 'LISTA',
+                    payload: 'list',
+                    classes: this.selected === 'list' ? 'is-selected' : ''
+                }, {
+                    text: 'GRAFICO',
+                    payload: 'chart',
+                    classes: this.selected === 'chart' ? 'is-selected' : ''
+                }, {
+                    text: 'TIMELINE',
+                    payload: 'timeline',
+                    classes: this.selected === 'timeline' ? 'is-selected' : ''
+                }]
+        };
+    }
+    /**
+     * @param {?} tabId
+     * @return {?}
+     */
+    setSelected(tabId) {
+        this.selected = tabId;
+    }
+}
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutTabsDS.prototype.selected;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+
+var DS$1 = /*#__PURE__*/Object.freeze({
+    AwLinkedObjectsDS: AwLinkedObjectsDS,
+    AwAutocompleteWrapperDS: AwAutocompleteWrapperDS,
+    AwBubbleChartDS: AwBubbleChartDS,
+    AwHeroDS: AwHeroDS,
+    AwTableDS: AwTableDS,
+    AwHomeHeroPatrimonioDS: AwHomeHeroPatrimonioDS,
+    AwHomeFacetsWrapperDS: AwHomeFacetsWrapperDS,
+    AwHomeItemTagsWrapperDS: AwHomeItemTagsWrapperDS,
+    AwHomeAutocompleteDS: AwHomeAutocompleteDS,
+    AwEntitaNavDS: AwEntitaNavDS,
+    AwEntitaMetadataViewerDS: AwEntitaMetadataViewerDS,
+    AwTreeDS: AwTreeDS,
+    AwSidebarHeaderDS: AwSidebarHeaderDS,
+    AwSchedaBreadcrumbsDS: AwSchedaBreadcrumbsDS,
+    AwSchedaMetadataDS: AwSchedaMetadataDS,
+    AwSchedaImageDS: AwSchedaImageDS,
+    AwSchedaInnerTitleDS: AwSchedaInnerTitleDS,
+    AwSearchLayoutTabsDS: AwSearchLayoutTabsDS
+});
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwLinkedObjectsEH extends EventHandler {
+    constructor() {
+        super(...arguments);
+        this.handleScroll = (/**
+         * @param {?} target
+         * @return {?}
+         */
+        target => {
+            const { totalObjects, loadedData } = this.dataSource;
+            /** @type {?} */
+            const loadedTotal = Array.isArray(loadedData.result) ? loadedData.result.length : 0;
+            if (loadedTotal >= totalObjects) {
+                return;
+            }
+            /*
+              Check if the target element is scrolled near the end while data is not already loading.
+              If the condition is met, a request for more data is sent.
+            */
+            if (target.scrollTop + target.clientHeight >= target.scrollHeight - 150 && this.dataSource.loadedData.isLoading == false) {
+                this.dataSource.loadedData.isLoading = true;
+                this.emitOuter('datarequest', {
+                    currentPage: this.dataSource.currentPage
+                });
+            }
+        });
+    }
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-linked-objects.click':
+                    if (payload.startsWith('page')) {
+                        // pagination routing is handled by the parent layout
+                        this.emitOuter('pagination', payload);
+                    }
+                    else if (payload.startsWith('goto')) {
+                        /** @type {?} */
+                        let targetPage = Number(payload.replace('goto-', ''))
+                        // kill impossible page navigations
+                        ;
+                        // kill impossible page navigations
+                        if (targetPage > this.dataSource.totalPages)
+                            return;
+                        else if (targetPage < 1 || targetPage === this.dataSource.currentPage)
+                            return;
+                        else
+                            this.emitOuter('goto', payload);
+                    }
+                    else {
+                        this.emitOuter('click', payload);
+                    }
+                    break;
+                case 'aw-linked-objects.change': // changed page size value (pagination)
+                    this.emitOuter('change', +payload.value);
+                    break;
+                default:
+                    console.warn('unhandled event type: ', type, ' with payload: ', payload);
+                    break;
+            }
+        }));
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-home-layout.viewmore':
+                    // ask home-layout for more data
+                    this.dataSource.checkForMore(false);
+                    this.emitOuter('datarequest', {
+                        currentPage: this.dataSource.currentPage
+                    });
+                    break;
+                case 'aw-home-layout.dataresponse':
+                    // handle incoming data from home-layout
+                    let { res } = payload;
+                    this.dataSource.handleIncomingData(res);
+                case 'aw-home-layout.scroll':
+                    this.handleScroll(payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
+    }
+}
+if (false) {
+    /** @type {?} */
+    AwLinkedObjectsEH.prototype.handleScroll;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwAutocompleteWrapperEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-autocomplete-wrapper.click':
+                    if (payload != 'fallback-simple-autocomplete') { // if this is the fallback item, kill the event.
+                        this.emitOuter('clickresult', payload);
+                    }
+                    break;
+                default:
+                    console.warn('unhandled event of type:', type);
+                    break;
+            }
+        }));
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwBubbleChartEH extends EventHandler {
+    constructor() {
+        super(...arguments);
+        this.toggleSelection = (/**
+         * @param {?} id
+         * @return {?}
+         */
+        id => {
+            /*
+              Expects the ID of a bubble.
+              Updates the graph with a new request
+            */
+            this.dataSource.handleBubbleClick(id);
+            this.emitOuter('selection', this.dataSource.selected);
+        });
+        this.toggleFilter = (/**
+         * @param {?} f
+         * @return {?}
+         */
+        f => {
+            /*
+              Toggle the clicked filter in the filteres array and
+              redraw the graph.
+            */
+            if (this.dataSource.filters.includes(f)) {
+                this.dataSource.filters.splice(this.dataSource.filters.indexOf(f), 1);
+            }
+            else {
+                this.dataSource.filters.push(f);
+            }
+            this.dataSource.updateChart(null); // null means "keep using the same response"
+        });
+    }
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-bubble-chart.click':
+                    this.toggleSelection(payload);
+                    this.emitOuter('lockfilter', this.dataSource.chartData.find((/**
+                     * @param {?} el
+                     * @return {?}
+                     */
+                    el => payload == el.entity.id)));
+                    break;
+                case 'aw-bubble-chart.d3end': // end of d3.js draw()
+                    this.dataSource.tippyMaker(this.dataSource.chartData); // make tooltips
+                    break;
+                case 'aw-bubble-chart.bubble-tooltip-goto-click':
+                    this.emitGlobal('navigate', {
+                        handler: 'router',
+                        path: [`aw/entita/${this.dataSource.focusedBubble}`]
+                    });
+                    break;
+                case 'aw-bubble-chart.bubble-tooltip-select-click':
+                    this.toggleSelection(this.dataSource.focusedBubble);
+                    this.emitOuter('lockfilter', this.dataSource.chartData.find((/**
+                     * @param {?} el
+                     * @return {?}
+                     */
+                    el => this.dataSource.focusedBubble == el.entity.id)));
+                    break;
+                default:
+                    console.warn('unhandled inner event of type', type, 'with payload', payload);
+                    break;
+            }
+        }));
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-home-layout.tagclick':
+                    this.toggleSelection(payload);
+                    break;
+                case 'aw-home-layout.facetclick':
+                    this.toggleSelection(payload);
+                    break;
+                case 'aw-home-layout.togglefilter':
+                    this.toggleFilter(payload);
+                    break;
+                case 'aw-scheda-layout.filterbubbleresponse':
+                case 'aw-entita-layout.filterbubbleresponse':
+                case 'aw-home-layout.filterbubbleresponse':
+                    this.dataSource.updateChart(payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
+    }
+}
+if (false) {
+    /** @type {?} */
+    AwBubbleChartEH.prototype.toggleSelection;
+    /** @type {?} */
+    AwBubbleChartEH.prototype.toggleFilter;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwHeroEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-hero.click':
+                    // TODO
+                    break;
+                case 'aw-hero.change':
+                    this.emitOuter('change', payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwHomeBubbleChartEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} event
+         * @return {?}
+         */
+        event => {
+            switch (event.type) {
+                case 'aw-home-bubble-chart.click':
+                    this.emitOuter('click', event.payload);
+                    break;
+                case 'aw-home-bubble-chart.mouseenter':
+                    this.emitOuter('mouseenter', event.payload);
+                    break;
+                case 'aw-home-bubble-chart.mouseleave':
+                    this.emitOuter('mouseleave', event.payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwHomeFacetsWrapperEH extends EventHandler {
+    constructor() {
+        super(...arguments);
+        this.handleEyeClick = (/**
+         * @param {?} type
+         * @return {?}
+         */
+        type => {
+            /*
+              Toggles the status of the selected eye, then reloads the component.
+            */
+            if (this.dataSource.closedEyes) {
+                /** @type {?} */
+                let i = this.dataSource.closedEyes.indexOf(type);
+                if (i >= 0) { // if the eye was closed
+                    this.dataSource.closedEyes.splice(i, 1); // open the eye
+                }
+                else { // if the eye was open
+                    this.dataSource.closedEyes.push(type); // close the eye
+                }
+            }
+            else {
+                this.dataSource.closedEyes = [type];
+            }
+            this.dataSource.update(this.dataSource.lastData); // reload the component with the same data
+        });
+        this.updateFilters = (/**
+         * @param {?} selectedBubble
+         * @return {?}
+         */
+        selectedBubble => {
+            /*
+              Adds (or removes) the ID of the selected bubble from the array of that type of entity.
+              Example:
+                • Click on bubble "0263a407-d0dd" of type "org"
+                • Add "0263a407-d0dd" to array "org".
+              Result:
+                • lockedFacets = { "org":[ "0263a407-d0dd" ] }
+            */
+            selectedBubble.entity.id.replace(/ /g, '-'); // fix for space in ID
+            // fix for space in ID
+            const { id, typeOfEntity } = selectedBubble.entity // payload is the selected bubble
+            ;
+            if (!this.dataSource.lockedFacets[typeOfEntity]) {
+                this.dataSource.lockedFacets[typeOfEntity] = [];
+            }
+            if (this.dataSource.lockedFacets[typeOfEntity].includes(id)) {
+                /** @type {?} */
+                let i = this.dataSource.lockedFacets[typeOfEntity].indexOf(id);
+                this.dataSource.lockedFacets[typeOfEntity].splice(i, 1);
+            }
+            else {
+                this.dataSource.lockedFacets[typeOfEntity].push(id);
+            }
+            this.dataSource.update(this.dataSource.lastData); // reload the component with the same data
+        });
+    }
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                // toggle visibility from facet header
+                case 'aw-home-facets-wrapper.click':
+                    if (payload === null) { // interrupt event for locked facets
+                        break;
+                    }
+                    this.emitOuter('click', payload);
+                    this.handleEyeClick(payload);
+                    break;
+                // change search input text
+                case 'aw-home-facets-wrapper.change':
+                    this.emitOuter('change', payload);
+                    break;
+                // pressed return while typing in search
+                case 'aw-home-facets-wrapper.enter':
+                    this.emitOuter('enter', payload);
+                    break;
+                default:
+                    console.warn('unhandled inner event of type:', type);
+                    break;
+            }
+        }));
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-home-layout.facetswrapperresponse': // incoming autocomplete response
+                    this.dataSource.tippyMaker(payload.response, payload.facetId.inputPayload);
+                    break;
+                case 'aw-home-layout.lockfilter':
+                    this.updateFilters(payload);
+                    break;
+                case 'aw-home-layout.tagclick':
+                    Object.keys(this.dataSource.lockedFacets).forEach((/**
+                     * @param {?} key
+                     * @return {?}
+                     */
+                    key => {
+                        if (this.dataSource.lockedFacets[key].includes(payload)) {
+                            this.dataSource.lockedFacets[key].splice(this.dataSource.lockedFacets[key].indexOf(payload), 1);
+                        }
+                    }));
+                    this.dataSource.update(this.dataSource.lastData);
+                    break;
+                default:
+                    // console.warn('unhandled outer event of type', type)
+                    break;
+            }
+        }));
+    }
+}
+if (false) {
+    /** @type {?} */
+    AwHomeFacetsWrapperEH.prototype.handleEyeClick;
+    /** @type {?} */
+    AwHomeFacetsWrapperEH.prototype.updateFilters;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwHomeHeroPatrimonioEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-home-hero-patrimonio.click':
+                    this.emitGlobal('navigate', {
+                        handler: 'router',
+                        path: ['aw/patrimonio']
+                    });
+                    break;
+                default:
+                    break;
+            }
+        }));
+        /*
+        this.outerEvents$.subscribe(event => {
+          
+        });
+        */
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwHomeItemTagsWrapperEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} event
+         * @return {?}
+         */
+        (event) => {
+            switch (event.type) {
+                case "aw-home-item-tags-wrapper.click":
+                    this.emitOuter('click', event.payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
+        /* this.outerEvents$.subscribe(event => {
+        
+        }); */
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwHomeAutocompleteEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case "aw-home-autocomplete.click":
+                    this.emitOuter('click', payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwEntitaNavEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-entita-nav.click':
+                    this.emitOuter('click', payload);
+                    break;
+                default:
+                    console.warn('unhandled event type');
+                    break;
+            }
+        }));
+        /*
+    
+        this.outerEvents$.subscribe(event => {
+          
+        });
+        */
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwSchedaSidebarEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            if (type == 'aw-sidebar-header.click') {
+                this.dataSource.toggleSidebar();
+                this.emitOuter(type, payload);
+            }
+        }));
+        /* this.outerEvents$.subscribe(event => {
+        
+        }); */
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwSidebarHeaderEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            if (type == 'aw-sidebar-header.click') {
+                this.dataSource.toggleSidebar();
+                this.emitOuter('click', payload);
+            }
+        }));
+        /* this.outerEvents$.subscribe(event => {
+        
+        }); */
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwTreeEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            if (payload && typeof payload.source != 'undefined') {
+                switch (payload.source) {
+                    case 'toggle':
+                        this.dataSource.updateTree(null, payload.parents, payload.id);
+                        break;
+                    case 'ToggleMenuItem': this.dataSource.updateTree(null, payload.parents, payload.id); //no break, I want to execute also the following instruction
+                    case 'menuItem':
+                        this.dataSource.selectTreeItem(payload.id);
+                        this.emitOuter('click', payload.id);
+                        break;
+                }
+            }
+        }));
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-sidebar-header.click':
+                    this.dataSource.toggleSidebar();
+                    break;
+                case 'aw-scheda-layout.selectItem':
+                    this.dataSource.selectTreeItem(payload);
+                    if (typeof this.dataSource.currentItem !== 'undefined') {
+                        this.dataSource.updateTree(null, this.dataSource.currentItem.payload.toggle.parents, payload);
+                    }
+                    else {
+                        console.warn('The object in the URL does not exist.');
+                        // Maybe navigate to 404 here.
+                    }
+                    break;
+                case 'aw-scheda-layout.navigationresponse':
+                    this.dataSource.parseData(payload);
+                    break;
+            }
+        }));
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwSearchLayoutTabsEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        // TODO
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwTableEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        /*
+        this.innerEvents$.subscribe(event => {
+          
+        });
+    
+        this.outerEvents$.subscribe(event => {
+          
+        });
+        */
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+
+var EH$1 = /*#__PURE__*/Object.freeze({
+    AwLinkedObjectsEH: AwLinkedObjectsEH,
+    AwAutocompleteWrapperEH: AwAutocompleteWrapperEH,
+    AwBubbleChartEH: AwBubbleChartEH,
+    AwHeroEH: AwHeroEH,
+    AwHomeBubbleChartEH: AwHomeBubbleChartEH,
+    AwHomeFacetsWrapperEH: AwHomeFacetsWrapperEH,
+    AwHomeHeroPatrimonioEH: AwHomeHeroPatrimonioEH,
+    AwHomeItemTagsWrapperEH: AwHomeItemTagsWrapperEH,
+    AwHomeAutocompleteEH: AwHomeAutocompleteEH,
+    AwEntitaNavEH: AwEntitaNavEH,
+    AwSchedaSidebarEH: AwSchedaSidebarEH,
+    AwSidebarHeaderEH: AwSidebarHeaderEH,
+    AwTreeEH: AwTreeEH,
+    AwSearchLayoutTabsEH: AwSearchLayoutTabsEH,
+    AwTableEH: AwTableEH
+});
+
+/**
+ * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -6988,7 +6582,6 @@ const AwEntitaLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaLayoutComponent extends AbstractLayout {
@@ -7109,47 +6702,23 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeLayoutDS extends LayoutDataSource {
     constructor() {
         super(...arguments);
-        this.facetData = null;
-        this.lockedFacets = {};
-        this.lockLastFacet = false;
         this.facetInputs = {};
-        // all the bubbles as they have been given by apollo
-        // (the objects in the allBubbles are not the same bubble objects
-        // present in the bubble chart)
-        this.allBubbles = null;
         this.autocompletePopoverOpen = false;
         this.autocompleteChanged$ = new Subject();
-        // the bubbles currently selected (these are saved from the event handler's
-        // and correspond exactly to the bubblechart's bubble objects)
-        this.selectedBubbles = [];
         this.numOfItemsStr = null;
-        // instance of the bubble chart (from which you can access all the various
-        // bubble objects)
-        this._bubbleChart = null;
-        // the maximum number of bubbles which can be selected at the same time
-        this.maxBubblesSelectable = 3;
-        // entities have their own unique id, these ids are generic and are very flexible
-        // bubbles (as the bubble chart's objects) have unique ids but do not allow certain
-        // characters, so each bubble has its own id different from the id of the entity which
-        // the bubble represents (given an bubble's id called bubbleId you can obtain the
-        // respective entity's id with as: entityId = entityBubbleIdMap[bubbleId] )
-        this.entityBubbleIdMap = {};
-        // widh of the window which is updated at each resize and it is used by the bubble
-        // chart to check if the width of the window has changed during the last resize
-        this.lastWindowWidth = -1;
-        this.bubblePopup = null;
         this.currentHoverEntity = null;
         this.hasScrollBackground = false;
-        this.loadingBubbles = false;
-        this.bubblesEnabled = false;
         this.resultsLimit = -1;
         this.selectedEntitiesIds = [];
+        // BUBBLE CHART DATA ↓
+        this.bubblesEnabled = false; // true if this Arianna Web project has the bubble chart module
+        // true if this Arianna Web project has the bubble chart module
+        this.selectedBubbles = []; // array of IDs
         this.updateComponent = (/**
          * @param {?} id
          * @param {?} data
@@ -7157,12 +6726,15 @@ class AwHomeLayoutDS extends LayoutDataSource {
          * @return {?}
          */
         (id, data, options) => {
+            // update components from EH
             if (options) {
                 this.one(id).updateOptions(options);
             }
             this.one(id).update(data);
         });
     }
+    // store the first array of bubbles, to find them in case of zero results (entities data returned as empty array from backend)
+    // BUBBLE CHART DATA ↑
     /**
      * @param {?} __0
      * @return {?}
@@ -7170,12 +6742,11 @@ class AwHomeLayoutDS extends LayoutDataSource {
     onInit({ communication, mainState, configuration, tippy }) {
         this.communication = communication;
         this.configuration = configuration;
-        this.facetData = [];
-        this.lastWindowWidth = window.outerWidth;
+        // this.facetData = [];
         this.mainState = mainState;
         this.tippy = tippy;
-        this.bubblesEnabled = this.configuration.get('features-enabled') ? this.configuration.get('features-enabled')['bubblechart'] : false;
         this.resultsLimit = this.configuration.get('home-layout')['results-limit'];
+        this.bubblesEnabled = this.configuration.get('features-enabled') ? this.configuration.get('features-enabled')['bubblechart'] : false;
         this.one('aw-hero').update(this.configuration.get('home-layout')['top-hero']);
         this.one('aw-home-hero-patrimonio').update(this.configuration.get('home-layout')['bottom-hero']);
         // update streams
@@ -7193,6 +6764,7 @@ class AwHomeLayoutDS extends LayoutDataSource {
      * @return {?}
      */
     makeRequest$(query, params) {
+        // make request from EH
         return this.communication.request$(query, {
             onError: (/**
              * @param {?} error
@@ -7213,7 +6785,7 @@ class AwHomeLayoutDS extends LayoutDataSource {
              */
             (error) => console.error(error)),
             params: {
-                entitiesListSize: this.configuration.get("home-layout")['max-bubble-num'] * 4
+                entitiesListSize: 500
             },
         });
     }
@@ -7222,6 +6794,9 @@ class AwHomeLayoutDS extends LayoutDataSource {
      * @return {?}
      */
     parseInitialRequest(response) {
+        this.firstBubbleResponse = response.entitiesData;
+        /** @type {?} */
+        const facetData = [];
         response.typeOfEntityData.forEach((/**
          * @param {?} toe
          * @return {?}
@@ -7229,19 +6804,9 @@ class AwHomeLayoutDS extends LayoutDataSource {
         (toe) => {
             /** @type {?} */
             const teoConfigData = this.configuration.get("config-keys")[toe.type.replace(" ", "-")];
-            this.facetData.push(Object.assign({}, toe, { enabled: true, locked: false, configKey: toe.type.replace(" ", "-") }, teoConfigData));
+            facetData.push(Object.assign({}, toe, { enabled: true, locked: false, configKey: toe.type.replace(" ", "-") }, teoConfigData));
         }));
-        this.one('aw-home-facets-wrapper').update({
-            facetData: this.facetData,
-            lockedFacets: this.lockedFacets
-        });
-        this.one('aw-bubble-chart').updateOptions({
-            context: 'home',
-            configKeys: this.configuration.get("config-keys"),
-            bubbleContainerId: 'bubbleChartContainer',
-            containerId: 'bubble-chart-container',
-            maxNumber: this.configuration.get("home-layout")['max-bubble-num']
-        });
+        this.one('aw-home-facets-wrapper').update(facetData);
         this.renderPreviewsFromApolloQuery(response);
     }
     /**
@@ -7274,185 +6839,13 @@ class AwHomeLayoutDS extends LayoutDataSource {
                 this.numOfItemsStr = numOfItems + '';
         }
         else {
-            this.numOfItemsStr = null;
+            this.numOfItemsStr = '0';
         }
         this.one('aw-linked-objects').updateOptions({
             context: 'home',
             config: this.configuration,
         });
         this.one('aw-linked-objects').update(response.itemsPagination);
-        if (document.getElementById('bubble-results-list')) {
-            // reset scroll position of result list
-            document.getElementById('bubble-results-list').scrollTo(0, 0);
-        }
-    }
-    /**
-     * @param {?} source
-     * @param {?} payload
-     * @return {?}
-     */
-    onBubbleTooltipClick(source, payload) {
-        switch (source) {
-            case 'select':
-                if (!payload)
-                    return;
-                /** @type {?} */
-                const bubbleId = payload.bubbleId;
-                if (!bubbleId)
-                    return;
-                /** @type {?} */
-                let bubble = null;
-                if (this._bubbleChart) {
-                    this._bubbleChart.selectAll(`g`).each((/**
-                     * @param {?} b
-                     * @return {?}
-                     */
-                    b => {
-                        if (b.id === bubbleId)
-                            bubble = b;
-                    }));
-                    if (bubble)
-                        this.onBubbleSelected(bubble);
-                }
-                break;
-            default:
-                break;
-        }
-    }
-    /**
-     * @param {?} bubble
-     * @return {?}
-     */
-    onBubbleSelected(bubble) {
-        if (bubble) {
-            if (!this.selectedBubbles.includes(bubble)) {
-                if (this.selectedBubbles.length < this.maxBubblesSelectable) {
-                    this.loadingBubbles = this.selectedBubbles.length == 0;
-                    this.selectedBubbles.push(bubble);
-                    return true;
-                }
-            }
-        }
-        return null;
-    }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
-    onBubbleDeselected(payload) {
-        if (payload && payload.bubble) {
-            this.selectedBubbles = this.selectedBubbles.filter((/**
-             * @param {?} b
-             * @return {?}
-             */
-            (b) => b.id !== payload.bubble.id));
-            if (payload.bubble.hasCloseIcon) {
-                payload.bubble.hasCloseIcon = false;
-                return this.filterRequest();
-            }
-        }
-    }
-    /**
-     * @param {?} response
-     * @return {?}
-     */
-    getBubblePayload(response) {
-        /** @type {?} */
-        let bubblePayload = {
-            reset: true,
-            setBubbleChart: (/**
-             * @param {?} bubbleCref
-             * @return {?}
-             */
-            (bubbleCref) => this._bubbleChart = bubbleCref),
-            facetData: this.facetData,
-            source: response,
-            selectedBubbles: this.selectedBubbles
-        };
-        return bubblePayload;
-    }
-    /**
-     * @private
-     * @return {?}
-     */
-    filterRequest() {
-        if (this.entityBubbleIdMap) {
-            /** @type {?} */
-            let k = this.configuration.get('config-keys');
-            /** @type {?} */
-            let activeBubbles = {
-                places: false,
-                people: false,
-                concepts: false,
-                organizations: false,
-            };
-            if (this.selectedBubbles.length <= 0) {
-                this.selectedEntitiesIds = [];
-            }
-            this.selectedBubbles.forEach((/**
-             * @param {?} sB
-             * @return {?}
-             */
-            (sB) => {
-                /** @type {?} */
-                let c = sB.color;
-                /** @type {?} */
-                let findTypeFromColor = (/**
-                 * @param {?} obj
-                 * @param {?} color
-                 * @return {?}
-                 */
-                (obj, color) => {
-                    return Object.keys(obj).find((/**
-                     * @param {?} key
-                     * @return {?}
-                     */
-                    key => obj[key].color.hex === color));
-                });
-                activeBubbles[findTypeFromColor(k, c)] = true;
-                /** @type {?} */
-                let entityId = this.entityBubbleIdMap[sB.id];
-                if (entityId)
-                    this.selectedEntitiesIds.push(entityId);
-            }));
-            this.lockedFacets = activeBubbles;
-            this.one('aw-home-facets-wrapper').update({
-                facetData: this.facetData,
-                lockedFacets: this.lockedFacets
-            });
-        }
-        return this.communication.request$('globalFilter', {
-            onError: (/**
-             * @param {?} error
-             * @return {?}
-             */
-            (error) => console.error(error)),
-            params: {
-                selectedEntitiesIds: this.selectedEntitiesIds,
-                itemsPagination: {
-                    offset: 0,
-                    limit: this.resultsLimit
-                }
-            },
-        });
-    }
-    /**
-     * @param {?} response
-     * @param {?=} onlyBubbles
-     * @return {?}
-     */
-    updateBubbles(response, onlyBubbles) {
-        if (!onlyBubbles) {
-            this.renderPreviewsFromApolloQuery(response);
-        }
-    }
-    /**
-     * @param {?} data
-     * @return {?}
-     */
-    updateBubbleFilter(data) {
-        this.allBubbles = data.allBubbles;
-        this.entityBubbleIdMap = data.entityIdmap;
     }
     /**
      * @param {?=} onlyBubbles
@@ -7462,26 +6855,6 @@ class AwHomeLayoutDS extends LayoutDataSource {
         if (!onlyBubbles) {
             this.renderItemTags();
         }
-    }
-    /**
-     * @return {?}
-     */
-    filterBubblesBasedOnFacetsEnabled() {
-        /** @type {?} */
-        let result = this.allBubbles.filter((/**
-         * @param {?} bubble
-         * @return {?}
-         */
-        (bubble) => {
-            for (var i = 0; i < this.facetData.length; i++) {
-                if (bubble.entity.typeOfEntity.id === this.facetData[i].type.id)
-                    if (!this.facetData[i].enabled) {
-                        return false;
-                    }
-            }
-            return true;
-        }));
-        return result;
     }
     /**
      * @param {?} change
@@ -7507,155 +6880,72 @@ class AwHomeLayoutDS extends LayoutDataSource {
         var value = this.facetInputs[payload];
     }
     /**
-     * @param {?} facetId
-     * @return {?}
-     */
-    handleFacetHeaderClick(facetId) {
-        /** @type {?} */
-        let updateBubbles = false;
-        /** @type {?} */
-        let enabledFacets = this.facetData.filter((/**
-         * @param {?} f
-         * @return {?}
-         */
-        f => f.enabled)).length;
-        this.facetData.forEach((/**
-         * @param {?} f
-         * @return {?}
-         */
-        f => {
-            f.type = f.type.replace(/ /g, '-'); // fix for space in facet type string ('cose notevoli')
-            if (f.type === facetId && f.locked === true) {
-                // if user clicked on a locked facet, ignore it
-                return;
-            }
-            if (f.type === facetId && f.enabled === true && enabledFacets < 1) {
-                return;
-            }
-            if (f.type === facetId) { // if this is the clicked facet
-                console.log(`${f.type} is the clicked facet`);
-                if (f.enabled && enabledFacets > 1) {
-                    f.enabled = false;
-                    f.locked = false;
-                    updateBubbles = true;
-                }
-                else {
-                    f.enabled = true;
-                    f.locked = false;
-                    updateBubbles = true;
-                }
-            }
-            else { // if this is another facet
-                if (enabledFacets <= 2 && f.enabled) {
-                    f.locked = true;
-                }
-                if (enabledFacets >= 1 && f.locked) {
-                    f.locked = false;
-                }
-            }
-        }));
-        this.one('aw-home-facets-wrapper').update({
-            facetData: this.facetData,
-            lockedFacets: this.lockedFacets
-        });
-        if (updateBubbles) {
-            /** @type {?} */
-            let disableFacetsIds = [];
-            this.facetData.forEach((/**
-             * @param {?} fD
-             * @return {?}
-             */
-            (fD) => {
-                if (!fD.enabled)
-                    disableFacetsIds.push(fD.type); // this is probably useless
-            }));
-            if (disableFacetsIds.length > 0) {
-                /** @type {?} */
-                let filteredSelectedBubbles = this.selectedBubbles.filter((/**
-                 * @param {?} bubble
-                 * @return {?}
-                 */
-                bubble => {
-                    for (var i = 0; i < this.allBubbles.length; i++) {
-                        if (this.allBubbles[i].id === bubble.id) {
-                            if (disableFacetsIds.includes(this.allBubbles[i].entity.typeOfEntity.id)) {
-                                return false;
-                            }
-                        }
-                    }
-                }));
-                if (filteredSelectedBubbles.length != this.selectedBubbles.length) {
-                    this.selectedBubbles = filteredSelectedBubbles;
-                }
-                ;
-            }
-            this.allBubbles.forEach((/**
-             * @param {?} bubble
-             * @return {?}
-             */
-            bubble => {
-                bubble.selected = false;
-                for (var i = 0; i < this.selectedBubbles.length; i++) {
-                    if (this.selectedBubbles[i].id === bubble.id)
-                        bubble.selected = true;
-                }
-            }));
-            this.one('aw-bubble-chart').update(this.getBubblePayload(null));
-        }
-    }
-    /**
      * @return {?}
      */
     renderItemTags() {
+        /*
+                    Try to build an item tag for each selected query looking at the data from the
+                    first response. If the needed bubble data cannot be found, ask the backend
+                    for that bubble's data.
+                */
         /** @type {?} */
-        let tagsData = [];
+        let queryList = [] // list of pending queries
+        ;
+        // list of pending queries
+        /** @type {?} */
+        let tagsData = [] // list of tags data built from query
+        ;
         this.selectedBubbles.forEach((/**
-         * @param {?} sBubble
-         * @return {?}
-         */
-        (sBubble) => {
-            /** @type {?} */
-            let label = '';
-            for (var i = 0; i < this.allBubbles.length; i++) {
-                if (this.allBubbles[i].id === sBubble.id) {
-                    label = this.allBubbles[i].entity.label;
-                    tagsData.push({
-                        label,
-                        icon: "n7-icon-close",
-                        payload: sBubble.id,
-                        classes: `tag-${this.allBubbles[i].entity.typeOfEntity.replace(/ /g, '-')}`
-                    });
-                    break;
-                }
-            }
-        }));
-        this.one('aw-home-item-tags-wrapper').update(tagsData);
-    }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
-    onTagClicked(payload) {
-        if (!payload)
-            return;
-        /** @type {?} */
-        const bubbleId = payload;
-        if (this._bubbleChart) {
-            this._bubbleChart.selectAll(`g`).each((/**
-             * @param {?} b
-             * @return {?}
-             */
-            b => {
-                if (b.id === bubbleId)
-                    b.hasCloseIcon = false;
-            }));
-        }
-        this.selectedBubbles = this.selectedBubbles.filter((/**
          * @param {?} b
          * @return {?}
          */
-        (b) => b.id !== payload));
-        return this.filterRequest();
+        b => {
+            // try to get the data of each selected bubble
+            /** @type {?} */
+            let theBubble = this.firstBubbleResponse.find((/**
+             * @param {?} el
+             * @return {?}
+             */
+            el => el.entity.id == b));
+            if (theBubble) { // if a bubble was found
+                tagsData.push({
+                    label: theBubble.entity.label,
+                    icon: 'n7-icon-close',
+                    payload: b,
+                    classes: `tag-${theBubble.entity.typeOfEntity.replace(/ /g, '-')}`
+                });
+            }
+            else { // if the bubble was not found, make a query
+                // if the bubble was not found, make a query
+                /** @type {?} */
+                let params = { entityId: b, entitiesListSize: 1 };
+                queryList.push(this.makeRequest$('getMissingBubble', params));
+            }
+        }));
+        if (queryList.length > 0) { // if there are pending bubble queries
+            forkJoin(queryList).subscribe((/**
+             * @param {?} forkres
+             * @return {?}
+             */
+            forkres => {
+                forkres.forEach((/**
+                 * @param {?} r
+                 * @return {?}
+                 */
+                r => {
+                    tagsData.push({
+                        label: r.label,
+                        icon: 'n7-icon-close',
+                        payload: r.id,
+                        classes: `tag-${r.typeOfEntity.replace(/ /g, '-')}`
+                    });
+                }));
+                this.one('aw-home-item-tags-wrapper').update(tagsData);
+            }));
+        }
+        else {
+            this.one('aw-home-item-tags-wrapper').update(tagsData);
+        }
     }
     /**
      * @param {?} value
@@ -7797,27 +7087,7 @@ if (false) {
      * @type {?}
      * @private
      */
-    AwHomeLayoutDS.prototype.facetData;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.lockedFacets;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.lockLastFacet;
-    /**
-     * @type {?}
-     * @private
-     */
     AwHomeLayoutDS.prototype.facetInputs;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.allBubbles;
     /**
      * @type {?}
      * @private
@@ -7834,42 +7104,11 @@ if (false) {
      */
     AwHomeLayoutDS.prototype.autocompleteChanged$;
     /** @type {?} */
-    AwHomeLayoutDS.prototype.selectedBubbles;
-    /** @type {?} */
     AwHomeLayoutDS.prototype.numOfItemsStr;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype._bubbleChart;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.maxBubblesSelectable;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.entityBubbleIdMap;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.lastWindowWidth;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.bubblePopup;
     /** @type {?} */
     AwHomeLayoutDS.prototype.currentHoverEntity;
     /** @type {?} */
     AwHomeLayoutDS.prototype.hasScrollBackground;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.loadingBubbles;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.bubblesEnabled;
     /** @type {?} */
     AwHomeLayoutDS.prototype.resultsLimit;
     /** @type {?} */
@@ -7881,12 +7120,19 @@ if (false) {
     /** @type {?} */
     AwHomeLayoutDS.prototype.homeAutocompleteQuery;
     /** @type {?} */
+    AwHomeLayoutDS.prototype.bubblesEnabled;
+    /** @type {?} */
+    AwHomeLayoutDS.prototype.selectedBubbles;
+    /** @type {?} */
+    AwHomeLayoutDS.prototype.lastBubbleResponse;
+    /** @type {?} */
+    AwHomeLayoutDS.prototype.firstBubbleResponse;
+    /** @type {?} */
     AwHomeLayoutDS.prototype.updateComponent;
 }
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/home-layout/home-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeLayoutEH extends EventHandler {
@@ -7898,61 +7144,7 @@ class AwHomeLayoutEH extends EventHandler {
          * @return {?}
          */
         payload => {
-            /** @type {?} */
-            const thebubble = this.dataSource.allBubbles.find((/**
-             * @param {?} b
-             * @return {?}
-             */
-            b => {
-                /** @type {?} */
-                const s = 'B_' + payload.replace(/-/g, '_');
-                return b.id === s;
-            }));
-            if (thebubble) {
-                this.dataSource.onBubbleSelected(thebubble);
-            }
-            if (this.dataSource.selectedEntitiesIds.indexOf(payload) < 0) {
-                this.dataSource.selectedEntitiesIds.push(payload);
-                this.dataSource.communication.request$('globalFilter', {
-                    onError: (/**
-                     * @param {?} error
-                     * @return {?}
-                     */
-                    (error) => console.error(error)),
-                    params: {
-                        selectedEntitiesIds: this.dataSource.selectedEntitiesIds,
-                        itemsPagination: {
-                            offset: 0,
-                            limit: this.dataSource.resultsLimit
-                        }
-                    },
-                }).subscribe((/**
-                 * @param {?} res
-                 * @return {?}
-                 */
-                res => {
-                    if (res) {
-                        this.dataSource.updateBubbleFilter({
-                            allBubbles: this.dataSource.allBubbles,
-                            bubble: thebubble,
-                            bubblePayload: { id: thebubble.id },
-                            entityIdmap: this.dataSource.entityBubbleIdMap,
-                            source: 'bubble'
-                        });
-                        this.dataSource.filterRequest().subscribe((/**
-                         * @param {?} res
-                         * @return {?}
-                         */
-                        res => {
-                            if (res) {
-                                this.emitOuter('filterbubbleresponse', this.dataSource.getBubblePayload(res));
-                                this.dataSource.updateBubbles(res);
-                            }
-                        }));
-                        // this.renderPreviewsFromApolloQuery(res)
-                    }
-                }));
-            }
+            this.emitOuter('facetclick', payload);
         });
     }
     /**
@@ -7979,6 +7171,17 @@ class AwHomeLayoutEH extends EventHandler {
                 case 'aw-home-layout.destroy':
                     this.destroyed$.next();
                     break;
+                case 'aw-home-layout.bubbleresultsviewallclick':
+                    /** @type {?} */
+                    const entityLinks = this.dataSource.selectedBubbles.join(',');
+                    /** @type {?} */
+                    const basePath = this.configuration.get('paths').searchBasePath;
+                    this.emitGlobal('navigate', {
+                        handler: 'router',
+                        path: [basePath],
+                        queryParams: { 'entity-links': entityLinks }
+                    });
+                    break;
                 default:
                     break;
             }
@@ -7993,16 +7196,15 @@ class AwHomeLayoutEH extends EventHandler {
                     this.dataSource.onHeroChange(payload.value);
                     break;
                 case 'aw-home-facets-wrapper.click':
-                    this.dataSource.handleFacetHeaderClick(payload);
+                    this.emitOuter('togglefilter', payload);
                     break;
                 case 'aw-home-facets-wrapper.change':
                     if (payload.value) {
                         /** @type {?} */
-                        const params = {
+                        let params = {
                             input: payload.value,
                             typeOfEntity: payload.inputPayload.replace('-search', ''),
                             itemsPagination: {
-                                // offset: 0, limit: this.configuration.get('home-layout')['results-limit']
                                 offset: 0, limit: this.configuration.get('home-layout')['results-limit']
                             }
                         };
@@ -8013,9 +7215,9 @@ class AwHomeLayoutEH extends EventHandler {
                         response => {
                             if (response.results.length < 1) {
                                 /** @type {?} */
-                                const fallback = {
+                                let fallback = {
                                     totalcount: 0,
-                                    entities: [
+                                    results: [
                                         {
                                             entity: {
                                                 id: 'fallback',
@@ -8043,89 +7245,13 @@ class AwHomeLayoutEH extends EventHandler {
                 case 'aw-home-facets-wrapper.enter':
                     this.dataSource.handleFacetSearchEnter(payload);
                     break;
-                case 'aw-bubble-chart.bubble-tooltip-close-click':
-                    this.dataSource.onBubbleTooltipClick('close', payload);
-                    break;
-                case 'aw-bubble-chart.bubble-tooltip-goto-click':
-                    if (!payload || !payload.entityId) {
-                        return;
-                    }
-                    this.emitGlobal('navigate', {
-                        handler: 'router',
-                        path: [`aw/entita/${payload.entityId}`]
-                    });
-                    break;
-                case 'aw-bubble-chart.bubble-tooltip-select-click':
-                    payload._bubbleChart = this.dataSource._bubbleChart;
-                    this.emitOuter('bubble-tooltip-select-click', payload);
-                    break;
-                case 'aw-bubble-chart.click':
-                    if (payload.source === 'bubble') {
-                        if (payload.bubble) {
-                            console.log({ payload });
-                            this.dataSource.updateBubbleFilter(payload);
-                            if (this.dataSource.onBubbleSelected(payload.bubble)) {
-                                this.dataSource.filterRequest().subscribe((/**
-                                 * @param {?} response
-                                 * @return {?}
-                                 */
-                                (response) => {
-                                    if (response) {
-                                        // console.log('filterRequest() returned: ', response)
-                                        this.emitOuter('filterbubbleresponse', this.dataSource.getBubblePayload(response));
-                                        this.dataSource.updateBubbles(response);
-                                    }
-                                }));
-                            }
-                        }
-                    }
-                    else if (payload.source === 'close') {
-                        this.dataSource.updateBubbleFilter(payload);
-                        this.dataSource.onBubbleDeselected({
-                            bubblePayload: payload.bubblePayload,
-                            bubble: payload.bubble
-                        }).subscribe((/**
-                         * @param {?} response
-                         * @return {?}
-                         */
-                        (response) => {
-                            if (response) {
-                                this.emitOuter('filterbubbleresponse', this.dataSource.getBubblePayload(response));
-                                this.dataSource.updateBubbles(response);
-                            }
-                        }));
-                    }
-                    break;
-                case 'aw-bubble-chart.bubble-filtered':
-                    this.dataSource.updateBubbleFilter(payload);
-                    this.dataSource.updateTags();
-                    /** @type {?} */
-                    const dataSource = this.dataSource;
-                    setTimeout((/**
-                     * @return {?}
-                     */
-                    function () {
-                        dataSource.loadingBubbles = false;
-                    }), 500);
-                    break;
-                /**
-                 * Tags & Item Previews Event Handlers
-                 */
                 case 'aw-home-item-tags-wrapper.click':
-                    this.dataSource.onTagClicked(payload).subscribe((/**
-                     * @param {?} response
-                     * @return {?}
-                     */
-                    (response) => {
-                        this.emitOuter('filterbubbleresponse', this.dataSource.getBubblePayload(response));
-                        this.dataSource.updateBubbles(response);
-                        this.dataSource.renderItemTags();
-                    }));
+                    this.emitOuter('tagclick', payload);
                     break;
                 case 'aw-linked-objects.datarequest':
-                    const { currentPage } = payload;
+                    let { currentPage } = payload;
                     /** @type {?} */
-                    const params = {
+                    let params = {
                         selectedEntitiesIds: this.dataSource.selectedEntitiesIds,
                         itemsPagination: {
                             offset: currentPage * this.dataSource.resultsLimit,
@@ -8152,17 +7278,17 @@ class AwHomeLayoutEH extends EventHandler {
                     const { source } = payload;
                     /** @type {?} */
                     let basePath;
-                    if (source === 'item') {
-                        basePath = this.configuration.get('paths').entitaBasePath;
+                    if (source === "item") {
+                        basePath = this.configuration.get("paths").entitaBasePath;
                         this.emitGlobal('navigate', {
                             handler: 'router',
                             path: [basePath, payload.id]
                         });
                     }
-                    else if (source === 'showMore') {
+                    else if (source === "showMore") {
                         /** @type {?} */
                         const query = this.dataSource.homeAutocompleteQuery;
-                        basePath = this.configuration.get('paths').searchBasePath;
+                        basePath = this.configuration.get("paths").searchBasePath;
                         this.emitGlobal('navigate', {
                             handler: 'router',
                             path: [basePath],
@@ -8170,13 +7296,61 @@ class AwHomeLayoutEH extends EventHandler {
                         });
                     }
                     break;
-                case 'aw-linked-objects.click':
+                case 'aw-bubble-chart.selection':
                     /** @type {?} */
-                    const paths = this.configuration.get('paths');
-                    this.emitGlobal('navigate', {
-                        handler: 'router',
-                        path: [paths.schedaBasePath, payload]
-                    });
+                    let selectedEntitiesIds = payload;
+                    this.dataSource.selectedBubbles = payload;
+                    this.dataSource.makeRequest$('globalFilter', {
+                        selectedEntitiesIds,
+                        entitiesListSize: 500
+                    }).subscribe((/**
+                     * @param {?} res
+                     * @return {?}
+                     */
+                    res => {
+                        if (res && res.entitiesData.length > 0) {
+                            // if some linked objects exist for the selected entities:
+                            this.dataSource.lastBubbleResponse = res.entitiesData;
+                            this.emitOuter('filterbubbleresponse', res.entitiesData);
+                            this.dataSource.renderPreviewsFromApolloQuery(res);
+                            this.dataSource.renderItemTags();
+                        }
+                        else {
+                            // if the backend returns an empty list of results:
+                            /** @type {?} */
+                            const queryList = [];
+                            this.dataSource.selectedBubbles.forEach((/**
+                             * @param {?} b
+                             * @return {?}
+                             */
+                            b => {
+                                /** @type {?} */
+                                let params = { entityId: b, entitiesListSize: 1 };
+                                queryList.push(// make a query for each selected bubble
+                                this.dataSource.makeRequest$('getMissingBubble', params));
+                            }));
+                            // await for every missing bubble and build a custom response
+                            forkJoin(queryList).subscribe((/**
+                             * @param {?} forkres
+                             * @return {?}
+                             */
+                            forkres => {
+                                /** @type {?} */
+                                let customBubbles = [];
+                                forkres.forEach((/**
+                                 * @param {?} r
+                                 * @return {?}
+                                 */
+                                r => { customBubbles.push({ count: 0, entity: r }); }));
+                                this.emitOuter('filterbubbleresponse', customBubbles);
+                                this.dataSource.renderPreviewsFromApolloQuery(res);
+                                this.dataSource.renderItemTags();
+                            }));
+                        }
+                    }));
+                    break;
+                case 'aw-bubble-chart.lockfilter':
+                    this.emitOuter('lockfilter', payload); // let aw-home-facets-wrapper handle this event
                     break;
                 default:
                     break;
@@ -8193,23 +7367,16 @@ class AwHomeLayoutEH extends EventHandler {
          * @return {?}
          */
         (response) => {
-            console.log('(home) Apollo responded with:', response);
-            if (response) {
-                this.dataSource.parseInitialRequest(response);
-                if (this.dataSource.bubblesEnabled) {
-                    /** @type {?} */
-                    const bubblePayload = {
-                        setBubbleChart: (/**
-                         * @param {?} bubbleCref
-                         * @return {?}
-                         */
-                        (bubbleCref) => this.dataSource._bubbleChart = bubbleCref),
-                        source: response,
-                        reset: false,
-                        facetData: this.dataSource.facetData
-                    };
-                    this.emitOuter('filterbubbleresponse', bubblePayload);
-                }
+            // console.log('(home) Apollo responded with:', response)
+            if (!response) {
+                return;
+            }
+            this.dataSource.parseInitialRequest(response);
+            if (this.dataSource.bubblesEnabled) {
+                this.emitOuter('filterbubbleresponse', {
+                    response,
+                    facetData: this.dataSource.facetData
+                });
             }
         }));
     }
@@ -8219,7 +7386,7 @@ class AwHomeLayoutEH extends EventHandler {
      * @return {?}
      */
     outerLinkClick(type, payload) {
-        window.open(payload, '_blank');
+        window.open(payload, "_blank");
     }
 }
 if (false) {
@@ -8244,7 +7411,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/home-layout/home-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -8278,7 +7444,6 @@ const AwHomeLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeLayoutComponent extends AbstractLayout {
@@ -8326,7 +7491,7 @@ class AwHomeLayoutComponent extends AbstractLayout {
 AwHomeLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-home-layout',
-                template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper n7-side-auto-padding\"\n        [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length > 0 }\"\n        *ngIf=\"lb.dataSource.bubblesEnabled\"\n    >\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n        <div\n            class=\"aw-home__bubble-chart-wrapper\"\n            [style.overflow]=\"lb.dataSource.loadingBubbles ? 'visible' : 'hidden'\"\n        >\n            <aw-bubble-chart-wrapper\n                [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                [container]=\"'bubble-chart-container'\"\n                [buttons]=\"['select', 'goto']\"\n            >\n                    <n7-bubble-chart\n                        [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n\n        <!-- Linked objects -->\n        <ng-container *ngIf=\"lb.dataSource.selectedBubbles.length > 0\" >\n            <div class=\"aw-home__bubble-results\"\n                 id=\"home-bubble-results\"\n                 [ngStyle]=\"{ 'display': 'flex' , 'flex-direction': 'column', 'transition': 'opacity 1s ease-in-out;' }\"\n                 [style.opacity]=\"lb.dataSource.loadingBubbles ? '0' : '1'\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\">\n                    <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">\n                        {{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span>\n                    </h1>\n                </div>\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list-wrapper\">\n                    <div class=\"aw-home__bubble-results-list\"\n                        [attr.id]=\"'bubble-results-list'\"\n                        (scroll)=\"lb.eventHandler.emitOuter('scroll', $event.target)\">\n                        <ng-container *ngFor=\"let widgetData of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.result;\">\n                            <n7-item-preview\n                                [data]=\"widgetData\"\n                                [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n                        <ng-container *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.isLoading\">\n                            <div class=\"aw-home__bubble-results-list-loader\">\n                                <n7-loader\n                                    [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.loaderData\">\n                                </n7-loader>\n                            </div>\n                        </ng-container>\n                    </div>\n                    <div *ngIf=\"lb.dataSource.hasScrollBackground\" class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                    <!-- aw-linked-objects__actions -->\n                    <div *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.actions as action\" class=\"aw-home__bubble-results-list-actions\">\n                        <button class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\">\n                            {{action[0].label}}\n                        </button>\n                    </div>\n                </div>\n\n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Outer links -->\n    <div\n    *ngIf=\"lb.dataSource.outerLinks && lb.dataSource.outerLinks.length > 0\"\n     class=\"aw-home__outer-links\">\n        <section class=\"aw-home__outer-links-wrapper n7-side-auto-padding\">\n            <h2 class=\"aw-home__outer-links-title\"\n                *ngIf=\"lb.dataSource.outerLinksTitle\">\n                {{ lb.dataSource.outerLinksTitle }}\n            </h2>\n            <div class=\"aw-home__outer-links-items\">\n                <!-- Item preview -->\n                <n7-item-preview\n                    *ngFor=\"let outerLink of lb.dataSource.outerLinks\"\n                    [data]=\"outerLink\"\n                    [emit]=\"lb.eventHandler.outerLinkClick.bind(lb.eventHandler)\"\n                >\n                </n7-item-preview>\n            <!-- END // Item preview -->\n            </div>\n        </section>\n    </div>\n    <!-- END // Outer links -->\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Adavanced autocomplete popover  -->\n    <div id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <n7-advanced-autocomplete\n            [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n\n    <!-- Simple autocomplete popover. DO NOT CHANGE parent div class! -->\n    <!-- Creating one template for each facet -->\n    <div *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\"\n         class=\"aw-simple-autocomplete__{{widgetData.header.payload}}\"\n         style=\"display: none;\">\n         <n7-simple-autocomplete\n            [data]=\"lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-autocomplete-wrapper'].emit\">\n        </n7-simple-autocomplete>\n    </div>\n</div>"
+                template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper n7-side-auto-padding\"\n        [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length > 0 }\" *ngIf=\"lb.dataSource.bubblesEnabled\">\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n        <div class=\"aw-home__bubble-chart-wrapper\"\n            [style.overflow]=\"lb.dataSource.loadingBubbles ? 'visible' : 'hidden'\">\n            <aw-bubble-chart-wrapper [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                [emit]=\"lb.widgets['aw-bubble-chart'].emit\" [container]=\"'bubble-chart-container'\"\n                [buttons]=\"['select', 'goto']\">\n                <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n\n        <!-- Linked objects -->\n        <ng-container *ngIf=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.selected.length > 0;\">\n            <div class=\"aw-home__bubble-results\" id=\"home-bubble-results\"\n                [style.opacity]=\"lb.dataSource.loadingBubbles ? '0' : '1'\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\" class=\"aw-home__bubble-results-title-wrapper\">\n                    <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">\n                            {{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span>\n                    </h1>\n                </div>\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list-wrapper\">\n                    <div class=\"aw-home__bubble-results-list\" [attr.id]=\"'bubble-results-list'\"\n                        (scroll)=\"lb.eventHandler.emitOuter('scroll', $event.target)\">\n                        <ng-container\n                            *ngFor=\"let widgetData of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.result;\">\n                            <n7-item-preview [data]=\"widgetData\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n                        <ng-container *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.isLoading\">\n                            <div class=\"aw-home__bubble-results-list-loader\">\n                                <n7-loader [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.loaderData\">\n                                </n7-loader>\n                            </div>\n                        </ng-container>\n                    </div>\n                    <div *ngIf=\"lb.dataSource.hasScrollBackground\"\n                        class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                    <!-- aw-linked-objects__actions -->\n                    <div *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.actions as action\" class=\"aw-home__bubble-results-list-actions\">\n                        <button (click)=\"lb.eventHandler.emitInner('bubbleresultsviewallclick')\" class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\">\n                            {{action[0].label}}\n                        </button>\n                    </div>\n                </div>\n\n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Outer links -->\n    <div\n    *ngIf=\"lb.dataSource.outerLinks && lb.dataSource.outerLinks.length > 0\"\n     class=\"aw-home__outer-links\">\n        <section class=\"aw-home__outer-links-wrapper n7-side-auto-padding\">\n            <h2 class=\"aw-home__outer-links-title\"\n                *ngIf=\"lb.dataSource.outerLinksTitle\">\n                {{ lb.dataSource.outerLinksTitle }}\n            </h2>\n            <div class=\"aw-home__outer-links-items\">\n                <!-- Item preview -->\n                <n7-item-preview\n                    *ngFor=\"let outerLink of lb.dataSource.outerLinks\"\n                    [data]=\"outerLink\"\n                    [emit]=\"lb.eventHandler.outerLinkClick.bind(lb.eventHandler)\"\n                >\n                </n7-item-preview>\n            <!-- END // Item preview -->\n            </div>\n        </section>\n    </div>\n    <!-- END // Outer links -->\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Adavanced autocomplete popover  -->\n    <div id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <n7-advanced-autocomplete [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n\n    <!-- Simple autocomplete popover. DO NOT CHANGE parent div class! -->\n    <!-- Creating one template for each facet -->\n    <div *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\"\n        class=\"aw-simple-autocomplete__template\" style=\"display: none;\">\n        <div class=\"aw-simple-autocomplete__tippy-wrapper\">\n            <n7-simple-autocomplete [data]=\"lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-autocomplete-wrapper'].emit\">\n            </n7-simple-autocomplete>\n        </div>\n    </div>\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -8362,7 +7527,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaLayoutDS extends LayoutDataSource {
@@ -8370,6 +7534,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         super(...arguments);
         this.allBubbles = null;
         this.selectedBubbles = [];
+        this.sidebarIsSticky = false;
     }
     /**
      * If you are not using these variables (from your-layout.ts),
@@ -8393,6 +7558,8 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         this.mainState.update('headTitle', 'Arianna Web > Patrimonio');
         this.mainState.update('pageTitle', 'Arianna Web: patrimonio Layout');
         this.mainState.updateCustom('currentNav', 'aw/patrimonio');
+        // sidebar sticky control
+        this._sidebarStickyControl();
     }
     /**
      * @param {?} id
@@ -8591,6 +7758,36 @@ class AwSchedaLayoutDS extends LayoutDataSource {
             return null;
         return ('B_' + entityId.replace(/-/g, '_'));
     }
+    /**
+     * @private
+     * @return {?}
+     */
+    _sidebarStickyControl() {
+        /** @type {?} */
+        const source$ = fromEvent(window, 'scroll');
+        source$.subscribe((/**
+         * @return {?}
+         */
+        () => {
+            /** @type {?} */
+            const windowTop = window.pageYOffset;
+            /** @type {?} */
+            const windowBottom = window.scrollY + window.innerHeight;
+            /** @type {?} */
+            const wrapper = document.getElementsByClassName('sticky-parent')[0];
+            /** @type {?} */
+            const wrapperTop = wrapper['offsetTop'];
+            /** @type {?} */
+            const wrapperBottom = wrapperTop + wrapper.clientHeight;
+            /** @type {?} */
+            const target = document.getElementsByClassName('sticky-target')[0];
+            /** @type {?} */
+            const targetTop = target['offsetTop'];
+            /** @type {?} */
+            const targetBottom = targetTop + target.clientHeight;
+            this.sidebarIsSticky = wrapperTop <= windowTop;
+        }));
+    }
 }
 if (false) {
     /**
@@ -8655,11 +7852,12 @@ if (false) {
     AwSchedaLayoutDS.prototype.hasSimilarItems;
     /** @type {?} */
     AwSchedaLayoutDS.prototype.imageViewerIstance;
+    /** @type {?} */
+    AwSchedaLayoutDS.prototype.sidebarIsSticky;
 }
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaLayoutEH extends EventHandler {
@@ -8805,7 +8003,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -8836,7 +8033,6 @@ const AwPatrimonioLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaLayoutComponent extends AbstractLayout {
@@ -8893,7 +8089,7 @@ class AwSchedaLayoutComponent extends AbstractLayout {
 AwSchedaLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-scheda-layout',
-                template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n\n         <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree\">\n            <n7-sidebar-header\n                [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"\n            ></n7-sidebar-header>\n            <n7-tree\n                [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-tree'].emit\"\n                *ngIf=\"!lb.dataSource.sidebarCollapsed\"\n            ></n7-tree>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper\">\n            <n7-breadcrumbs\n                [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-breadcrumbs>\n\n            <n7-inner-title\n                [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <n7-image-viewer\n                [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\" *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\"\n                     *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer\n                    [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section\n                class=\"aw-scheda__bubble-chart\"\n                *ngIf=\"lb.dataSource.bubblesEnabled\">\n                <div\n                    *ngIf = \"lb.dataSource.hasBubbles\"\n                    class=\"aw-scheda__inner-title\">{{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <div [style.overflow]=\"'hidden'\">\n                    <aw-bubble-chart-wrapper\n                        [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                        [container]=\"'bubble-chart-container'\"\n                        [buttons]=\"['goto']\">\n                        <n7-bubble-chart\n                            [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </section>\n\n            <section\n                *ngIf = \"lb.dataSource.hasSimilarItems\"\n                id=\"related-item-container\" class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.similarItemsSectionTitle}}</div>\n                <div class=\"aw-scheda__related-items\">\n                    <!--<ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">-->\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview\n                            [data]=\"preview\"\n                            [emit]=\"lb.widgets['aw-linked-objects'].emit\"\n                            >\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n             </section>\n        </div>\n    </div>\n</div>\n"
+                template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n\n         <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\"\n            [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header\n                [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"\n            ></n7-sidebar-header>\n            <n7-tree\n                [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-tree'].emit\"\n                *ngIf=\"!lb.dataSource.sidebarCollapsed\"\n            ></n7-tree>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper\">\n            <n7-breadcrumbs\n                [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-breadcrumbs>\n\n            <n7-inner-title\n                [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <n7-image-viewer\n                [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\" *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\"\n                     *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer\n                    [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section\n                class=\"aw-scheda__bubble-chart\"\n                *ngIf=\"lb.dataSource.bubblesEnabled\">\n                <div\n                    *ngIf = \"lb.dataSource.hasBubbles\"\n                    class=\"aw-scheda__inner-title\">{{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <div [style.overflow]=\"'hidden'\">\n                    <aw-bubble-chart-wrapper\n                        [hover]=\"lb.widgets['aw-bubble-chart'].ds.currentHoverEntity\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                        [container]=\"'bubble-chart-container'\"\n                        [buttons]=\"['goto']\">\n                        <n7-bubble-chart\n                            [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </section>\n\n            <section\n                *ngIf = \"lb.dataSource.hasSimilarItems\"\n                id=\"related-item-container\" class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.similarItemsSectionTitle}}</div>\n                <div class=\"aw-scheda__related-items\">\n                    <!--<ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">-->\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview\n                            [data]=\"preview\"\n                            [emit]=\"lb.widgets['aw-linked-objects'].emit\"\n                            >\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n             </section>\n        </div>\n    </div>\n</div>\n"
             }] }
 ];
 /** @nocollapse */
@@ -8946,90 +8142,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/works-layout/works-layout.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwWorksLayoutDS extends LayoutDataSource {
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
-    onInit(payload) {
-        // TODO
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/works-layout/works-layout.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwWorksLayoutEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        /* this.innerEvents$.subscribe(({ type, payload }) => {
-          
-        }); */
-        /* this.outerEvents$.subscribe(({ type, payload }) => {
-          
-        }); */
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/works-layout/works-layout.config.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-const AwWorksLayoutConfig = {
-    layoutId: 'aw-works-layout',
-    widgets: [],
-    layoutDS: AwWorksLayoutDS,
-    layoutEH: AwWorksLayoutEH,
-    widgetsDataSources: DS$1,
-    widgetsEventHandlers: EH$1,
-    layoutOptions: {
-    // TODO
-    }
-};
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/works-layout/works-layout.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwWorksLayoutComponent extends AbstractLayout {
-    constructor() {
-        super(AwWorksLayoutConfig);
-    }
-    /**
-     * @return {?}
-     */
-    ngOnInit() {
-        this.onInit();
-    }
-    /**
-     * @return {?}
-     */
-    ngOnDestroy() {
-        this.onDestroy();
-    }
-}
-AwWorksLayoutComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'aw-works-layout',
-                template: "<div class=\"\" *ngIf=\"lb.dataSource\">\n    Works page!\n</div>"
-            }] }
-];
-/** @nocollapse */
-AwWorksLayoutComponent.ctorParameters = () => [];
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/search-layout/search-facets.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var facetsConfig = {
@@ -9160,10 +8272,11 @@ var facetsConfig = {
                     type: 'link',
                     facetId: 'entity-links',
                     filterConfig: {
+                        isArray: true,
                         limit: 20,
                         searchIn: [
                             {
-                                key: 'source.id',
+                                key: 'relatedEntities.id',
                                 operator: '='
                             }
                         ]
@@ -9174,9 +8287,9 @@ var facetsConfig = {
     ],
     results: {
         order: {
-            type: 'score',
+            type: 'text',
             // score | text | date
-            key: 'author',
+            key: 'label',
             // docPath, elastic key, ecc
             direction: 'DESC' // ASC | DESC
         },
@@ -9193,7 +8306,6 @@ var facetsConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -9204,28 +8316,18 @@ class AwSearchLayoutDS extends LayoutDataSource {
         this.currentPage = 1; // pagination value (url param)
         // pagination value (url param)
         this.pageSize = 10; // linked objects page size
+        // linked objects page size
+        this.sidebarIsSticky = false;
         this.orderByLabel = 'Ordina per';
         this.orderByOptions = [
             {
-                value: 'text_DESC',
+                value: 'label_DESC',
                 label: 'Ordine alfabetico (DESC)'
             },
             {
-                value: 'text_ASC',
+                value: 'label_ASC',
                 label: 'Ordine alfabetico (ASC)'
-            } /* {
-            value: 'score_DESC',
-            label: 'Ordine per rilevanza (DESC)'
-          }, {
-            value: 'score_ASC',
-            label: 'Ordine per rilevanza (ASC)'
-          }, {
-            value: 'date_DESC',
-            label: 'Ordina per data (DESC)'
-          }, {
-            value: 'date_ASC',
-            label: 'Ordina per data (ASC)'
-          } */
+            }
         ];
         this.getSearchModelId = (/**
          * @return {?}
@@ -9254,7 +8356,10 @@ class AwSearchLayoutDS extends LayoutDataSource {
          */
         () => {
             this.one('facets-wrapper').update({ searchModel: this.searchModel });
+            this.searchModel.updateInputsFromFilters();
         }));
+        // sidebar sticky control
+        this._sidebarStickyControl();
     }
     /**
      * @param {?} payload
@@ -9441,6 +8546,24 @@ class AwSearchLayoutDS extends LayoutDataSource {
          */
         singleItem => ({ item: Object.assign({}, singleItem) })));
     }
+    /**
+     * @private
+     * @return {?}
+     */
+    _sidebarStickyControl() {
+        /** @type {?} */
+        const source$ = fromEvent(window, 'scroll');
+        source$.subscribe((/**
+         * @return {?}
+         */
+        () => {
+            /** @type {?} */
+            const windowOffsetTop = window.pageYOffset;
+            /** @type {?} */
+            const wrapperOffsetTop = document.getElementsByClassName('sticky-parent')[0]['offsetTop'];
+            this.sidebarIsSticky = wrapperOffsetTop <= windowOffsetTop;
+        }));
+    }
 }
 if (false) {
     /**
@@ -9489,6 +8612,8 @@ if (false) {
     /** @type {?} */
     AwSearchLayoutDS.prototype.pageSize;
     /** @type {?} */
+    AwSearchLayoutDS.prototype.sidebarIsSticky;
+    /** @type {?} */
     AwSearchLayoutDS.prototype.options;
     /** @type {?} */
     AwSearchLayoutDS.prototype.orderByLabel;
@@ -9500,7 +8625,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/search-layout/search-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutEH extends EventHandler {
@@ -9520,7 +8644,9 @@ class AwSearchLayoutEH extends EventHandler {
             switch (type) {
                 case 'aw-search-layout.init':
                     this.dataSource.onInit(payload);
+                    this.route = payload.route;
                     this._listenToFacetsChange();
+                    this._listenToRouterChanges();
                     break;
                 case 'aw-search-layout.orderbychange':
                     this.dataSource.onOrderByChange(payload);
@@ -9537,7 +8663,7 @@ class AwSearchLayoutEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'facets-wrapper.facetschange':
-                    this.facetsChange$.next();
+                    // this.facetsChange$.next();
                     break;
                 case 'aw-linked-objects.pagination':
                     this.dataSource.onPaginationChange(payload).subscribe((/**
@@ -9595,8 +8721,27 @@ class AwSearchLayoutEH extends EventHandler {
             }));
         }));
     }
+    /**
+     * @private
+     * @return {?}
+     */
+    _listenToRouterChanges() {
+        this.route.queryParams.subscribe((/**
+         * @param {?} params
+         * @return {?}
+         */
+        params => {
+            this.emitOuter('queryparamschange', params);
+            this.facetsChange$.next();
+        }));
+    }
 }
 if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutEH.prototype.route;
     /**
      * @type {?}
      * @private
@@ -9606,7 +8751,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/search-layout/search-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -9632,7 +8776,6 @@ const AwSearchLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutComponent extends AbstractLayout {
@@ -9642,14 +8785,16 @@ class AwSearchLayoutComponent extends AbstractLayout {
      * @param {?} mainState
      * @param {?} communication
      * @param {?} search
+     * @param {?} route
      */
-    constructor(configuration, layoutsConfiguration, mainState, communication, search) {
+    constructor(configuration, layoutsConfiguration, mainState, communication, search, route) {
         super(layoutsConfiguration.get('AwSearchLayoutConfig') || AwSearchLayoutConfig);
         this.configuration = configuration;
         this.layoutsConfiguration = layoutsConfiguration;
         this.mainState = mainState;
         this.communication = communication;
         this.search = search;
+        this.route = route;
     }
     /**
      * Optional variables that can be accessed from the layout's logic.
@@ -9664,6 +8809,7 @@ class AwSearchLayoutComponent extends AbstractLayout {
             mainState: this.mainState,
             communication: this.communication,
             search: this.search,
+            route: this.route,
             options: this.config.options || {},
         };
     }
@@ -9683,7 +8829,7 @@ class AwSearchLayoutComponent extends AbstractLayout {
 AwSearchLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-search-layout',
-                template: "<div class=\"aw-search n7-side-auto-padding\" id=\"search-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>        \n        <!--\n        <div class=\"aw-search__header-right\">\n            <n7-nav\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\n            </n7-nav>\n        </div>\n        -->\n    </div>\n    <div class=\"aw-search__content-wrapper\">\n        <!-- Left sidebar: facets -->\n        <div class=\"aw-search__sidebar\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper\n                    [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>        \n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\" for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\" id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\" [value]=\"option.value\">{{ option.label }}</option>\n                    </select>\n                </div>     \n            </div>\n            <!-- Search details -->\n            <div class=\"aw-search__results-wrapper\">\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                    <n7-breadcrumbs [data]=\"preview.breadcrumbs\">\n                    </n7-breadcrumbs>\n                    <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n                <n7-pagination [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-pagination>\n            </div>\n        </div>\n    </div>\n</div>\n"
+                template: "<div class=\"aw-search n7-side-auto-padding\" id=\"search-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>        \n        <!--\n        <div class=\"aw-search__header-right\">\n            <n7-nav\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\n            </n7-nav>\n        </div>\n        -->\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div\n            class=\"aw-search__sidebar sticky-target\" \n            [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper\n                    [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>        \n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\" for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\" id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\" [value]=\"option.value\">{{ option.label }}</option>\n                    </select>\n                </div>     \n            </div>\n            <!-- Search details -->\n            <div class=\"aw-search__results-wrapper\">\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                    <n7-breadcrumbs [data]=\"preview.breadcrumbs\">\n                    </n7-breadcrumbs>\n                    <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n                <n7-pagination [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-pagination>\n            </div>\n        </div>\n    </div>\n</div>\n"
             }] }
 ];
 /** @nocollapse */
@@ -9692,7 +8838,8 @@ AwSearchLayoutComponent.ctorParameters = () => [
     { type: LayoutsConfigurationService },
     { type: MainStateService },
     { type: CommunicationService },
-    { type: SearchService }
+    { type: SearchService },
+    { type: ActivatedRoute }
 ];
 if (false) {
     /**
@@ -9720,11 +8867,15 @@ if (false) {
      * @private
      */
     AwSearchLayoutComponent.prototype.search;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutComponent.prototype.route;
 }
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/components/bubble-chart-wrapper/bubble-chart-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class BubbleChartWrapperComponent {
@@ -9753,7 +8904,7 @@ class BubbleChartWrapperComponent {
 BubbleChartWrapperComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-bubble-chart-wrapper',
-                template: "<div class=\"aw-bubble-chart-wrapper\" >\n    <button style=\"display: none;\" id=\"bubble-popup-menu_closebutton\"\n        (click)=\"onClick('bubble-tooltip-close-click',{entityId: (hover ? hover.id : null)} )\"></button>\n    <button style=\"display: none;\" id=\"bubble-popup-menu_gotobutton\"\n        (click)=\"onClick('bubble-tooltip-goto-click',{entityId:(hover  ? hover.id : null)} )\"></button>\n    <button style=\"display: none;\" id=\"bubble-popup-menu_selectbutton\"\n        (click)=\"onClick('bubble-tooltip-select-click',{entityId:(hover ? hover.id : null)} )\"></button>\n    <div id=\"bubble-popup-menu\" class=\"aw-bubble-popup-menu\" style=\"display: none;\">\n        <h2 class=\"aw-bubble-popup-menu__title\">{{ ( hover ? hover.label : '' ) }}</h2>\n        <span class=\"n7-icon-close aw-bubble-popup-menu__close\"\n            onclick=\"document.getElementById('bubble-popup-menu_closebutton').click();\"></span>\n        <p class=\"aw-bubble-popup-menu__text\">\n            {{ ( hover ? '\u00C8 collegato a '+ hover.count + ' entit\u00E0' : '' ) }}\n        </p>\n        <div class=\"aw-bubble-popup-menu__actions\">\n            <span class=\"aw-bubble-popup-menu__link\" *ngIf=\"buttons.indexOf('goto') >= 0\"\n                onclick=\"document.getElementById('bubble-popup-menu_gotobutton').click();\">Vai alla scheda</span>\n            <ng-container *ngIf=\"buttons.length > 1\"></ng-container>\n            <span class=\"aw-bubble-popup-menu__link\" *ngIf=\"buttons.indexOf('select') >= 0\"\n                onclick=\"document.getElementById('bubble-popup-menu_selectbutton').click();\">Seleziona</span>\n        </div>\n    </div>\n    <div [id]=\"container\">\n        <ng-content></ng-content>\n    </div>\n</div>"
+                template: "<div class=\"aw-bubble-chart-wrapper\">\n    <div class=\"bubble-chart__tippy-template\" style=\"display: none;\">\n        <!-- <button id=\"bubble-popup-menu_closebutton\" style=\"display: none;\"\n            (click)=\"onClick('bubble-tooltip-close-click')\"></button> -->\n        <button id=\"bubble-popup-menu_gotobutton\" class=\"bubble-popup-menu_gotobutton\" style=\"display: none;\"\n            (click)=\"onClick('bubble-tooltip-goto-click', {})\"></button>\n        <button id=\"bubble-popup-menu_selectbutton\" style=\"display: none;\"\n            (click)=\"onClick('bubble-tooltip-select-click', {})\"></button>\n        <div id=\"bubble-popup-menu\" class=\"aw-bubble-popup-menu\">\n            <h2 class=\"aw-bubble-popup-menu__title\">\n                <!-- Set by tippy builder fuction -->\n            </h2>\n            <!-- <span class=\"n7-icon-close aw-bubble-popup-menu__close\"\n                onclick=\"document.getElementById('bubble-popup-menu_closebutton').click();\">\n            </span> -->\n            <p class=\"aw-bubble-popup-menu__text\">\n                <!-- Set by tippy builder fuction -->\n            </p>\n            <div class=\"aw-bubble-popup-menu__actions\">\n                <span class=\"aw-bubble-popup-menu__link\" *ngIf=\"buttons.indexOf('goto') >= 0\"\n                    onclick=\"document.getElementById('bubble-popup-menu_gotobutton').click();\">Vai alla scheda</span>\n                <ng-container *ngIf=\"buttons.length > 1\"></ng-container>\n                <span class=\"aw-bubble-popup-menu__link\" *ngIf=\"buttons.indexOf('select') >= 0\"\n                    onclick=\"document.getElementById('bubble-popup-menu_selectbutton').click();\">\n                    <!-- Set by tippy builder function -->\n                </span>\n            </div>\n        </div>\n    </div>\n\n    <ng-content></ng-content>\n</div>"
             }] }
 ];
 BubbleChartWrapperComponent.propDecorators = {
@@ -9775,7 +8926,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/components/smart-breadcrumbs/smart-breadcrumbs.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -9928,16 +9078,13 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/n7-boilerplate-arianna-web.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
 const COMPONENTS$1 = [
-    AwAboutLayoutComponent,
     AwEntitaLayoutComponent,
     AwHomeLayoutComponent,
     AwSchedaLayoutComponent,
-    AwWorksLayoutComponent,
     AwSearchLayoutComponent,
     BubbleChartWrapperComponent,
     SmartBreadcrumbsComponent
@@ -9959,7 +9106,6 @@ N7BoilerplateAriannaWebModule.decorators = [
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/components/data-widget-wrapper/data-widget-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -9991,7 +9137,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/layout/example-layout/example-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvExampleLayoutDS extends LayoutDataSource {
@@ -9999,7 +9144,6 @@ class DvExampleLayoutDS extends LayoutDataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/layout/example-layout/example-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvExampleLayoutEH extends EventHandler {
@@ -10012,7 +9156,6 @@ class DvExampleLayoutEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/data-sources/data-widget-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvDataWidgetDS extends DataSource {
@@ -10030,7 +9173,6 @@ class DvDataWidgetDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/data-sources/graph.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvGraphDS extends DataSource {
@@ -10117,7 +9259,6 @@ class DvGraphDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/data-sources/inner-title.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvInnerTitleDS extends DataSource {
@@ -10144,7 +9285,6 @@ class DvInnerTitleDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/data-sources/widget.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvWidgetDS extends DataSource {
@@ -10160,12 +9300,10 @@ class DvWidgetDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS$2 = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     DvDataWidgetDS: DvDataWidgetDS,
     DvGraphDS: DvGraphDS,
     DvInnerTitleDS: DvInnerTitleDS,
@@ -10174,7 +9312,6 @@ var DS$2 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/event-handlers/data-widget-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvDataWidgetEH extends EventHandler {
@@ -10188,18 +9325,15 @@ class DvDataWidgetEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH$2 = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     DvDataWidgetEH: DvDataWidgetEH
 });
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/layout/example-layout/example-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -10225,7 +9359,6 @@ const DvExampleLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/layout/example-layout/example-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvExampleLayoutComponent extends AbstractLayout {
@@ -10256,7 +9389,6 @@ DvExampleLayoutComponent.ctorParameters = () => [];
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/n7-boilerplate-data-viz.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -10281,7 +9413,6 @@ N7BoilerplateDataVizModule.decorators = [
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/n7-boilerplate-lib.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class N7BoilerplateLibModule {
@@ -10305,51 +9436,43 @@ N7BoilerplateLibModule.decorators = [
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/layout/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: public-api.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: n7-frontend-boilerplate.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAboutLayoutComponent, AwAboutLayoutConfig, AwAboutLayoutDS, AwAboutLayoutEH, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeBubbleChartEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, AwWorksLayoutComponent, AwWorksLayoutConfig, AwWorksLayoutDS, AwWorksLayoutEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DvDataWidgetDS, DvDataWidgetEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsEH, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SearchModel, SearchService, SmartBreadcrumbsComponent, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwAboutLayoutComponent as ɵk, AwEntitaLayoutComponent as ɵl, CommunicationService as ɵm, MainStateService as ɵn, AwHomeLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwWorksLayoutComponent as ɵq, AwSearchLayoutComponent as ɵr, ConfigurationService as ɵs, LayoutsConfigurationService as ɵt, SearchService as ɵu, BubbleChartWrapperComponent as ɵv, SmartBreadcrumbsComponent as ɵw, DataWidgetWrapperComponent as ɵx, DvExampleLayoutComponent as ɵy };
+export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeBubbleChartEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DvDataWidgetDS, DvDataWidgetEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsEH, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SearchModel, SearchService, SmartBreadcrumbsComponent, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, CommunicationService as ɵl, MainStateService as ɵm, AwHomeLayoutComponent as ɵn, AwSchedaLayoutComponent as ɵo, AwSearchLayoutComponent as ɵp, ConfigurationService as ɵq, LayoutsConfigurationService as ɵr, SearchService as ɵs, BubbleChartWrapperComponent as ɵt, SmartBreadcrumbsComponent as ɵu, DataWidgetWrapperComponent as ɵv, DvExampleLayoutComponent as ɵw };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

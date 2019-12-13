@@ -31,7 +31,7 @@ export declare class FacetsWrapperDS extends DataSource {
     updateFiltersFromQueryParams: (queryParams: any) => void;
     getInputByFacetId: (facetId: any) => import("../models").FacetInput;
     filterTarget: (target: any) => void;
-    updateInputsFromFilters(): void;
+    updateInputsFromFilters: () => void;
     private _getSectionClasses;
     private _headerConfig;
 }

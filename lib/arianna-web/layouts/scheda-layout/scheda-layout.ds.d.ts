@@ -25,6 +25,7 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
     bubblesEnabled: boolean;
     hasSimilarItems: boolean;
     imageViewerIstance: any;
+    sidebarIsSticky: boolean;
     /**
     * If you are not using these variables (from your-layout.ts),
     * remove them from onInit() parameters and inside the function.
@@ -44,4 +45,5 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
     collapseSidebar(): void;
     setAllBubblesFromApolloQuery(response: any, reset?: boolean): void;
     private convertEntityIdToBubbleId;
+    private _sidebarStickyControl;
 }

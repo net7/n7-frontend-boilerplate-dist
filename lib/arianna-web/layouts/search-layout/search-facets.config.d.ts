@@ -123,12 +123,12 @@ declare const _default: {
             type: string;
             facetId: string;
             filterConfig: {
+                isArray: boolean;
                 limit: number;
                 searchIn: {
                     key: string;
                     operator: string;
                 }[];
-                isArray?: undefined;
                 context?: undefined;
                 target?: undefined;
                 delay?: undefined;
