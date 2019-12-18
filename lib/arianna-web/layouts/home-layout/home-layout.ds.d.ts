@@ -16,6 +16,7 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     outerLinks: any;
     outerLinksTitle: string;
     homeAutocompleteQuery: string;
+    private destroyed$;
     bubblesEnabled: boolean;
     selectedBubbles: any[];
     lastBubbleResponse: any;
@@ -26,6 +27,7 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
         configuration: any;
         tippy: any;
     }): void;
+    onDestroy(): void;
     makeRequest$(query: any, params: any): any;
     updateComponent: (id: any, data: any, options?: any) => void;
     initialFilterRequest(): any;

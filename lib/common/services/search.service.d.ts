@@ -105,5 +105,6 @@ export declare class SearchService {
     static queryParams: any;
     private _models;
     add(id: string, config: ISearchConfig): void;
+    remove(id: string): void;
     model(id: string): SearchModel;
 }

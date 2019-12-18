@@ -1,6 +1,7 @@
 import { LayoutDataSource } from '@n7-frontend/core';
 import { Observable } from 'rxjs';
 export declare class AwSearchLayoutDS extends LayoutDataSource {
+    private destroyed$;
     private communication;
     private configuration;
     private mainState;
@@ -8,12 +9,15 @@ export declare class AwSearchLayoutDS extends LayoutDataSource {
     private searchModel;
     private prettifyLabels;
     private configKeys;
+    private fallback;
+    private resetButtonEnabled;
     pageTitle: string;
     resultsTitle: string;
     totalCount: number;
     currentPage: any;
     pageSize: number;
     sidebarIsSticky: boolean;
+    isFirstLoading: boolean;
     options: any;
     orderByLabel: string;
     orderByOptions: any;
@@ -24,9 +28,12 @@ export declare class AwSearchLayoutDS extends LayoutDataSource {
         communication: any;
         search: any;
     }): void;
+    onDestroy(): void;
+    onSearchResponse(): void;
     onOrderByChange(payload: any): void;
     onPaginationChange(payload: any): Observable<boolean>;
     onPaginationGoToChange(payload: any): Observable<boolean>;
+    resetPagination(): void;
     onResultsLimitChange(payload: any): void;
     getSearchModelId: () => string;
     doSearchRequest$(): Observable<any>;

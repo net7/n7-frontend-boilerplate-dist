@@ -17,6 +17,6 @@ export declare class AwHomeAutocompleteDS extends DataSource {
                 };
             };
         };
-        fallback: string;
+        fallback: any;
     };
 }
