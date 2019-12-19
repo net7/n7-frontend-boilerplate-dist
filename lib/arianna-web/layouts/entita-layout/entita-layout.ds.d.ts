@@ -5,8 +5,10 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
     protected router: any;
     protected location: any;
     protected titleService: any;
+    protected route: any;
     options: any;
     pageTitle: string;
+    showFields: boolean;
     myResponse: any;
     selectedTab: string;
     navHeader: any;
@@ -16,10 +18,11 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
     bubblesSize: number;
     bubblesEnabled: boolean;
     private communication;
-    onInit({ configuration, mainState, router, location, options, titleService, communication }: {
+    onInit({ configuration, mainState, router, route, location, options, titleService, communication }: {
         configuration: any;
         mainState: any;
         router: any;
+        route: any;
         location: any;
         options: any;
         titleService: any;

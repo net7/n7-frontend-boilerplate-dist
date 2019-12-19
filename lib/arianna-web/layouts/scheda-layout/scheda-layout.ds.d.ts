@@ -1,6 +1,8 @@
 import { LayoutDataSource } from '@n7-frontend/core';
 export declare class AwSchedaLayoutDS extends LayoutDataSource {
+    static tree: any;
     private destroyed$;
+    private stickyControlTrigger$;
     private communication;
     protected configuration: any;
     protected mainState: any;
@@ -32,6 +34,8 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
     }): void;
     onDestroy(): void;
     getNavigation(id: any): any;
+    setTree(tree: any): void;
+    getTree: () => any;
     updateNavigation(data: any): void;
     loadItem(id: any): any;
     loadContent(response: any): void;

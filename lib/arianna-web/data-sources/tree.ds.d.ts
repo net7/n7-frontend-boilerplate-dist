@@ -1,12 +1,18 @@
 import { DataSource } from '@n7-frontend/core';
 export declare class AwTreeDS extends DataSource {
-    currentItem: any;
-    icons: any;
-    protected transform(data: any): any;
-    updateTree(data: any, parents: any, id: any): void;
-    private updateTreeData;
-    selectTreeItem(id: any, data: any): void;
-    toggleSidebar(): void;
-    parseData(response: any): void;
-    private parseTree;
+    static dataCache: any;
+    private rootId;
+    private currentId;
+    private activeId;
+    protected transform(tree: any): any;
+    load(data: any): void;
+    build(id: any): void;
+    setActive(id: any): void;
+    highlightActive(): void;
+    private _getCachedData;
+    private _normalize;
+    private _getParent;
+    private _getTreePath;
+    private _getTree;
+    private _getTreeItem;
 }
