@@ -49,7 +49,8 @@ export declare class SearchModel {
     getResults$: () => Subject<any[]>;
     setResults: (results: any) => void;
     updateFilter(facetId: any, value: any, remove?: boolean): void;
-    updateFiltersFromQueryParams(queryParams: any): void;
+    clear(): void;
+    updateFiltersFromQueryParams(queryParams: any, clearAll?: boolean): void;
     updateInputsFromFilters(): void;
     updateFacets(facets: any): void;
     updateTotalCount(totalCount: any): void;

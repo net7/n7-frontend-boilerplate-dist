@@ -4,6 +4,7 @@ export declare class AwHomeFacetsWrapperDS extends DataSource {
     lockedFacets: {};
     lastData: {};
     closedEyes: any[];
+    openTippy: string;
     protected transform(data: any): any[];
     tippyMaker: (res: any, id: any) => void;
 }

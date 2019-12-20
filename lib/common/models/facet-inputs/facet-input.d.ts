@@ -11,6 +11,7 @@ export declare abstract class FacetInput {
     protected config: any;
     protected output: any;
     protected data: IFacetInputData[];
+    protected isEmpty: boolean;
     constructor(config: any);
     abstract setActive(facetValue: any): void;
     protected abstract transform(): any;
@@ -26,6 +27,7 @@ export declare abstract class FacetInput {
     getSearchIn: () => any;
     getType: () => any;
     getOutput: () => any;
+    setIsEmpty: (empty: boolean) => void;
     setData: (newData: IFacetInputData[]) => IFacetInputData[];
     private _setId;
 }

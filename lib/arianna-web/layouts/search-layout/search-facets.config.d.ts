@@ -103,6 +103,7 @@ declare const _default: {
                 limit?: undefined;
             };
             placeholder?: undefined;
+            emptyState?: undefined;
         } | {
             type: string;
             facetId: string;
@@ -119,9 +120,13 @@ declare const _default: {
                 isArray?: undefined;
                 limit?: undefined;
             };
+            emptyState?: undefined;
         } | {
             type: string;
             facetId: string;
+            emptyState: {
+                label: string;
+            };
             filterConfig: {
                 isArray: boolean;
                 limit: number;

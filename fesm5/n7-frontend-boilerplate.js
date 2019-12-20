@@ -1021,6 +1021,7 @@ if (false) {
 var FacetInput = /** @class */ (function () {
     function FacetInput(config) {
         var _this = this;
+        this.isEmpty = false;
         this.update = (/**
          * @return {?}
          */
@@ -1069,6 +1070,13 @@ var FacetInput = /** @class */ (function () {
          * @return {?}
          */
         function () { return _this.output; });
+        this.setIsEmpty = (/**
+         * @param {?} empty
+         * @return {?}
+         */
+        function (empty) {
+            _this.isEmpty = empty;
+        });
         this.setData = (/**
          * @param {?} newData
          * @return {?}
@@ -1089,7 +1097,6 @@ var FacetInput = /** @class */ (function () {
     function () {
         this.id = "facet-input-" + this.getType() + "-" + FacetInput.index;
     };
-    ;
     FacetInput.index = 0;
     return FacetInput;
 }());
@@ -1116,6 +1123,11 @@ if (false) {
      * @protected
      */
     FacetInput.prototype.data;
+    /**
+     * @type {?}
+     * @protected
+     */
+    FacetInput.prototype.isEmpty;
     /** @type {?} */
     FacetInput.prototype.update;
     /** @type {?} */
@@ -1141,8 +1153,9 @@ if (false) {
     /** @type {?} */
     FacetInput.prototype.getOutput;
     /** @type {?} */
+    FacetInput.prototype.setIsEmpty;
+    /** @type {?} */
     FacetInput.prototype.setData;
-    /* Skipping unhandled member: ;*/
     /**
      * @abstract
      * @param {?} facetValue
@@ -1302,7 +1315,8 @@ var FacetInputLink = /** @class */ (function (_super) {
         var _this = this;
         /** @type {?} */
         var facetId = this.getFacetId();
-        return this.data.map((/**
+        /** @type {?} */
+        var results = this.data.map((/**
          * @param {?} __0
          * @return {?}
          */
@@ -1337,6 +1351,34 @@ var FacetInputLink = /** @class */ (function (_super) {
                 _meta: { facetId: facetId, value: value }
             };
         }));
+        // empty state control
+        /** @type {?} */
+        var itemEmpty = results.filter((/**
+         * @param {?} item
+         * @return {?}
+         */
+        function (item) { return item.id === 'empty'; }))[0];
+        if (this.isEmpty) {
+            if (itemEmpty) {
+                itemEmpty.classes = 'empty-text-link';
+            }
+            else {
+                var label = this.getConfig().emptyState.label;
+                /** @type {?} */
+                var emptyId = 'empty-link';
+                results.push({
+                    type: 'link',
+                    id: emptyId,
+                    text: label,
+                    classes: 'empty-text-link',
+                    _meta: { facetId: emptyId, value: null }
+                });
+            }
+        }
+        else if (itemEmpty) {
+            itemEmpty.classes = 'empty-text-link is-hidden';
+        }
+        return results;
     };
     /**
      * @param {?} facetValue
@@ -1638,15 +1680,27 @@ var SearchModel = /** @class */ (function () {
         }));
     };
     /**
+     * @return {?}
+     */
+    SearchModel.prototype.clear = /**
+     * @return {?}
+     */
+    function () {
+        this.updateFiltersFromQueryParams({}, true);
+    };
+    /**
      * @param {?} queryParams
+     * @param {?=} clearAll
      * @return {?}
      */
     SearchModel.prototype.updateFiltersFromQueryParams = /**
      * @param {?} queryParams
+     * @param {?=} clearAll
      * @return {?}
      */
-    function (queryParams) {
+    function (queryParams, clearAll) {
         var _this = this;
+        if (clearAll === void 0) { clearAll = false; }
         this._facets.forEach((/**
          * @param {?} __0
          * @return {?}
@@ -1659,7 +1713,7 @@ var SearchModel = /** @class */ (function () {
             var value = queryParams[id];
             /** @type {?} */
             var isInternal = _this.getInputByFacetId(id).getContext() === 'internal';
-            if (isInternal) {
+            if (isInternal && !clearAll) {
                 return;
             }
             selectedFilters.forEach((/**
@@ -1930,6 +1984,15 @@ var SearchModel = /** @class */ (function () {
         function (item) { return _this._filterData(searchIns, item); }));
         // update
         targetInput.setData(facetData);
+        if (targetInput.getConfig().emptyState) {
+            /** @type {?} */
+            var isEmpty = !facetData.filter((/**
+             * @param {?} data
+             * @return {?}
+             */
+            function (data) { return !data.hidden; })).length;
+            targetInput.setIsEmpty(isEmpty);
+        }
         targetInput.update();
     };
     /**
@@ -3307,6 +3370,10 @@ var FacetsWrapperEH = /** @class */ (function (_super) {
             var type = _a.type, payload = _a.payload;
             switch (type) {
                 case 'facets-wrapper.facet':
+                    // empty payload control
+                    if (!payload.eventPayload.inputPayload) {
+                        return;
+                    }
                     var facetId = payload.eventPayload.inputPayload.facetId;
                     /** @type {?} */
                     var input = _this.dataSource.getInputByFacetId(facetId);
@@ -3914,6 +3981,15 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
          */
         function (tab) {
             _this.selectedTab = tab;
+            // this.one('aw-bubble-chart').updateComponent(
+            //   'aw-bubble-chart',
+            //   this.myResponse.relatedEntities,
+            //   {
+            //     simple: true,
+            //     config: this.configuration,
+            //     limit: this.route.snapshot.params.tab == 'overview' ? 3 : this.configuration.get('bubble-chart').bubbleLimit
+            //   }
+            // );
             _this.updateWidgets(_this.myResponse);
             /** @type {?} */
             var page = tab == 'oggetti-collegati' ? "/1" : "";
@@ -3966,8 +4042,15 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
         this.currentId = "";
         this.currentPage = +this.route.snapshot.params.page;
         this.bubblesEnabled = this.configuration.get('features-enabled') ? this.configuration.get('features-enabled')['bubblechart'] : false;
-        this.bubblesSize = this.configuration.get('entita-layout') ? this.configuration.get('entita-layout')['max-bubble-num'] : this.bubblesSize;
-        this.one('aw-bubble-chart').updateOptions({ simple: true, config: this.configuration });
+        this.bubblesSize = this.configuration.get('entita-layout') ? this.configuration.get('entita-layout')['entitiesQuerySize'] : this.bubblesSize;
+        this.one('aw-bubble-chart').updateOptions({
+            simple: true,
+            config: this.configuration,
+            limit: this.configuration.get('bubble-chart').bubbleLimit,
+            smallChartSize: this.configuration.get('entita-layout').overview.smallChartSize
+        });
+        // update head title
+        this.mainState.update('headTitle', 'Arianna Web > Entità');
     };
     /**
      * @param {?} id
@@ -4123,6 +4206,8 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
             });
         }
         this.one('aw-linked-objects').update({ items: res.relatedItems });
+        // update head title
+        this.mainState.update('headTitle', "Arianna Web > Entit\u00E0 > " + this.myResponse.label);
     };
     return AwEntitaLayoutDS;
 }(LayoutDataSource));
@@ -4950,15 +5035,16 @@ var AwBubbleChartDS = /** @class */ (function (_super) {
         function (res) {
             /*
               Redraws the graph with the incoming data.
-              "res" should be Apollo's "response.entitiesData"
+              "res" should be Apollo's "response.entitiesData".
+              When res is passed as null, the chart is rendered with the previous data.
             */
-            if (res) {
-                _this.chartData = res;
-            }
-            else if (res === null) {
+            if (res === null) {
                 res = _this.chartData;
             }
-            if (_this.filters.length > 0) { // apply filters to the response before redrawing the graph
+            else {
+                _this.chartData = res;
+            }
+            if (_this.filters.length > 0) { // apply filters to the response
                 res = _this.chartData.filter((/**
                  * @param {?} el
                  * @return {?}
@@ -4966,12 +5052,28 @@ var AwBubbleChartDS = /** @class */ (function (_super) {
                 function (el) { return !_this.filters.includes(el.entity.typeOfEntity.replace(/ /g, '-')); }));
             }
             if (!_this.draw) {
-                _this.update(res); // component self-update
+                _this.update(_this.smartSlice(res)); // component self-update
             }
             else {
-                _this.output.data = res;
                 _this.output.selected = _this.selected;
+                _this.output.data = _this.smartSlice(res);
                 _this.draw();
+            }
+        });
+        _this.smartSlice = (/**
+         * @param {?} d
+         * @param {?=} length
+         * @return {?}
+         */
+        function (d, length) {
+            /** @type {?} */
+            var l = length ? length : _this.options.limit;
+            if (l && l < d.length) {
+                // return d.splice(d.length - l, l)
+                return d.slice(0, l);
+            }
+            else {
+                return d;
             }
         });
         _this.handleBubbleClick = (/**
@@ -5055,27 +5157,31 @@ var AwBubbleChartDS = /** @class */ (function (_super) {
              */
             function (b) {
                 /** @type {?} */
-                var el = document.getElementById(b.entity.id).parentElement // selects a <g> element
+                var el = document.getElementById(b.entity.id);
+                /** @type {?} */
+                var group = el ? el.parentElement : false // selects a <g> element
                 ;
-                _this.tippyList.push(// add this tippy to the array of instances
-                tippy(el, {
-                    content: buildTooltip(b),
-                    interactive: true,
-                    appendTo: document.body,
-                    // suppress interactive warning
-                    arrow: true,
-                    flip: false,
-                    theme: 'light-border no-padding',
-                    placement: 'top',
-                    delay: [150, 30],
-                    updateDuration: 400,
-                    onMount: /**
-                     * @return {?}
-                     */
-                    function () {
-                        focusBubble(b.entity.id);
-                    }
-                }));
+                if (group) {
+                    _this.tippyList.push(// add this tippy to the array of instances
+                    tippy(group, {
+                        content: buildTooltip(b),
+                        interactive: true,
+                        appendTo: document.body,
+                        // suppress interactive warning
+                        arrow: true,
+                        flip: false,
+                        theme: 'light-border no-padding',
+                        placement: 'top',
+                        delay: [150, 30],
+                        updateDuration: 400,
+                        onMount: /**
+                         * @return {?}
+                         */
+                        function () {
+                            focusBubble(b.entity.id);
+                        }
+                    }));
+                }
             }));
             // createSingleton(this.tippyList, {
             //   interactive: true,
@@ -5094,7 +5200,9 @@ var AwBubbleChartDS = /** @class */ (function (_super) {
         });
         return _this;
     }
+    // public bubbleBasket: any[]
     // id of the focused bubble
+    // public bubbleBasket: any[]
     /**
      * @protected
      * @param {?} data
@@ -5102,6 +5210,7 @@ var AwBubbleChartDS = /** @class */ (function (_super) {
      */
     AwBubbleChartDS.prototype.transform = 
     // id of the focused bubble
+    // public bubbleBasket: any[]
     /**
      * @protected
      * @param {?} data
@@ -5125,10 +5234,8 @@ var AwBubbleChartDS = /** @class */ (function (_super) {
             domain.push(k.replace(/-/g, ' '));
             range.push(((colorConfig[k] || {}).color || {}).hex);
         }));
-        if (data.response && data.response.entitiesData) {
-            this.chartData = data.response.entitiesData;
-        }
-        return {
+        /** @type {?} */
+        var commonParams = {
             fontRendering: fontRendering,
             containerId: 'bubbleChartContainer',
             width: 500,
@@ -5138,13 +5245,12 @@ var AwBubbleChartDS = /** @class */ (function (_super) {
             sizeRange: [.5, 500],
             selected: this.selected,
             colorMatch: { domain: domain, range: range },
-            data: this.chartData,
-            setDraw: (/**
+        };
+        return __assign({}, commonParams, { data: this.smartSlice(data), smallView: __assign({}, commonParams, { data: this.smartSlice(data, (this.options.smallChartSize || null)) }), setDraw: (/**
              * @param {?} draw
              * @return {?}
              */
-            function (draw) { return _this.draw = draw; })
-        };
+            function (draw) { return _this.draw = draw; }) });
     };
     return AwBubbleChartDS;
 }(DataSource));
@@ -5165,6 +5271,8 @@ if (false) {
     AwBubbleChartDS.prototype.focusedBubble;
     /** @type {?} */
     AwBubbleChartDS.prototype.updateChart;
+    /** @type {?} */
+    AwBubbleChartDS.prototype.smartSlice;
     /** @type {?} */
     AwBubbleChartDS.prototype.handleBubbleClick;
     /** @type {?} */
@@ -5290,6 +5398,8 @@ var AwHomeFacetsWrapperDS = /** @class */ (function (_super) {
         _this.lastData = {}; // store the last response so the component can be rendered again with the same data
         // store the last response so the component can be rendered again with the same data
         _this.closedEyes = []; // list of closed eyes
+        // list of closed eyes
+        _this.openTippy = ''; // tipe of entity of the currently open tippy
         _this.tippyMaker = (/**
          * @param {?} res
          * @param {?} id
@@ -5346,14 +5456,14 @@ var AwHomeFacetsWrapperDS = /** @class */ (function (_super) {
         });
         return _this;
     }
-    // list of closed eyes
+    // tipe of entity of the currently open tippy
     /**
      * @protected
      * @param {?} data
      * @return {?}
      */
     AwHomeFacetsWrapperDS.prototype.transform = 
-    // list of closed eyes
+    // tipe of entity of the currently open tippy
     /**
      * @protected
      * @param {?} data
@@ -5456,6 +5566,9 @@ var AwHomeFacetsWrapperDS = /** @class */ (function (_super) {
                     facet.locked = false;
                 }
             }
+            else {
+                facet.locked = false;
+            }
             /** @type {?} */
             var headerClasses = [];
             /** @type {?} */
@@ -5527,6 +5640,8 @@ if (false) {
     AwHomeFacetsWrapperDS.prototype.lastData;
     /** @type {?} */
     AwHomeFacetsWrapperDS.prototype.closedEyes;
+    /** @type {?} */
+    AwHomeFacetsWrapperDS.prototype.openTippy;
     /** @type {?} */
     AwHomeFacetsWrapperDS.prototype.tippyMaker;
 }
@@ -6743,7 +6858,9 @@ var AwBubbleChartEH = /** @class */ (function (_super) {
                     _this.toggleSelection(payload);
                     break;
                 case 'aw-home-layout.facetclick':
-                    _this.toggleSelection(payload);
+                    if (!_this.dataSource.selected.includes(payload)) {
+                        _this.toggleSelection(payload);
+                    }
                     break;
                 case 'aw-home-layout.togglefilter':
                     _this.toggleFilter(payload);
@@ -6910,6 +7027,7 @@ var AwHomeFacetsWrapperEH = /** @class */ (function (_super) {
                     break;
                 // change search input text
                 case 'aw-home-facets-wrapper.change':
+                    _this.dataSource.openTippy = payload.inputPayload.replace('-search', '');
                     _this.changedInput$.next(payload);
                     break;
                 // pressed return while typing in search
@@ -6947,7 +7065,20 @@ var AwHomeFacetsWrapperEH = /** @class */ (function (_super) {
                     _this.dataSource.update(_this.dataSource.lastData);
                     break;
                 case 'aw-home-layout.clearselection':
+                    _this.dataSource.lockedFacets = {};
+                    _this.dataSource.closedEyes = [];
+                    _this.dataSource.update(_this.dataSource.lastData);
+                    break;
                 case 'aw-home-layout.facetclick':
+                    var openTippy = _this.dataSource.openTippy;
+                    if (_this.dataSource.lockedFacets[openTippy]) {
+                        if (_this.dataSource.lockedFacets[openTippy].indexOf(payload) == -1) {
+                            _this.dataSource.lockedFacets[openTippy].push(payload);
+                        }
+                    }
+                    else {
+                        _this.dataSource.lockedFacets[openTippy] = [payload];
+                    }
                     _this.dataSource.update(_this.dataSource.lastData);
                     break;
                 default:
@@ -7428,7 +7559,7 @@ var AwEntitaLayoutComponent = /** @class */ (function (_super) {
     AwEntitaLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-entita-layout',
-                    template: "<div class=\"aw-entity n7-side-auto-padding\" *ngIf=\"lb.dataSource\">\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n    <!-- lb.dataSource.selectedTab -->\n    <div class=\"aw-entity__content\">\n        <section>\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\n                class=\"aw-entity__content-section\" [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <button *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'wiki')\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                    <button *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'maxxi')\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n            </div>\n\n            <ng-container *ngIf=\"\n            ((lb.dataSource.myResponse.fields || []).length > 0 && lb.dataSource.selectedTab == 'campi') ||\n            (lb.dataSource.showFields && lb.dataSource.selectedTab == 'overview')\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                    [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'campi'\">\n                    <div class=\"aw-entity__content-section-header\">\n                        <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                        <button class=\"n7-btn n7-btn-light\" (click)=\"lb.eventHandler.emitInner('showmore', 'campi')\">\n                            TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\n                        </button>\n                    </div>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async \">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <button class=\"n7-btn n7-btn-light\" *ngIf=\"lb.dataSource.selectedTab == 'overview'\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'oggetti-collegati')\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n                <div class=\"aw-entity__content-item-previews\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n                <n7-pagination [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                *ngIf=\"lb.dataSource.bubblesEnabled\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <button class=\"n7-btn n7-btn-light\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'entita-collegate')\"\n                        *ngIf=\"lb.dataSource.selectedTab == 'overview'\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n                <div class=\"aw-home__bubble-chart-wrapper\">\n                    <aw-bubble-chart-wrapper [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                        [container]=\"'bubble-chart-container'\" [buttons]=\"['select', 'goto']\">\n                        <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                *ngIf=\"lb.dataSource.myResponse.extraTab\" [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n                *ngIf=\"lb.dataSource.myResponse.wikiTab\" [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{lb.dataSource.myResponse.wikiTab.url}}\n                </a>\n            </div>\n        </section>\n    </div>\n</div>"
+                    template: "<div class=\"aw-entity n7-side-auto-padding\" *ngIf=\"lb.dataSource\">\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n    <!-- lb.dataSource.selectedTab -->\n    <div class=\"aw-entity__content\">\n        <section>\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\n                class=\"aw-entity__content-section\" [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <button *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'wiki')\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                    <button *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'maxxi')\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n            </div>\n\n            <ng-container *ngIf=\"\n            ((lb.dataSource.myResponse.fields || []).length > 0 && lb.dataSource.selectedTab == 'campi') ||\n            (lb.dataSource.showFields && lb.dataSource.selectedTab == 'overview')\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                    [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'campi'\">\n                    <div class=\"aw-entity__content-section-header\">\n                        <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                        <button class=\"n7-btn n7-btn-light\" (click)=\"lb.eventHandler.emitInner('showmore', 'campi')\">\n                            TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\n                        </button>\n                    </div>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async \">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <button class=\"n7-btn n7-btn-light\" *ngIf=\"lb.dataSource.selectedTab == 'overview'\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'oggetti-collegati')\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n                <div class=\"aw-entity__content-item-previews\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n                <n7-pagination [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview aw-bubble-chart__{{lb.dataSource.selectedTab}}\"\n                *ngIf=\"lb.dataSource.bubblesEnabled\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <button class=\"n7-btn n7-btn-light\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'entita-collegate')\"\n                        *ngIf=\"lb.dataSource.selectedTab == 'overview'\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n                <!-- SMALL BUBBLE CHART -->\n                <div class=\"aw-home__bubble-chart-wrapper-small\" *ngIf=\"lb.dataSource.selectedTab == 'overview'\">\n                    <aw-bubble-chart-wrapper [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                        [container]=\"'bubble-chart-container'\" [buttons]=\"['select', 'goto']\">\n                        <n7-bubble-chart [data]=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.smallView\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n                <!-- NORMAL BUBBLE CHART -->\n                <div class=\"aw-home__bubble-chart-wrapper\" *ngIf=\"lb.dataSource.selectedTab == 'entita-collegate'\">\n                    <aw-bubble-chart-wrapper [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                        [container]=\"'bubble-chart-container'\" [buttons]=\"['select', 'goto']\">\n                        <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                *ngIf=\"lb.dataSource.myResponse.extraTab\" [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n                *ngIf=\"lb.dataSource.myResponse.wikiTab\" [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{lb.dataSource.myResponse.wikiTab.url}}\n                </a>\n            </div>\n        </section>\n    </div>\n</div>"
                 }] }
     ];
     /** @nocollapse */
@@ -7508,6 +7639,9 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
         _this.bubblesEnabled = false; // true if this Arianna Web project has the bubble chart module
         // true if this Arianna Web project has the bubble chart module
         _this.selectedBubbles = []; // array of IDs
+        // store the first array of bubbles, to find them in case of zero results (entities data returned as empty array from backend)
+        // BUBBLE CHART DATA ↑
+        _this.homeAutocompleteIsLoading = false;
         _this.updateComponent = (/**
          * @param {?} id
          * @param {?} data
@@ -7523,17 +7657,11 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
         });
         return _this;
     }
-    // BUBBLE CHART DATA ↑
-    // store the first array of bubbles, to find them in case of zero results (entities data returned as empty array from backend)
-    // BUBBLE CHART DATA ↑
     /**
      * @param {?} __0
      * @return {?}
      */
-    AwHomeLayoutDS.prototype.onInit = 
-    // store the first array of bubbles, to find them in case of zero results (entities data returned as empty array from backend)
-    // BUBBLE CHART DATA ↑
-    /**
+    AwHomeLayoutDS.prototype.onInit = /**
      * @param {?} __0
      * @return {?}
      */
@@ -7556,7 +7684,7 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
         this._listenAutoCompleteChanges();
         this.outerLinks = this.configuration.get('home-layout')['outer-links']['test'];
         this.outerLinksTitle = this.configuration.get('home-layout')['outer-links']['title'];
-        this.one('aw-bubble-chart').updateOptions({ config: this.configuration });
+        this.one('aw-bubble-chart').updateOptions({ config: this.configuration, limit: this.configuration.get('bubble-chart').bubbleLimit });
     };
     /**
      * @return {?}
@@ -7602,7 +7730,7 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
              */
             function (error) { return console.error(error); }),
             params: {
-                entitiesListSize: this.configuration.get('home-layout')['max-bubble-num']
+                entitiesListSize: this.configuration.get('home-layout')['entitiesQuerySize']
             },
         });
     };
@@ -7798,6 +7926,11 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
      */
     function (value) {
         this.autocompleteChanged$.next(value);
+        this.homeAutocompleteIsLoading = true;
+        this.homeAutocompleteQuery = value;
+        if (!this.autocompletePopoverOpen) {
+            this._toggleAutocompletePopover();
+        }
     };
     /**
      * @private
@@ -7880,9 +8013,8 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
                  * @return {?}
                  */
                 function (response) {
+                    _this.homeAutocompleteIsLoading = false;
                     _this.one('aw-home-autocomplete').update(response);
-                    if (!_this.autocompletePopoverOpen)
-                        _this._toggleAutocompletePopover();
                 }));
             }
             else {
@@ -8001,6 +8133,8 @@ if (false) {
     /** @type {?} */
     AwHomeLayoutDS.prototype.firstBubbleResponse;
     /** @type {?} */
+    AwHomeLayoutDS.prototype.homeAutocompleteIsLoading;
+    /** @type {?} */
     AwHomeLayoutDS.prototype.updateComponent;
 }
 
@@ -8030,7 +8164,7 @@ var AwHomeLayoutEH = /** @class */ (function (_super) {
             _this.dataSource.selectedBubbles = payload;
             _this.dataSource.makeRequest$('globalFilter', {
                 selectedEntitiesIds: selectedEntitiesIds,
-                entitiesListSize: _this.configuration.get('home-layout')['max-bubble-num']
+                entitiesListSize: _this.configuration.get('home-layout')['entitiesQuerySize']
             }).subscribe((/**
              * @param {?} res
              * @return {?}
@@ -8292,10 +8426,7 @@ var AwHomeLayoutEH = /** @class */ (function (_super) {
             }
             _this.dataSource.parseInitialRequest(response);
             if (_this.dataSource.bubblesEnabled) {
-                _this.emitOuter('filterbubbleresponse', {
-                    response: response,
-                    facetData: _this.dataSource.facetData
-                });
+                _this.emitOuter('filterbubbleresponse', response.entitiesData);
             }
         }));
     };
@@ -8422,7 +8553,7 @@ var AwHomeLayoutComponent = /** @class */ (function (_super) {
     AwHomeLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-home-layout',
-                    template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper n7-side-auto-padding\"\n        [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length > 0 }\" *ngIf=\"lb.dataSource.bubblesEnabled\">\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n        <div class=\"aw-home__bubble-chart-wrapper\"\n            [style.overflow]=\"lb.dataSource.loadingBubbles ? 'visible' : 'hidden'\">\n            <aw-bubble-chart-wrapper [emit]=\"lb.widgets['aw-bubble-chart'].emit\" [container]=\"'bubble-chart-container'\"\n                [buttons]=\"['select', 'goto']\">\n                <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n\n        <!-- Linked objects -->\n        <ng-container *ngIf=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.selected.length > 0;\">\n            <div class=\"aw-home__bubble-results\" id=\"home-bubble-results\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\" class=\"aw-home__bubble-results-title-wrapper\">\n                    <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">\n                            {{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span>\n                    </h1>\n                </div>\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list-wrapper\">\n                    <div class=\"aw-home__bubble-results-list\" [attr.id]=\"'bubble-results-list'\"\n                        (scroll)=\"lb.eventHandler.emitOuter('scroll', $event.target)\">\n\n                        <div class=\"aw-home__bubble-results-fallback\"\n                            *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length < 1;\">\n                            <p class=\"aw-home__bubble-results-fallback-text\">\n                                {{ (lb.widgets['aw-linked-objects'].ds.out$ | async)?.fallback }}\n                            </p>\n                            <button class=\"n7-btn aw-home__bubble-results-reset\"\n                                (click)=\"lb.eventHandler.emitInner('clearselection')\">\n                                Resetta la ricerca\n                            </button>\n                        </div>\n\n                        <ng-container\n                            *ngFor=\"let widgetData of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.result;\">\n                            <n7-item-preview [data]=\"widgetData\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n\n                        <ng-container *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.isLoading\">\n                            <div class=\"aw-home__bubble-results-list-loader\">\n                                <n7-loader [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.loaderData\">\n                                </n7-loader>\n                            </div>\n                        </ng-container>\n                    </div>\n                    <div *ngIf=\"lb.dataSource.hasScrollBackground\"\n                        class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                    <!-- aw-linked-objects__actions -->\n                    <ng-container *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length > 0;\">\n                        <div *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.actions as action\"\n                            class=\"aw-home__bubble-results-list-actions\">\n                            <button (click)=\"lb.eventHandler.emitInner('bubbleresultsviewallclick')\"\n                                class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\">\n                                {{action[0].label}}\n                            </button>\n                        </div>\n                    </ng-container>\n                </div>\n\n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Outer links -->\n    <div *ngIf=\"lb.dataSource.outerLinks && lb.dataSource.outerLinks.length > 0\" class=\"aw-home__outer-links\">\n        <section class=\"aw-home__outer-links-wrapper n7-side-auto-padding\">\n            <h2 class=\"aw-home__outer-links-title\" *ngIf=\"lb.dataSource.outerLinksTitle\">\n                {{ lb.dataSource.outerLinksTitle }}\n            </h2>\n            <div class=\"aw-home__outer-links-items\">\n                <!-- Item preview -->\n                <n7-item-preview *ngFor=\"let outerLink of lb.dataSource.outerLinks\" [data]=\"outerLink\"\n                    [emit]=\"lb.eventHandler.outerLinkClick.bind(lb.eventHandler)\">\n                </n7-item-preview>\n                <!-- END // Item preview -->\n            </div>\n        </section>\n    </div>\n    <!-- END // Outer links -->\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Adavanced autocomplete popover  -->\n    <div id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <n7-advanced-autocomplete [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n\n    <!-- Simple autocomplete popover. DO NOT CHANGE parent div class! -->\n    <!-- Creating one template for each facet -->\n    <div *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\"\n        class=\"aw-simple-autocomplete__template\" style=\"display: none;\">\n        <div class=\"aw-simple-autocomplete__tippy-wrapper\">\n            <n7-simple-autocomplete [data]=\"lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-autocomplete-wrapper'].emit\">\n            </n7-simple-autocomplete>\n        </div>\n    </div>\n</div>"
+                    template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper n7-side-auto-padding\"\n        [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length > 0 }\" *ngIf=\"lb.dataSource.bubblesEnabled\">\n        <div class=\"aw-home__facets-wrapper\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n        <div class=\"aw-home__bubble-chart-wrapper\"\n            [style.overflow]=\"lb.dataSource.loadingBubbles ? 'visible' : 'hidden'\">\n            <aw-bubble-chart-wrapper [emit]=\"lb.widgets['aw-bubble-chart'].emit\" [container]=\"'bubble-chart-container'\"\n                [buttons]=\"['select', 'goto']\">\n                <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n\n        <!-- Linked objects -->\n        <ng-container *ngIf=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.selected.length > 0;\">\n            <div class=\"aw-home__bubble-results\" id=\"home-bubble-results\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\" class=\"aw-home__bubble-results-title-wrapper\">\n                    <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">\n                            {{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span>\n                    </h1>\n                </div>\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list-wrapper\">\n                    <div class=\"aw-home__bubble-results-list\" [attr.id]=\"'bubble-results-list'\"\n                        (scroll)=\"lb.eventHandler.emitOuter('scroll', $event.target)\">\n\n                        <div class=\"aw-home__bubble-results-fallback\"\n                            *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length < 1;\">\n                            <p class=\"aw-home__bubble-results-fallback-text\">\n                                {{ (lb.widgets['aw-linked-objects'].ds.out$ | async)?.fallback }}\n                            </p>\n                            <button class=\"n7-btn aw-home__bubble-results-reset\"\n                                (click)=\"lb.eventHandler.emitInner('clearselection')\">\n                                Resetta la ricerca\n                            </button>\n                        </div>\n\n                        <ng-container\n                            *ngFor=\"let widgetData of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.result;\">\n                            <n7-item-preview [data]=\"widgetData\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n\n                        <ng-container *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.isLoading\">\n                            <div class=\"aw-home__bubble-results-list-loader\">\n                                <n7-loader [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.loaderData\">\n                                </n7-loader>\n                            </div>\n                        </ng-container>\n                    </div>\n                    <div *ngIf=\"lb.dataSource.hasScrollBackground\"\n                        class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                    <!-- aw-linked-objects__actions -->\n                    <ng-container *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length > 0;\">\n                        <div *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.actions as action\"\n                            class=\"aw-home__bubble-results-list-actions\">\n                            <button (click)=\"lb.eventHandler.emitInner('bubbleresultsviewallclick')\"\n                                class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\">\n                                {{action[0].label}}\n                            </button>\n                        </div>\n                    </ng-container>\n                </div>\n\n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Outer links -->\n    <div *ngIf=\"lb.dataSource.outerLinks && lb.dataSource.outerLinks.length > 0\" class=\"aw-home__outer-links\">\n        <section class=\"aw-home__outer-links-wrapper n7-side-auto-padding\">\n            <h2 class=\"aw-home__outer-links-title\" *ngIf=\"lb.dataSource.outerLinksTitle\">\n                {{ lb.dataSource.outerLinksTitle }}\n            </h2>\n            <div class=\"aw-home__outer-links-items\">\n                <!-- Item preview -->\n                <n7-item-preview *ngFor=\"let outerLink of lb.dataSource.outerLinks\" [data]=\"outerLink\"\n                    [emit]=\"lb.eventHandler.outerLinkClick.bind(lb.eventHandler)\">\n                </n7-item-preview>\n                <!-- END // Item preview -->\n            </div>\n        </section>\n    </div>\n    <!-- END // Outer links -->\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Adavanced autocomplete popover  -->\n    <div id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <n7-loader data=\"{}\" *ngIf=\"lb.dataSource.homeAutocompleteIsLoading\"></n7-loader>\n        <n7-advanced-autocomplete *ngIf=\"!lb.dataSource.homeAutocompleteIsLoading\"\n            [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n\n    <!-- Simple autocomplete popover. DO NOT CHANGE parent div class! -->\n    <!-- Creating one template for each facet -->\n    <div *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\"\n        class=\"aw-simple-autocomplete__template\" style=\"display: none;\">\n        <div class=\"aw-simple-autocomplete__tippy-wrapper\">\n            <n7-simple-autocomplete [data]=\"lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-autocomplete-wrapper'].emit\">\n            </n7-simple-autocomplete>\n        </div>\n    </div>\n</div>"
                 }] }
     ];
     /** @nocollapse */
@@ -8499,7 +8630,7 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
         this.metadataSectionTitle = this.configuration.get('scheda-layout')['metadata']['title'];
         this.hasSimilarItems = false;
         this.bubblesEnabled = this.configuration.get('features-enabled') ? this.configuration.get('features-enabled')['bubblechart'] : false;
-        this.one('aw-bubble-chart').updateOptions({ simple: true, config: this.configuration });
+        this.one('aw-bubble-chart').updateOptions({ simple: true, config: this.configuration, limit: this.configuration.get('bubble-chart').bubbleLimit });
         this.mainState.update('headTitle', 'Arianna Web > Patrimonio');
         this.mainState.update('pageTitle', 'Arianna Web: patrimonio Layout');
         this.mainState.updateCustom('currentNav', 'aw/patrimonio');
@@ -8682,6 +8813,8 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
                 }));
                 this.one('aw-scheda-breadcrumbs').update(breadcrumbs_1);
             }
+            // update head title
+            this.mainState.update('headTitle', "Arianna Web > Patrimonio > " + (response.title || response.label));
         }
         if (response.relatedItems) {
             this.hasSimilarItems = true;
@@ -9271,6 +9404,9 @@ var facetsConfig = {
                 {
                     type: 'link',
                     facetId: 'entity-links',
+                    emptyState: {
+                        label: 'La tua ricerca non ha dato risultati, prova a cambiare i filtri'
+                    },
                     filterConfig: {
                         isArray: true,
                         limit: 20,
@@ -9372,6 +9508,7 @@ var AwSearchLayoutDS = /** @class */ (function (_super) {
         }
         // sidebar sticky control
         this._sidebarStickyControl();
+        this.mainState.update('headTitle', 'Arianna Web > Ricerca');
     };
     /**
      * @return {?}
@@ -9778,6 +9915,7 @@ var AwSearchLayoutEH = /** @class */ (function (_super) {
                     break;
                 case 'aw-search-layout.searchreset':
                     _this.dataSource.resetButtonEnabled = false;
+                    _this.dataSource.searchModel.clear();
                     _this.emitGlobal('navigate', {
                         handler: 'router',
                         path: [_this.configuration.get('paths').searchBasePath]

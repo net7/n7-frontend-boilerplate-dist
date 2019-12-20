@@ -8,6 +8,23 @@ export declare class AwBubbleChartDS extends DataSource {
     tippyList: any[];
     focusedBubble: string;
     protected transform(data: any): {
+        data: any;
+        smallView: {
+            data: any;
+            fontRendering: any;
+            containerId: string;
+            width: number;
+            height: number;
+            shuffle: any;
+            transition: any;
+            sizeRange: number[];
+            selected: string[];
+            colorMatch: {
+                domain: any[];
+                range: any[];
+            };
+        };
+        setDraw: (draw: any) => any;
         fontRendering: any;
         containerId: string;
         width: number;
@@ -20,10 +37,9 @@ export declare class AwBubbleChartDS extends DataSource {
             domain: any[];
             range: any[];
         };
-        data: any;
-        setDraw: (draw: any) => any;
     };
     updateChart: (res: any) => void;
+    smartSlice: (d: any, length?: any) => any;
     handleBubbleClick: (payload: any) => void;
     tippyMaker: (bubbles: any) => void;
 }
