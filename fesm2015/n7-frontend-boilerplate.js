@@ -2,7 +2,7 @@ import { Injectable, Inject, ɵɵdefineInjectable, ɵɵinject, Component, Input,
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK } from '@n7-frontend/components';
-import { ReplaySubject, empty, Subject, of, forkJoin, fromEvent, merge } from 'rxjs';
+import { ReplaySubject, empty, of, Subject, forkJoin, fromEvent, merge } from 'rxjs';
 import { map, catchError, tap, takeUntil, filter, debounceTime } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
@@ -1133,7 +1133,6 @@ class MainLayoutDS extends LayoutDataSource {
         this.route = route;
         this.titleService = titleService;
         this.options = options;
-        this.mainState.addCustom('currentNav', new Subject());
         // update header
         if (this.configuration.get('header')) {
             this.one('header').update({ 'items': this.configuration.get('header') });
@@ -1162,11 +1161,6 @@ class MainLayoutDS extends LayoutDataSource {
          * @return {?}
          */
         val => this.one('breadcrumbs').update(val)));
-        this.mainState.getCustom$('currentNav').subscribe((/**
-         * @param {?} val
-         * @return {?}
-         */
-        val => this.one('header').update({ "items": this.configuration.get('header'), 'selected': val })));
         // mainState test
         /* this.mainState.addCustom('customNav', new Subject());
         this.mainState.get$('pageTitle').subscribe(val => console.log('pageTitle', val));
@@ -2701,9 +2695,10 @@ class MainLayoutEH extends EventHandler {
             switch (type) {
                 case 'main-layout.init':
                     this.dataSource.onInit(payload);
+                    this.mainState = payload.mainState;
                     this.route = payload.route;
-                    this.router = payload.router;
                     this._listenRouterChanges();
+                    this._listenMainStateChanges();
                     break;
                 case 'main-layout.destroy':
                     this.destroyed$.next();
@@ -2750,6 +2745,20 @@ class MainLayoutEH extends EventHandler {
             SearchService.queryParams = params;
         }));
     }
+    /**
+     * @private
+     * @return {?}
+     */
+    _listenMainStateChanges() {
+        this.mainState.addCustom('currentNav', new Subject());
+        this.mainState.getCustom$('currentNav').subscribe((/**
+         * @param {?} val
+         * @return {?}
+         */
+        val => {
+            this.emitOuter('currentnavchange', val);
+        }));
+    }
 }
 if (false) {
     /**
@@ -2766,7 +2775,7 @@ if (false) {
      * @type {?}
      * @private
      */
-    MainLayoutEH.prototype.router;
+    MainLayoutEH.prototype.mainState;
 }
 
 /**
@@ -2780,27 +2789,25 @@ class HeaderDS extends DataSource {
      * @return {?}
      */
     transform(data) {
-        if (data.selected) {
-            this.selectNavItem(data.selected);
-        }
         return data.items;
     }
     /**
-     * @param {?} selectedItem
+     * @param {?} payload
      * @return {?}
      */
-    selectNavItem(selectedItem) {
+    onCurrentNavChange(payload) {
         this.output.nav.items.forEach((/**
          * @param {?} item
          * @return {?}
          */
         item => {
-            item.classes = "";
-            if (item.payload == selectedItem) {
-                item.classes = "is-current";
+            if (item._meta.id === payload) {
+                item.classes = 'is-current';
+            }
+            else {
+                item.classes = '';
             }
         }));
-        this.update({ 'items': this.output });
     }
 }
 
@@ -3235,16 +3242,23 @@ class HeaderEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'header.click':
-                    // navigate control
-                    // if(payload.source === 'navigate'){
-                    this.dataSource.selectNavItem(payload);
                     this.emitGlobal('navigate', {
                         handler: 'router',
                         path: [payload]
                     });
-                    // }
-                    // global signal
-                    // this.emitGlobal(type, payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'main-layout.currentnavchange':
+                    this.dataSource.onCurrentNavChange(payload);
                     break;
                 default:
                     break;
@@ -3958,6 +3972,8 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             limit: this.configuration.get('bubble-chart').bubbleLimit,
             smallChartSize: this.configuration.get('entita-layout').overview.smallChartSize
         });
+        // navigation update
+        this.mainState.updateCustom('currentNav', 'entita');
         // update head title
         this.mainState.update('headTitle', 'Arianna Web > Entità');
     }
@@ -7134,7 +7150,7 @@ class AwHomeLayoutDS extends LayoutDataSource {
         // update streams
         this.mainState.update('headTitle', 'Arianna Web > Home');
         this.mainState.update('pageTitle', 'Arianna Web: Home Layout');
-        this.mainState.updateCustom('currentNav', 'aw/home');
+        this.mainState.updateCustom('currentNav', 'home');
         // listen autocomplete changes
         this._listenAutoCompleteChanges();
         this.outerLinks = this.configuration.get('home-layout')['outer-links']['test'];
@@ -7993,7 +8009,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         this.one('aw-bubble-chart').updateOptions({ simple: true, config: this.configuration, limit: this.configuration.get('bubble-chart').bubbleLimit });
         this.mainState.update('headTitle', 'Arianna Web > Patrimonio');
         this.mainState.update('pageTitle', 'Arianna Web: patrimonio Layout');
-        this.mainState.updateCustom('currentNav', 'aw/patrimonio');
+        this.mainState.updateCustom('currentNav', 'patrimonio');
         // sidebar sticky control
         this._sidebarStickyControl();
     }
@@ -8796,6 +8812,7 @@ class AwSearchLayoutDS extends LayoutDataSource {
         }
         // sidebar sticky control
         this._sidebarStickyControl();
+        this.mainState.updateCustom('currentNav', 'ricerca');
         this.mainState.update('headTitle', 'Arianna Web > Ricerca');
     }
     /**

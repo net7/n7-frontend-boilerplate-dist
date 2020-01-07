@@ -958,7 +958,6 @@
             this.route = route;
             this.titleService = titleService;
             this.options = options;
-            this.mainState.addCustom('currentNav', new rxjs.Subject());
             // update header
             if (this.configuration.get('header')) {
                 this.one('header').update({ 'items': this.configuration.get('header') });
@@ -987,11 +986,6 @@
              * @return {?}
              */
             function (val) { return _this.one('breadcrumbs').update(val); }));
-            this.mainState.getCustom$('currentNav').subscribe((/**
-             * @param {?} val
-             * @return {?}
-             */
-            function (val) { return _this.one('header').update({ "items": _this.configuration.get('header'), 'selected': val }); }));
             // mainState test
             /* this.mainState.addCustom('customNav', new Subject());
             this.mainState.get$('pageTitle').subscribe(val => console.log('pageTitle', val));
@@ -2829,9 +2823,10 @@
                 switch (type) {
                     case 'main-layout.init':
                         _this.dataSource.onInit(payload);
+                        _this.mainState = payload.mainState;
                         _this.route = payload.route;
-                        _this.router = payload.router;
                         _this._listenRouterChanges();
+                        _this._listenMainStateChanges();
                         break;
                     case 'main-layout.destroy':
                         _this.destroyed$.next();
@@ -2884,6 +2879,25 @@
                 SearchService.queryParams = params;
             }));
         };
+        /**
+         * @private
+         * @return {?}
+         */
+        MainLayoutEH.prototype._listenMainStateChanges = /**
+         * @private
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.mainState.addCustom('currentNav', new rxjs.Subject());
+            this.mainState.getCustom$('currentNav').subscribe((/**
+             * @param {?} val
+             * @return {?}
+             */
+            function (val) {
+                _this.emitOuter('currentnavchange', val);
+            }));
+        };
         return MainLayoutEH;
     }(core$1.EventHandler));
     if (false) {
@@ -2901,7 +2915,7 @@
          * @type {?}
          * @private
          */
-        MainLayoutEH.prototype.router;
+        MainLayoutEH.prototype.mainState;
     }
 
     /**
@@ -2924,31 +2938,29 @@
          * @return {?}
          */
         function (data) {
-            if (data.selected) {
-                this.selectNavItem(data.selected);
-            }
             return data.items;
         };
         /**
-         * @param {?} selectedItem
+         * @param {?} payload
          * @return {?}
          */
-        HeaderDS.prototype.selectNavItem = /**
-         * @param {?} selectedItem
+        HeaderDS.prototype.onCurrentNavChange = /**
+         * @param {?} payload
          * @return {?}
          */
-        function (selectedItem) {
+        function (payload) {
             this.output.nav.items.forEach((/**
              * @param {?} item
              * @return {?}
              */
             function (item) {
-                item.classes = "";
-                if (item.payload == selectedItem) {
-                    item.classes = "is-current";
+                if (item._meta.id === payload) {
+                    item.classes = 'is-current';
+                }
+                else {
+                    item.classes = '';
                 }
             }));
-            this.update({ 'items': this.output });
         };
         return HeaderDS;
     }(core$1.DataSource));
@@ -3480,16 +3492,24 @@
                 var type = _a.type, payload = _a.payload;
                 switch (type) {
                     case 'header.click':
-                        // navigate control
-                        // if(payload.source === 'navigate'){
-                        _this.dataSource.selectNavItem(payload);
                         _this.emitGlobal('navigate', {
                             handler: 'router',
                             path: [payload]
                         });
-                        // }
-                        // global signal
-                        // this.emitGlobal(type, payload);
+                        break;
+                    default:
+                        break;
+                }
+            }));
+            this.outerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case 'main-layout.currentnavchange':
+                        _this.dataSource.onCurrentNavChange(payload);
                         break;
                     default:
                         break;
@@ -4311,6 +4331,8 @@
                 limit: this.configuration.get('bubble-chart').bubbleLimit,
                 smallChartSize: this.configuration.get('entita-layout').overview.smallChartSize
             });
+            // navigation update
+            this.mainState.updateCustom('currentNav', 'entita');
             // update head title
             this.mainState.update('headTitle', 'Arianna Web > Entità');
         };
@@ -7931,7 +7953,7 @@
             // update streams
             this.mainState.update('headTitle', 'Arianna Web > Home');
             this.mainState.update('pageTitle', 'Arianna Web: Home Layout');
-            this.mainState.updateCustom('currentNav', 'aw/home');
+            this.mainState.updateCustom('currentNav', 'home');
             // listen autocomplete changes
             this._listenAutoCompleteChanges();
             this.outerLinks = this.configuration.get('home-layout')['outer-links']['test'];
@@ -8885,7 +8907,7 @@
             this.one('aw-bubble-chart').updateOptions({ simple: true, config: this.configuration, limit: this.configuration.get('bubble-chart').bubbleLimit });
             this.mainState.update('headTitle', 'Arianna Web > Patrimonio');
             this.mainState.update('pageTitle', 'Arianna Web: patrimonio Layout');
-            this.mainState.updateCustom('currentNav', 'aw/patrimonio');
+            this.mainState.updateCustom('currentNav', 'patrimonio');
             // sidebar sticky control
             this._sidebarStickyControl();
         };
@@ -9760,6 +9782,7 @@
             }
             // sidebar sticky control
             this._sidebarStickyControl();
+            this.mainState.updateCustom('currentNav', 'ricerca');
             this.mainState.update('headTitle', 'Arianna Web > Ricerca');
         };
         /**

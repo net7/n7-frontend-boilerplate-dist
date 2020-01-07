@@ -2,7 +2,7 @@ import { Injectable, Inject, ɵɵdefineInjectable, ɵɵinject, Component, Input,
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK } from '@n7-frontend/components';
-import { ReplaySubject, empty, Subject, of, forkJoin, fromEvent, merge } from 'rxjs';
+import { ReplaySubject, empty, of, Subject, forkJoin, fromEvent, merge } from 'rxjs';
 import { map, catchError, tap, takeUntil, filter, debounceTime } from 'rxjs/operators';
 import { __extends, __assign, __values, __read } from 'tslib';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -766,7 +766,6 @@ var MainLayoutDS = /** @class */ (function (_super) {
         this.route = route;
         this.titleService = titleService;
         this.options = options;
-        this.mainState.addCustom('currentNav', new Subject());
         // update header
         if (this.configuration.get('header')) {
             this.one('header').update({ 'items': this.configuration.get('header') });
@@ -795,11 +794,6 @@ var MainLayoutDS = /** @class */ (function (_super) {
          * @return {?}
          */
         function (val) { return _this.one('breadcrumbs').update(val); }));
-        this.mainState.getCustom$('currentNav').subscribe((/**
-         * @param {?} val
-         * @return {?}
-         */
-        function (val) { return _this.one('header').update({ "items": _this.configuration.get('header'), 'selected': val }); }));
         // mainState test
         /* this.mainState.addCustom('customNav', new Subject());
         this.mainState.get$('pageTitle').subscribe(val => console.log('pageTitle', val));
@@ -2637,9 +2631,10 @@ var MainLayoutEH = /** @class */ (function (_super) {
             switch (type) {
                 case 'main-layout.init':
                     _this.dataSource.onInit(payload);
+                    _this.mainState = payload.mainState;
                     _this.route = payload.route;
-                    _this.router = payload.router;
                     _this._listenRouterChanges();
+                    _this._listenMainStateChanges();
                     break;
                 case 'main-layout.destroy':
                     _this.destroyed$.next();
@@ -2692,6 +2687,25 @@ var MainLayoutEH = /** @class */ (function (_super) {
             SearchService.queryParams = params;
         }));
     };
+    /**
+     * @private
+     * @return {?}
+     */
+    MainLayoutEH.prototype._listenMainStateChanges = /**
+     * @private
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        this.mainState.addCustom('currentNav', new Subject());
+        this.mainState.getCustom$('currentNav').subscribe((/**
+         * @param {?} val
+         * @return {?}
+         */
+        function (val) {
+            _this.emitOuter('currentnavchange', val);
+        }));
+    };
     return MainLayoutEH;
 }(EventHandler));
 if (false) {
@@ -2709,7 +2723,7 @@ if (false) {
      * @type {?}
      * @private
      */
-    MainLayoutEH.prototype.router;
+    MainLayoutEH.prototype.mainState;
 }
 
 /**
@@ -2732,31 +2746,29 @@ var HeaderDS = /** @class */ (function (_super) {
      * @return {?}
      */
     function (data) {
-        if (data.selected) {
-            this.selectNavItem(data.selected);
-        }
         return data.items;
     };
     /**
-     * @param {?} selectedItem
+     * @param {?} payload
      * @return {?}
      */
-    HeaderDS.prototype.selectNavItem = /**
-     * @param {?} selectedItem
+    HeaderDS.prototype.onCurrentNavChange = /**
+     * @param {?} payload
      * @return {?}
      */
-    function (selectedItem) {
+    function (payload) {
         this.output.nav.items.forEach((/**
          * @param {?} item
          * @return {?}
          */
         function (item) {
-            item.classes = "";
-            if (item.payload == selectedItem) {
-                item.classes = "is-current";
+            if (item._meta.id === payload) {
+                item.classes = 'is-current';
+            }
+            else {
+                item.classes = '';
             }
         }));
-        this.update({ 'items': this.output });
     };
     return HeaderDS;
 }(DataSource));
@@ -3288,16 +3300,24 @@ var HeaderEH = /** @class */ (function (_super) {
             var type = _a.type, payload = _a.payload;
             switch (type) {
                 case 'header.click':
-                    // navigate control
-                    // if(payload.source === 'navigate'){
-                    _this.dataSource.selectNavItem(payload);
                     _this.emitGlobal('navigate', {
                         handler: 'router',
                         path: [payload]
                     });
-                    // }
-                    // global signal
-                    // this.emitGlobal(type, payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                case 'main-layout.currentnavchange':
+                    _this.dataSource.onCurrentNavChange(payload);
                     break;
                 default:
                     break;
@@ -4119,6 +4139,8 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
             limit: this.configuration.get('bubble-chart').bubbleLimit,
             smallChartSize: this.configuration.get('entita-layout').overview.smallChartSize
         });
+        // navigation update
+        this.mainState.updateCustom('currentNav', 'entita');
         // update head title
         this.mainState.update('headTitle', 'Arianna Web > Entità');
     };
@@ -7739,7 +7761,7 @@ var AwHomeLayoutDS = /** @class */ (function (_super) {
         // update streams
         this.mainState.update('headTitle', 'Arianna Web > Home');
         this.mainState.update('pageTitle', 'Arianna Web: Home Layout');
-        this.mainState.updateCustom('currentNav', 'aw/home');
+        this.mainState.updateCustom('currentNav', 'home');
         // listen autocomplete changes
         this._listenAutoCompleteChanges();
         this.outerLinks = this.configuration.get('home-layout')['outer-links']['test'];
@@ -8693,7 +8715,7 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
         this.one('aw-bubble-chart').updateOptions({ simple: true, config: this.configuration, limit: this.configuration.get('bubble-chart').bubbleLimit });
         this.mainState.update('headTitle', 'Arianna Web > Patrimonio');
         this.mainState.update('pageTitle', 'Arianna Web: patrimonio Layout');
-        this.mainState.updateCustom('currentNav', 'aw/patrimonio');
+        this.mainState.updateCustom('currentNav', 'patrimonio');
         // sidebar sticky control
         this._sidebarStickyControl();
     };
@@ -9568,6 +9590,7 @@ var AwSearchLayoutDS = /** @class */ (function (_super) {
         }
         // sidebar sticky control
         this._sidebarStickyControl();
+        this.mainState.updateCustom('currentNav', 'ricerca');
         this.mainState.update('headTitle', 'Arianna Web > Ricerca');
     };
     /**
