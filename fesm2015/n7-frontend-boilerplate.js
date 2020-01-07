@@ -1439,6 +1439,10 @@ class FacetInput {
         FacetInput.index++;
     }
     /**
+     * @return {?}
+     */
+    clear() { }
+    /**
      * @private
      * @return {?}
      */
@@ -1617,6 +1621,8 @@ class FacetInputText extends FacetInput {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+/** @type {?} */
+const RESULTS_LIMIT = 1000;
 class FacetInputLink extends FacetInput {
     /**
      * @protected
@@ -1626,11 +1632,19 @@ class FacetInputLink extends FacetInput {
         /** @type {?} */
         const facetId = this.getFacetId();
         /** @type {?} */
-        const results = this.data.map((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ label, value, counter, hidden, options }) => {
+        const results = [];
+        /** @type {?} */
+        let resultsCounter = 0;
+        for (const itemData of this.data) {
+            const { label, counter, hidden } = itemData;
+            let { value, options } = itemData;
+            if (hidden) {
+                continue;
+            }
+            resultsCounter += 1;
+            if (resultsCounter > RESULTS_LIMIT) {
+                break;
+            }
             // normalize value
             value = '' + value;
             options = options || {};
@@ -1639,13 +1653,10 @@ class FacetInputLink extends FacetInput {
             if (options.classes) {
                 classes.push(options.classes);
             }
-            if (hidden) {
-                classes.push('is-hidden');
-            }
             if (this._isActive(this.facetValue, value)) {
                 classes.push('is-active');
             }
-            return {
+            results.push({
                 type: 'link',
                 id: this.getId(),
                 text: label,
@@ -1658,8 +1669,38 @@ class FacetInputLink extends FacetInput {
                 icon: options.icon || null,
                 classes: classes.join(' '),
                 _meta: { facetId, value }
-            };
-        }));
+            });
+        }
+        /* const results: any[] = this.data.map(({ label, value, counter, hidden, options }) => {
+              if (hidden) {
+                return;
+              }
+        
+              resultsCounter += 1;
+              // normalize value
+              value = '' + value;
+              options = options || {};
+        
+              const classes = [];
+              if (options.classes) { classes.push(options.classes); }
+              if (this._isActive(this.facetValue, value)) { classes.push('is-active'); }
+        
+              return {
+                type: 'link',
+                id: this.getId(),
+                text: label,
+                counter,
+                payload: {
+                  facetId,
+                  source: 'input-link',
+                  value
+                },
+                icon: options.icon || null,
+                classes: classes.join(' '),
+                _meta: { facetId, value }
+              };
+            });
+             */
         // empty state control
         /** @type {?} */
         const itemEmpty = results.filter((/**
@@ -1726,6 +1767,12 @@ class FacetInputLink extends FacetInput {
         this.facetValue = facetValue;
         return ((Array.isArray(facetValue) && facetValue.indexOf(value) !== -1) ||
             (facetValue === value));
+    }
+    /**
+     * @return {?}
+     */
+    clear() {
+        this.facetValue = [];
     }
 }
 if (false) {
@@ -1962,6 +2009,7 @@ class SearchModel {
      */
     clear() {
         this.updateFiltersFromQueryParams({}, true);
+        this._clearInputs();
     }
     /**
      * @param {?} queryParams
@@ -2231,6 +2279,19 @@ class SearchModel {
     }
     /**
      * @private
+     * @return {?}
+     */
+    _clearInputs() {
+        this._inputs.forEach((/**
+         * @param {?} input
+         * @return {?}
+         */
+        input => {
+            input.clear();
+        }));
+    }
+    /**
+     * @private
      * @param {?} searchIns
      * @param {?} item
      * @return {?}
@@ -2381,7 +2442,6 @@ class SearchModel {
      */
     _filterDataLike(value, refValue) {
         if (value &&
-            refValue &&
             typeof value === 'string' &&
             typeof refValue === 'string') {
             /** @type {?} */

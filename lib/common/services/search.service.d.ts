@@ -86,6 +86,7 @@ export declare class SearchModel {
     setSearchConfigDirection(direction: any): void;
     setPageConfigOffset(offset: any): void;
     setPageConfigLimit(limit: any): void;
+    private _clearInputs;
     private _filterData;
     private _filterDataEquals;
     private _filterDataGreaterThan;

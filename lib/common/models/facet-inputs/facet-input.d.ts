@@ -27,6 +27,7 @@ export declare abstract class FacetInput {
     getSearchIn: () => any;
     getType: () => any;
     getOutput: () => any;
+    clear(): void;
     setIsEmpty: (empty: boolean) => void;
     setData: (newData: IFacetInputData[]) => IFacetInputData[];
     private _setId;

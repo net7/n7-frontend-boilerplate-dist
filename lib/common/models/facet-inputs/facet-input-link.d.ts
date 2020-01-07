@@ -4,4 +4,5 @@ export declare class FacetInputLink extends FacetInput {
     protected transform(): any[];
     setActive(facetValue: any): void;
     private _isActive;
+    clear(): void;
 }

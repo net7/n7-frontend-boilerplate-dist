@@ -1279,6 +1279,13 @@
             FacetInput.index++;
         }
         /**
+         * @return {?}
+         */
+        FacetInput.prototype.clear = /**
+         * @return {?}
+         */
+        function () { };
+        /**
          * @private
          * @return {?}
          */
@@ -1490,6 +1497,8 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
+    /** @type {?} */
+    var RESULTS_LIMIT = 1000;
     var FacetInputLink = /** @class */ (function (_super) {
         __extends(FacetInputLink, _super);
         function FacetInputLink() {
@@ -1504,45 +1513,89 @@
          * @return {?}
          */
         function () {
-            var _this = this;
+            var e_1, _a;
             /** @type {?} */
             var facetId = this.getFacetId();
             /** @type {?} */
-            var results = this.data.map((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            function (_a) {
-                var label = _a.label, value = _a.value, counter = _a.counter, hidden = _a.hidden, options = _a.options;
-                // normalize value
-                value = '' + value;
-                options = options || {};
-                /** @type {?} */
-                var classes = [];
-                if (options.classes) {
-                    classes.push(options.classes);
+            var results = [];
+            /** @type {?} */
+            var resultsCounter = 0;
+            try {
+                for (var _b = __values(this.data), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var itemData = _c.value;
+                    var label = itemData.label, counter = itemData.counter, hidden = itemData.hidden;
+                    var value = itemData.value, options = itemData.options;
+                    if (hidden) {
+                        continue;
+                    }
+                    resultsCounter += 1;
+                    if (resultsCounter > RESULTS_LIMIT) {
+                        break;
+                    }
+                    // normalize value
+                    value = '' + value;
+                    options = options || {};
+                    /** @type {?} */
+                    var classes = [];
+                    if (options.classes) {
+                        classes.push(options.classes);
+                    }
+                    if (this._isActive(this.facetValue, value)) {
+                        classes.push('is-active');
+                    }
+                    results.push({
+                        type: 'link',
+                        id: this.getId(),
+                        text: label,
+                        counter: counter,
+                        payload: {
+                            facetId: facetId,
+                            source: 'input-link',
+                            value: value
+                        },
+                        icon: options.icon || null,
+                        classes: classes.join(' '),
+                        _meta: { facetId: facetId, value: value }
+                    });
                 }
-                if (hidden) {
-                    classes.push('is-hidden');
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
                 }
-                if (_this._isActive(_this.facetValue, value)) {
-                    classes.push('is-active');
-                }
-                return {
+                finally { if (e_1) throw e_1.error; }
+            }
+            /* const results: any[] = this.data.map(({ label, value, counter, hidden, options }) => {
+                  if (hidden) {
+                    return;
+                  }
+            
+                  resultsCounter += 1;
+                  // normalize value
+                  value = '' + value;
+                  options = options || {};
+            
+                  const classes = [];
+                  if (options.classes) { classes.push(options.classes); }
+                  if (this._isActive(this.facetValue, value)) { classes.push('is-active'); }
+            
+                  return {
                     type: 'link',
-                    id: _this.getId(),
+                    id: this.getId(),
                     text: label,
-                    counter: counter,
+                    counter,
                     payload: {
-                        facetId: facetId,
-                        source: 'input-link',
-                        value: value
+                      facetId,
+                      source: 'input-link',
+                      value
                     },
                     icon: options.icon || null,
                     classes: classes.join(' '),
-                    _meta: { facetId: facetId, value: value }
-                };
-            }));
+                    _meta: { facetId, value }
+                  };
+                });
+                 */
             // empty state control
             /** @type {?} */
             var itemEmpty = results.filter((/**
@@ -1620,6 +1673,15 @@
             this.facetValue = facetValue;
             return ((Array.isArray(facetValue) && facetValue.indexOf(value) !== -1) ||
                 (facetValue === value));
+        };
+        /**
+         * @return {?}
+         */
+        FacetInputLink.prototype.clear = /**
+         * @return {?}
+         */
+        function () {
+            this.facetValue = [];
         };
         return FacetInputLink;
     }(FacetInput));
@@ -1879,6 +1941,7 @@
          */
         function () {
             this.updateFiltersFromQueryParams({}, true);
+            this._clearInputs();
         };
         /**
          * @param {?} queryParams
@@ -2233,6 +2296,23 @@
         };
         /**
          * @private
+         * @return {?}
+         */
+        SearchModel.prototype._clearInputs = /**
+         * @private
+         * @return {?}
+         */
+        function () {
+            this._inputs.forEach((/**
+             * @param {?} input
+             * @return {?}
+             */
+            function (input) {
+                input.clear();
+            }));
+        };
+        /**
+         * @private
          * @param {?} searchIns
          * @param {?} item
          * @return {?}
@@ -2435,7 +2515,6 @@
          */
         function (value, refValue) {
             if (value &&
-                refValue &&
                 typeof value === 'string' &&
                 typeof refValue === 'string') {
                 /** @type {?} */
