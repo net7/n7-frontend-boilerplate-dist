@@ -3845,15 +3845,6 @@ class AwEntitaLayoutDS extends LayoutDataSource {
          */
         tab => {
             this.selectedTab = tab;
-            // this.one('aw-bubble-chart').updateComponent(
-            //   'aw-bubble-chart',
-            //   this.myResponse.relatedEntities,
-            //   {
-            //     simple: true,
-            //     config: this.configuration,
-            //     limit: this.route.snapshot.params.tab == 'overview' ? 3 : this.configuration.get('bubble-chart').bubbleLimit
-            //   }
-            // );
             this.updateWidgets(this.myResponse);
             /** @type {?} */
             const page = tab == 'oggetti-collegati' ? "/1" : "";
@@ -3879,7 +3870,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                 setTimeout((/**
                  * @return {?}
                  */
-                () => { this.updateBubbes(this.myResponse); }), 800);
+                () => { this.updateBubbes(this.myResponse.relatedEntities); }), 800);
             }
             this.location.go(`${this.configuration.get('paths').entitaBasePath}${this.currentId}/${tab}${page}`);
         });
@@ -3952,7 +3943,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
      * @return {?}
      */
     updateBubbes(data) {
-        this.one('aw-bubble-chart').update(data.relatedEntities);
+        this.one('aw-bubble-chart').update(data);
     }
     /*
         Loads the data for the selected nav item, into the adjacent text block.
@@ -4121,7 +4112,6 @@ class AwEntitaLayoutEH extends EventHandler {
                     this.entityId = this.route.snapshot.params.id || "";
                     this.dataSource.currentPage = this.route.snapshot.params.page || 1;
                     this.listenRoute(this.entityId);
-                    //this.loadNavigation(this.entityId);
                     break;
                 case 'aw-entita-layout.destroy':
                     this.destroyed$.next();
@@ -4155,34 +4145,17 @@ class AwEntitaLayoutEH extends EventHandler {
                     if (payload) {
                         this.dataSource.selectedTab = payload;
                         this.dataSource.handleNavUpdate(payload);
-                        // this.dataSource.updateComponent(
-                        //   'aw-entita-metadata-viewer',
-                        //   this.dataSource.myResponse.fields,
-                        //   { 
-                        //     context: this.dataSource.selectedTab,
-                        //     config: this.dataSource.configuration,
-                        //     labels: this.dataSource.configuration.get("labels")
-                        //   }
-                        // )
                     }
                     break;
                 case 'aw-linked-objects.pagination':
                     console.log(payload);
                     this.dataSource.currentPage = +payload.split('-')[1];
                     this.dataSource.handlePageNavigation();
-                    /*this.emitGlobal('navigate', {
-                      handler: 'router',
-                      path: [`aw/entita/${this.route.snapshot.params.id}/oggetti-collegati/${payload.split('-')[1]}`]
-                    });*/
                     break;
                 case 'aw-linked-objects.goto':
                     console.log(payload);
                     this.dataSource.currentPage = +payload.replace('goto-', '');
                     this.dataSource.handlePageNavigation();
-                    // this.emitGlobal('navigate', {
-                    //   handler: 'router',
-                    //   path: [`aw/entita/${this.route.snapshot.params.id}/oggetti-collegati/${targetPage}`]
-                    // });
                     break;
                 case 'aw-linked-objects.change': // changed page size value (pagination)
                     this.dataSource.pageSize = payload;
@@ -4209,7 +4182,6 @@ class AwEntitaLayoutEH extends EventHandler {
                 case 'aw-bubble-chart.bubble-filtered':
                     if (this.dataSource.selectedTab == "overview" || this.dataSource.selectedTab == "entita-collegate") {
                         this.emitOuter('filterbubbleresponse', payload.relatedEntities);
-                        //this.dataSource.updateBubbes(payload);
                     }
                     break;
                 case 'aw-linked-objects.click':
@@ -4253,16 +4225,16 @@ class AwEntitaLayoutEH extends EventHandler {
                         this.dataSource.loadContent(res);
                         // remove the entity of this page
                         /** @type {?} */
-                        let entities = res.relatedEntities.filter((/**
+                        const entities = res.relatedEntities.filter((/**
                          * @param {?} entity
                          * @return {?}
                          */
                         entity => entity.id !== params.get('id')));
-                        this.emitOuter('filterbubbleresponse', entities);
                         this.dataSource.updateWidgets(res);
                         if (selectedItem) {
                             this.emitOuter('selectItem', selectedItem);
                         }
+                        this.emitOuter('filterbubbleresponse', entities);
                     }
                 }));
             }
@@ -4825,6 +4797,7 @@ class AwBubbleChartDS extends DataSource {
             else {
                 this.output.selected = this.selected;
                 this.output.data = this.smartSlice(res);
+                this.output.smallView.data = this.smartSlice(res, this.options.smallChartSize);
                 this.draw();
             }
         });
@@ -4837,7 +4810,6 @@ class AwBubbleChartDS extends DataSource {
             /** @type {?} */
             const l = length ? length : this.options.limit;
             if (l && l < d.length) {
-                // return d.splice(d.length - l, l)
                 return d.slice(0, l);
             }
             else {
@@ -4968,7 +4940,6 @@ class AwBubbleChartDS extends DataSource {
         });
     }
     // id of the focused bubble
-    // public bubbleBasket: any[]
     /**
      * @protected
      * @param {?} data
@@ -4993,21 +4964,33 @@ class AwBubbleChartDS extends DataSource {
         }));
         /** @type {?} */
         const commonParams = {
-            fontRendering,
             containerId: 'bubbleChartContainer',
-            width: 500,
-            height: 500,
-            shuffle,
-            transition,
-            sizeRange: [.5, 500],
-            selected: this.selected,
-            colorMatch: { domain, range },
-        };
-        return Object.assign({}, commonParams, { data: this.smartSlice(data), smallView: Object.assign({}, commonParams, { data: this.smartSlice(data, (this.options.smallChartSize || null)) }), setDraw: (/**
+            setDraw: (/**
              * @param {?} draw
              * @return {?}
              */
-            draw => this.draw = draw) });
+            draw => this.draw = draw),
+            colorMatch: { domain, range },
+            selected: this.selected,
+            sizeRange: [.5, 500],
+            fontRendering,
+            height: 500,
+            width: 500,
+            transition,
+            shuffle,
+        }
+        /*
+          Two data streams are ouputted.
+          The default stream is for the normal visualization,
+          "smallView" is used for a compressed view of the same data.
+        */
+        ;
+        /*
+          Two data streams are ouputted.
+          The default stream is for the normal visualization,
+          "smallView" is used for a compressed view of the same data.
+        */
+        return Object.assign({}, commonParams, { data: this.smartSlice(data), smallView: Object.assign({}, commonParams, { data: this.smartSlice(data, this.options.smallChartSize) }) });
     }
 }
 if (false) {

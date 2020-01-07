@@ -4173,15 +4173,6 @@
              */
             function (tab) {
                 _this.selectedTab = tab;
-                // this.one('aw-bubble-chart').updateComponent(
-                //   'aw-bubble-chart',
-                //   this.myResponse.relatedEntities,
-                //   {
-                //     simple: true,
-                //     config: this.configuration,
-                //     limit: this.route.snapshot.params.tab == 'overview' ? 3 : this.configuration.get('bubble-chart').bubbleLimit
-                //   }
-                // );
                 _this.updateWidgets(_this.myResponse);
                 /** @type {?} */
                 var page = tab == 'oggetti-collegati' ? "/1" : "";
@@ -4207,7 +4198,7 @@
                     setTimeout((/**
                      * @return {?}
                      */
-                    function () { _this.updateBubbes(_this.myResponse); }), 800);
+                    function () { _this.updateBubbes(_this.myResponse.relatedEntities); }), 800);
                 }
                 _this.location.go("" + _this.configuration.get('paths').entitaBasePath + _this.currentId + "/" + tab + page);
             });
@@ -4310,7 +4301,7 @@
          * @return {?}
          */
         function (data) {
-            this.one('aw-bubble-chart').update(data.relatedEntities);
+            this.one('aw-bubble-chart').update(data);
         };
         /*
           Loads the data for the selected nav item, into the adjacent text block.
@@ -4506,7 +4497,6 @@
                         _this.entityId = _this.route.snapshot.params.id || "";
                         _this.dataSource.currentPage = _this.route.snapshot.params.page || 1;
                         _this.listenRoute(_this.entityId);
-                        //this.loadNavigation(this.entityId);
                         break;
                     case 'aw-entita-layout.destroy':
                         _this.destroyed$.next();
@@ -4541,34 +4531,17 @@
                         if (payload) {
                             _this.dataSource.selectedTab = payload;
                             _this.dataSource.handleNavUpdate(payload);
-                            // this.dataSource.updateComponent(
-                            //   'aw-entita-metadata-viewer',
-                            //   this.dataSource.myResponse.fields,
-                            //   { 
-                            //     context: this.dataSource.selectedTab,
-                            //     config: this.dataSource.configuration,
-                            //     labels: this.dataSource.configuration.get("labels")
-                            //   }
-                            // )
                         }
                         break;
                     case 'aw-linked-objects.pagination':
                         console.log(payload);
                         _this.dataSource.currentPage = +payload.split('-')[1];
                         _this.dataSource.handlePageNavigation();
-                        /*this.emitGlobal('navigate', {
-                          handler: 'router',
-                          path: [`aw/entita/${this.route.snapshot.params.id}/oggetti-collegati/${payload.split('-')[1]}`]
-                        });*/
                         break;
                     case 'aw-linked-objects.goto':
                         console.log(payload);
                         _this.dataSource.currentPage = +payload.replace('goto-', '');
                         _this.dataSource.handlePageNavigation();
-                        // this.emitGlobal('navigate', {
-                        //   handler: 'router',
-                        //   path: [`aw/entita/${this.route.snapshot.params.id}/oggetti-collegati/${targetPage}`]
-                        // });
                         break;
                     case 'aw-linked-objects.change': // changed page size value (pagination)
                         _this.dataSource.pageSize = payload;
@@ -4595,7 +4568,6 @@
                     case 'aw-bubble-chart.bubble-filtered':
                         if (_this.dataSource.selectedTab == "overview" || _this.dataSource.selectedTab == "entita-collegate") {
                             _this.emitOuter('filterbubbleresponse', payload.relatedEntities);
-                            //this.dataSource.updateBubbes(payload);
                         }
                         break;
                     case 'aw-linked-objects.click':
@@ -4657,11 +4629,11 @@
                              * @return {?}
                              */
                             function (entity) { return entity.id !== params.get('id'); }));
-                            _this.emitOuter('filterbubbleresponse', entities);
                             _this.dataSource.updateWidgets(res);
                             if (selectedItem) {
                                 _this.emitOuter('selectItem', selectedItem);
                             }
+                            _this.emitOuter('filterbubbleresponse', entities);
                         }
                     }));
                 }
@@ -5249,6 +5221,7 @@
                 else {
                     _this.output.selected = _this.selected;
                     _this.output.data = _this.smartSlice(res);
+                    _this.output.smallView.data = _this.smartSlice(res, _this.options.smallChartSize);
                     _this.draw();
                 }
             });
@@ -5261,7 +5234,6 @@
                 /** @type {?} */
                 var l = length ? length : _this.options.limit;
                 if (l && l < d.length) {
-                    // return d.splice(d.length - l, l)
                     return d.slice(0, l);
                 }
                 else {
@@ -5392,9 +5364,7 @@
             });
             return _this;
         }
-        // public bubbleBasket: any[]
         // id of the focused bubble
-        // public bubbleBasket: any[]
         /**
          * @protected
          * @param {?} data
@@ -5402,7 +5372,6 @@
          */
         AwBubbleChartDS.prototype.transform = 
         // id of the focused bubble
-        // public bubbleBasket: any[]
         /**
          * @protected
          * @param {?} data
@@ -5428,21 +5397,33 @@
             }));
             /** @type {?} */
             var commonParams = {
-                fontRendering: fontRendering,
                 containerId: 'bubbleChartContainer',
-                width: 500,
-                height: 500,
-                shuffle: shuffle,
-                transition: transition,
-                sizeRange: [.5, 500],
-                selected: this.selected,
-                colorMatch: { domain: domain, range: range },
-            };
-            return __assign({}, commonParams, { data: this.smartSlice(data), smallView: __assign({}, commonParams, { data: this.smartSlice(data, (this.options.smallChartSize || null)) }), setDraw: (/**
+                setDraw: (/**
                  * @param {?} draw
                  * @return {?}
                  */
-                function (draw) { return _this.draw = draw; }) });
+                function (draw) { return _this.draw = draw; }),
+                colorMatch: { domain: domain, range: range },
+                selected: this.selected,
+                sizeRange: [.5, 500],
+                fontRendering: fontRendering,
+                height: 500,
+                width: 500,
+                transition: transition,
+                shuffle: shuffle,
+            }
+            /*
+              Two data streams are ouputted.
+              The default stream is for the normal visualization,
+              "smallView" is used for a compressed view of the same data.
+            */
+            ;
+            /*
+              Two data streams are ouputted.
+              The default stream is for the normal visualization,
+              "smallView" is used for a compressed view of the same data.
+            */
+            return __assign({}, commonParams, { data: this.smartSlice(data), smallView: __assign({}, commonParams, { data: this.smartSlice(data, this.options.smallChartSize) }) });
         };
         return AwBubbleChartDS;
     }(core$1.DataSource));

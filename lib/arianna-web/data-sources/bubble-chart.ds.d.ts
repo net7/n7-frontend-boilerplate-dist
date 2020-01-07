@@ -11,32 +11,33 @@ export declare class AwBubbleChartDS extends DataSource {
         data: any;
         smallView: {
             data: any;
-            fontRendering: any;
             containerId: string;
-            width: number;
-            height: number;
-            shuffle: any;
-            transition: any;
-            sizeRange: number[];
-            selected: string[];
+            setDraw: (draw: any) => any;
             colorMatch: {
                 domain: any[];
                 range: any[];
             };
+            selected: string[];
+            sizeRange: number[];
+            fontRendering: any;
+            height: number;
+            width: number;
+            transition: any;
+            shuffle: any;
         };
-        setDraw: (draw: any) => any;
-        fontRendering: any;
         containerId: string;
-        width: number;
-        height: number;
-        shuffle: any;
-        transition: any;
-        sizeRange: number[];
-        selected: string[];
+        setDraw: (draw: any) => any;
         colorMatch: {
             domain: any[];
             range: any[];
         };
+        selected: string[];
+        sizeRange: number[];
+        fontRendering: any;
+        height: number;
+        width: number;
+        transition: any;
+        shuffle: any;
     };
     updateChart: (res: any) => void;
     smartSlice: (d: any, length?: any) => any;
