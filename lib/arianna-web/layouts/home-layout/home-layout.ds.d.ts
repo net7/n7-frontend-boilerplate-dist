@@ -22,6 +22,7 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     lastBubbleResponse: any;
     firstBubbleResponse: any;
     homeAutocompleteIsLoading: boolean;
+    resultsListIsLoading: boolean;
     onInit({ communication, mainState, configuration, tippy }: {
         communication: any;
         mainState: any;
