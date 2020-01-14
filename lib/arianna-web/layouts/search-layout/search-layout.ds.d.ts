@@ -18,6 +18,7 @@ export declare class AwSearchLayoutDS extends LayoutDataSource {
     pageSize: number;
     sidebarIsSticky: boolean;
     isFirstLoading: boolean;
+    resultsLoading: boolean;
     options: any;
     orderByLabel: string;
     orderByOptions: any;
