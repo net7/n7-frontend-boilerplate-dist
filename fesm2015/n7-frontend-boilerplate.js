@@ -4960,7 +4960,6 @@ class AwBubbleChartDS extends DataSource {
                     let toggleBubbleText = this.selected.includes(bubble.entity.id) ? `Deseleziona` : `Seleziona`;
                     selectButton.innerHTML = toggleBubbleText;
                 }
-                // console.log(element)
                 return element.innerHTML;
             });
             /** @type {?} */
@@ -4985,9 +4984,7 @@ class AwBubbleChartDS extends DataSource {
              */
             b => {
                 /** @type {?} */
-                let el = document.getElementById(b.entity.id);
-                /** @type {?} */
-                let group = el ? el.parentElement : false // selects a <g> element
+                let group = document.getElementById(`g_${b.entity.id}`) // select 
                 ;
                 if (group) {
                     this.tippyList.push(// add this tippy to the array of instances

@@ -5217,7 +5217,6 @@ var AwBubbleChartDS = /** @class */ (function (_super) {
                     var toggleBubbleText = _this.selected.includes(bubble.entity.id) ? "Deseleziona" : "Seleziona";
                     selectButton.innerHTML = toggleBubbleText;
                 }
-                // console.log(element)
                 return element.innerHTML;
             });
             /** @type {?} */
@@ -5242,9 +5241,7 @@ var AwBubbleChartDS = /** @class */ (function (_super) {
              */
             function (b) {
                 /** @type {?} */
-                var el = document.getElementById(b.entity.id);
-                /** @type {?} */
-                var group = el ? el.parentElement : false // selects a <g> element
+                var group = document.getElementById("g_" + b.entity.id) // select 
                 ;
                 if (group) {
                     _this.tippyList.push(// add this tippy to the array of instances
