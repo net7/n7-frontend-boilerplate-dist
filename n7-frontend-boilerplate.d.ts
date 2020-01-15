@@ -20,4 +20,5 @@ export { ConfigurationService as ɵc } from './lib/common/services/configuration
 export { LayoutsConfigurationService as ɵd } from './lib/common/services/layouts-configuration.service';
 export { MainStateService as ɵe } from './lib/common/services/main-state.service';
 export { DataWidgetWrapperComponent as ɵv } from './lib/data-viz/components/data-widget-wrapper/data-widget-wrapper';
-export { DvExampleLayoutComponent as ɵw } from './lib/data-viz/layout/example-layout/example-layout';
+export { DatepickerWrapperComponent as ɵw } from './lib/data-viz/components/datepicker-wrapper/datepicker-wrapper';
+export { DvExampleLayoutComponent as ɵx } from './lib/data-viz/layout/example-layout/example-layout';

@@ -2,7 +2,7 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('@angular/common'), require('@angular/common/http'), require('@n7-frontend/components'), require('rxjs'), require('rxjs/operators'), require('@angular/router'), require('@angular/platform-browser'), require('@n7-frontend/core'), require('tippy.js'), require('lodash')) :
     typeof define === 'function' && define.amd ? define('@n7-frontend/boilerplate', ['exports', '@angular/core', '@angular/common', '@angular/common/http', '@n7-frontend/components', 'rxjs', 'rxjs/operators', '@angular/router', '@angular/platform-browser', '@n7-frontend/core', 'tippy.js', 'lodash'], factory) :
     (global = global || self, factory((global['n7-frontend'] = global['n7-frontend'] || {}, global['n7-frontend'].boilerplate = {}), global.ng.core, global.ng.common, global.ng.common.http, global.components, global.rxjs, global.rxjs.operators, global.ng.router, global.ng.platformBrowser, global.core$1, global.tippy, global.lodash));
-}(this, function (exports, core, common, http, components, rxjs, operators, router, platformBrowser, core$1, tippy, lodash) { 'use strict';
+}(this, (function (exports, core, common, http, components, rxjs, operators, router, platformBrowser, core$1, tippy, lodash) { 'use strict';
 
     var tippy__default = 'default' in tippy ? tippy['default'] : tippy;
 
@@ -205,6 +205,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/services/configuration.service.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var ConfigurationService = /** @class */ (function () {
@@ -264,6 +265,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/services/layouts-configuration.service.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var LayoutsConfigurationService = /** @class */ (function () {
@@ -323,6 +325,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/services/main-state.service.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MainStateService = /** @class */ (function () {
@@ -461,6 +464,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/services/communication-providers/apollo/config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -505,6 +509,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/services/communication-providers/apollo/apollo.provider.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var ApolloProvider = /** @class */ (function () {
@@ -659,6 +664,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/services/communication-providers/rest/config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -668,6 +674,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/services/communication-providers/rest/rest.provider.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var RestProvider = /** @class */ (function () {
@@ -750,6 +757,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/services/communication.service.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var CommunicationService = /** @class */ (function () {
@@ -854,6 +862,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/models/abstract-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /**
@@ -934,6 +943,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/layouts/main-layout/main-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MainLayoutDS = /** @class */ (function (_super) {
@@ -1081,6 +1091,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/services/json-config.service.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var JsonConfigService = /** @class */ (function () {
@@ -1183,6 +1194,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/models/facet-inputs/facet-input.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /**
@@ -1365,6 +1377,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/models/facet-inputs/facet-input-checkbox.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FacetInputCheckbox = /** @class */ (function (_super) {
@@ -1437,6 +1450,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/models/facet-inputs/facet-input-text.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FacetInputText = /** @class */ (function (_super) {
@@ -1489,6 +1503,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/models/facet-inputs/facet-input-link.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -1689,6 +1704,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/models/facet-inputs/facet-input-select.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FacetInputSelect = /** @class */ (function (_super) {
@@ -1757,11 +1773,13 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/models/index.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/services/search.service.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -2792,11 +2810,13 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/services/index.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/layouts/main-layout/main-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MainLayoutEH = /** @class */ (function (_super) {
@@ -2920,6 +2940,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/data-sources/header.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var HeaderDS = /** @class */ (function (_super) {
@@ -2967,6 +2988,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/data-sources/subnav.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var SubnavDS = /** @class */ (function (_super) {
@@ -3032,6 +3054,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/data-sources/breadcrumbs.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var BreadcrumbsDS = /** @class */ (function (_super) {
@@ -3057,6 +3080,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/data-sources/facets.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FacetsDS = /** @class */ (function (_super) {
@@ -3089,6 +3113,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/data-sources/facets-wrapper.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -3427,6 +3452,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/data-sources/footer.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FooterDS = /** @class */ (function (_super) {
@@ -3455,10 +3481,12 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/data-sources/index.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     var DS = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         HeaderDS: HeaderDS,
         SubnavDS: SubnavDS,
         BreadcrumbsDS: BreadcrumbsDS,
@@ -3469,6 +3497,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/event-handlers/header.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var HeaderEH = /** @class */ (function (_super) {
@@ -3521,6 +3550,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/event-handlers/subnav.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var SubnavEH = /** @class */ (function (_super) {
@@ -3561,6 +3591,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/event-handlers/breadcrumbs.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var BreadcrumbsEH = /** @class */ (function (_super) {
@@ -3601,6 +3632,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/event-handlers/facets.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FacetsEH = /** @class */ (function (_super) {
@@ -3633,6 +3665,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/event-handlers/facets-wrapper.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FacetsWrapperEH = /** @class */ (function (_super) {
@@ -3786,6 +3819,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/event-handlers/footer.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FooterEH = /** @class */ (function (_super) {
@@ -3818,10 +3852,12 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/event-handlers/index.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     var EH = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         HeaderEH: HeaderEH,
         SubnavEH: SubnavEH,
         BreadcrumbsEH: BreadcrumbsEH,
@@ -3832,6 +3868,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/layouts/main-layout/main-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -3857,6 +3894,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/layouts/main-layout/main-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MainLayoutComponent = /** @class */ (function (_super) {
@@ -3959,6 +3997,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/layouts/page404-layout/page404-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var Page404LayoutDS = /** @class */ (function (_super) {
@@ -3987,6 +4026,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/layouts/page404-layout/page404-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var Page404LayoutEH = /** @class */ (function (_super) {
@@ -4047,6 +4087,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/layouts/page404-layout/page404-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -4064,6 +4105,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/layouts/page404-layout/page404-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var Page404LayoutComponent = /** @class */ (function (_super) {
@@ -4117,6 +4159,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/components/facets-wrapper/facets-wrapper.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FacetsWrapperComponent = /** @class */ (function () {
@@ -4173,6 +4216,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/n7-boilerplate-common.module.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -4222,6 +4266,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwEntitaLayoutDS = /** @class */ (function (_super) {
@@ -4564,6 +4609,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwEntitaLayoutEH = /** @class */ (function (_super) {
@@ -4771,6 +4817,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/common/helpers.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var helpers = {
@@ -4802,6 +4849,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/linked-objects.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     // used for cherry-picking object keys from app-config.json
@@ -5205,6 +5253,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/autocomplete-wrapper.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwAutocompleteWrapperDS = /** @class */ (function (_super) {
@@ -5289,6 +5338,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/bubble-chart.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwBubbleChartDS = /** @class */ (function (_super) {
@@ -5564,6 +5614,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/hero.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHeroDS = /** @class */ (function (_super) {
@@ -5608,6 +5659,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/table.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwTableDS = /** @class */ (function (_super) {
@@ -5633,6 +5685,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/home-hero-patrimonio.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeHeroPatrimonioDS = /** @class */ (function (_super) {
@@ -5668,6 +5721,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/home-facets-wrapper.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeFacetsWrapperDS = /** @class */ (function (_super) {
@@ -5943,6 +5997,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/home-item-tags-wrapper.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeItemTagsWrapperDS = /** @class */ (function (_super) {
@@ -5968,6 +6023,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/home-autocomplete.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeAutocompleteDS = /** @class */ (function (_super) {
@@ -6073,6 +6129,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/entita-nav.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwEntitaNavDS = /** @class */ (function (_super) {
@@ -6146,6 +6203,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/entita-metadata-viewer.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwEntitaMetadataViewerDS = /** @class */ (function (_super) {
@@ -6293,6 +6351,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/tree.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwTreeDS = /** @class */ (function (_super) {
@@ -6631,6 +6690,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/sidebar-header.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSidebarHeaderDS = /** @class */ (function (_super) {
@@ -6681,6 +6741,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/scheda-breadcrumbs.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSchedaBreadcrumbsDS = /** @class */ (function (_super) {
@@ -6723,6 +6784,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/scheda-metadata.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSchedaMetadataDS = /** @class */ (function (_super) {
@@ -6781,6 +6843,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/scheda-image.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSchedaImageDS = /** @class */ (function (_super) {
@@ -6806,6 +6869,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/scheda-inner-title.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSchedaInnerTitleDS = /** @class */ (function (_super) {
@@ -6831,6 +6895,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/search-layout-tabs.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSearchLayoutTabsDS = /** @class */ (function (_super) {
@@ -6890,10 +6955,12 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/data-sources/index.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     var DS$1 = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         AwLinkedObjectsDS: AwLinkedObjectsDS,
         AwAutocompleteWrapperDS: AwAutocompleteWrapperDS,
         AwBubbleChartDS: AwBubbleChartDS,
@@ -6916,6 +6983,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/event-handlers/linked-objects.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwLinkedObjectsEH = /** @class */ (function (_super) {
@@ -7028,6 +7096,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/event-handlers/autocomplete-wrapper.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwAutocompleteWrapperEH = /** @class */ (function (_super) {
@@ -7066,6 +7135,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/event-handlers/bubble-chart.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwBubbleChartEH = /** @class */ (function (_super) {
@@ -7193,6 +7263,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/event-handlers/hero.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHeroEH = /** @class */ (function (_super) {
@@ -7236,6 +7307,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/event-handlers/home-facets-wrapper.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeFacetsWrapperEH = /** @class */ (function (_super) {
@@ -7411,6 +7483,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/event-handlers/home-hero-patrimonio.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeHeroPatrimonioEH = /** @class */ (function (_super) {
@@ -7454,6 +7527,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/event-handlers/home-item-tags-wrapper.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeItemTagsWrapperEH = /** @class */ (function (_super) {
@@ -7491,6 +7565,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/event-handlers/home-autocomplete.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeAutocompleteEH = /** @class */ (function (_super) {
@@ -7526,6 +7601,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/event-handlers/entita-nav.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwEntitaNavEH = /** @class */ (function (_super) {
@@ -7568,6 +7644,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/event-handlers/scheda-breadcrumbs.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSchedaSidebarEH = /** @class */ (function (_super) {
@@ -7603,6 +7680,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/event-handlers/sidebar-header.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSidebarHeaderEH = /** @class */ (function (_super) {
@@ -7638,6 +7716,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/event-handlers/tree.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwTreeEH = /** @class */ (function (_super) {
@@ -7702,6 +7781,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/event-handlers/search-layout-tabs.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSearchLayoutTabsEH = /** @class */ (function (_super) {
@@ -7723,6 +7803,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/event-handlers/table.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwTableEH = /** @class */ (function (_super) {
@@ -7752,10 +7833,12 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/event-handlers/index.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     var EH$1 = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         AwLinkedObjectsEH: AwLinkedObjectsEH,
         AwAutocompleteWrapperEH: AwAutocompleteWrapperEH,
         AwBubbleChartEH: AwBubbleChartEH,
@@ -7774,6 +7857,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -7796,6 +7880,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwEntitaLayoutComponent = /** @class */ (function (_super) {
@@ -7929,6 +8014,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeLayoutDS = /** @class */ (function (_super) {
@@ -8456,6 +8542,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/layouts/home-layout/home-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeLayoutEH = /** @class */ (function (_super) {
@@ -8796,6 +8883,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/layouts/home-layout/home-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -8829,6 +8917,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeLayoutComponent = /** @class */ (function (_super) {
@@ -8918,6 +9007,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSchedaLayoutDS = /** @class */ (function (_super) {
@@ -9265,6 +9355,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSchedaLayoutEH = /** @class */ (function (_super) {
@@ -9427,6 +9518,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -9457,6 +9549,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSchedaLayoutComponent = /** @class */ (function (_super) {
@@ -9578,6 +9671,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/layouts/search-layout/search-facets.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var facetsConfig = {
@@ -9745,6 +9839,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -10180,6 +10275,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/layouts/search-layout/search-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSearchLayoutEH = /** @class */ (function (_super) {
@@ -10353,6 +10449,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/layouts/search-layout/search-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -10378,6 +10475,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSearchLayoutComponent = /** @class */ (function (_super) {
@@ -10491,6 +10589,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/components/bubble-chart-wrapper/bubble-chart-wrapper.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var BubbleChartWrapperComponent = /** @class */ (function () {
@@ -10533,6 +10632,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/components/smart-breadcrumbs/smart-breadcrumbs.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /**
@@ -10691,6 +10791,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/arianna-web/n7-boilerplate-arianna-web.module.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -10722,6 +10823,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/data-viz/components/data-widget-wrapper/data-widget-wrapper.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /**
@@ -10756,18 +10858,176 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/data-viz/components/datepicker-wrapper/datepicker-wrapper.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    /**
+     * @record
+     */
+    function IDatepickerWrapperData() { }
+    if (false) {
+        /** @type {?} */
+        IDatepickerWrapperData.prototype.select;
+        /** @type {?} */
+        IDatepickerWrapperData.prototype.datepicker;
+        /** @type {?|undefined} */
+        IDatepickerWrapperData.prototype.payload;
+    }
+    /**
+     * @record
+     */
+    function ISelect() { }
+    if (false) {
+        /** @type {?} */
+        ISelect.prototype.id;
+        /** @type {?} */
+        ISelect.prototype.hidden;
+        /** @type {?|undefined} */
+        ISelect.prototype.icon;
+        /** @type {?} */
+        ISelect.prototype.label;
+        /** @type {?} */
+        ISelect.prototype.items;
+        /** @type {?|undefined} */
+        ISelect.prototype.classes;
+    }
+    /**
+     * @record
+     */
+    function IDropdownItems() { }
+    if (false) {
+        /** @type {?} */
+        IDropdownItems.prototype.text;
+        /** @type {?} */
+        IDropdownItems.prototype.payload;
+        /** @type {?|undefined} */
+        IDropdownItems.prototype.classes;
+    }
+    var DatepickerWrapperComponent = /** @class */ (function () {
+        function DatepickerWrapperComponent() {
+        }
+        /**
+         * @param {?} payload
+         * @return {?}
+         */
+        DatepickerWrapperComponent.prototype.onClick = /**
+         * @param {?} payload
+         * @return {?}
+         */
+        function (payload) {
+            if (!this.emit)
+                return;
+            this.emit('click', payload);
+        };
+        /**
+         * @param {?} payload
+         * @return {?}
+         */
+        DatepickerWrapperComponent.prototype.toggleDropDown = /**
+         * @param {?} payload
+         * @return {?}
+         */
+        function (payload) {
+            if (!this.emit)
+                return;
+            this.emit('toggle', payload);
+        };
+        DatepickerWrapperComponent.decorators = [
+            { type: core.Component, args: [{
+                        selector: 'dv-datepicker-wrapper',
+                        template: "<div *ngIf=\"data\" class=\"dv-datepicker-wrapper {{ data.select.classes || '' }}\">\n    <div class=\"dv-datepicker-wrapper__label\" (click)=\"toggleDropDown(data.payload)\">\n        <input type=\"text\" [value]=\"data.select.label\" [readOnly]=\"true\"/>\n        <span class=\"{{data.select.icon}}\"></span>\n    </div>\n    <div class=\"dv-datepicker-wrapper__dropdown\" [hidden]=\"data.select.hidden\">\n        <ul class=\"dv-datepicker-wrapper__dropdown-list\">\n            <li class=\"dv-datepicker-wrapper__dropdown-list-option {{ opt.classes || '' }}\" *ngFor=\"let opt of data.select.items\" (click)=\"onClick(opt.payload)\">{{opt.text}}</li>\n        </ul>\n    </div>\n    <n7-datepicker\n        [hidden]=\"data.datepicker.hidden\"\n        [data]=\"data.datepicker.data\"\n        [emit]=\"emit\">\n    </n7-datepicker>\n</div>\n"
+                    }] }
+        ];
+        DatepickerWrapperComponent.propDecorators = {
+            data: [{ type: core.Input }],
+            emit: [{ type: core.Input }]
+        };
+        return DatepickerWrapperComponent;
+    }());
+    if (false) {
+        /** @type {?} */
+        DatepickerWrapperComponent.prototype.data;
+        /** @type {?} */
+        DatepickerWrapperComponent.prototype.emit;
+    }
+
+    /**
+     * @fileoverview added by tsickle
+     * Generated from: lib/data-viz/layout/example-layout/example-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var DvExampleLayoutDS = /** @class */ (function (_super) {
         __extends(DvExampleLayoutDS, _super);
         function DvExampleLayoutDS() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.Items = [
+                {
+                    text: "Last week",
+                    payload: "lastWeek",
+                },
+                {
+                    text: "Last month",
+                    payload: "lastMonth",
+                },
+                {
+                    text: "Last year",
+                    payload: "lastYear",
+                },
+                {
+                    text: "Select Date",
+                    //this payload key is use for visualise the datepicker.
+                    payload: "ByDate",
+                }
+            ];
+            _this.datepickerOptions = {
+                dateFormat: 'Y-m-d',
+                mode: 'range',
+            };
+            _this.datePickerExternalData = {
+                select: {
+                    id: "dv-select",
+                    label: "Last Week",
+                    items: _this.Items,
+                },
+                datepicker: {
+                    id: "datepicker",
+                    libOptions: _this.datepickerOptions,
+                }
+            };
+            return _this;
         }
+        /**
+         * @return {?}
+         */
+        DvExampleLayoutDS.prototype.onInit = /**
+         * @return {?}
+         */
+        function () {
+            this.one('dv-datepicker-wrapper').update(this.datePickerExternalData);
+        };
         return DvExampleLayoutDS;
     }(core$1.LayoutDataSource));
+    if (false) {
+        /**
+         * @type {?}
+         * @private
+         */
+        DvExampleLayoutDS.prototype.Items;
+        /**
+         * @type {?}
+         * @private
+         */
+        DvExampleLayoutDS.prototype.datepickerOptions;
+        /**
+         * @type {?}
+         * @private
+         */
+        DvExampleLayoutDS.prototype.datePickerExternalData;
+    }
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/data-viz/layout/example-layout/example-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var DvExampleLayoutEH = /** @class */ (function (_super) {
@@ -10782,12 +11042,22 @@
          * @return {?}
          */
         function () {
+            var _this = this;
+            this.innerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                _this.dataSource.onInit();
+            }));
         };
         return DvExampleLayoutEH;
     }(core$1.EventHandler));
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/data-viz/data-sources/data-widget-wrapper.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var DvDataWidgetDS = /** @class */ (function (_super) {
@@ -10815,6 +11085,126 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/data-viz/data-sources/datepicker-wrapper.ds.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var DvDatepickerWrapperDS = /** @class */ (function (_super) {
+        __extends(DvDatepickerWrapperDS, _super);
+        function DvDatepickerWrapperDS() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this._datepicker = null;
+            return _this;
+        }
+        /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        DvDatepickerWrapperDS.prototype.transform = /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        function (data) {
+            var _this = this;
+            if (!data) {
+                return;
+            }
+            ;
+            return {
+                //set select option
+                select: {
+                    id: data.select.id,
+                    hidden: true,
+                    icon: data.select.icon || "n7-icon-angle-down",
+                    label: data.select.label,
+                    items: data.select.items,
+                    classes: data.select.classes,
+                },
+                //set picker
+                datepicker: {
+                    hidden: true,
+                    data: {
+                        id: data.datepicker.id,
+                        libOptions: data.datepicker.libOptions,
+                        getInstance: (/**
+                         * @param {?} datepicker
+                         * @return {?}
+                         */
+                        function (datepicker) { return _this._datepicker = datepicker; }),
+                    }
+                }
+            };
+        };
+        /**
+         * @return {?}
+         */
+        DvDatepickerWrapperDS.prototype.openDatepicker = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            setTimeout((/**
+             * @return {?}
+             */
+            function () { return _this._datepicker.open(); }));
+            this.output.select.hidden = true;
+            this.output.datepicker.hidden = false;
+        };
+        /**
+         * @return {?}
+         */
+        DvDatepickerWrapperDS.prototype.closeDatepicker = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            setTimeout((/**
+             * @return {?}
+             */
+            function () { return _this._datepicker.close(); }));
+            this.output.select.hidden = true;
+            this.output.datepicker.hidden = true;
+        };
+        /**
+         * @param {?} payload
+         * @return {?}
+         */
+        DvDatepickerWrapperDS.prototype.setLabel = /**
+         * @param {?} payload
+         * @return {?}
+         */
+        function (payload) {
+            this.output.select.label = payload.dateStr;
+            this.output.datepicker.hidden = true;
+        };
+        /**
+         * @return {?}
+         */
+        DvDatepickerWrapperDS.prototype.toggleDropDown = /**
+         * @return {?}
+         */
+        function () {
+            if (this.output.select.hidden === false) {
+                this.output.select.hidden = true;
+            }
+            else {
+                this.output.select.hidden = false;
+            }
+        };
+        return DvDatepickerWrapperDS;
+    }(core$1.DataSource));
+    if (false) {
+        /**
+         * @type {?}
+         * @protected
+         */
+        DvDatepickerWrapperDS.prototype._datepicker;
+    }
+
+    /**
+     * @fileoverview added by tsickle
+     * Generated from: lib/data-viz/data-sources/graph.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var DvGraphDS = /** @class */ (function (_super) {
@@ -10911,6 +11301,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/data-viz/data-sources/inner-title.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var DvInnerTitleDS = /** @class */ (function (_super) {
@@ -10947,6 +11338,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/data-viz/data-sources/widget.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var DvWidgetDS = /** @class */ (function (_super) {
@@ -10972,11 +11364,14 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/data-viz/data-sources/index.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     var DS$2 = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         DvDataWidgetDS: DvDataWidgetDS,
+        DvDatepickerWrapperDS: DvDatepickerWrapperDS,
         DvGraphDS: DvGraphDS,
         DvInnerTitleDS: DvInnerTitleDS,
         DvWidgetDS: DvWidgetDS
@@ -10984,6 +11379,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/data-viz/event-handlers/data-widget-wrapper.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var DvDataWidgetEH = /** @class */ (function (_super) {
@@ -10998,22 +11394,70 @@
          * @return {?}
          */
         function () {
-            console.log("....");
         };
         return DvDataWidgetEH;
     }(core$1.EventHandler));
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/data-viz/event-handlers/datepicker-wrapper.eh.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var DvDatepickerWrapperEH = /** @class */ (function (_super) {
+        __extends(DvDatepickerWrapperEH, _super);
+        function DvDatepickerWrapperEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        DvDatepickerWrapperEH.prototype.listen = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.innerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case 'dv-datepicker-wrapper.click':
+                        if (payload === "ByDate") {
+                            _this.dataSource.openDatepicker();
+                        }
+                        else {
+                            _this.dataSource.closeDatepicker();
+                        }
+                        break;
+                    case 'dv-datepicker-wrapper.toggle':
+                        _this.dataSource.toggleDropDown();
+                        break;
+                    case 'dv-datepicker-wrapper.change':
+                        _this.dataSource.setLabel(payload);
+                        break;
+                }
+            }));
+        };
+        return DvDatepickerWrapperEH;
+    }(core$1.EventHandler));
+
+    /**
+     * @fileoverview added by tsickle
+     * Generated from: lib/data-viz/event-handlers/index.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     var EH$2 = /*#__PURE__*/Object.freeze({
-        DvDataWidgetEH: DvDataWidgetEH
+        __proto__: null,
+        DvDataWidgetEH: DvDataWidgetEH,
+        DvDatepickerWrapperEH: DvDatepickerWrapperEH
     });
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/data-viz/layout/example-layout/example-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -11026,6 +11470,7 @@
         widgets: [
             { id: 'dv-inner-title', hasStaticData: true },
             { id: 'dv-widget', hasStaticData: true },
+            { id: 'dv-datepicker-wrapper' },
             { id: 'dv-graph', hasStaticData: true },
         ],
         layoutDS: DvExampleLayoutDS,
@@ -11039,6 +11484,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/data-viz/layout/example-layout/example-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var DvExampleLayoutComponent = /** @class */ (function (_super) {
@@ -11067,7 +11513,7 @@
         DvExampleLayoutComponent.decorators = [
             { type: core.Component, args: [{
                         selector: 'dv-example-layout',
-                        template: "<div class=\"dv-example-layout\" id=\"example-layout\">\n    <dv-data-widget-wrapper>\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-chart\n                    [data]=\"lb.widgets['dv-graph'].ds.out$ | async\">\n                </n7-chart>\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n</div>"
+                        template: "<div class=\"dv-example-layout\" id=\"example-layout\">\n    <dv-data-widget-wrapper>\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-chart\n                    [data]=\"lb.widgets['dv-graph'].ds.out$ | async\">\n                </n7-chart>\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n    <dv-datepicker-wrapper \n        [data]=\"lb.widgets['dv-datepicker-wrapper'].ds.out$ | async\"\n        [emit]=\"lb.widgets['dv-datepicker-wrapper'].emit\">\n    </dv-datepicker-wrapper>\n</div>"
                     }] }
         ];
         /** @nocollapse */
@@ -11077,11 +11523,13 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/data-viz/n7-boilerplate-data-viz.module.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
     var COMPONENTS$2 = [
         DataWidgetWrapperComponent,
+        DatepickerWrapperComponent,
         DvExampleLayoutComponent,
     ];
     var N7BoilerplateDataVizModule = /** @class */ (function () {
@@ -11104,6 +11552,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/n7-boilerplate-lib.module.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var N7BoilerplateLibModule = /** @class */ (function () {
@@ -11185,8 +11634,11 @@
     exports.CommunicationService = CommunicationService;
     exports.ConfigurationService = ConfigurationService;
     exports.DataWidgetWrapperComponent = DataWidgetWrapperComponent;
+    exports.DatepickerWrapperComponent = DatepickerWrapperComponent;
     exports.DvDataWidgetDS = DvDataWidgetDS;
     exports.DvDataWidgetEH = DvDataWidgetEH;
+    exports.DvDatepickerWrapperDS = DvDatepickerWrapperDS;
+    exports.DvDatepickerWrapperEH = DvDatepickerWrapperEH;
     exports.DvExampleLayoutComponent = DvExampleLayoutComponent;
     exports.DvExampleLayoutConfig = DvExampleLayoutConfig;
     exports.DvExampleLayoutDS = DvExampleLayoutDS;
@@ -11252,9 +11704,10 @@
     exports.ɵt = BubbleChartWrapperComponent;
     exports.ɵu = SmartBreadcrumbsComponent;
     exports.ɵv = DataWidgetWrapperComponent;
-    exports.ɵw = DvExampleLayoutComponent;
+    exports.ɵw = DatepickerWrapperComponent;
+    exports.ɵx = DvExampleLayoutComponent;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
-}));
+})));
 //# sourceMappingURL=n7-frontend-boilerplate.umd.js.map

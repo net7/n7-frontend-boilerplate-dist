@@ -7,11 +7,14 @@ export declare const DvExampleLayoutConfig: {
     /**
      * Array of components you want to use
      * in this leyout
-     */
-    widgets: {
+    */
+    widgets: ({
         id: string;
         hasStaticData: boolean;
-    }[];
+    } | {
+        id: string;
+        hasStaticData?: undefined;
+    })[];
     layoutDS: typeof DvExampleLayoutDS;
     layoutEH: typeof DvExampleLayoutEH;
     widgetsDataSources: typeof DS;
