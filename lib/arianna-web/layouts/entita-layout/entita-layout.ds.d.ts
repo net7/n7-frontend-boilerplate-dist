@@ -13,6 +13,7 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
     selectedTab: string;
     navHeader: any;
     currentId: string;
+    currentSlug: string;
     currentPage: any;
     pageSize: number;
     bubblesSize: number;
@@ -34,6 +35,6 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
     handleNavUpdate: (tab: any) => void;
     updateWidgets(data: any): void;
     updateBubbes(data: any): void;
-    loadItem(id: any, tab: any): any;
+    loadItem(id: any, slug: any, tab: any): any;
     loadContent(res: any): void;
 }

@@ -7,6 +7,7 @@ export declare class AwBubbleChartDS extends DataSource {
     closedEyes: any[];
     tippyList: any[];
     focusedBubble: string;
+    focusedBubbleLabel: string;
     protected transform(data: any): {
         data: any;
         smallView: {

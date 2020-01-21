@@ -25,6 +25,8 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
     sidebarIsSticky: boolean;
     treeMaxHeight: string;
     contentIsLoading: boolean;
+    currentId: string | null;
+    emptyLabel: string;
     onInit({ configuration, mainState, router, options, titleService, communication }: {
         configuration: any;
         mainState: any;
@@ -37,7 +39,7 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
     getNavigation(id: any): any;
     setTree(tree: any): void;
     getTree: () => any;
-    updateNavigation(label: any): void;
+    updateNavigation(text: any): void;
     loadItem(id: any): any;
     loadContent(response: any): void;
     collapseSidebar(): void;

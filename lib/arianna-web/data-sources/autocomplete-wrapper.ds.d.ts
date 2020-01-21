@@ -7,4 +7,5 @@ export declare class AwAutocompleteWrapperDS extends DataSource {
         suggestion: any[];
         loading?: undefined;
     };
+    private stringTrim;
 }

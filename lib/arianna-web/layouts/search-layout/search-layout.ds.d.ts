@@ -19,6 +19,8 @@ export declare class AwSearchLayoutDS extends LayoutDataSource {
     sidebarIsSticky: boolean;
     isFirstLoading: boolean;
     resultsLoading: boolean;
+    orderBy: string;
+    orderDirection: string;
     options: any;
     orderByLabel: string;
     orderByOptions: any;
@@ -36,6 +38,7 @@ export declare class AwSearchLayoutDS extends LayoutDataSource {
     onPaginationGoToChange(payload: any): Observable<boolean>;
     resetPagination(): void;
     onResultsLimitChange(payload: any): void;
+    setLimit(payload: any): void;
     getSearchModelId: () => string;
     doSearchRequest$(): Observable<any>;
     private _updateSearchPage;
