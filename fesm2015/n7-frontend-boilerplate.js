@@ -10,7 +10,6 @@ import { LayoutBuilder, LayoutDataSource, EventHandler, DataSource } from '@n7-f
 import tippy, { hideAll } from 'tippy.js';
 import { get, cloneDeep } from 'lodash';
 import slug from 'slug';
-import helpers$1 from 'n7-boilerplate-lib/lib/common/helpers';
 
 /**
  * @fileoverview added by tsickle
@@ -5236,7 +5235,7 @@ class AwChartTippyDS extends DataSource {
                 text: `È collegato a ${count} entità`,
                 isSelected: selected.includes(id),
                 anchorData: {
-                    href: `${basePath}${id}/${helpers$1.slugify(label)}`
+                    href: `${basePath}${id}/${helpers.slugify(label)}`
                 }
             };
         }));
@@ -8477,7 +8476,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
                             href: [
                                 this.configuration.get('paths').schedaBasePath,
                                 element.link + '/',
-                                helpers$1.slugify(element.label)
+                                helpers.slugify(element.label)
                             ].join('')
                         }
                     });
@@ -8511,7 +8510,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
      */
     _sidebarStickyControl() {
         // no sticky for Internet Explorer
-        if (helpers$1.browserIsIE()) {
+        if (helpers.browserIsIE()) {
             return;
         }
         /** @type {?} */

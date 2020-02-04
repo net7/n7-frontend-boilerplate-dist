@@ -1,12 +1,11 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('@angular/common'), require('@angular/common/http'), require('@n7-frontend/components'), require('rxjs'), require('rxjs/operators'), require('@angular/router'), require('@angular/platform-browser'), require('@n7-frontend/core'), require('tippy.js'), require('lodash'), require('slug'), require('n7-boilerplate-lib/lib/common/helpers')) :
-    typeof define === 'function' && define.amd ? define('@n7-frontend/boilerplate', ['exports', '@angular/core', '@angular/common', '@angular/common/http', '@n7-frontend/components', 'rxjs', 'rxjs/operators', '@angular/router', '@angular/platform-browser', '@n7-frontend/core', 'tippy.js', 'lodash', 'slug', 'n7-boilerplate-lib/lib/common/helpers'], factory) :
-    (global = global || self, factory((global['n7-frontend'] = global['n7-frontend'] || {}, global['n7-frontend'].boilerplate = {}), global.ng.core, global.ng.common, global.ng.common.http, global.components, global.rxjs, global.rxjs.operators, global.ng.router, global.ng.platformBrowser, global.core$1, global.tippy, global.lodash, global.slug, global.helpers$1));
-}(this, function (exports, core, common, http, components, rxjs, operators, router, platformBrowser, core$1, tippy, lodash, slug, helpers$1) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('@angular/common'), require('@angular/common/http'), require('@n7-frontend/components'), require('rxjs'), require('rxjs/operators'), require('@angular/router'), require('@angular/platform-browser'), require('@n7-frontend/core'), require('tippy.js'), require('lodash'), require('slug')) :
+    typeof define === 'function' && define.amd ? define('@n7-frontend/boilerplate', ['exports', '@angular/core', '@angular/common', '@angular/common/http', '@n7-frontend/components', 'rxjs', 'rxjs/operators', '@angular/router', '@angular/platform-browser', '@n7-frontend/core', 'tippy.js', 'lodash', 'slug'], factory) :
+    (global = global || self, factory((global['n7-frontend'] = global['n7-frontend'] || {}, global['n7-frontend'].boilerplate = {}), global.ng.core, global.ng.common, global.ng.common.http, global.components, global.rxjs, global.rxjs.operators, global.ng.router, global.ng.platformBrowser, global.core$1, global.tippy, global.lodash, global.slug));
+}(this, function (exports, core, common, http, components, rxjs, operators, router, platformBrowser, core$1, tippy, lodash, slug) { 'use strict';
 
     var tippy__default = 'default' in tippy ? tippy['default'] : tippy;
     slug = slug && slug.hasOwnProperty('default') ? slug['default'] : slug;
-    helpers$1 = helpers$1 && helpers$1.hasOwnProperty('default') ? helpers$1['default'] : helpers$1;
 
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation. All rights reserved.
@@ -5663,7 +5662,7 @@
                     text: "\u00C8 collegato a " + count + " entit\u00E0",
                     isSelected: selected.includes(id),
                     anchorData: {
-                        href: "" + basePath + id + "/" + helpers$1.slugify(label)
+                        href: "" + basePath + id + "/" + helpers.slugify(label)
                     }
                 };
             }));
@@ -9381,7 +9380,7 @@
                                 href: [
                                     _this.configuration.get('paths').schedaBasePath,
                                     element.link + '/',
-                                    helpers$1.slugify(element.label)
+                                    helpers.slugify(element.label)
                                 ].join('')
                             }
                         });
@@ -9423,7 +9422,7 @@
         function () {
             var _this = this;
             // no sticky for Internet Explorer
-            if (helpers$1.browserIsIE()) {
+            if (helpers.browserIsIE()) {
                 return;
             }
             /** @type {?} */
