@@ -34,8 +34,10 @@ export declare class AwSearchLayoutDS extends LayoutDataSource {
     onDestroy(): void;
     onSearchResponse(): void;
     onOrderByChange(payload: any): void;
+    onPageSizeChange(size: any): Observable<boolean>;
     onPaginationChange(payload: any): Observable<boolean>;
     onPaginationGoToChange(payload: any): Observable<boolean>;
+    drawPagination: () => void;
     resetPagination(): void;
     onResultsLimitChange(payload: any): void;
     setLimit(payload: any): void;

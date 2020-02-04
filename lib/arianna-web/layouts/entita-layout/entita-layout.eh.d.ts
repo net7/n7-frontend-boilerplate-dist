@@ -5,6 +5,7 @@ export declare class AwEntitaLayoutEH extends EventHandler {
     private route;
     private entityId;
     listen(): void;
+    private handlePageSizeChange;
     /**
      * Listens to routing events of this layout.
      */

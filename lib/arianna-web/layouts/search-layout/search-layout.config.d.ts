@@ -2,8 +2,8 @@ import { AwSearchLayoutDS } from './search-layout.ds';
 import { AwSearchLayoutEH } from './search-layout.eh';
 import * as DS from '../../data-sources';
 import * as EH from '../../event-handlers';
-import { FacetsWrapperDS } from '../../../common/data-sources';
-import { FacetsWrapperEH } from '../../../common/event-handlers';
+import { FacetsWrapperDS, SmartPaginationDS } from '../../../common/data-sources';
+import { FacetsWrapperEH, SmartPaginationEH } from '../../../common/event-handlers';
 export declare const AwSearchLayoutConfig: {
     layoutId: string;
     /**
@@ -25,6 +25,11 @@ export declare const AwSearchLayoutConfig: {
         hasStaticData: boolean;
         dataSource?: undefined;
         eventHandler?: undefined;
+    } | {
+        id: string;
+        dataSource: typeof SmartPaginationDS;
+        eventHandler: typeof SmartPaginationEH;
+        hasStaticData?: undefined;
     })[];
     layoutDS: typeof AwSearchLayoutDS;
     layoutEH: typeof AwSearchLayoutEH;
