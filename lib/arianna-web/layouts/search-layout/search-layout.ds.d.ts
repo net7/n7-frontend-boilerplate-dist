@@ -46,4 +46,5 @@ export declare class AwSearchLayoutDS extends LayoutDataSource {
     private _addFacetsOptions;
     private _normalizeItems;
     private _sidebarStickyControl;
+    private _getPaginationParams;
 }

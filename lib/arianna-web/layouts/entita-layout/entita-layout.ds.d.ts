@@ -37,4 +37,6 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
     updateBubbes(data: any): void;
     loadItem(id: any, slug: any, tab: any): any;
     loadContent(res: any): void;
+    private _getPaginationParams;
+    getNavBasePath(): string;
 }

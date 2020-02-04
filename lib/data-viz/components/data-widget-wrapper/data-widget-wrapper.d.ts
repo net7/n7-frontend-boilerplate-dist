@@ -3,5 +3,4 @@ export interface IDataWidgetWrapperData {
 }
 export declare class DataWidgetWrapperComponent {
     data: IDataWidgetWrapperData;
-    emit: any;
 }

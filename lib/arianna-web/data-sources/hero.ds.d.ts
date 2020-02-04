@@ -7,7 +7,9 @@ export declare class AwHeroDS extends DataSource {
         backgroundImage: any;
         button: {
             text: any;
-            payload: string;
+            anchor: {
+                payload: string;
+            };
         };
         input: {
             placeholder: any;

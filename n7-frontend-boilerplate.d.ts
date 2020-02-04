@@ -3,7 +3,8 @@
  */
 export * from './public-api';
 export { BubbleChartWrapperComponent as ɵt } from './lib/arianna-web/components/bubble-chart-wrapper/bubble-chart-wrapper';
-export { SmartBreadcrumbsComponent as ɵu } from './lib/arianna-web/components/smart-breadcrumbs/smart-breadcrumbs';
+export { ChartTippyComponent as ɵu } from './lib/arianna-web/components/chart-tippy/chart-tippy';
+export { SmartBreadcrumbsComponent as ɵv } from './lib/arianna-web/components/smart-breadcrumbs/smart-breadcrumbs';
 export { AwEntitaLayoutComponent as ɵk } from './lib/arianna-web/layouts/entita-layout/entita-layout';
 export { AwHomeLayoutComponent as ɵn } from './lib/arianna-web/layouts/home-layout/home-layout';
 export { AwSchedaLayoutComponent as ɵo } from './lib/arianna-web/layouts/scheda-layout/scheda-layout';
@@ -19,6 +20,6 @@ export { CommunicationService as ɵh } from './lib/common/services/communication
 export { ConfigurationService as ɵc } from './lib/common/services/configuration.service';
 export { LayoutsConfigurationService as ɵd } from './lib/common/services/layouts-configuration.service';
 export { MainStateService as ɵe } from './lib/common/services/main-state.service';
-export { DataWidgetWrapperComponent as ɵv } from './lib/data-viz/components/data-widget-wrapper/data-widget-wrapper';
-export { DatepickerWrapperComponent as ɵw } from './lib/data-viz/components/datepicker-wrapper/datepicker-wrapper';
-export { DvExampleLayoutComponent as ɵx } from './lib/data-viz/layout/example-layout/example-layout';
+export { DataWidgetWrapperComponent as ɵw } from './lib/data-viz/components/data-widget-wrapper/data-widget-wrapper';
+export { DatepickerWrapperComponent as ɵx } from './lib/data-viz/components/datepicker-wrapper/datepicker-wrapper';
+export { DvExampleLayoutComponent as ɵy } from './lib/data-viz/layout/example-layout/example-layout';

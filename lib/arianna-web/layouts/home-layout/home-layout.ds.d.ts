@@ -17,12 +17,12 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     outerLinksTitle: string;
     homeAutocompleteQuery: string;
     private destroyed$;
+    homeAutocompleteIsLoading: boolean;
+    resultsListIsLoading: boolean;
     bubblesEnabled: boolean;
     selectedBubbles: any[];
     lastBubbleResponse: any;
     firstBubbleResponse: any;
-    homeAutocompleteIsLoading: boolean;
-    resultsListIsLoading: boolean;
     onInit({ communication, mainState, configuration, tippy }: {
         communication: any;
         mainState: any;

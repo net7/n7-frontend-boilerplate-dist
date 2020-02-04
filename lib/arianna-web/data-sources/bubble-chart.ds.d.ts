@@ -6,9 +6,10 @@ export declare class AwBubbleChartDS extends DataSource {
     filters: any[];
     closedEyes: any[];
     tippyList: any[];
-    focusedBubble: string;
-    focusedBubbleLabel: string;
     protected transform(data: any): {
+        anchorData: {
+            href: string;
+        };
         data: any;
         smallView: {
             data: any;
@@ -43,5 +44,4 @@ export declare class AwBubbleChartDS extends DataSource {
     updateChart: (res: any) => void;
     smartSlice: (d: any, length?: any) => any;
     handleBubbleClick: (payload: any) => void;
-    tippyMaker: (bubbles: any) => void;
 }

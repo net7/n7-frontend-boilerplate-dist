@@ -4,12 +4,13 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK } from '@n7-frontend/components';
 import { ReplaySubject, empty, of, Subject, forkJoin, fromEvent, merge } from 'rxjs';
 import { map, catchError, tap, takeUntil, filter, debounceTime } from 'rxjs/operators';
-import { Router, ActivatedRoute } from '@angular/router';
+import { NavigationStart, Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { LayoutBuilder, LayoutDataSource, EventHandler, DataSource } from '@n7-frontend/core';
 import tippy, { hideAll } from 'tippy.js';
 import { get, cloneDeep } from 'lodash';
 import slug from 'slug';
+import helpers$1 from 'n7-boilerplate-lib/lib/common/helpers';
 
 /**
  * @fileoverview added by tsickle
@@ -740,6 +741,10 @@ const ApolloProviderConfig = {
               subTitle
               image
               text
+              relatedTypesOfEntity {
+                type
+                count
+              }
               breadcrumbs {
                 label
                 link
@@ -1236,6 +1241,7 @@ class MainLayoutDS extends LayoutDataSource {
           });
         }, 5000); */
     }
+    // navigate emitter (click) handler
     /**
      * @param {?} payload
      * @return {?}
@@ -1260,6 +1266,13 @@ class MainLayoutDS extends LayoutDataSource {
             // on change
             this._onRouterNavigate();
         }
+    }
+    // links routerLink change handler
+    /**
+     * @return {?}
+     */
+    onRouterChanged() {
+        hideAll();
     }
     /**
      * @private
@@ -1633,6 +1646,74 @@ class FacetInputCheckbox extends FacetInput {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+/** @type {?} */
+const domParser = new DOMParser();
+var helpers = {
+    /**
+     * @param {?} key
+     * @param {?=} label
+     * @return {?}
+     */
+    prettifySnakeCase(key, label) {
+        if (label) {
+            return label;
+        }
+        return (key || '').split('_').map((/**
+         * @param {?} word
+         * @param {?} index
+         * @return {?}
+         */
+        (word, index) => index === 0 ? this.ucFirst(word) : word)).join(' ');
+    },
+    /**
+     * @param {?} str
+     * @return {?}
+     */
+    ucFirst(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    },
+    /**
+     * @param {?} str
+     * @return {?}
+     */
+    slugify(str) {
+        if (!str) {
+            return '';
+        }
+        /** @type {?} */
+        const parsedDoc = domParser.parseFromString(str, 'text/html');
+        /** @type {?} */
+        const parsedString = parsedDoc.body.textContent || '';
+        return slug(parsedString, { lower: true });
+    },
+    /**
+     * @return {?}
+     */
+    browserIsIE() {
+        return window.navigator.userAgent.match(/(MSIE|Trident)/);
+    },
+    /**
+     * @param {?} str
+     * @return {?}
+     */
+    escapeDoubleQuotes(str) {
+        return str.replace(/\\([\s\S])|(")/g, "\\$1$2"); // thanks @slevithan!
+    },
+    /**
+     * @param {?} str
+     * @return {?}
+     */
+    unescapeDoubleQuotes(str) {
+        if (str && str != "")
+            str = str.replace(/\\(")/g, "$1"); // thanks @slevithan!
+        return str;
+    }
+};
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 class FacetInputText extends FacetInput {
     /**
      * @protected
@@ -1664,7 +1745,7 @@ class FacetInputText extends FacetInput {
      * @return {?}
      */
     setActive(facetValue) {
-        this.output.value = facetValue || null;
+        this.output.value = helpers.unescapeDoubleQuotes(facetValue) || null;
     }
 }
 
@@ -2051,7 +2132,7 @@ class SearchModel {
                 filter.value.push(value);
             }
             else {
-                filter.value = !remove ? value : null;
+                filter.value = !remove ? helpers.escapeDoubleQuotes(value) : null;
             }
         }));
     }
@@ -2754,6 +2835,7 @@ class MainLayoutEH extends EventHandler {
                     this.dataSource.onInit(payload);
                     this.mainState = payload.mainState;
                     this.route = payload.route;
+                    this.router = payload.router;
                     this._listenRouterChanges();
                     this._listenMainStateChanges();
                     break;
@@ -2801,6 +2883,19 @@ class MainLayoutEH extends EventHandler {
             // to use in searchs
             SearchService.queryParams = params;
         }));
+        // router changed
+        this.router.events.pipe(filter((/**
+         * @param {?} event
+         * @return {?}
+         */
+        event => event instanceof NavigationStart)))
+            .subscribe((/**
+         * @param {?} event
+         * @return {?}
+         */
+        (event) => {
+            this.dataSource.onRouterChanged();
+        }));
     }
     /**
      * @private
@@ -2828,6 +2923,11 @@ if (false) {
      * @private
      */
     MainLayoutEH.prototype.route;
+    /**
+     * @type {?}
+     * @private
+     */
+    MainLayoutEH.prototype.router;
     /**
      * @type {?}
      * @private
@@ -3292,22 +3392,6 @@ class HeaderEH extends EventHandler {
      * @return {?}
      */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                case 'header.click':
-                    this.emitGlobal('navigate', {
-                        handler: 'router',
-                        path: [payload]
-                    });
-                    break;
-                default:
-                    break;
-            }
-        }));
         this.outerEvents$.subscribe((/**
          * @param {?} __0
          * @return {?}
@@ -3561,17 +3645,7 @@ class FooterEH extends EventHandler {
      * @return {?}
      */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                default:
-                    console.warn('unhandled inner event of type', type);
-                    break;
-            }
-        }));
+        // no events
     }
 }
 
@@ -3935,7 +4009,6 @@ class AwEntitaLayoutDS extends LayoutDataSource {
     constructor() {
         super(...arguments);
         this.showFields = false;
-        this.myResponse = {}; // backend response object
         // selected nav item
         this.navHeader = {}; // nav-header (custom) data
         // pagination value (url param)
@@ -3962,7 +4035,13 @@ class AwEntitaLayoutDS extends LayoutDataSource {
          * @return {?}
          */
         () => {
+            if (!this.myResponse) {
+                return;
+            }
+            /** @type {?} */
+            const paginationParams = this._getPaginationParams();
             this.one('aw-linked-objects').updateOptions({
+                paginationParams,
                 context: this.selectedTab,
                 config: this.configuration,
                 page: this.currentPage,
@@ -3970,13 +4049,6 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                 size: this.pageSize,
             });
             this.one('aw-linked-objects').update({ items: this.myResponse.relatedItems });
-            this.location.go([
-                this.configuration.get('paths').entitaBasePath,
-                this.currentId + '/',
-                this.currentSlug,
-                '/oggetti-collegati/',
-                this.currentPage
-            ].join(''));
         });
         this.handleNavUpdate = (/**
          * @param {?} tab
@@ -3986,13 +4058,14 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             this.selectedTab = tab;
             this.updateWidgets(this.myResponse);
             /** @type {?} */
-            const page = tab == 'oggetti-collegati' ? "/1" : "";
-            if (tab == 'oggetti-collegati') {
+            const page = tab === 'oggetti-collegati' ? '/1' : '';
+            if (tab === 'oggetti-collegati') {
                 this.one('aw-linked-objects').updateOptions({
                     context: this.selectedTab,
                     config: this.configuration,
                     page: this.currentPage,
                     pagination: true,
+                    paginationParams: this._getPaginationParams(),
                     size: this.pageSize,
                 });
                 this.one('aw-linked-objects').update({ items: this.myResponse.relatedItems });
@@ -4011,13 +4084,6 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                  */
                 () => { this.updateBubbes(this.myResponse.relatedEntities); }), 800);
             }
-            this.location.go([
-                this.configuration.get('paths').entitaBasePath,
-                this.currentId + '/',
-                this.currentSlug + '/',
-                tab,
-                page
-            ].join(''));
         });
     }
     /**
@@ -4043,6 +4109,9 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             config: this.configuration,
             limit: this.configuration.get('bubble-chart').bubbleLimit,
             smallChartSize: this.configuration.get('entita-layout').overview.smallChartSize
+        });
+        this.one('aw-chart-tippy').updateOptions({
+            basePath: this.configuration.get('paths')['entitaBasePath']
         });
         // navigation update
         this.mainState.updateCustom('currentNav', 'entita');
@@ -4076,7 +4145,21 @@ class AwEntitaLayoutDS extends LayoutDataSource {
     updateWidgets(data) {
         /** @type {?} */
         const selected = this.selectedTab;
-        this.one('aw-entita-nav').update({ data, selected });
+        Object.keys(data).forEach((/**
+         * @param {?} k
+         * @return {?}
+         */
+        k => {
+            if (Array.isArray(data[k]) && data[k].length == 0) {
+                data[k] = null;
+            }
+        }));
+        console.log({ data });
+        this.one('aw-entita-nav').update({
+            data,
+            selected,
+            basePath: this.getNavBasePath()
+        });
         this.updateComponent('aw-entita-metadata-viewer', this.myResponse.fields, {
             context: this.selectedTab,
             config: this.configuration,
@@ -4154,6 +4237,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                 config: this.configuration,
                 page: this.currentPage,
                 pagination: true,
+                paginationParams: this._getPaginationParams(),
                 size: this.pageSize,
             });
         }
@@ -4167,6 +4251,33 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         this.one('aw-linked-objects').update({ items: res.relatedItems });
         // update head title
         this.mainState.update('headTitle', `Arianna Web > Entità > ${this.myResponse.label}`);
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    _getPaginationParams() {
+        return {
+            href: [
+                this.configuration.get('paths').entitaBasePath,
+                this.currentId + '/',
+                this.currentSlug,
+                '/oggetti-collegati/'
+            ].join(''),
+            queryParams: {
+                page: this.currentPage
+            }
+        };
+    }
+    /**
+     * @return {?}
+     */
+    getNavBasePath() {
+        return [
+            this.configuration.get('paths').entitaBasePath,
+            this.currentId + '/',
+            this.currentSlug
+        ].join('');
     }
 }
 if (false) {
@@ -4241,46 +4352,6 @@ if (false) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-var helpers = {
-    /**
-     * @param {?} key
-     * @param {?=} label
-     * @return {?}
-     */
-    prettifySnakeCase(key, label) {
-        if (label) {
-            return label;
-        }
-        return (key || '').split('_').map((/**
-         * @param {?} word
-         * @param {?} index
-         * @return {?}
-         */
-        (word, index) => index === 0 ? this.ucFirst(word) : word)).join(' ');
-    },
-    /**
-     * @param {?} str
-     * @return {?}
-     */
-    ucFirst(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    },
-    /**
-     * @param {?} str
-     * @return {?}
-     */
-    slugify(str) {
-        if (!str) {
-            return '';
-        }
-        return slug(str, { lower: true });
-    }
-};
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwEntitaLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
@@ -4323,28 +4394,21 @@ class AwEntitaLayoutEH extends EventHandler {
          */
         ({ type, payload }) => {
             switch (type) {
+                case 'aw-bubble-chart.d3end': // bounce the event, from bubble-chart to chart-tippy
+                    this.emitOuter('d3end', payload);
+                    break;
                 case 'aw-entita-nav.click':
                     if (payload) {
                         this.dataSource.selectedTab = payload;
                         this.dataSource.handleNavUpdate(payload);
                     }
                     break;
-                case 'aw-linked-objects.pagination':
-                    console.log(payload);
-                    this.dataSource.currentPage = +payload.split('-')[1];
-                    this.dataSource.handlePageNavigation();
-                    break;
-                case 'aw-linked-objects.goto':
-                    console.log(payload);
-                    this.dataSource.currentPage = +payload.replace('goto-', '');
-                    this.dataSource.handlePageNavigation();
-                    break;
                 case 'aw-linked-objects.change': // changed page size value (pagination)
                     this.dataSource.pageSize = payload;
                     this.dataSource.currentPage = 1; // reset page
                     // reset page
                     /** @type {?} */
-                    let options = {
+                    const options = {
                         context: this.dataSource.selectedTab,
                         config: this.dataSource.configuration,
                         page: this.dataSource.currentPage,
@@ -4353,7 +4417,7 @@ class AwEntitaLayoutEH extends EventHandler {
                     };
                     this.dataSource.updateComponent('aw-linked-objects', { items: this.dataSource.myResponse.relatedItems }, options);
                     break;
-                case "aw-bubble-chart.bubble-tooltip-goto-click":
+                case 'aw-bubble-chart.bubble-tooltip-goto-click':
                     const { id, label } = payload;
                     this.emitGlobal('navigate', {
                         handler: 'router',
@@ -4370,14 +4434,6 @@ class AwEntitaLayoutEH extends EventHandler {
                         this.emitOuter('filterbubbleresponse', payload.relatedEntities);
                     }
                     break;
-                case 'aw-linked-objects.click':
-                    /** @type {?} */
-                    const paths = this.configuration.get('paths');
-                    this.emitGlobal('navigate', {
-                        handler: 'router',
-                        path: [payload.type == undefined ? paths.schedaBasePath : paths.entitaBasePath, payload.id, helpers.slugify(payload.title)]
-                    });
-                    break;
                 default:
                     break;
             }
@@ -4390,7 +4446,22 @@ class AwEntitaLayoutEH extends EventHandler {
      * @param {?=} forceReload
      * @return {?}
      */
-    listenRoute(selectedItem = "", forceReload = false) {
+    listenRoute(selectedItem = '', forceReload = false) {
+        // listen for "page" query param changes
+        this.route.queryParams.pipe(map((/**
+         * @param {?} params
+         * @return {?}
+         */
+        (params) => params.page))).subscribe((/**
+         * @param {?} page
+         * @return {?}
+         */
+        page => {
+            if (this.dataSource.currentPage !== page) {
+                this.dataSource.currentPage = page;
+                this.dataSource.handlePageNavigation();
+            }
+        }));
         // get URL parameters with angular's paramMap
         this.route.paramMap.subscribe((/**
          * @param {?} params
@@ -4399,8 +4470,12 @@ class AwEntitaLayoutEH extends EventHandler {
         params => {
             // look for id
             if (params.get('id')) {
-                if (this.dataSource.currentId == params.get('id') && !forceReload)
+                if (this.dataSource.currentId === params.get('id') && !forceReload) {
+                    if (this.dataSource.selectedTab !== params.get('tab')) {
+                        this.dataSource.handleNavUpdate(params.get('tab'));
+                    }
                     return;
+                }
                 // get item from response with id === id and return as promise
                 this.dataSource.loadItem(params.get('id'), params.get('slug'), params.get('tab')).subscribe((/**
                  * @param {?} res
@@ -4514,10 +4589,22 @@ class AwLinkedObjectsDS extends DataSource {
             /** @type {?} */
             const sizeOptions = [10, 25, 50];
             this.loadedData.pagination = {
-                first: { payload: `goto-${1}`, classes: page === 1 ? 'is-disabled' : '' },
-                prev: { payload: `goto-${page / 1 - 1}`, classes: page === 1 ? 'is-disabled' : '' },
-                next: { payload: `goto-${page / 1 + 1}`, classes: page === totalPages ? 'is-disabled' : '' },
-                last: { payload: `goto-${totalPages}`, classes: page === totalPages ? 'is-disabled' : '' },
+                first: {
+                    classes: page === 1 ? 'is-disabled' : '',
+                    anchor: page !== 1 ? this._getPaginationAnchor(1) : null
+                },
+                prev: {
+                    classes: page === 1 ? 'is-disabled' : '',
+                    anchor: page !== 1 ? this._getPaginationAnchor(page / 1 - 1) : null
+                },
+                next: {
+                    classes: page === totalPages ? 'is-disabled' : '',
+                    anchor: page !== totalPages ? this._getPaginationAnchor(page / 1 + 1) : null
+                },
+                last: {
+                    classes: page === totalPages ? 'is-disabled' : '',
+                    anchor: page !== totalPages ? this._getPaginationAnchor(totalPages) : null
+                },
                 links: this.makePagination(totalPages, page),
                 select: {
                     label: 'Numero di risultati',
@@ -4547,6 +4634,7 @@ class AwLinkedObjectsDS extends DataSource {
                 */
             /** @type {?} */
             const result = [];
+            const { href, queryParams } = this.options.paginationParams;
             /** @type {?} */
             let limit = this.paths.paginationLimit - 1;
             if (totalPages <= limit) {
@@ -4583,19 +4671,23 @@ class AwLinkedObjectsDS extends DataSource {
                 for (let i = firstPage; i <= lastPage; i++) {
                     result.push({
                         text: String(i),
-                        payload: 'page-' + String(i),
-                        classes: currentPage === i ? 'is-active' : ''
+                        classes: currentPage === i ? 'is-active' : '',
+                        anchor: currentPage !== i ? this._getPaginationAnchor(i) : null
                     });
                 }
             }
             else {
                 result.push({
                     text: '1',
-                    payload: 'page-1',
-                    classes: currentPage === 1 ? 'is-active' : ''
+                    classes: currentPage === 1 ? 'is-active' : '',
+                    anchor: currentPage !== 1 ? this._getPaginationAnchor(1) : null
                 });
                 for (let i = 1; i < totalPages; i++) {
-                    result.push({ text: String(i + 1), payload: 'page-' + String(i + 1), classes: currentPage === i + 1 ? 'is-active' : '' });
+                    result.push({
+                        text: String(i + 1),
+                        classes: currentPage === i + 1 ? 'is-active' : '',
+                        anchor: currentPage !== i + 1 ? this._getPaginationAnchor(i + 1) : null
+                    });
                 }
             }
             return result;
@@ -4672,7 +4764,9 @@ class AwLinkedObjectsDS extends DataSource {
              */
             el => {
                 /** @type {?} */
-                const infoData = get(el, paths.metadata.info.data, el.item.fields);
+                const itemData = el.item ? el.item : el;
+                /** @type {?} */
+                const infoData = get(el, paths.metadata.info.data, itemData.fields);
                 /** @type {?} */
                 const infoDataItems = infoData ? infoData.filter((/**
                  * @param {?} data
@@ -4680,30 +4774,43 @@ class AwLinkedObjectsDS extends DataSource {
                  */
                 data => enabledKeys.indexOf(data.key) !== -1)) : [];
                 /** @type {?} */
-                const toeData = get(el, paths.metadata.toe.data, el.relatedTypesOfEntity);
+                const toeData = get(el, paths.metadata.toe.data, itemData.relatedTypesOfEntity);
                 /** @type {?} */
-                const breadcrumbs = get(el, paths.metadata.breadcrumbs.data, el.item.breadcrumbs);
+                const breadcrumbs = get(el, paths.metadata.breadcrumbs.data, itemData.breadcrumbs);
                 if (['entita', 'search'].includes(context)) {
-                    if (el.item.typeOfEntity && el.item.typeOfEntity != "") {
-                        infoDataItems.push({ "key": "Tipo di entità", "value": keys[el.item.typeOfEntity]['singular-label'] });
+                    if (itemData.typeOfEntity && itemData.typeOfEntity != "") {
+                        infoDataItems.push({ "key": "Tipo di entità", "value": keys[itemData.typeOfEntity]['singular-label'] });
                     }
                 }
                 /** @type {?} */
                 let classes = ['entita', 'search', 'oggetti-collegati'].includes(context) ? 'is-fullwidth' : '';
-                classes += el.item.typeOfEntity ? " is-" + el.item.typeOfEntity.replace(/ /g, '-') : " is-oggetto-culturale";
+                classes += itemData.typeOfEntity ? " is-" + itemData.typeOfEntity.replace(/ /g, '-') : " is-oggetto-culturale";
                 /** @type {?} */
-                const itemTitle = +paths.title.maxLength && get(el, paths.title, el.item.label).length > +paths.title.maxLength
-                    ? get(el, paths.title, el.item.label).slice(0, +paths.title.maxLength) + '…'
-                    : get(el, paths.title, el.item.label);
+                const itemTitle = +paths.title.maxLength && get(el, paths.title, itemData.label).length > +paths.title.maxLength
+                    ? get(el, paths.title, itemData.label).slice(0, +paths.title.maxLength) + '…'
+                    : get(el, paths.title, itemData.label);
+                /** @type {?} */
+                const itemId = get(el, paths.payload, itemData.id);
+                /** @type {?} */
+                const itemType = itemData.typeOfEntity;
+                /** @type {?} */
+                const itemHref = [
+                    itemType ? config.get('paths').entitaBasePath : config.get('paths').schedaBasePath,
+                    itemId,
+                    helpers.slugify(itemTitle)
+                ].join('/');
                 /** @type {?} */
                 const item = {
-                    image: get(el, paths.image, el.image),
+                    image: get(el, paths.image, itemData.image),
                     title: itemTitle,
                     text: !paths.text ? null : // make text block (in config) optional
-                        +paths.text.maxLength && get(el, paths.text.data, el.item.text).length > +paths.text.maxLength ?
-                            get(el, paths.text.data, el.item.text).slice(0, +paths.text.maxLength) + '…' :
-                            get(el, paths.text.data, el.item.text),
-                    payload: { id: get(el, paths.payload, el.item.id), type: el.item.typeOfEntity, title: itemTitle },
+                        +paths.text.maxLength && get(el, paths.text.data, itemData.text).length > +paths.text.maxLength ?
+                            get(el, paths.text.data, itemData.text).slice(0, +paths.text.maxLength) + '…' :
+                            get(el, paths.text.data, itemData.text),
+                    anchor: {
+                        href: itemHref
+                    },
+                    // payload: { id: _get(el, paths.payload, el.item.id), type: el.item.typeOfEntity, title: itemTitle },
                     classes: classes,
                     metadata: infoDataItems.length || toeData ? [] : null,
                     breadcrumbs: breadcrumbs
@@ -4751,9 +4858,13 @@ class AwLinkedObjectsDS extends DataSource {
                          * @return {?}
                          */
                         crumb => {
+                            /** @type {?} */
+                            const label = get(crumb, paths.metadata.breadcrumbs.label, crumb.label);
                             return {
-                                label: get(crumb, paths.metadata.breadcrumbs.label, crumb.label),
-                                payload: get(crumb, paths.metadata.breadcrumbs.payload, crumb.link),
+                                label,
+                                anchor: {
+                                    href: itemHref
+                                }
                             };
                         }))
                     };
@@ -4810,6 +4921,18 @@ class AwLinkedObjectsDS extends DataSource {
         this.checkForMore(); // checks if <Show More> button should be enabled
         this.loadedData.loaderData = {};
         return this.loadedData;
+    }
+    /**
+     * @private
+     * @param {?} page
+     * @return {?}
+     */
+    _getPaginationAnchor(page) {
+        const { href, queryParams } = this.options.paginationParams;
+        return {
+            href: queryParams ? href : href + page,
+            queryParams: queryParams ? Object.assign({}, queryParams, { page: page }) : null
+        };
     }
 }
 if (false) {
@@ -4906,7 +5029,9 @@ class AwAutocompleteWrapperDS extends DataSource {
             const text = this.stringTrim(el.entity.label, maxLength);
             suggestion.push({
                 text,
-                payload: el.entity.id
+                anchor: {
+                    payload: el.entity.id
+                }
             });
         }));
         return { suggestion };
@@ -4935,7 +5060,8 @@ class AwBubbleChartDS extends DataSource {
         // list of selected bubbles
         this.filters = []; // list of active filters to show only some TypeOfEntity(s)
         // list of active filters to show only some TypeOfEntity(s)
-        this.closedEyes = [];
+        this.closedEyes = []; // array of the activated eye filters 
+        // array of the activated eye filters 
         this.tippyList = []; // list of tippy instances
         this.updateChart = (/**
          * @param {?} res
@@ -5002,111 +5128,8 @@ class AwBubbleChartDS extends DataSource {
                 this.selected.push(id); // add selection
             }
         });
-        this.tippyMaker = (/**
-         * @param {?} bubbles
-         * @return {?}
-         */
-        bubbles => {
-            // flush existing tooltips
-            this.tippyList.forEach((/**
-             * @param {?} t
-             * @return {?}
-             */
-            t => { if (t) {
-                t.destroy();
-            } }));
-            this.tippyList = [];
-            /** @type {?} */
-            const buildTooltip = (/**
-             * @param {?} bubble
-             * @return {?}
-             */
-            bubble => {
-                /** @type {?} */
-                let element = (/** @type {?} */ (document.getElementsByClassName('bubble-chart__tippy-template')[0].cloneNode(true)));
-                /** @type {?} */
-                let gotoButton = element.getElementsByClassName('aw-bubble-popup-menu__text')[0];
-                gotoButton.innerHTML =
-                    `È collegato a ${bubble.count} entità`;
-                element.getElementsByClassName('aw-bubble-popup-menu__title')[0].innerHTML =
-                    `${bubble.entity.label}`;
-                /** @type {?} */
-                let selectButton = element.getElementsByClassName('aw-bubble-popup-menu__link')[1];
-                if (this.options.simple) {
-                    if (selectButton)
-                        selectButton.remove();
-                }
-                else {
-                    /** @type {?} */
-                    let toggleBubbleText = this.selected.includes(bubble.entity.id) ? `Deseleziona` : `Seleziona`;
-                    selectButton.innerHTML = toggleBubbleText;
-                }
-                return element.innerHTML;
-            });
-            /** @type {?} */
-            const focusBubble = (/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ id, label }) => {
-                this.focusedBubble = id;
-                this.focusedBubbleLabel = label;
-            });
-            if (this.filters.length > 0) { // apply filters to the data before adding tooltips
-                bubbles = bubbles.filter((/**
-                 * @param {?} el
-                 * @return {?}
-                 */
-                el => !this.filters.includes(el.entity.typeOfEntity.replace(/ /g, '-'))));
-            }
-            // make new tooltips
-            bubbles.forEach((/**
-             * @param {?} b
-             * @return {?}
-             */
-            b => {
-                /** @type {?} */
-                let group = document.getElementById(`g_${b.entity.id}`) // select 
-                ;
-                if (group) {
-                    this.tippyList.push(// add this tippy to the array of instances
-                    tippy(group, {
-                        content: buildTooltip(b),
-                        interactive: true,
-                        appendTo: document.body,
-                        // suppress interactive warning
-                        arrow: true,
-                        flip: false,
-                        theme: 'light-border no-padding',
-                        placement: 'top',
-                        delay: [150, 30],
-                        updateDuration: 400,
-                        /**
-                         * @return {?}
-                         */
-                        onMount() {
-                            focusBubble(b.entity);
-                        }
-                    }));
-                }
-            }));
-            // createSingleton(this.tippyList, {
-            //   interactive: true,
-            //   appendTo: document.body, // suppress interactive warning
-            //   arrow: true,
-            //   flip: false,
-            //   theme: 'light-border no-padding',
-            //   placement: 'top',
-            //   delay: [150, 30],
-            //   updateDuration: 400,
-            // onTrigger(ref) {
-            //   console.log({ref})
-            //   console.log('fired')
-            // }
-            // })
-        });
     }
-    // id of the focused bubble
+    // list of tippy instances
     /**
      * @protected
      * @param {?} data
@@ -5147,17 +5170,17 @@ class AwBubbleChartDS extends DataSource {
             shuffle,
         }
         /*
-          Two data streams are ouputted.
-          The default stream is for the normal visualization,
-          "smallView" is used for a compressed view of the same data.
+        Two data streams are ouputted.
+        The default stream is for the normal visualization,
+        "smallView" is used for a compressed view of the same data.
         */
         ;
         /*
-          Two data streams are ouputted.
-          The default stream is for the normal visualization,
-          "smallView" is used for a compressed view of the same data.
+        Two data streams are ouputted.
+        The default stream is for the normal visualization,
+        "smallView" is used for a compressed view of the same data.
         */
-        return Object.assign({}, commonParams, { data: this.smartSlice(data), smallView: Object.assign({}, commonParams, { data: this.smartSlice(data, smallChartSize) }) });
+        return Object.assign({}, commonParams, { anchorData: { href: '/placeholder/' }, data: this.smartSlice(data), smallView: Object.assign({}, commonParams, { data: this.smartSlice(data, smallChartSize) }) });
     }
 }
 if (false) {
@@ -5174,17 +5197,51 @@ if (false) {
     /** @type {?} */
     AwBubbleChartDS.prototype.tippyList;
     /** @type {?} */
-    AwBubbleChartDS.prototype.focusedBubble;
-    /** @type {?} */
-    AwBubbleChartDS.prototype.focusedBubbleLabel;
-    /** @type {?} */
     AwBubbleChartDS.prototype.updateChart;
     /** @type {?} */
     AwBubbleChartDS.prototype.smartSlice;
     /** @type {?} */
     AwBubbleChartDS.prototype.handleBubbleClick;
-    /** @type {?} */
-    AwBubbleChartDS.prototype.tippyMaker;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwChartTippyDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        // ====== DATA ======
+        const { bubbles, selected } = data;
+        const { basePath, selectable } = this.options
+        // ==================
+        ;
+        // ==================
+        /** @type {?} */
+        const templates = bubbles.map((/**
+         * @param {?} b
+         * @return {?}
+         */
+        b => {
+            const { count, entity } = b;
+            const { id, label, typeOfEntity } = entity;
+            return {
+                id,
+                selectable,
+                title: label,
+                text: `È collegato a ${count} entità`,
+                isSelected: selected.includes(id),
+                anchorData: {
+                    href: `${basePath}${id}/${helpers$1.slugify(label)}`
+                }
+            };
+        }));
+        return templates;
+    }
 }
 
 /**
@@ -5209,11 +5266,13 @@ class AwHeroDS extends DataSource {
             backgroundImage,
             button: {
                 text: button.text,
-                payload: 'cerca'
+                anchor: {
+                    payload: 'cerca'
+                }
             },
             input: {
                 placeholder: input.placeholder,
-                payload: "cerca-in-maxxi"
+                payload: 'cerca-in-maxxi'
             }
         };
     }
@@ -5249,17 +5308,7 @@ class AwHomeHeroPatrimonioDS extends DataSource {
      * @return {?}
      */
     transform(data) {
-        const { title, backgroundImage, image, text, button } = data;
-        return {
-            title,
-            backgroundImage,
-            image,
-            text,
-            button: {
-                text: button.text,
-                payload: "naviga-patrimonio"
-            }
-        };
+        return data;
     }
 }
 
@@ -5553,8 +5602,9 @@ class AwHomeAutocompleteDS extends DataSource {
      * @return {?}
      */
     transform(data) {
-        const { results, totalCount } = data;
-        const { keys, config } = this.options;
+        const { response, query } = data;
+        const { results, totalCount } = response;
+        const { keys, config, paths } = this.options;
         /** @type {?} */
         const labels = this.options.labels || {};
         /** @type {?} */
@@ -5601,11 +5651,8 @@ class AwHomeAutocompleteDS extends DataSource {
                 groups[groupId].items.push({
                     title: currentItem.label,
                     metadata,
-                    payload: {
-                        source: 'item',
-                        id: currentItem.id,
-                        type: (groups[groupId] || {}).type,
-                        title: currentItem.label
+                    anchor: {
+                        href: `${paths[entity ? 'entitaBasePath' : 'schedaBasePath']}/${currentItem.id}/${helpers.slugify(currentItem.label)}`
                     }
                 });
             }
@@ -5626,12 +5673,15 @@ class AwHomeAutocompleteDS extends DataSource {
             actions: {
                 showMore: {
                     text: `Visualizza tutti i ${totalCount} risultati`,
-                    payload: {
-                        source: 'showMore'
+                    anchor: {
+                        href: paths.searchBasePath,
+                        queryParams: {
+                            query
+                        }
                     }
                 }
             },
-            fallback: ((config.get('home-layout') || {})["top-hero"] || {}).fallback
+            fallback: ((config.get('home-layout') || {})['top-hero'] || {}).fallback
         };
     }
 }
@@ -5647,8 +5697,9 @@ class AwEntitaNavDS extends DataSource {
      * @return {?}
      */
     transform(param) {
-        if (!param)
+        if (!param) {
             return;
+        }
         /** @type {?} */
         const data = param.data;
         /** @type {?} */
@@ -5657,42 +5708,47 @@ class AwEntitaNavDS extends DataSource {
         const navigation = { items: [], payload: 'entita-nav' };
         navigation.items.push({
             text: 'OVERVIEW',
-            payload: 'overview',
-            classes: selected == 'overview' ? 'is-selected' : ''
+            anchor: { href: param.basePath + '/overview' },
+            classes: selected === 'overview' ? 'is-selected' : ''
         });
         if (data.fields && data.fields.length > 0) {
             navigation.items.push({
                 text: 'CAMPI',
-                payload: 'campi',
-                classes: selected == 'campi' ? 'is-selected' : ''
+                anchor: { href: param.basePath + '/campi' },
+                classes: selected === 'campi' ? 'is-selected' : ''
             });
         }
         if (data.relatedItems) {
             navigation.items.push({
                 text: 'OGGETTI-COLLEGATI',
-                payload: 'oggetti-collegati',
-                classes: selected == 'oggetti-collegati' ? 'is-selected' : ''
+                anchor: {
+                    href: param.basePath + '/oggetti-collegati',
+                    queryParams: {
+                        page: 1
+                    }
+                },
+                classes: selected === 'oggetti-collegati' ? 'is-selected' : ''
             });
         }
         if (data.relatedEntities && this.options['bubblesEnabled']) {
             navigation.items.push({
                 text: 'ENTITÀ COLLEGATE',
-                payload: 'entita-collegate',
-                classes: selected == 'entita-collegate' ? 'is-selected' : ''
+                anchor: { href: param.basePath + '/entita-collegate' },
+                classes: selected === 'entita-collegate' ? 'is-selected' : ''
             });
         }
         if (data.extraTab) {
             navigation.items.push({
                 text: 'MAXXI',
-                payload: 'maxxi',
-                classes: selected == 'maxxi' ? 'is-selected' : ''
+                anchor: { href: param.basePath + '/maxxi' },
+                classes: selected === 'maxxi' ? 'is-selected' : ''
             });
         }
         if (data.wikiTab) {
             navigation.items.push({
                 text: 'WIKIPEDIA',
-                payload: 'wiki',
-                classes: selected == 'wiki' ? 'is-selected' : ''
+                anchor: { href: param.basePath + '/wiki' },
+                classes: selected === 'wiki' ? 'is-selected' : ''
             });
         }
         return navigation;
@@ -5973,10 +6029,8 @@ class AwTreeDS extends DataSource {
                     }
                 } : null,
                 meta: id,
-                payload: {
-                    id,
-                    source: 'menuitem',
-                    label
+                anchor: {
+                    href: `${this.basePath}/${id}/${helpers.slugify(label)}`
                 }
             };
         });
@@ -5997,8 +6051,9 @@ class AwTreeDS extends DataSource {
      * @return {?}
      */
     load(data) {
-        const { tree } = data;
+        const { tree, basePath } = data;
         this.rootId = tree.id;
+        this.basePath = basePath;
         // save in cache
         if (!AwTreeDS.dataCache[this.rootId]) {
             AwTreeDS.dataCache[this.rootId] = { flatIds: [], flatData: {} };
@@ -6086,6 +6141,11 @@ AwTreeDS.dataCache = {};
 if (false) {
     /** @type {?} */
     AwTreeDS.dataCache;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwTreeDS.prototype.basePath;
     /**
      * @type {?}
      * @private
@@ -6333,6 +6393,7 @@ var DS$1 = /*#__PURE__*/Object.freeze({
     AwLinkedObjectsDS: AwLinkedObjectsDS,
     AwAutocompleteWrapperDS: AwAutocompleteWrapperDS,
     AwBubbleChartDS: AwBubbleChartDS,
+    AwChartTippyDS: AwChartTippyDS,
     AwHeroDS: AwHeroDS,
     AwTableDS: AwTableDS,
     AwHomeHeroPatrimonioDS: AwHomeHeroPatrimonioDS,
@@ -6390,30 +6451,6 @@ class AwLinkedObjectsEH extends EventHandler {
          */
         ({ type, payload }) => {
             switch (type) {
-                case 'aw-linked-objects.click':
-                    if (typeof payload == 'string') { // click on pagination
-                        if (payload.startsWith('page')) {
-                            // pagination routing is handled by the parent layout
-                            this.emitOuter('pagination', payload);
-                        }
-                        else if (payload.startsWith('goto')) {
-                            /** @type {?} */
-                            let targetPage = +payload.replace('goto-', '')
-                            // kill impossible page navigations
-                            ;
-                            // kill impossible page navigations
-                            if (targetPage > this.dataSource.totalPages)
-                                return;
-                            else if (targetPage < 1 || targetPage === this.dataSource.currentPage)
-                                return;
-                            else
-                                this.emitOuter('goto', payload);
-                        }
-                    }
-                    else { // click on a linked object
-                        this.emitOuter('click', payload);
-                    }
-                    break;
                 case 'aw-linked-objects.change': // changed page size value (pagination)
                     this.emitOuter('change', +payload.value);
                     break;
@@ -6469,7 +6506,7 @@ class AwAutocompleteWrapperEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'aw-autocomplete-wrapper.click':
-                    if (payload != 'fallback-simple-autocomplete') { // if this is the fallback item, kill the event.
+                    if (payload !== 'fallback-simple-autocomplete') { // if this is the fallback item, kill the event.
                         this.emitOuter('clickresult', payload);
                     }
                     break;
@@ -6488,6 +6525,7 @@ class AwAutocompleteWrapperEH extends EventHandler {
 class AwBubbleChartEH extends EventHandler {
     constructor() {
         super(...arguments);
+        this.initialLoad = false;
         this.toggleSelection = (/**
          * @param {?} id
          * @return {?}
@@ -6506,7 +6544,7 @@ class AwBubbleChartEH extends EventHandler {
          */
         f => {
             /*
-              Toggle the clicked filter in the filteres array and
+              Toggle the clicked eye-filter in the filteres array and
               redraw the graph.
             */
             if (this.dataSource.filters.includes(f)) {
@@ -6515,7 +6553,7 @@ class AwBubbleChartEH extends EventHandler {
             else {
                 this.dataSource.filters.push(f);
             }
-            this.dataSource.updateChart(null); // null means "keep using the same response"
+            this.dataSource.updateChart(null); // null means "reuse the last response"
         });
     }
     /**
@@ -6539,22 +6577,34 @@ class AwBubbleChartEH extends EventHandler {
                     el => payload == el.entity.id)));
                     break;
                 case 'aw-bubble-chart.d3end': // end of d3.js draw()
-                    this.dataSource.tippyMaker(this.dataSource.chartData); // make tooltips
-                    break;
-                case 'aw-bubble-chart.bubble-tooltip-goto-click':
-                    this.emitOuter('bubble-tooltip-goto-click', {
-                        id: this.dataSource.focusedBubble,
-                        label: this.dataSource.focusedBubbleLabel
+                    // end of d3.js draw()
+                    /** @type {?} */
+                    let filteredChartData;
+                    if (this.dataSource.filters.length > 0) { // apply filters to the data before adding tooltips
+                        filteredChartData = this.dataSource.chartData.filter((/**
+                         * @param {?} el
+                         * @return {?}
+                         */
+                        el => !this.dataSource.filters.includes(el.entity.typeOfEntity.replace(/ /g, '-'))));
+                    }
+                    else {
+                        filteredChartData = this.dataSource.chartData;
+                    }
+                    this.emitOuter('d3end', {
+                        bubbles: this.dataSource.smartSlice(filteredChartData),
+                        selected: this.dataSource.selected
                     });
                     break;
-                case 'aw-bubble-chart.bubble-tooltip-select-click':
-                    this.toggleSelection(this.dataSource.focusedBubble);
-                    this.emitOuter('lockfilter', this.dataSource.chartData.find((/**
-                     * @param {?} el
-                     * @return {?}
-                     */
-                    el => this.dataSource.focusedBubble == el.entity.id)));
-                    break;
+                // case 'aw-bubble-chart.bubble-tooltip-goto-click':
+                //   this.emitOuter('bubble-tooltip-goto-click', {
+                //     id: this.dataSource.focusedBubble,
+                //     label: this.dataSource.focusedBubbleLabel
+                //   });
+                //   break;
+                // case 'aw-bubble-chart.bubble-tooltip-select-click':
+                //   this.toggleSelection(this.dataSource.focusedBubble)
+                //   this.emitOuter('lockfilter', this.dataSource.chartData.find(el => this.dataSource.focusedBubble == el.entity.id))
+                //   break;
                 default:
                     console.warn('unhandled inner event of type', type, 'with payload', payload);
                     break;
@@ -6566,6 +6616,22 @@ class AwBubbleChartEH extends EventHandler {
          */
         ({ type, payload }) => {
             switch (type) {
+                case 'aw-home-layout.select':
+                    const { id } = payload;
+                    this.toggleSelection(id);
+                    /** @type {?} */
+                    const foundBubble = this.dataSource.chartData.find((/**
+                     * @param {?} el
+                     * @return {?}
+                     */
+                    el => id == el.entity.id));
+                    if (foundBubble) {
+                        this.emitOuter('lockfilter', foundBubble);
+                    }
+                    else {
+                        console.warn('Unable to determine which bubble was selected.');
+                    }
+                    break;
                 case 'aw-home-layout.tagclick':
                     this.toggleSelection(payload);
                     break;
@@ -6594,9 +6660,116 @@ class AwBubbleChartEH extends EventHandler {
 }
 if (false) {
     /** @type {?} */
+    AwBubbleChartEH.prototype.initialLoad;
+    /** @type {?} */
     AwBubbleChartEH.prototype.toggleSelection;
     /** @type {?} */
     AwBubbleChartEH.prototype.toggleFilter;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class AwChartTippyEH extends EventHandler {
+    constructor() {
+        super(...arguments);
+        this.tippyList = []; // array of tippy instances
+        this.tippyMaker = (/**
+         * @param {?} bubbles
+         * @return {?}
+         */
+        bubbles => {
+            /*
+              Destroys every existing tooltip,
+              then creates a new Tippy instance for each bubble.
+            */
+            // flush existing tooltips
+            this.tippyList.forEach((/**
+             * @param {?} t
+             * @return {?}
+             */
+            t => { if (t) {
+                t.destroy();
+            } }));
+            this.tippyList = [];
+            // create new tooltips
+            bubbles.forEach((/**
+             * @param {?} b
+             * @return {?}
+             */
+            b => {
+                // give a tooltip to each bubble
+                /** @type {?} */
+                let target = document.getElementById(`g_${b.entity.id}`);
+                if (target) {
+                    this.tippyList.push(// add this tippy to the array of instances
+                    tippy(target, {
+                        content: document.getElementById(`template__${b.entity.id}`),
+                        interactive: true,
+                        appendTo: document.body,
+                        // suppress interactive warning
+                        arrow: true,
+                        flip: false,
+                        theme: 'light-border no-padding',
+                        placement: 'top',
+                        delay: [150, 30],
+                        updateDuration: 400,
+                    }));
+                }
+            }));
+        });
+    }
+    // array of tippy instances
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-chart-tippy.select':
+                    this.emitOuter('select', payload);
+                    break;
+                default:
+                    console.warn('(chart-tippy) unhandled inner event of type', type);
+                    break;
+            }
+        }));
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'aw-home-layout.d3end':
+                case 'aw-entita-layout.d3end':
+                case 'aw-scheda-layout.d3end':
+                    this.dataSource.update(payload); // creating DOM Elements (templates)
+                    setTimeout((/**
+                     * @return {?}
+                     */
+                    () => {
+                        this.tippyMaker(payload.bubbles); // assign templates to the bubbles
+                    }));
+                    break;
+                default:
+                    break;
+            }
+        }));
+    }
+}
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwChartTippyEH.prototype.tippyList;
+    /** @type {?} */
+    AwChartTippyEH.prototype.tippyMaker;
 }
 
 /**
@@ -6613,9 +6786,12 @@ class AwHeroEH extends EventHandler {
          * @return {?}
          */
         ({ type, payload }) => {
+            console.log(type, payload);
             switch (type) {
                 case 'aw-hero.click':
-                    this.emitOuter('click', this.dataSource.currentInputValue);
+                    if (payload === 'cerca' && this.dataSource.currentInputValue) {
+                        this.emitOuter('enter', this.dataSource.currentInputValue);
+                    }
                     break;
                 case 'aw-hero.change':
                     this.dataSource.currentInputValue = payload;
@@ -6807,27 +6983,7 @@ class AwHomeHeroPatrimonioEH extends EventHandler {
      * @return {?}
      */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                case 'aw-home-hero-patrimonio.click':
-                    this.emitGlobal('navigate', {
-                        handler: 'router',
-                        path: ['aw/patrimonio']
-                    });
-                    break;
-                default:
-                    break;
-            }
-        }));
-        /*
-        this.outerEvents$.subscribe(event => {
-          
-        });
-        */
+        // no events
     }
 }
 
@@ -6984,11 +7140,6 @@ class AwTreeEH extends EventHandler {
                 case 'toggle':
                     this.dataSource.build(payload.id);
                     break;
-                case 'menuitem':
-                    this.dataSource.setActive(payload.id);
-                    this.dataSource.highlightActive();
-                    this.emitOuter('click', payload);
-                    break;
                 default:
                     break;
             }
@@ -7013,6 +7164,15 @@ class AwTreeEH extends EventHandler {
                     const currentId = payload.currentItem || payload.tree.id;
                     this.dataSource.load(payload);
                     this.dataSource.build(currentId);
+                    break;
+                case 'aw-scheda-layout.routechanged':
+                    // has output (not first load)
+                    if (this.dataSource.output) {
+                        this.dataSource.setActive(payload);
+                        this.dataSource.highlightActive();
+                    }
+                    break;
+                default:
                     break;
             }
         }));
@@ -7062,6 +7222,7 @@ var EH$1 = /*#__PURE__*/Object.freeze({
     AwLinkedObjectsEH: AwLinkedObjectsEH,
     AwAutocompleteWrapperEH: AwAutocompleteWrapperEH,
     AwBubbleChartEH: AwBubbleChartEH,
+    AwChartTippyEH: AwChartTippyEH,
     AwHeroEH: AwHeroEH,
     AwHomeFacetsWrapperEH: AwHomeFacetsWrapperEH,
     AwHomeHeroPatrimonioEH: AwHomeHeroPatrimonioEH,
@@ -7087,6 +7248,7 @@ const AwEntitaLayoutConfig = {
         { id: 'aw-entita-metadata-viewer' },
         { id: 'aw-linked-objects' },
         { id: 'aw-bubble-chart' },
+        { id: 'aw-chart-tippy' },
     ],
     layoutDS: AwEntitaLayoutDS,
     layoutEH: AwEntitaLayoutEH,
@@ -7160,7 +7322,7 @@ class AwEntitaLayoutComponent extends AbstractLayout {
 AwEntitaLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-entita-layout',
-                template: "<div class=\"aw-entity n7-side-auto-padding\" *ngIf=\"lb.dataSource\">\n    \n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-title-wrapper-loading\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-nav-loading\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-nav'\n                }]\n            }\">\n            </n7-content-placeholder>\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-nav'\n                }]\n            }\">\n            </n7-content-placeholder>\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-nav'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <!-- lb.dataSource.selectedTab -->\n    <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content-loading\">\n        <div class=\"aw-entity__content-loading-title\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\"></n7-content-placeholder>\n        </div>\n        \n        <div class=\"aw-entity__content-loading-items\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [\n                {\n                    classes: 'entity-placeholder-item-preview'\n                }\n                ]\n            }\"></n7-content-placeholder>\n            <n7-content-placeholder [data]=\"{\n                blocks: [\n                {\n                    classes: 'entity-placeholder-item-preview'\n                }\n                ]\n            }\"></n7-content-placeholder>\n            <n7-content-placeholder [data]=\"{\n                blocks: [\n                {\n                    classes: 'entity-placeholder-item-preview'\n                }\n                ]\n            }\"></n7-content-placeholder>\n            <n7-content-placeholder [data]=\"{\n                blocks: [\n                {\n                    classes: 'entity-placeholder-item-preview'\n                }\n                ]\n            }\"></n7-content-placeholder>\n        </div>\n    </div>\n\n    <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content\">\n        <section>\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\n                class=\"aw-entity__content-section\" [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <button *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'wiki')\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                    <button *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'maxxi')\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n            </div>\n\n            <ng-container *ngIf=\"\n            ((lb.dataSource.myResponse.fields || []).length > 0 && lb.dataSource.selectedTab == 'campi') ||\n            (lb.dataSource.showFields && lb.dataSource.selectedTab == 'overview')\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                    [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'campi'\">\n                    <div class=\"aw-entity__content-section-header\">\n                        <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                        <button class=\"n7-btn n7-btn-light\" (click)=\"lb.eventHandler.emitInner('showmore', 'campi')\">\n                            TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\n                        </button>\n                    </div>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async \">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <button class=\"n7-btn n7-btn-light\" *ngIf=\"lb.dataSource.selectedTab == 'overview'\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'oggetti-collegati')\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n                <div class=\"aw-entity__content-item-previews\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n                <n7-pagination [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview aw-bubble-chart__{{lb.dataSource.selectedTab}}\"\n                *ngIf=\"lb.dataSource.bubblesEnabled\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <button class=\"n7-btn n7-btn-light\"\n                        (click)=\"lb.eventHandler.emitInner('showmore', 'entita-collegate')\"\n                        *ngIf=\"lb.dataSource.selectedTab == 'overview'\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </button>\n                </div>\n                <!-- Small Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper-small\" *ngIf=\"lb.dataSource.selectedTab == 'overview'\">\n                    <aw-bubble-chart-wrapper [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                        [container]=\"'bubble-chart-container'\" [buttons]=\"['select', 'goto']\">\n                        <n7-bubble-chart [data]=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.smallView\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n                <!-- Big Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper\" *ngIf=\"lb.dataSource.selectedTab == 'entita-collegate'\">\n                    <aw-bubble-chart-wrapper [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                        [container]=\"'bubble-chart-container'\" [buttons]=\"['select', 'goto']\">\n                        <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                *ngIf=\"lb.dataSource.myResponse.extraTab\" [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n                *ngIf=\"lb.dataSource.myResponse.wikiTab\" [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{lb.dataSource.myResponse.wikiTab.url}}\n                </a>\n            </div>\n        </section>\n    </div>\n</div>"
+                template: "<div class=\"aw-entity n7-side-auto-padding\" *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-title-wrapper-loading\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\"\n            class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-nav-loading\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2]\"\n            [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-nav'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <!-- lb.dataSource.selectedTab -->\n    <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content-loading\">\n        <div class=\"aw-entity__content-loading-title\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\"></n7-content-placeholder>\n        </div>\n\n        <div class=\"aw-entity__content-loading-items\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n            [data]=\"{\n                blocks: [\n                {\n                    classes: 'entity-placeholder-item-preview'\n                }\n                ]\n            }\"></n7-content-placeholder>\n        </div>\n    </div>\n\n    <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content\">\n        <section>\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\n                class=\"aw-entity__content-section\" [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <a *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/wiki']\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                    <a *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/maxxi']\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n            </div>\n\n            <ng-container *ngIf=\"\n            ((lb.dataSource.myResponse.fields || []).length > 0 && lb.dataSource.selectedTab == 'campi') ||\n            (lb.dataSource.showFields && lb.dataSource.selectedTab == 'overview')\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                    [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'campi'\">\n                    <div class=\"aw-entity__content-section-header\">\n                        <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                        <a class=\"n7-btn n7-btn-light\" [routerLink]=\"[lb.dataSource.getNavBasePath() + 'campi']\">\n                            TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\n                        </a>\n                    </div>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async \">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <a *ngIf=\"lb.dataSource.selectedTab === 'overview' \"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/oggetti-collegati/']\"\n                        [queryParams]=\"{ page: 1 }\" class=\"n7-btn n7-btn-light\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <div class=\"aw-entity__content-item-previews\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n                <n7-pagination [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview aw-bubble-chart__{{lb.dataSource.selectedTab}}\"\n                *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.myResponse.relatedEntities\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <a *ngIf=\"lb.dataSource.selectedTab == 'overview'\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/entita-collegate']\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <!-- Small Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper-small\" *ngIf=\"lb.dataSource.selectedTab == 'overview'\">\n                    <aw-bubble-chart-wrapper>\n                        <!-- Tippy template moved to end of HTML -->\n                        <n7-bubble-chart [data]=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.smallView\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n                <!-- Big Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper\" *ngIf=\"lb.dataSource.selectedTab == 'entita-collegate'\">\n                    <aw-bubble-chart-wrapper>\n                        <!-- Tippy template moved to end of HTML -->\n                        <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                *ngIf=\"lb.dataSource.myResponse.extraTab\" [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n                *ngIf=\"lb.dataSource.myResponse.wikiTab\" [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{ lb.dataSource.myResponse.wikiTab.url }}\n                </a>\n            </div>\n        </section>\n    </div>\n    <!-- Template for bubble chart tooltips -->\n    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\" [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n    </aw-chart-tippy>\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -7233,14 +7395,12 @@ class AwHomeLayoutDS extends LayoutDataSource {
         this.resultsLimit = -1;
         this.selectedEntitiesIds = [];
         this.destroyed$ = new Subject();
-        // BUBBLE CHART DATA ↓
+        this.homeAutocompleteIsLoading = false;
+        this.resultsListIsLoading = false;
+        // ===== BUBBLE CHART =====
         this.bubblesEnabled = false; // true if this Arianna Web project has the bubble chart module
         // true if this Arianna Web project has the bubble chart module
         this.selectedBubbles = []; // array of IDs
-        // store the first array of bubbles, to find them in case of zero results (entities data returned as empty array from backend)
-        // BUBBLE CHART DATA ↑
-        this.homeAutocompleteIsLoading = false;
-        this.resultsListIsLoading = false;
         this.updateComponent = (/**
          * @param {?} id
          * @param {?} data
@@ -7255,6 +7415,8 @@ class AwHomeLayoutDS extends LayoutDataSource {
             this.one(id).update(data);
         });
     }
+    // store the first array of bubbles, to find them in case of zero results (entities data returned as empty array from backend)
+    // ========================
     /**
      * @param {?} __0
      * @return {?}
@@ -7281,6 +7443,10 @@ class AwHomeLayoutDS extends LayoutDataSource {
             selectable: true,
             config: this.configuration,
             limit: this.configuration.get('bubble-chart').bubbleLimit
+        });
+        this.one('aw-chart-tippy').updateOptions({
+            basePath: this.configuration.get('paths')['entitaBasePath'],
+            selectable: true
         });
     }
     /**
@@ -7316,7 +7482,7 @@ class AwHomeLayoutDS extends LayoutDataSource {
              */
             (error) => console.error(error)),
             params: {
-                entitiesListSize: this.configuration.get('home-layout')['entitiesQuerySize']
+                entitiesListSize: this.configuration.get('bubble-chart')['bubbleLimit']
             },
         });
     }
@@ -7544,7 +7710,8 @@ class AwHomeLayoutDS extends LayoutDataSource {
         this.one('aw-home-autocomplete').updateOptions({
             keys: this.configuration.get('config-keys'),
             config: this.configuration,
-            labels: this.configuration.get('labels')
+            labels: this.configuration.get('labels'),
+            paths: this.configuration.get('paths')
         });
         this.autocompleteChanged$.pipe(debounceTime(500), takeUntil(this.destroyed$)).subscribe((/**
          * @param {?} value
@@ -7567,7 +7734,10 @@ class AwHomeLayoutDS extends LayoutDataSource {
              */
             (response) => {
                 this.homeAutocompleteIsLoading = false;
-                this.one('aw-home-autocomplete').update(response);
+                this.one('aw-home-autocomplete').update({
+                    response,
+                    query: value
+                });
             }));
         }));
     }
@@ -7668,6 +7838,10 @@ if (false) {
      */
     AwHomeLayoutDS.prototype.destroyed$;
     /** @type {?} */
+    AwHomeLayoutDS.prototype.homeAutocompleteIsLoading;
+    /** @type {?} */
+    AwHomeLayoutDS.prototype.resultsListIsLoading;
+    /** @type {?} */
     AwHomeLayoutDS.prototype.bubblesEnabled;
     /** @type {?} */
     AwHomeLayoutDS.prototype.selectedBubbles;
@@ -7675,10 +7849,6 @@ if (false) {
     AwHomeLayoutDS.prototype.lastBubbleResponse;
     /** @type {?} */
     AwHomeLayoutDS.prototype.firstBubbleResponse;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.homeAutocompleteIsLoading;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.resultsListIsLoading;
     /** @type {?} */
     AwHomeLayoutDS.prototype.updateComponent;
 }
@@ -7709,7 +7879,7 @@ class AwHomeLayoutEH extends EventHandler {
             this.dataSource.resultsListIsLoading = true;
             this.dataSource.makeRequest$('globalFilter', {
                 selectedEntitiesIds,
-                entitiesListSize: this.configuration.get('home-layout')['entitiesQuerySize']
+                entitiesListSize: this.configuration.get('bubble-chart')['bubbleLimit']
             }).subscribe((/**
              * @param {?} res
              * @return {?}
@@ -7807,13 +7977,18 @@ class AwHomeLayoutEH extends EventHandler {
          */
         ({ type, payload }) => {
             switch (type) {
+                case 'aw-bubble-chart.d3end': // bounce the event, from bubble-chart to chart-tippy
+                    this.emitOuter('d3end', payload);
+                    break;
+                case 'aw-chart-tippy.select':
+                    this.emitOuter('select', payload);
+                    break;
                 case 'aw-hero.enter':
-                case 'aw-hero.click':
                     /** @type {?} */
                     const query = payload.value;
                     this.emitGlobal('navigate', {
                         handler: 'router',
-                        path: [this.configuration.get("paths").searchBasePath],
+                        path: [this.configuration.get('paths').searchBasePath],
                         queryParams: { query }
                     });
                     break;
@@ -7906,12 +8081,6 @@ class AwHomeLayoutEH extends EventHandler {
                         }
                     }));
                     break;
-                case 'aw-linked-objects.click':
-                    this.emitGlobal('navigate', {
-                        handler: 'router',
-                        path: [this.configuration.get("paths").schedaBasePath, payload.id, helpers.slugify(payload.title)]
-                    });
-                    break;
                 case 'aw-autocomplete-wrapper.clickresult':
                     this.handleSimpleAutocompleteClick(payload);
                     break;
@@ -7948,17 +8117,18 @@ class AwHomeLayoutEH extends EventHandler {
                 case 'aw-bubble-chart.lockfilter':
                     this.emitOuter('lockfilter', payload); // let aw-home-facets-wrapper handle this event
                     break;
-                case 'aw-bubble-chart.bubble-tooltip-goto-click':
-                    this.emitGlobal('navigate', {
-                        handler: 'router',
-                        path: [
-                            this.configuration.get('paths').entitaBasePath,
-                            payload.id,
-                            helpers.slugify(payload.label)
-                        ]
-                    });
-                    break;
+                // case 'aw-bubble-chart.bubble-tooltip-goto-click':
+                //   this.emitGlobal('navigate', {
+                //     handler: 'router',
+                //     path: [
+                //       this.configuration.get('paths').entitaBasePath,
+                //       payload.id,
+                //       helpers.slugify(payload.label)
+                //     ]
+                //   });
+                //   break;
                 default:
+                    // console.warn('(home) unhandled outer event of type', type)
                     break;
             }
         }));
@@ -8037,6 +8207,8 @@ const AwHomeLayoutConfig = {
             id: 'aw-linked-objects',
         }, {
             id: 'aw-autocomplete-wrapper',
+        }, {
+            id: 'aw-chart-tippy',
         }],
     layoutDS: AwHomeLayoutDS,
     layoutEH: AwHomeLayoutEH,
@@ -8096,7 +8268,7 @@ class AwHomeLayoutComponent extends AbstractLayout {
 AwHomeLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-home-layout',
-                template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper n7-side-auto-padding\"\n        [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length > 0 }\" *ngIf=\"lb.dataSource.bubblesEnabled\">\n        <div class=\"aw-home__facets-wrapper-loading\" *ngIf=\"!(lb.widgets['aw-home-facets-wrapper'].ds.out$ | async)\">\n            <n7-content-placeholder\n            [data]=\"{\n                blocks: [{\n                    classes: 'facet-placeholder-header'\n                }, {\n                    classes: 'facet-placeholder-input'\n                }] \n            }\"></n7-content-placeholder>\n            <n7-content-placeholder\n            [data]=\"{\n                blocks: [{\n                    classes: 'facet-placeholder-header'\n                }, {\n                    classes: 'facet-placeholder-input'\n                }] \n            }\"></n7-content-placeholder>\n            <n7-content-placeholder\n            [data]=\"{\n                blocks: [{\n                    classes: 'facet-placeholder-header'\n                }, {\n                    classes: 'facet-placeholder-input'\n                }] \n            }\"></n7-content-placeholder>\n            <n7-content-placeholder\n            [data]=\"{\n                blocks: [{\n                    classes: 'facet-placeholder-header'\n                }, {\n                    classes: 'facet-placeholder-input'\n                }] \n            }\"></n7-content-placeholder>\n        </div>\n        <div class=\"aw-home__facets-wrapper\" *ngIf=\"!!(lb.widgets['aw-home-facets-wrapper'].ds.out$ | async)\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div class=\"aw-home__bubble-chart-wrapper-loading\" *ngIf=\"!(lb.widgets['aw-bubble-chart'].ds.out$ | async)\">\n            <n7-content-placeholder\n            [data]=\"{\n                blocks: [\n                    {\n                        classes: 'facet-placeholder-item-1'\n                    }\n                ]\n            }\"></n7-content-placeholder>\n        </div>\n        <div class=\"aw-home__bubble-chart-wrapper\" *ngIf=\"!!(lb.widgets['aw-bubble-chart'].ds.out$ | async)\"\n            [style.overflow]=\"lb.dataSource.loadingBubbles ? 'visible' : 'hidden'\">\n            <aw-bubble-chart-wrapper [emit]=\"lb.widgets['aw-bubble-chart'].emit\" [container]=\"'bubble-chart-container'\"\n                [buttons]=\"['select', 'goto']\">\n                <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n\n        <!-- Linked objects -->\n        <ng-container *ngIf=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.selected.length > 0;\">\n            <div class=\"aw-home__bubble-results\" id=\"home-bubble-results\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\" class=\"aw-home__bubble-results-title-wrapper\">\n                    <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">\n                            {{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span>\n                    </h1>\n                </div>\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                \n                <div class=\"aw-home__bubble-results-list-wrapper\">\n                    <div class=\"aw-home__bubble-results-list-loading\" *ngIf=\"lb.dataSource.resultsListIsLoading\">\n                        <n7-content-placeholder\n                        [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                        <n7-content-placeholder\n                        [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                        <n7-content-placeholder\n                        [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                        <n7-content-placeholder\n                        [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                        <n7-content-placeholder\n                        [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                    </div>\n                    <div\n                    *ngIf=\"!lb.dataSource.resultsListIsLoading\" \n                    class=\"aw-home__bubble-results-list\" [attr.id]=\"'bubble-results-list'\"\n                        (scroll)=\"lb.eventHandler.emitOuter('scroll', $event.target)\">\n\n                        <div class=\"aw-home__bubble-results-fallback\"\n                            *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length < 1;\">\n                            <p class=\"aw-home__bubble-results-fallback-text\">\n                                {{ (lb.widgets['aw-linked-objects'].ds.out$ | async)?.fallback }}\n                            </p>\n                            <button class=\"n7-btn aw-home__bubble-results-reset\"\n                                (click)=\"lb.eventHandler.emitInner('clearselection')\">\n                                Resetta la ricerca\n                            </button>\n                        </div>\n\n                        <ng-container\n                            *ngFor=\"let widgetData of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.result;\">\n                            <n7-item-preview [data]=\"widgetData\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n\n                        <ng-container *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.isLoading\">\n                            <div class=\"aw-home__bubble-results-list-loader\">\n                                <n7-loader [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.loaderData\">\n                                </n7-loader>\n                            </div>\n                        </ng-container>\n                    </div>\n                    <div [ngClass]=\"{ 'is-visible' : lb.dataSource.hasScrollBackground }\"\n                         class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                </div>\n                <!-- aw-linked-objects__actions -->\n                <ng-container *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length > 0 && !lb.dataSource.resultsListIsLoading\">\n                    <div *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.actions as action\"\n                        class=\"aw-home__bubble-results-list-actions\">\n                        <button (click)=\"lb.eventHandler.emitInner('bubbleresultsviewallclick')\"\n                            class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\">\n                            {{action[0].label}}\n                        </button>\n                    </div>\n                </ng-container>\n\n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Outer links -->\n    <div *ngIf=\"lb.dataSource.outerLinks && lb.dataSource.outerLinks.length > 0\" class=\"aw-home__outer-links\">\n        <section class=\"aw-home__outer-links-wrapper n7-side-auto-padding\">\n            <h2 class=\"aw-home__outer-links-title\" *ngIf=\"lb.dataSource.outerLinksTitle\">\n                {{ lb.dataSource.outerLinksTitle }}\n            </h2>\n            <div class=\"aw-home__outer-links-items\">\n                <!-- Item preview -->\n                <n7-item-preview *ngFor=\"let outerLink of lb.dataSource.outerLinks\" [data]=\"outerLink\"\n                    [emit]=\"lb.eventHandler.outerLinkClick.bind(lb.eventHandler)\">\n                </n7-item-preview>\n                <!-- END // Item preview -->\n            </div>\n        </section>\n    </div>\n    <!-- END // Outer links -->\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Adavanced autocomplete popover  -->\n    <div class=\"aw-home__advanced-autocomplete\" id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <div class=\"aw-home__advanced-autocomplete-loader\" *ngIf=\"lb.dataSource.homeAutocompleteIsLoading\">\n            <n7-loader [data]=\"{}\"></n7-loader>\n        </div>\n        <n7-advanced-autocomplete *ngIf=\"!lb.dataSource.homeAutocompleteIsLoading\"\n            [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n\n    <!-- Simple autocomplete popover. DO NOT CHANGE parent div class! -->\n    <!-- Creating one template for each facet -->\n    <div *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\"\n        class=\"aw-home__simple-autocomplete aw-simple-autocomplete__template\" style=\"display: none;\">\n        <div class=\"aw-home__simple-autocomplete-content aw-simple-autocomplete__tippy-wrapper\">\n            <div class=\"aw-home__simple-autocomplete-loader aw-simple-autocomplete__tippy-wrapper-loader\" *ngIf=\"(lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async)?.loading\">\n                <n7-loader [data]=\"{}\"></n7-loader>\n            </div>\n            <n7-simple-autocomplete \n                *ngIf=\"!(lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async)?.loading\"\n                [data]=\"lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-autocomplete-wrapper'].emit\">\n            </n7-simple-autocomplete>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper n7-side-auto-padding\"\n        [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length > 0 }\" *ngIf=\"lb.dataSource.bubblesEnabled\">\n        <div class=\"aw-home__facets-wrapper-loading\" *ngIf=\"!(lb.widgets['aw-home-facets-wrapper'].ds.out$ | async)\">\n            <n7-content-placeholder\n            [data]=\"{\n                blocks: [{\n                    classes: 'facet-placeholder-header'\n                }, {\n                    classes: 'facet-placeholder-input'\n                }] \n            }\"></n7-content-placeholder>\n            <n7-content-placeholder\n            [data]=\"{\n                blocks: [{\n                    classes: 'facet-placeholder-header'\n                }, {\n                    classes: 'facet-placeholder-input'\n                }] \n            }\"></n7-content-placeholder>\n            <n7-content-placeholder\n            [data]=\"{\n                blocks: [{\n                    classes: 'facet-placeholder-header'\n                }, {\n                    classes: 'facet-placeholder-input'\n                }] \n            }\"></n7-content-placeholder>\n            <n7-content-placeholder\n            [data]=\"{\n                blocks: [{\n                    classes: 'facet-placeholder-header'\n                }, {\n                    classes: 'facet-placeholder-input'\n                }] \n            }\"></n7-content-placeholder>\n        </div>\n        <div class=\"aw-home__facets-wrapper\" *ngIf=\"!!(lb.widgets['aw-home-facets-wrapper'].ds.out$ | async)\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div class=\"aw-home__bubble-chart-wrapper-loading\" *ngIf=\"!(lb.widgets['aw-bubble-chart'].ds.out$ | async)\">\n            <n7-content-placeholder\n            [data]=\"{\n                blocks: [\n                    {\n                        classes: 'facet-placeholder-item-1'\n                    }\n                ]\n            }\"></n7-content-placeholder>\n        </div>\n        <div class=\"aw-home__bubble-chart-wrapper\" *ngIf=\"!!(lb.widgets['aw-bubble-chart'].ds.out$ | async)\"\n            [style.overflow]=\"lb.dataSource.loadingBubbles ? 'visible' : 'hidden'\">\n            <aw-bubble-chart-wrapper>\n                <aw-chart-tippy \n                    [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                </aw-chart-tippy>\n                <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n\n        <!-- Linked objects -->\n        <ng-container *ngIf=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.selected.length > 0;\">\n            <div class=\"aw-home__bubble-results\" id=\"home-bubble-results\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\" class=\"aw-home__bubble-results-title-wrapper\">\n                    <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">\n                            {{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span>\n                    </h1>\n                </div>\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                \n                <div class=\"aw-home__bubble-results-list-wrapper\">\n                    <div class=\"aw-home__bubble-results-list-loading\" *ngIf=\"lb.dataSource.resultsListIsLoading\">\n                        <n7-content-placeholder\n                        [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                        <n7-content-placeholder\n                        [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                        <n7-content-placeholder\n                        [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                        <n7-content-placeholder\n                        [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                        <n7-content-placeholder\n                        [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                    </div>\n                    <div\n                    *ngIf=\"!lb.dataSource.resultsListIsLoading\" \n                    class=\"aw-home__bubble-results-list\" [attr.id]=\"'bubble-results-list'\"\n                        (scroll)=\"lb.eventHandler.emitOuter('scroll', $event.target)\">\n\n                        <div class=\"aw-home__bubble-results-fallback\"\n                            *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length < 1;\">\n                            <p class=\"aw-home__bubble-results-fallback-text\">\n                                {{ (lb.widgets['aw-linked-objects'].ds.out$ | async)?.fallback }}\n                            </p>\n                            <button class=\"n7-btn aw-home__bubble-results-reset\"\n                                (click)=\"lb.eventHandler.emitInner('clearselection')\">\n                                Resetta la ricerca\n                            </button>\n                        </div>\n\n                        <ng-container\n                            *ngFor=\"let widgetData of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.result;\">\n                            <n7-item-preview [data]=\"widgetData\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n\n                        <ng-container *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.isLoading\">\n                            <div class=\"aw-home__bubble-results-list-loader\">\n                                <n7-loader [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.loaderData\">\n                                </n7-loader>\n                            </div>\n                        </ng-container>\n                    </div>\n                    <div [ngClass]=\"{ 'is-visible' : lb.dataSource.hasScrollBackground }\"\n                         class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                </div>\n                <!-- aw-linked-objects__actions -->\n                <ng-container *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length > 0 && !lb.dataSource.resultsListIsLoading\">\n                    <div *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.actions as action\"\n                        class=\"aw-home__bubble-results-list-actions\">\n                        <button (click)=\"lb.eventHandler.emitInner('bubbleresultsviewallclick')\"\n                            class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\">\n                            {{action[0].label}}\n                        </button>\n                    </div>\n                </ng-container>\n\n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Outer links -->\n    <div *ngIf=\"lb.dataSource.outerLinks && lb.dataSource.outerLinks.length > 0\" class=\"aw-home__outer-links\">\n        <section class=\"aw-home__outer-links-wrapper n7-side-auto-padding\">\n            <h2 class=\"aw-home__outer-links-title\" *ngIf=\"lb.dataSource.outerLinksTitle\">\n                {{ lb.dataSource.outerLinksTitle }}\n            </h2>\n            <div class=\"aw-home__outer-links-items\">\n                <!-- Item preview -->\n                <n7-item-preview *ngFor=\"let outerLink of lb.dataSource.outerLinks\" [data]=\"outerLink\"\n                    [emit]=\"lb.eventHandler.outerLinkClick.bind(lb.eventHandler)\">\n                </n7-item-preview>\n                <!-- END // Item preview -->\n            </div>\n        </section>\n    </div>\n    <!-- END // Outer links -->\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Adavanced autocomplete popover  -->\n    <div class=\"aw-home__advanced-autocomplete\" id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <div class=\"aw-home__advanced-autocomplete-loader\" *ngIf=\"lb.dataSource.homeAutocompleteIsLoading\">\n            <n7-loader [data]=\"{}\"></n7-loader>\n        </div>\n        <n7-advanced-autocomplete *ngIf=\"!lb.dataSource.homeAutocompleteIsLoading\"\n            [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n\n    <!-- Simple autocomplete popover. DO NOT CHANGE parent div class! -->\n    <!-- Creating one template for each facet -->\n    <div *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\"\n        class=\"aw-home__simple-autocomplete aw-simple-autocomplete__template\" style=\"display: none;\">\n        <div class=\"aw-home__simple-autocomplete-content aw-simple-autocomplete__tippy-wrapper\">\n            <div class=\"aw-home__simple-autocomplete-loader aw-simple-autocomplete__tippy-wrapper-loader\" *ngIf=\"(lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async)?.loading\">\n                <n7-loader [data]=\"{}\"></n7-loader>\n            </div>\n            <n7-simple-autocomplete \n                *ngIf=\"!(lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async)?.loading\"\n                [data]=\"lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-autocomplete-wrapper'].emit\">\n            </n7-simple-autocomplete>\n        </div>\n    </div>\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -8172,6 +8344,9 @@ class AwSchedaLayoutDS extends LayoutDataSource {
             config: this.configuration,
             limit: this.configuration.get('bubble-chart').bubbleLimit
         });
+        this.one('aw-chart-tippy').updateOptions({
+            basePath: this.configuration.get('paths')['entitaBasePath']
+        });
         this.emptyLabel = this.configuration.get('scheda-layout')['empty-label'];
         this.mainState.update('headTitle', 'Arianna Web > Patrimonio');
         this.mainState.update('pageTitle', 'Arianna Web: patrimonio Layout');
@@ -8238,6 +8413,11 @@ class AwSchedaLayoutDS extends LayoutDataSource {
      */
     loadContent(response) {
         if (response) {
+            this.hasMetadata = Array.isArray(response.fields) && response.fields.length;
+            this.hasSimilarItems = Array.isArray(response.relatedItems) && response.relatedItems.length;
+            this.hasBreadcrumb = Array.isArray(response.breadcrumbs) && response.breadcrumbs.length;
+            this.hasBubbles = Array.isArray(response.relatedEntities) && response.relatedEntities.length;
+            this.hasImage = !!response.image;
             this.contentParts = [];
             /** @type {?} */
             const content = {};
@@ -8278,8 +8458,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
                 actions: {}
             };
             this.one('aw-scheda-inner-title').update(titleObj);
-            this.hasMetadata = response.fields != null;
-            this.one('aw-scheda-metadata').updateOptions({ labels: this.configuration.get("labels") });
+            this.one('aw-scheda-metadata').updateOptions({ labels: this.configuration.get('labels') });
             this.one('aw-scheda-metadata').update(response);
             // Breadcrumb section
             /** @type {?} */
@@ -8294,7 +8473,13 @@ class AwSchedaLayoutDS extends LayoutDataSource {
                 element => {
                     breadcrumbs.items.push({
                         label: element.label,
-                        payload: element.link
+                        anchor: {
+                            href: [
+                                this.configuration.get('paths').schedaBasePath,
+                                element.link + '/',
+                                helpers$1.slugify(element.label)
+                            ].join('')
+                        }
                     });
                 }));
                 this.one('aw-scheda-breadcrumbs').update(breadcrumbs);
@@ -8303,12 +8488,8 @@ class AwSchedaLayoutDS extends LayoutDataSource {
             this.mainState.update('headTitle', `Arianna Web > Patrimonio > ${response.title || response.label}`);
         }
         if (response.relatedItems) {
-            this.hasSimilarItems = true;
             this.one('aw-linked-objects').updateOptions({ context: 'scheda', config: this.configuration });
             this.one('aw-linked-objects').update(response);
-        }
-        else {
-            this.hasSimilarItems = false;
         }
         // control sticky
         setTimeout((/**
@@ -8329,6 +8510,10 @@ class AwSchedaLayoutDS extends LayoutDataSource {
      * @return {?}
      */
     _sidebarStickyControl() {
+        // no sticky for Internet Explorer
+        if (helpers$1.browserIsIE()) {
+            return;
+        }
         /** @type {?} */
         const source$ = fromEvent(window, 'scroll');
         merge(source$, this.stickyControlTrigger$).pipe(takeUntil(this.destroyed$)).subscribe((/**
@@ -8428,6 +8613,8 @@ if (false) {
     /** @type {?} */
     AwSchedaLayoutDS.prototype.hasSimilarItems;
     /** @type {?} */
+    AwSchedaLayoutDS.prototype.hasImage;
+    /** @type {?} */
     AwSchedaLayoutDS.prototype.imageViewerIstance;
     /** @type {?} */
     AwSchedaLayoutDS.prototype.sidebarIsSticky;
@@ -8467,7 +8654,7 @@ class AwSchedaLayoutEH extends EventHandler {
                     this.configuration = payload.configuration;
                     this.route = payload.route;
                     /** @type {?} */
-                    const paramId = this.route.snapshot.params.id || "";
+                    const paramId = this.route.snapshot.params.id || '';
                     if (paramId) {
                         this.dataSource.currentId = paramId;
                     }
@@ -8488,22 +8675,13 @@ class AwSchedaLayoutEH extends EventHandler {
          */
         ({ type, payload }) => {
             switch (type) {
-                case 'aw-tree.click':
-                    if (payload) {
-                        this.emitGlobal('navigate', {
-                            path: [
-                                this.configuration.get('paths').schedaBasePath,
-                                payload.id,
-                                helpers.slugify(payload.label)
-                            ],
-                            handler: 'router'
-                        });
-                    }
+                case 'aw-bubble-chart.d3end': // bounce the event, from bubble-chart to chart-tippy
+                    this.emitOuter('d3end', payload);
                     break;
                 case 'aw-sidebar-header.click':
                     this.dataSource.collapseSidebar();
                     break;
-                case "aw-bubble-chart.bubble-tooltip-goto-click":
+                case 'aw-bubble-chart.bubble-tooltip-goto-click':
                     const { id, label } = payload;
                     this.emitGlobal('navigate', {
                         handler: 'router',
@@ -8513,14 +8691,6 @@ class AwSchedaLayoutEH extends EventHandler {
                             helpers.slugify(label),
                             'overview'
                         ]
-                    });
-                    break;
-                case 'aw-linked-objects.click':
-                    /** @type {?} */
-                    const paths = this.configuration.get('paths');
-                    this.emitGlobal('navigate', {
-                        handler: 'router',
-                        path: [paths.schedaBasePath, payload.id, helpers.slugify(payload.title)]
                     });
                     break;
                 default:
@@ -8543,6 +8713,7 @@ class AwSchedaLayoutEH extends EventHandler {
             if (paramId) {
                 if (paramId) {
                     this.dataSource.currentId = paramId;
+                    this.emitOuter('routechanged', paramId);
                 }
                 this.dataSource.contentIsLoading = true;
                 this.dataSource.loadItem(paramId).subscribe((/**
@@ -8554,7 +8725,6 @@ class AwSchedaLayoutEH extends EventHandler {
                     if (response) {
                         this.dataSource.loadContent(response);
                         if (Array.isArray(response.relatedEntities) && response.relatedEntities.length) {
-                            this.dataSource.hasBubbles = true;
                             if (this.dataSource.bubblesEnabled) {
                                 this.emitOuter('filterbubbleresponse', response.relatedEntities);
                             }
@@ -8579,7 +8749,11 @@ class AwSchedaLayoutEH extends EventHandler {
             if (response) {
                 this.dataSource.setTree(response);
                 this.dataSource.updateNavigation(this.dataSource.getTree().label);
-                this.emitOuter('navigationresponse', { tree: this.dataSource.getTree(), currentItem: selectedItem });
+                this.emitOuter('navigationresponse', {
+                    tree: this.dataSource.getTree(),
+                    currentItem: selectedItem,
+                    basePath: this.configuration.get('paths').schedaBasePath
+                });
             }
         }));
     }
@@ -8621,6 +8795,7 @@ const AwPatrimonioLayoutConfig = {
         { id: 'aw-scheda-image' },
         { id: 'aw-scheda-inner-title' },
         { id: 'aw-bubble-chart' },
+        { id: 'aw-chart-tippy' },
         { id: 'aw-linked-objects' }
     ],
     layoutDS: AwSchedaLayoutDS,
@@ -8690,7 +8865,7 @@ class AwSchedaLayoutComponent extends AbstractLayout {
 AwSchedaLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-scheda-layout',
-                template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n        [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\" [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n            <div class=\"aw-scheda__tree-content-loading\" *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n            </div>\n            <div class=\"aw-scheda__tree-content\" \n                [ngStyle]=\"{ \n                    'max-height': lb.dataSource.treeMaxHeight, \n                    'overflow': 'auto' \n                }\"\n            >\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\" [emit]=\"lb.widgets['aw-tree'].emit\"\n                    *ngIf=\"!lb.dataSource.sidebarCollapsed\"></n7-tree>\n            </div>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper-loading\" *ngIf=\"lb.dataSource.contentIsLoading\">\n            <!--\n                <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'content-placeholder-title'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }]\n            }\"></n7-content-placeholder>\n            -->\n        </div>\n        <div class=\"aw-scheda__scheda-wrapper\" *ngIf=\"!lb.dataSource.contentIsLoading\">\n            <div *ngIf=\"!lb.dataSource.currentId\"\n                 class=\"aw-scheda__intro-text\"\n                 [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n            <n7-breadcrumbs [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-breadcrumbs>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <n7-image-viewer [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\" *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\" *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section class=\"aw-scheda__bubble-chart\" *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\n                <div *ngIf=\"lb.dataSource.hasBubbles\" class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <aw-bubble-chart-wrapper [emit]=\"lb.widgets['aw-bubble-chart'].emit\"\n                    [container]=\"'bubble-chart-container'\" [buttons]=\"['goto']\">\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </section>\n\n            <section *ngIf=\"lb.dataSource.hasSimilarItems\" id=\"related-item-container\" class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.similarItemsSectionTitle}}</div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <!--<ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">-->\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n            </section>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n        [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\" [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n            <div class=\"aw-scheda__tree-content-loading\" *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\" [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n            </div>\n            <div class=\"aw-scheda__tree-content\" [ngStyle]=\"{ \n                    'max-height': lb.dataSource.treeMaxHeight, \n                    'overflow': 'auto' \n                }\">\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\" [emit]=\"lb.widgets['aw-tree'].emit\"\n                    *ngIf=\"!lb.dataSource.sidebarCollapsed\"></n7-tree>\n            </div>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper-loading\" *ngIf=\"lb.dataSource.contentIsLoading\">\n            <!--\n                <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'content-placeholder-title'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }]\n            }\"></n7-content-placeholder>\n            -->\n        </div>\n        <div class=\"aw-scheda__scheda-wrapper\" *ngIf=\"!lb.dataSource.contentIsLoading\">\n            <div *ngIf=\"!lb.dataSource.currentId\" class=\"aw-scheda__intro-text\" [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\" [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <n7-image-viewer *ngIf=\"lb.dataSource.hasImage\" [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\" *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\" *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section class=\"aw-scheda__bubble-chart\" *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\n                <div *ngIf=\"lb.dataSource.hasBubbles\" class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <aw-bubble-chart-wrapper>\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                    </aw-chart-tippy>\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </section>\n\n            <section *ngIf=\"lb.dataSource.hasSimilarItems\" id=\"related-item-container\" class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.similarItemsSectionTitle}}</div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <!--<ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">-->\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n            </section>\n        </div>\n    </div>\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -9106,6 +9281,7 @@ class AwSearchLayoutDS extends LayoutDataSource {
                 config: this.configuration,
                 page: this.currentPage,
                 pagination: true,
+                paginationParams: this._getPaginationParams(),
                 dynamicPagination: {
                     total: totalCount
                 },
@@ -9214,6 +9390,10 @@ class AwSearchLayoutDS extends LayoutDataSource {
      * @return {?}
      */
     _sidebarStickyControl() {
+        // no sticky for Internet Explorer
+        if (helpers.browserIsIE()) {
+            return;
+        }
         /** @type {?} */
         const source$ = fromEvent(window, 'scroll');
         source$.pipe(takeUntil(this.destroyed$)).subscribe((/**
@@ -9226,6 +9406,30 @@ class AwSearchLayoutDS extends LayoutDataSource {
             const wrapperOffsetTop = document.getElementsByClassName('sticky-parent')[0]['offsetTop'];
             this.sidebarIsSticky = wrapperOffsetTop <= windowOffsetTop;
         }));
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    _getPaginationParams() {
+        /** @type {?} */
+        const requestParams = this.searchModel.getRequestParams();
+        /** @type {?} */
+        const queryParams = this.searchModel.filtersAsQueryParams(requestParams.filters);
+        Object.keys(queryParams).forEach((/**
+         * @param {?} key
+         * @return {?}
+         */
+        key => queryParams[key] = queryParams[key] || null));
+        // aditional params
+        queryParams.orderby = this.orderBy;
+        queryParams.orderdirection = this.orderDirection;
+        queryParams.page = this.currentPage;
+        queryParams.limit = this.pageSize;
+        return {
+            queryParams,
+            href: this.configuration.get('paths').searchBasePath
+        };
     }
 }
 if (false) {
@@ -9365,45 +9569,9 @@ class AwSearchLayoutEH extends EventHandler {
                 case 'facets-wrapper.facetschange':
                     this.dataSource.resetPagination();
                     break;
-                case 'aw-linked-objects.pagination':
-                    this.dataSource.onPaginationChange(payload).subscribe((/**
-                     * @param {?} changed
-                     * @return {?}
-                     */
-                    changed => {
-                        if (changed) {
-                            this.aditionalParamsChange$.next();
-                        }
-                    }));
-                    break;
                 case 'aw-linked-objects.change':
                     this.dataSource.onResultsLimitChange(payload);
                     this.aditionalParamsChange$.next();
-                    break;
-                case 'aw-linked-objects.goto':
-                    this.dataSource.onPaginationGoToChange(payload).subscribe((/**
-                     * @param {?} changed
-                     * @return {?}
-                     */
-                    changed => {
-                        if (changed) {
-                            this.aditionalParamsChange$.next();
-                        }
-                    }));
-                    break;
-                case 'aw-linked-objects.click':
-                    /** @type {?} */
-                    const paths = this.dataSource.configuration.get('paths');
-                    this.emitGlobal('navigate', {
-                        handler: 'router',
-                        path: [
-                            payload.type == undefined
-                                ? paths.schedaBasePath
-                                : paths.entitaBasePath,
-                            payload.id,
-                            helpers.slugify(payload.title)
-                        ]
-                    });
                     break;
                 default:
                     break;
@@ -9596,7 +9764,7 @@ class AwSearchLayoutComponent extends AbstractLayout {
 AwSearchLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-search-layout',
-                template: "<div class=\"aw-search n7-side-auto-padding\" id=\"search-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n        <!--\n        <div class=\"aw-search__header-right\">\n            <n7-nav\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\n            </n7-nav>\n        </div>\n        -->\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar sticky-target\" [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                        for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                        id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\" [value]=\"option.value\" [selected]=\"option.selected\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngIf=\"lb.dataSource.resultsLoading\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n                <n7-content-placeholder *ngIf=\"lb.dataSource.resultsLoading\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n                <n7-content-placeholder *ngIf=\"lb.dataSource.resultsLoading\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n                <n7-content-placeholder *ngIf=\"lb.dataSource.resultsLoading\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n                <n7-content-placeholder *ngIf=\"lb.dataSource.resultsLoading\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n                <n7-content-placeholder *ngIf=\"lb.dataSource.resultsLoading\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper\">\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                    <n7-breadcrumbs [data]=\"preview.breadcrumbs\">\n                    </n7-breadcrumbs>\n                    <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\" class=\"n7-btn aw-search__fallback-button\" (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                    [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-pagination>\n            </div>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"aw-search n7-side-auto-padding\" id=\"search-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n        <!--\n        <div class=\"aw-search__header-right\">\n            <n7-nav\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\n            </n7-nav>\n        </div>\n        -->\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar sticky-target\" [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                        for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                        id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\" [value]=\"option.value\" [selected]=\"option.selected\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngIf=\"lb.dataSource.resultsLoading\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n                <n7-content-placeholder *ngIf=\"lb.dataSource.resultsLoading\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n                <n7-content-placeholder *ngIf=\"lb.dataSource.resultsLoading\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n                <n7-content-placeholder *ngIf=\"lb.dataSource.resultsLoading\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n                <n7-content-placeholder *ngIf=\"lb.dataSource.resultsLoading\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n                <n7-content-placeholder *ngIf=\"lb.dataSource.resultsLoading\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper\">\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                    <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                    </n7-smart-breadcrumbs>\n                    <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\" class=\"n7-btn aw-search__fallback-button\" (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                    [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-pagination>\n            </div>\n        </div>\n    </div>\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -9645,6 +9813,40 @@ if (false) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+class ChartTippyComponent {
+    /**
+     * @param {?} type
+     * @param {?} payload
+     * @return {?}
+     */
+    onClick(type, payload) {
+        this.emit(type, payload);
+    }
+}
+ChartTippyComponent.decorators = [
+    { type: Component, args: [{
+                selector: 'aw-chart-tippy',
+                template: "<div *ngIf=\"data\" style=\"display: none;\">\n  <div *ngFor=\"let d of data\" id=\"template__{{d.id}}\" class=\"bubble-chart__tippy-template\">\n    <div id=\"bubble-popup-menu\" class=\"aw-bubble-popup-menu\">\n      <h2 class=\"aw-bubble-popup-menu__title\">{{ d.title }}</h2>\n      <p class=\"aw-bubble-popup-menu__text\">\n        {{ d.text }}\n      </p>\n      <div class=\"aw-bubble-popup-menu__actions\">\n        <n7-anchor-wrapper [classes]=\"'aw-bubble-popup-menu__link'\" [data]=\"d.anchorData\">\n          Vai alla scheda\n        </n7-anchor-wrapper>\n        <span *ngIf=\"d.selectable\" class=\"aw-bubble-popup-menu__link\" (click)=\"onClick('select', {id: d.id})\">\n          {{ d.isSelected ? 'Deseleziona' : 'Seleziona'}}\n        </span>\n      </div>\n    </div>\n  </div>\n</div>"
+            }] }
+];
+ChartTippyComponent.propDecorators = {
+    data: [{ type: Input }],
+    emit: [{ type: Input }],
+    anchorData: [{ type: Input }]
+};
+if (false) {
+    /** @type {?} */
+    ChartTippyComponent.prototype.data;
+    /** @type {?} */
+    ChartTippyComponent.prototype.emit;
+    /** @type {?} */
+    ChartTippyComponent.prototype.anchorData;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 class BubbleChartWrapperComponent {
     /**
      * @param {?} type
@@ -9658,7 +9860,7 @@ class BubbleChartWrapperComponent {
 BubbleChartWrapperComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-bubble-chart-wrapper',
-                template: "<div class=\"aw-bubble-chart-wrapper\">\n    <div class=\"bubble-chart__tippy-template\" style=\"display: none;\">\n        <!-- <button id=\"bubble-popup-menu_closebutton\" style=\"display: none;\"\n            (click)=\"onClick('bubble-tooltip-close-click')\"></button> -->\n        <button id=\"bubble-popup-menu_gotobutton\" class=\"bubble-popup-menu_gotobutton\" style=\"display: none;\"\n            (click)=\"onClick('bubble-tooltip-goto-click', {})\"></button>\n        <button id=\"bubble-popup-menu_selectbutton\" style=\"display: none;\"\n            (click)=\"onClick('bubble-tooltip-select-click', {})\"></button>\n        <div id=\"bubble-popup-menu\" class=\"aw-bubble-popup-menu\">\n            <h2 class=\"aw-bubble-popup-menu__title\">\n                <!-- Set by tippy builder fuction -->\n            </h2>\n            <!-- <span class=\"n7-icon-close aw-bubble-popup-menu__close\"\n                onclick=\"document.getElementById('bubble-popup-menu_closebutton').click();\">\n            </span> -->\n            <p class=\"aw-bubble-popup-menu__text\">\n                <!-- Set by tippy builder fuction -->\n            </p>\n            <div class=\"aw-bubble-popup-menu__actions\">\n                <span class=\"aw-bubble-popup-menu__link\" *ngIf=\"buttons.indexOf('goto') >= 0\"\n                    onclick=\"document.getElementById('bubble-popup-menu_gotobutton').click();\">Vai alla scheda</span>\n                <ng-container>\n                    <span class=\"aw-bubble-popup-menu__link\" *ngIf=\"buttons.indexOf('select') >= 0\"\n                        onclick=\"document.getElementById('bubble-popup-menu_selectbutton').click();\">\n                        <!-- Set by tippy builder function -->\n                    </span>\n                </ng-container>\n            </div>\n        </div>\n    </div>\n\n    <ng-content></ng-content>\n</div>"
+                template: "<div class=\"aw-bubble-chart-wrapper\">\n    <ng-content></ng-content>\n</div>"
             }] }
 ];
 BubbleChartWrapperComponent.propDecorators = {
@@ -9803,7 +10005,7 @@ class SmartBreadcrumbsComponent {
 SmartBreadcrumbsComponent.decorators = [
     { type: Component, args: [{
                 selector: 'n7-smart-breadcrumbs',
-                template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\n    <nav class=\"n7-breadcrumbs__nav\">\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\n                <a class=\"n7-breadcrumbs__label\" (click)=\"onClick(item.payload)\">{{ item.label }}</a>\n            </li>\n        </ol>\n    </nav>\n</div>"
+                template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\n    <nav class=\"n7-breadcrumbs__nav\">\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\n                <n7-anchor-wrapper [classes]=\"'n7-breadcrumbs__label'\"\n                [data]=\"item.anchor\"\n                (clicked)=\"onClick($event)\">\n                    {{ item.label }}\n                </n7-anchor-wrapper>\n            </li>\n        </ol>\n    </nav>\n</div>"
             }] }
 ];
 SmartBreadcrumbsComponent.propDecorators = {
@@ -9838,6 +10040,7 @@ const COMPONENTS$1 = [
     AwSchedaLayoutComponent,
     AwSearchLayoutComponent,
     BubbleChartWrapperComponent,
+    ChartTippyComponent,
     SmartBreadcrumbsComponent
 ];
 class N7BoilerplateAriannaWebModule {
@@ -9847,6 +10050,7 @@ N7BoilerplateAriannaWebModule.decorators = [
                 declarations: COMPONENTS$1,
                 imports: [
                     CommonModule,
+                    RouterModule,
                     DvComponentsLibModule,
                     N7BoilerplateCommonModule,
                 ],
@@ -9872,18 +10076,15 @@ class DataWidgetWrapperComponent {
 DataWidgetWrapperComponent.decorators = [
     { type: Component, args: [{
                 selector: 'dv-data-widget-wrapper',
-                template: "<div class=\"dv-data-widget-wrapper\">\n    <ng-content></ng-content>\n</div>"
+                template: "<div class=\"dv-data-widget-wrapper {{ data && data.classes || '' }}\">\n    <ng-content></ng-content>\n</div>"
             }] }
 ];
 DataWidgetWrapperComponent.propDecorators = {
-    data: [{ type: Input }],
-    emit: [{ type: Input }]
+    data: [{ type: Input }]
 };
 if (false) {
     /** @type {?} */
     DataWidgetWrapperComponent.prototype.data;
-    /** @type {?} */
-    DataWidgetWrapperComponent.prototype.emit;
 }
 
 /**
@@ -10143,7 +10344,7 @@ class DvDatepickerWrapperDS extends DataSource {
      * @return {?}
      */
     setLabel(payload) {
-        this.output.select.label = payload.dateStr;
+        this.output.select.label = payload;
         this.output.datepicker.hidden = true;
     }
     /**
@@ -10334,6 +10535,7 @@ class DvDatepickerWrapperEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'dv-datepicker-wrapper.click':
+                    this.dataSource.setLabel(payload);
                     if (payload === "ByDate") {
                         this.dataSource.openDatepicker();
                     }
@@ -10345,7 +10547,7 @@ class DvDatepickerWrapperEH extends EventHandler {
                     this.dataSource.toggleDropDown();
                     break;
                 case 'dv-datepicker-wrapper.change':
-                    this.dataSource.setLabel(payload);
+                    this.dataSource.setLabel(payload.dateStr);
                     break;
             }
         }));
@@ -10412,7 +10614,7 @@ class DvExampleLayoutComponent extends AbstractLayout {
 DvExampleLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'dv-example-layout',
-                template: "<div class=\"dv-example-layout\" id=\"example-layout\">\n    <dv-data-widget-wrapper>\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-chart\n                    [data]=\"lb.widgets['dv-graph'].ds.out$ | async\">\n                </n7-chart>\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n    <dv-datepicker-wrapper \n        [data]=\"lb.widgets['dv-datepicker-wrapper'].ds.out$ | async\"\n        [emit]=\"lb.widgets['dv-datepicker-wrapper'].emit\">\n    </dv-datepicker-wrapper>\n</div>"
+                template: "<div class=\"dv-example-layout\" id=\"example-layout\">\n\n    <!-- Data widget wrapper with not-fixed height, two rows -->\n    <dv-data-widget-wrapper>\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-chart\n                    [data]=\"lb.widgets['dv-graph'].ds.out$ | async\">\n                </n7-chart>\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n\n    <!-- Data widget wrapper with fixed height, two rows -->\n    <dv-data-widget-wrapper [data]=\"{ classes: 'dv-data-widget-wrapper-fixed-height' }\">\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                Row content\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n\n    <!-- Data widget wrapper with fixed height, one row -->\n    <dv-data-widget-wrapper [data]=\"{ classes: 'dv-data-widget-wrapper-fixed-height' }\">\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n    \n    <dv-datepicker-wrapper \n        [data]=\"lb.widgets['dv-datepicker-wrapper'].ds.out$ | async\"\n        [emit]=\"lb.widgets['dv-datepicker-wrapper'].emit\">\n    </dv-datepicker-wrapper>\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -10506,5 +10708,5 @@ N7BoilerplateLibModule.decorators = [
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDataWidgetEH, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsEH, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SearchModel, SearchService, SmartBreadcrumbsComponent, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, CommunicationService as ɵl, MainStateService as ɵm, AwHomeLayoutComponent as ɵn, AwSchedaLayoutComponent as ɵo, AwSearchLayoutComponent as ɵp, ConfigurationService as ɵq, LayoutsConfigurationService as ɵr, SearchService as ɵs, BubbleChartWrapperComponent as ɵt, SmartBreadcrumbsComponent as ɵu, DataWidgetWrapperComponent as ɵv, DatepickerWrapperComponent as ɵw, DvExampleLayoutComponent as ɵx };
+export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDataWidgetEH, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsEH, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SearchModel, SearchService, SmartBreadcrumbsComponent, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, CommunicationService as ɵl, MainStateService as ɵm, AwHomeLayoutComponent as ɵn, AwSchedaLayoutComponent as ɵo, AwSearchLayoutComponent as ɵp, ConfigurationService as ɵq, LayoutsConfigurationService as ɵr, SearchService as ɵs, BubbleChartWrapperComponent as ɵt, ChartTippyComponent as ɵu, SmartBreadcrumbsComponent as ɵv, DataWidgetWrapperComponent as ɵw, DatepickerWrapperComponent as ɵx, DvExampleLayoutComponent as ɵy };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

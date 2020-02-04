@@ -21,6 +21,7 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
     hasBubbles: boolean;
     bubblesEnabled: boolean;
     hasSimilarItems: boolean;
+    hasImage: boolean;
     imageViewerIstance: any;
     sidebarIsSticky: boolean;
     treeMaxHeight: string;

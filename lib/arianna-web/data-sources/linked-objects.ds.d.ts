@@ -14,4 +14,5 @@ export declare class AwLinkedObjectsDS extends DataSource {
     addPagination: (page: any, totalPages: any, size: any) => void;
     makePagination: (totalPages: any, currentPage: any) => any[];
     private unpackData;
+    private _getPaginationAnchor;
 }

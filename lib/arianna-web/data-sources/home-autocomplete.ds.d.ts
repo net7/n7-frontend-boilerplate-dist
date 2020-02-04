@@ -12,8 +12,11 @@ export declare class AwHomeAutocompleteDS extends DataSource {
         actions: {
             showMore: {
                 text: string;
-                payload: {
-                    source: string;
+                anchor: {
+                    href: any;
+                    queryParams: {
+                        query: any;
+                    };
                 };
             };
         };
