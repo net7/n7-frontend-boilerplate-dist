@@ -2,11 +2,11 @@ import { OnInit, OnDestroy } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-import { AbstractLayout } from "../../../common/models/abstract-layout";
+import { AbstractLayout } from '../../../common/models/abstract-layout';
 import { ConfigurationService } from '../../../common/services/configuration.service';
 import { LayoutsConfigurationService } from '../../../common/services/layouts-configuration.service';
-import { MainStateService } from '../../../common/services';
-import { CommunicationService } from '../../../common/services';
+import { MainStateService } from '../../../common/services/main-state.service';
+import { CommunicationService } from '../../../common/services/communication.service';
 export declare class AwEntitaLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private router;
     private route;

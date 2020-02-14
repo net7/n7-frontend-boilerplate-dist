@@ -4,7 +4,7 @@ import { AbstractLayout } from '../../../common/models/abstract-layout';
 import { ConfigurationService } from '../../../common/services/configuration.service';
 import { LayoutsConfigurationService } from '../../../common/services/layouts-configuration.service';
 import { MainStateService } from '../../../common/services/main-state.service';
-import { CommunicationService } from '../../../common/services';
+import { CommunicationService } from '../../../common/services/communication.service';
 export declare class AwHomeLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private router;
     private configuration;
