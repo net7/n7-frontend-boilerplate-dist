@@ -11505,15 +11505,15 @@
             _this.Items = [
                 {
                     text: "Last week",
-                    payload: "lastWeek",
+                    payload: "Last week",
                 },
                 {
                     text: "Last month",
-                    payload: "lastMonth",
+                    payload: "Last month",
                 },
                 {
                     text: "Last year",
-                    payload: "lastYear",
+                    payload: "Last year",
                 },
                 {
                     text: "Select Date",
@@ -11528,7 +11528,7 @@
             _this.datePickerExternalData = {
                 select: {
                     id: "dv-select",
-                    label: "Last Week",
+                    label: "Last week",
                     items: _this.Items,
                 },
                 datepicker: {
