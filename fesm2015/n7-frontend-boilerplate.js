@@ -1,4 +1,4 @@
-import { Injectable, Inject, ɵɵdefineInjectable, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef } from '@angular/core';
+import { Injectable, ɵɵdefineInjectable, Inject, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK } from '@n7-frontend/components';
@@ -13,14 +13,11 @@ import slug from 'slug';
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/configuration.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class ConfigurationService {
-    /**
-     * @param {?} config
-     */
-    constructor(config) {
-        this.config = config;
+    constructor() {
         this.defaults = {};
         this.get = (/**
          * @param {?} key
@@ -33,15 +30,6 @@ class ConfigurationService {
          * @return {?}
          */
         (key, value) => this.defaults[key] = value);
-        if (this.config.global) {
-            Object.keys(this.config.global).forEach((/**
-             * @param {?} key
-             * @return {?}
-             */
-            key => {
-                this.set(key, this.config.global[key]);
-            }));
-        }
     }
 }
 ConfigurationService.decorators = [
@@ -49,11 +37,7 @@ ConfigurationService.decorators = [
                 providedIn: 'root'
             },] }
 ];
-/** @nocollapse */
-ConfigurationService.ctorParameters = () => [
-    { type: undefined, decorators: [{ type: Inject, args: ['config',] }] }
-];
-/** @nocollapse */ ConfigurationService.ngInjectableDef = ɵɵdefineInjectable({ factory: function ConfigurationService_Factory() { return new ConfigurationService(ɵɵinject("config")); }, token: ConfigurationService, providedIn: "root" });
+/** @nocollapse */ ConfigurationService.ngInjectableDef = ɵɵdefineInjectable({ factory: function ConfigurationService_Factory() { return new ConfigurationService(); }, token: ConfigurationService, providedIn: "root" });
 if (false) {
     /**
      * @type {?}
@@ -64,15 +48,11 @@ if (false) {
     ConfigurationService.prototype.get;
     /** @type {?} */
     ConfigurationService.prototype.set;
-    /**
-     * @type {?}
-     * @private
-     */
-    ConfigurationService.prototype.config;
 }
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/layouts-configuration.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class LayoutsConfigurationService {
@@ -133,6 +113,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/main-state.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainStateService {
@@ -251,6 +232,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/communication-providers/apollo/config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -785,6 +767,7 @@ const ApolloProviderConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/communication-providers/apollo/apollo.provider.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class ApolloProvider {
@@ -931,6 +914,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/communication-providers/rest/config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -940,6 +924,7 @@ const RestProviderConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/communication-providers/rest/rest.provider.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class RestProvider {
@@ -1019,6 +1004,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/communication.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class CommunicationService {
@@ -1114,6 +1100,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/abstract-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -1180,6 +1167,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/main-layout/main-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainLayoutDS extends LayoutDataSource {
@@ -1316,6 +1304,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/json-config.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class JsonConfigService {
@@ -1329,9 +1318,10 @@ class JsonConfigService {
     }
     /**
      * @param {?} path
+     * @param {?=} staticConfig
      * @return {?}
      */
-    load(path) {
+    load(path, staticConfig) {
         return this.http.get(path).pipe(catchError((/**
          * @param {?} error
          * @return {?}
@@ -1340,14 +1330,24 @@ class JsonConfigService {
          * @param {?} response
          * @return {?}
          */
-        response => this._handleResponse(response)))).toPromise();
+        response => this._handleResponse(response, staticConfig)))).toPromise();
     }
     /**
      * @private
      * @param {?} response
+     * @param {?} staticConfig
      * @return {?}
      */
-    _handleResponse(response) {
+    _handleResponse(response, staticConfig) {
+        // set config defaults
+        if (staticConfig) {
+            Object.keys(staticConfig).forEach((/**
+             * @param {?} key
+             * @return {?}
+             */
+            key => this.config.set(key, staticConfig[key])));
+        }
+        // set loaded json config
         if (response) {
             Object.keys(response).forEach((/**
              * @param {?} key
@@ -1412,6 +1412,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -1588,6 +1589,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input-checkbox.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetInputCheckbox extends FacetInput {
@@ -1645,6 +1647,7 @@ class FacetInputCheckbox extends FacetInput {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/helpers.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -1713,6 +1716,7 @@ var helpers = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input-text.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetInputText extends FacetInput {
@@ -1752,6 +1756,7 @@ class FacetInputText extends FacetInput {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input-link.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -1918,6 +1923,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input-select.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetInputSelect extends FacetInput {
@@ -1970,11 +1976,13 @@ class FacetInputSelect extends FacetInput {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/search.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -2810,11 +2818,13 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/main-layout/main-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainLayoutEH extends EventHandler {
@@ -2938,6 +2948,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/header.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class HeaderDS extends DataSource {
@@ -2971,6 +2982,7 @@ class HeaderDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/subnav.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SubnavDS extends DataSource {
@@ -3019,6 +3031,7 @@ class SubnavDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/breadcrumbs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class BreadcrumbsDS extends DataSource {
@@ -3034,6 +3047,7 @@ class BreadcrumbsDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/facets.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetsDS extends DataSource {
@@ -3055,6 +3069,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/facets-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -3354,6 +3369,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/footer.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FooterDS extends DataSource {
@@ -3372,6 +3388,7 @@ class FooterDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/smart-pagination.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SmartPaginationDS extends DataSource {
@@ -3550,10 +3567,12 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     HeaderDS: HeaderDS,
     SubnavDS: SubnavDS,
     BreadcrumbsDS: BreadcrumbsDS,
@@ -3565,6 +3584,7 @@ var DS = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/header.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class HeaderEH extends EventHandler {
@@ -3590,6 +3610,7 @@ class HeaderEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/subnav.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SubnavEH extends EventHandler {
@@ -3620,6 +3641,7 @@ class SubnavEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/breadcrumbs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class BreadcrumbsEH extends EventHandler {
@@ -3650,6 +3672,7 @@ class BreadcrumbsEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/facets.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetsEH extends EventHandler {
@@ -3673,6 +3696,7 @@ class FacetsEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/facets-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetsWrapperEH extends EventHandler {
@@ -3818,6 +3842,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/footer.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FooterEH extends EventHandler {
@@ -3831,6 +3856,7 @@ class FooterEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/smart-pagination.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SmartPaginationEH extends EventHandler {
@@ -3860,10 +3886,12 @@ class SmartPaginationEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     HeaderEH: HeaderEH,
     SubnavEH: SubnavEH,
     BreadcrumbsEH: BreadcrumbsEH,
@@ -3875,6 +3903,7 @@ var EH = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/main-layout/main-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -3900,6 +3929,7 @@ const MainLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/main-layout/main-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainLayoutComponent extends AbstractLayout {
@@ -3997,6 +4027,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/page404-layout/page404-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class Page404LayoutDS extends LayoutDataSource {
@@ -4015,6 +4046,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/page404-layout/page404-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class Page404LayoutEH extends EventHandler {
@@ -4067,6 +4099,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/page404-layout/page404-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -4084,6 +4117,7 @@ const Page404LayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/page404-layout/page404-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class Page404LayoutComponent extends AbstractLayout {
@@ -4128,6 +4162,7 @@ Page404LayoutComponent.ctorParameters = () => [
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/components/facets-wrapper/facets-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetsWrapperComponent {
@@ -4171,6 +4206,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/components/smart-pagination/smart-pagination.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SmartPaginationComponent {
@@ -4209,6 +4245,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/n7-boilerplate-common.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -4231,7 +4268,6 @@ class N7BoilerplateCommonModule {
                 ConfigurationService,
                 LayoutsConfigurationService,
                 CommunicationService,
-                ApolloProvider,
                 { provide: 'config', useValue: config }
             ]
         };
@@ -4252,6 +4288,7 @@ N7BoilerplateCommonModule.decorators = [
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaLayoutDS extends LayoutDataSource {
@@ -4624,6 +4661,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaLayoutEH extends EventHandler {
@@ -4820,6 +4858,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/linked-objects.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 // used for cherry-picking object keys from app-config.json
@@ -5139,6 +5178,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/autocomplete-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwAutocompleteWrapperDS extends DataSource {
@@ -5217,6 +5257,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/bubble-chart.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwBubbleChartDS extends DataSource {
@@ -5376,6 +5417,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/chart-tippy.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwChartTippyDS extends DataSource {
@@ -5416,6 +5458,7 @@ class AwChartTippyDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/hero.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHeroDS extends DataSource {
@@ -5454,6 +5497,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/table.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwTableDS extends DataSource {
@@ -5469,6 +5513,7 @@ class AwTableDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/home-hero-patrimonio.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeHeroPatrimonioDS extends DataSource {
@@ -5484,6 +5529,7 @@ class AwHomeHeroPatrimonioDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/home-facets-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeFacetsWrapperDS extends DataSource {
@@ -5748,6 +5794,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/home-item-tags-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeItemTagsWrapperDS extends DataSource {
@@ -5763,6 +5810,7 @@ class AwHomeItemTagsWrapperDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/home-autocomplete.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeAutocompleteDS extends DataSource {
@@ -5858,6 +5906,7 @@ class AwHomeAutocompleteDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/entita-nav.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaNavDS extends DataSource {
@@ -5927,6 +5976,7 @@ class AwEntitaNavDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/entita-metadata-viewer.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaMetadataViewerDS extends DataSource {
@@ -6057,6 +6107,7 @@ class AwEntitaMetadataViewerDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/tree.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwTreeDS extends DataSource {
@@ -6365,6 +6416,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/sidebar-header.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSidebarHeaderDS extends DataSource {
@@ -6402,6 +6454,7 @@ class AwSidebarHeaderDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/scheda-breadcrumbs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaBreadcrumbsDS extends DataSource {
@@ -6431,6 +6484,7 @@ class AwSchedaBreadcrumbsDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/scheda-metadata.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaMetadataDS extends DataSource {
@@ -6479,6 +6533,7 @@ class AwSchedaMetadataDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/scheda-image.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaImageDS extends DataSource {
@@ -6494,6 +6549,7 @@ class AwSchedaImageDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/scheda-inner-title.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaInnerTitleDS extends DataSource {
@@ -6509,6 +6565,7 @@ class AwSchedaInnerTitleDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/search-layout-tabs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutTabsDS extends DataSource {
@@ -6556,10 +6613,12 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     AwLinkedObjectsDS: AwLinkedObjectsDS,
     AwAutocompleteWrapperDS: AwAutocompleteWrapperDS,
     AwBubbleChartDS: AwBubbleChartDS,
@@ -6583,6 +6642,7 @@ var DS$1 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/linked-objects.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwLinkedObjectsEH extends EventHandler {
@@ -6662,6 +6722,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/autocomplete-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwAutocompleteWrapperEH extends EventHandler {
@@ -6690,6 +6751,7 @@ class AwAutocompleteWrapperEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/bubble-chart.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwBubbleChartEH extends EventHandler {
@@ -6839,6 +6901,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/chart-tippy.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwChartTippyEH extends EventHandler {
@@ -6944,6 +7007,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/hero.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHeroEH extends EventHandler {
@@ -6980,6 +7044,7 @@ class AwHeroEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/home-facets-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeFacetsWrapperEH extends EventHandler {
@@ -7146,6 +7211,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/home-hero-patrimonio.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeHeroPatrimonioEH extends EventHandler {
@@ -7159,6 +7225,7 @@ class AwHomeHeroPatrimonioEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/home-item-tags-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeItemTagsWrapperEH extends EventHandler {
@@ -7187,6 +7254,7 @@ class AwHomeItemTagsWrapperEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/home-autocomplete.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeAutocompleteEH extends EventHandler {
@@ -7212,6 +7280,7 @@ class AwHomeAutocompleteEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/entita-nav.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaNavEH extends EventHandler {
@@ -7244,6 +7313,7 @@ class AwEntitaNavEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/scheda-breadcrumbs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaSidebarEH extends EventHandler {
@@ -7269,6 +7339,7 @@ class AwSchedaSidebarEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/sidebar-header.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSidebarHeaderEH extends EventHandler {
@@ -7294,6 +7365,7 @@ class AwSidebarHeaderEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/tree.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwTreeEH extends EventHandler {
@@ -7351,6 +7423,7 @@ class AwTreeEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/search-layout-tabs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutTabsEH extends EventHandler {
@@ -7364,6 +7437,7 @@ class AwSearchLayoutTabsEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/table.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwTableEH extends EventHandler {
@@ -7385,10 +7459,12 @@ class AwTableEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     AwLinkedObjectsEH: AwLinkedObjectsEH,
     AwAutocompleteWrapperEH: AwAutocompleteWrapperEH,
     AwBubbleChartEH: AwBubbleChartEH,
@@ -7408,6 +7484,7 @@ var EH$1 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -7436,6 +7513,7 @@ const AwEntitaLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaLayoutComponent extends AbstractLayout {
@@ -7556,6 +7634,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeLayoutDS extends LayoutDataSource {
@@ -8032,6 +8111,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/home-layout/home-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeLayoutEH extends EventHandler {
@@ -8363,6 +8443,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/home-layout/home-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -8398,6 +8479,7 @@ const AwHomeLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeLayoutComponent extends AbstractLayout {
@@ -8481,6 +8563,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaLayoutDS extends LayoutDataSource {
@@ -8809,6 +8892,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaLayoutEH extends EventHandler {
@@ -8955,6 +9039,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -8986,6 +9071,7 @@ const AwPatrimonioLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaLayoutComponent extends AbstractLayout {
@@ -9095,6 +9181,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-facets.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var facetsConfig = {
@@ -9262,6 +9349,7 @@ var facetsConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -9722,6 +9810,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutEH extends EventHandler {
@@ -9893,6 +9982,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -9923,6 +10013,7 @@ const AwSearchLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutComponent extends AbstractLayout {
@@ -10023,6 +10114,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/components/chart-tippy/chart-tippy.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class ChartTippyComponent {
@@ -10057,6 +10149,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/components/bubble-chart-wrapper/bubble-chart-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class BubbleChartWrapperComponent {
@@ -10091,6 +10184,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/components/smart-breadcrumbs/smart-breadcrumbs.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -10243,6 +10337,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/n7-boilerplate-arianna-web.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -10273,6 +10368,7 @@ N7BoilerplateAriannaWebModule.decorators = [
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/components/data-widget-wrapper/data-widget-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -10301,6 +10397,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/components/datepicker-wrapper/datepicker-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -10384,6 +10481,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/example-layout/example-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvExampleLayoutDS extends LayoutDataSource {
@@ -10451,6 +10549,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/example-layout/example-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvExampleLayoutEH extends EventHandler {
@@ -10470,6 +10569,7 @@ class DvExampleLayoutEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/data-widget-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvDataWidgetDS extends DataSource {
@@ -10487,6 +10587,7 @@ class DvDataWidgetDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/datepicker-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvDatepickerWrapperDS extends DataSource {
@@ -10581,6 +10682,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/graph.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvGraphDS extends DataSource {
@@ -10667,6 +10769,7 @@ class DvGraphDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/inner-title.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvInnerTitleDS extends DataSource {
@@ -10693,6 +10796,7 @@ class DvInnerTitleDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/widget.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvWidgetDS extends DataSource {
@@ -10708,10 +10812,12 @@ class DvWidgetDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS$2 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     DvDataWidgetDS: DvDataWidgetDS,
     DvDatepickerWrapperDS: DvDatepickerWrapperDS,
     DvGraphDS: DvGraphDS,
@@ -10721,6 +10827,7 @@ var DS$2 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/event-handlers/data-widget-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvDataWidgetEH extends EventHandler {
@@ -10733,6 +10840,7 @@ class DvDataWidgetEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/event-handlers/datepicker-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvDatepickerWrapperEH extends EventHandler {
@@ -10768,16 +10876,19 @@ class DvDatepickerWrapperEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH$2 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     DvDataWidgetEH: DvDataWidgetEH,
     DvDatepickerWrapperEH: DvDatepickerWrapperEH
 });
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/example-layout/example-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -10804,6 +10915,7 @@ const DvExampleLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/example-layout/example-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvExampleLayoutComponent extends AbstractLayout {
@@ -10834,6 +10946,7 @@ DvExampleLayoutComponent.ctorParameters = () => [];
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/n7-boilerplate-data-viz.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -10859,6 +10972,7 @@ N7BoilerplateDataVizModule.decorators = [
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/n7-boilerplate-lib.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class N7BoilerplateLibModule {
@@ -10882,41 +10996,49 @@ N7BoilerplateLibModule.decorators = [
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: public-api.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: n7-frontend-boilerplate.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
