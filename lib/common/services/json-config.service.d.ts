@@ -4,6 +4,6 @@ export declare class JsonConfigService {
     private http;
     private config;
     constructor(http: HttpClient, config: ConfigurationService);
-    load(path: any): Promise<any>;
+    load(path: any, staticConfig?: any): Promise<any>;
     private _handleResponse;
 }

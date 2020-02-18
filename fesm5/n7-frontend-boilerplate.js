@@ -1,4 +1,4 @@
-import { Injectable, Inject, ɵɵdefineInjectable, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef } from '@angular/core';
+import { Injectable, ɵɵdefineInjectable, Inject, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK } from '@n7-frontend/components';
@@ -17,9 +17,8 @@ import slug from 'slug';
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var ConfigurationService = /** @class */ (function () {
-    function ConfigurationService(config) {
+    function ConfigurationService() {
         var _this = this;
-        this.config = config;
         this.defaults = {};
         this.get = (/**
          * @param {?} key
@@ -32,26 +31,13 @@ var ConfigurationService = /** @class */ (function () {
          * @return {?}
          */
         function (key, value) { return _this.defaults[key] = value; });
-        if (this.config.global) {
-            Object.keys(this.config.global).forEach((/**
-             * @param {?} key
-             * @return {?}
-             */
-            function (key) {
-                _this.set(key, _this.config.global[key]);
-            }));
-        }
     }
     ConfigurationService.decorators = [
         { type: Injectable, args: [{
                     providedIn: 'root'
                 },] }
     ];
-    /** @nocollapse */
-    ConfigurationService.ctorParameters = function () { return [
-        { type: undefined, decorators: [{ type: Inject, args: ['config',] }] }
-    ]; };
-    /** @nocollapse */ ConfigurationService.ngInjectableDef = ɵɵdefineInjectable({ factory: function ConfigurationService_Factory() { return new ConfigurationService(ɵɵinject("config")); }, token: ConfigurationService, providedIn: "root" });
+    /** @nocollapse */ ConfigurationService.ngInjectableDef = ɵɵdefineInjectable({ factory: function ConfigurationService_Factory() { return new ConfigurationService(); }, token: ConfigurationService, providedIn: "root" });
     return ConfigurationService;
 }());
 if (false) {
@@ -64,11 +50,6 @@ if (false) {
     ConfigurationService.prototype.get;
     /** @type {?} */
     ConfigurationService.prototype.set;
-    /**
-     * @type {?}
-     * @private
-     */
-    ConfigurationService.prototype.config;
 }
 
 /**
@@ -916,13 +897,15 @@ var JsonConfigService = /** @class */ (function () {
     }
     /**
      * @param {?} path
+     * @param {?=} staticConfig
      * @return {?}
      */
     JsonConfigService.prototype.load = /**
      * @param {?} path
+     * @param {?=} staticConfig
      * @return {?}
      */
-    function (path) {
+    function (path, staticConfig) {
         var _this = this;
         return this.http.get(path).pipe(catchError((/**
          * @param {?} error
@@ -932,20 +915,31 @@ var JsonConfigService = /** @class */ (function () {
          * @param {?} response
          * @return {?}
          */
-        function (response) { return _this._handleResponse(response); }))).toPromise();
+        function (response) { return _this._handleResponse(response, staticConfig); }))).toPromise();
     };
     /**
      * @private
      * @param {?} response
+     * @param {?} staticConfig
      * @return {?}
      */
     JsonConfigService.prototype._handleResponse = /**
      * @private
      * @param {?} response
+     * @param {?} staticConfig
      * @return {?}
      */
-    function (response) {
+    function (response, staticConfig) {
         var _this = this;
+        // set config defaults
+        if (staticConfig) {
+            Object.keys(staticConfig).forEach((/**
+             * @param {?} key
+             * @return {?}
+             */
+            function (key) { return _this.config.set(key, staticConfig[key]); }));
+        }
+        // set loaded json config
         if (response) {
             Object.keys(response).forEach((/**
              * @param {?} key
@@ -4370,7 +4364,6 @@ var N7BoilerplateCommonModule = /** @class */ (function () {
                 ConfigurationService,
                 LayoutsConfigurationService,
                 CommunicationService,
-                ApolloProvider,
                 { provide: 'config', useValue: config }
             ]
         };

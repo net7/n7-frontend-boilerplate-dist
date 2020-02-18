@@ -1,4 +1,4 @@
-import { Injectable, Inject, ɵɵdefineInjectable, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef } from '@angular/core';
+import { Injectable, ɵɵdefineInjectable, Inject, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK } from '@n7-frontend/components';
@@ -16,11 +16,7 @@ import slug from 'slug';
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class ConfigurationService {
-    /**
-     * @param {?} config
-     */
-    constructor(config) {
-        this.config = config;
+    constructor() {
         this.defaults = {};
         this.get = (/**
          * @param {?} key
@@ -33,15 +29,6 @@ class ConfigurationService {
          * @return {?}
          */
         (key, value) => this.defaults[key] = value);
-        if (this.config.global) {
-            Object.keys(this.config.global).forEach((/**
-             * @param {?} key
-             * @return {?}
-             */
-            key => {
-                this.set(key, this.config.global[key]);
-            }));
-        }
     }
 }
 ConfigurationService.decorators = [
@@ -49,11 +36,7 @@ ConfigurationService.decorators = [
                 providedIn: 'root'
             },] }
 ];
-/** @nocollapse */
-ConfigurationService.ctorParameters = () => [
-    { type: undefined, decorators: [{ type: Inject, args: ['config',] }] }
-];
-/** @nocollapse */ ConfigurationService.ngInjectableDef = ɵɵdefineInjectable({ factory: function ConfigurationService_Factory() { return new ConfigurationService(ɵɵinject("config")); }, token: ConfigurationService, providedIn: "root" });
+/** @nocollapse */ ConfigurationService.ngInjectableDef = ɵɵdefineInjectable({ factory: function ConfigurationService_Factory() { return new ConfigurationService(); }, token: ConfigurationService, providedIn: "root" });
 if (false) {
     /**
      * @type {?}
@@ -64,11 +47,6 @@ if (false) {
     ConfigurationService.prototype.get;
     /** @type {?} */
     ConfigurationService.prototype.set;
-    /**
-     * @type {?}
-     * @private
-     */
-    ConfigurationService.prototype.config;
 }
 
 /**
@@ -1329,9 +1307,10 @@ class JsonConfigService {
     }
     /**
      * @param {?} path
+     * @param {?=} staticConfig
      * @return {?}
      */
-    load(path) {
+    load(path, staticConfig) {
         return this.http.get(path).pipe(catchError((/**
          * @param {?} error
          * @return {?}
@@ -1340,14 +1319,24 @@ class JsonConfigService {
          * @param {?} response
          * @return {?}
          */
-        response => this._handleResponse(response)))).toPromise();
+        response => this._handleResponse(response, staticConfig)))).toPromise();
     }
     /**
      * @private
      * @param {?} response
+     * @param {?} staticConfig
      * @return {?}
      */
-    _handleResponse(response) {
+    _handleResponse(response, staticConfig) {
+        // set config defaults
+        if (staticConfig) {
+            Object.keys(staticConfig).forEach((/**
+             * @param {?} key
+             * @return {?}
+             */
+            key => this.config.set(key, staticConfig[key])));
+        }
+        // set loaded json config
         if (response) {
             Object.keys(response).forEach((/**
              * @param {?} key
@@ -4231,7 +4220,6 @@ class N7BoilerplateCommonModule {
                 ConfigurationService,
                 LayoutsConfigurationService,
                 CommunicationService,
-                ApolloProvider,
                 { provide: 'config', useValue: config }
             ]
         };
