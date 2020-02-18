@@ -4121,24 +4121,26 @@ Page404LayoutComponent.ctorParameters = () => [
  */
 class FacetsWrapperComponent {
     /**
-     * @param {?} type
-     * @param {?} payload
+     * @param {?} eventType
+     * @param {?} eventPayload
      * @return {?}
      */
-    headerEmit(type, payload) {
-        if (!this.emit)
+    headerEmit(eventType, eventPayload) {
+        if (!this.emit) {
             return;
-        this.emit('facetheader', { type, payload });
+        }
+        this.emit('facetheader', { eventType, eventPayload });
     }
     /**
-     * @param {?} type
-     * @param {?} payload
+     * @param {?} eventType
+     * @param {?} eventPayload
      * @return {?}
      */
-    facetEmit(type, payload) {
-        if (!this.emit)
+    facetEmit(eventType, eventPayload) {
+        if (!this.emit) {
             return;
-        this.emit('facet', { type, payload });
+        }
+        this.emit('facet', { eventType, eventPayload });
     }
 }
 FacetsWrapperComponent.decorators = [

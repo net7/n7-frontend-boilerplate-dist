@@ -4242,34 +4242,36 @@ var FacetsWrapperComponent = /** @class */ (function () {
     function FacetsWrapperComponent() {
     }
     /**
-     * @param {?} type
-     * @param {?} payload
+     * @param {?} eventType
+     * @param {?} eventPayload
      * @return {?}
      */
     FacetsWrapperComponent.prototype.headerEmit = /**
-     * @param {?} type
-     * @param {?} payload
+     * @param {?} eventType
+     * @param {?} eventPayload
      * @return {?}
      */
-    function (type, payload) {
-        if (!this.emit)
+    function (eventType, eventPayload) {
+        if (!this.emit) {
             return;
-        this.emit('facetheader', { type: type, payload: payload });
+        }
+        this.emit('facetheader', { eventType: eventType, eventPayload: eventPayload });
     };
     /**
-     * @param {?} type
-     * @param {?} payload
+     * @param {?} eventType
+     * @param {?} eventPayload
      * @return {?}
      */
     FacetsWrapperComponent.prototype.facetEmit = /**
-     * @param {?} type
-     * @param {?} payload
+     * @param {?} eventType
+     * @param {?} eventPayload
      * @return {?}
      */
-    function (type, payload) {
-        if (!this.emit)
+    function (eventType, eventPayload) {
+        if (!this.emit) {
             return;
-        this.emit('facet', { type: type, payload: payload });
+        }
+        this.emit('facet', { eventType: eventType, eventPayload: eventPayload });
     };
     FacetsWrapperComponent.decorators = [
         { type: Component, args: [{

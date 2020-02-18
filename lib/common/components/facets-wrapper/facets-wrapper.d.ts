@@ -1,6 +1,6 @@
 export declare class FacetsWrapperComponent {
     data: any;
     emit: any;
-    headerEmit(type: any, payload: any): void;
-    facetEmit(type: any, payload: any): void;
+    headerEmit(eventType: any, eventPayload: any): void;
+    facetEmit(eventType: any, eventPayload: any): void;
 }
