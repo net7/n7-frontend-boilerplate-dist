@@ -150,6 +150,7 @@
         padding-left: $space*2;
         box-sizing: border-box;
         background-color: $color-background-medium;
+        box-shadow: inset 0 3px 20px rgba(0,0,0,.03);
 
         .n7-breadcrumbs__label {
             &:hover {
@@ -160,6 +161,15 @@
         .n7-breadcrumbs__item:last-child a {
             cursor: pointer;
         }
+    }
+
+    /*  Fake breadcrumbs */
+    .aw-scheda__fake-breadcrumbs {
+        width: 100%;
+        height: $sidebar-header-height;
+        box-sizing: border-box;
+        background-color: $color-background-medium;
+        box-shadow: inset 0 3px 20px rgba(0,0,0,.03);
     }
 
     /* Inner title */
@@ -190,15 +200,6 @@
     .aw-scheda__metadata {
         .n7-metadata-viewer {
             padding: 0 $aw-scheda-content-padding $aw-scheda-content-padding $aw-scheda-content-padding;
-            columns: 2;
-        }
-
-        .n7-metadata-viewer__group-wrapper {
-            break-inside: avoid;
-        }
-
-        .n7-metadata-viewer__group-title {
-            font-size: $font-size-l;
         }
     }
 
@@ -269,14 +270,8 @@
         .aw-scheda__description {
             columns: 1;
         }
-
-        /* Metadata */
-        .aw-scheda__metadata {
-            .n7-metadata-viewer {
-                columns: 1;
-            }
-        }
     }
+    
 }
 
 @media all and (max-width: $breakpoint-ipad-portrait) {

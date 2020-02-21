@@ -16,6 +16,18 @@ export declare class AwHomeAutocompleteDS extends DataSource {
                     href: any;
                     queryParams: {
                         query: any;
+                        'query-all'?: undefined;
+                    };
+                };
+            };
+        } | {
+            showMore: {
+                text: string;
+                anchor: {
+                    href: any;
+                    queryParams: {
+                        query: any;
+                        'query-all': number;
                     };
                 };
             };
