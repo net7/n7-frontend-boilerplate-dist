@@ -10,6 +10,7 @@ import { LayoutBuilder, LayoutDataSource, EventHandler, DataSource } from '@n7-f
 import tippy, { hideAll } from 'tippy.js';
 import { get, cloneDeep } from 'lodash';
 import slug from 'slug';
+import helpers$1 from 'n7-boilerplate-lib/lib/common/helpers';
 
 /**
  * @fileoverview added by tsickle
@@ -1645,7 +1646,7 @@ var helpers = {
      * @return {?}
      */
     prettifySnakeCase(key, label) {
-        if (label) {
+        if (typeof label === 'string') {
             return label;
         }
         return (key || '').split('_').map((/**
@@ -1687,7 +1688,13 @@ var helpers = {
      * @return {?}
      */
     escapeDoubleQuotes(str) {
-        return str.replace(/\\([\s\S])|(")/g, "\\$1$2"); // thanks @slevithan!
+        if (str.search(/\\?(")([\w\s]+)\\?(")/g) >= 0) {
+            //match piece of string between double quotes
+            return str.replace(/\\?(")([\w\s]+)\\?(")/g, "\\$1$2\\$3"); // thanks @slevithan!
+        }
+        else {
+            return str.replace(/\\([\s\S])|(")/g, "\\\\\\$1$2"); // thanks @slevithan!
+        }
     },
     /**
      * @param {?} str
@@ -1695,7 +1702,7 @@ var helpers = {
      */
     unescapeDoubleQuotes(str) {
         if (str && str != "")
-            str = str.replace(/\\(")/g, "$1"); // thanks @slevithan!
+            str = str.replace(/\\*(")/g, "$1"); // thanks @slevithan!
         return str;
     }
 };
@@ -4952,9 +4959,12 @@ class AwLinkedObjectsDS extends DataSource {
                 /** @type {?} */
                 let classes = ['entita', 'search', 'oggetti-collegati'].includes(context) ? 'is-fullwidth' : '';
                 classes += itemData.typeOfEntity ? ' is-' + config.get('config-keys')[itemData.typeOfEntity]['class-name'] : ' is-oggetto-culturale';
+                //consider the lenght of <em> tags to exclude from count
                 /** @type {?} */
-                const itemTitle = +paths.title.maxLength && get(el, paths.title, itemData.label).length > +paths.title.maxLength
-                    ? get(el, paths.title, itemData.label).slice(0, +paths.title.maxLength) + '…'
+                const highlights = get(el, paths.title, itemData.label).match(/<em>/g) ? get(el, paths.title, itemData.label).match(/<em>/g).length * 9 : 0;
+                /** @type {?} */
+                const itemTitle = +paths.title.maxLength && get(el, paths.title, itemData.label).length > +paths.title.maxLength + highlights
+                    ? get(el, paths.title, itemData.label).slice(0, +paths.title.maxLength + highlights) + '…'
                     : get(el, paths.title, itemData.label);
                 /** @type {?} */
                 const itemId = get(el, paths.payload, itemData.id);
@@ -7786,9 +7796,10 @@ class AwHomeLayoutDS extends LayoutDataSource {
              * @return {?}
              */
             el => el.entity.id === b));
-            /** @type {?} */
-            const bubbleConfig = this.configuration.get('config-keys')[theBubble.entity.typeOfEntity];
             if (theBubble) { // if a bubble was found
+                // if a bubble was found
+                /** @type {?} */
+                const bubbleConfig = this.configuration.get('config-keys')[theBubble.entity.typeOfEntity];
                 tagsData.push({
                     label: theBubble.entity.label,
                     icon: 'n7-icon-close',
@@ -7836,6 +7847,7 @@ class AwHomeLayoutDS extends LayoutDataSource {
      */
     onHeroChange(value) {
         if (value) {
+            value = helpers$1.escapeDoubleQuotes(value);
             this.autocompleteChanged$.next(value);
             this.homeAutocompleteIsLoading = true;
             this.homeAutocompleteQuery = value;
@@ -9055,7 +9067,7 @@ class AwSchedaLayoutComponent extends AbstractLayout {
 AwSchedaLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-scheda-layout',
-                template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n        [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\" [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n            <div class=\"aw-scheda__tree-content-loading\" *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\" [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n            </div>\n            <div class=\"aw-scheda__tree-content\" [ngStyle]=\"{ \n                    'max-height': lb.dataSource.treeMaxHeight, \n                    'overflow': 'auto' \n                }\">\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\" [emit]=\"lb.widgets['aw-tree'].emit\"\n                    *ngIf=\"!lb.dataSource.sidebarCollapsed\"></n7-tree>\n            </div>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper-loading\" *ngIf=\"lb.dataSource.contentIsLoading\">\n            <!--\n                <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'content-placeholder-title'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }]\n            }\"></n7-content-placeholder>\n            -->\n        </div>\n        <div class=\"aw-scheda__scheda-wrapper\" *ngIf=\"!lb.dataSource.contentIsLoading\">\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\" [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\" class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n            \n            <div *ngIf=\"!lb.dataSource.currentId\" class=\"aw-scheda__intro-text\" [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n            \n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <n7-image-viewer *ngIf=\"lb.dataSource.hasImage\" [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\" *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\" *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section class=\"aw-scheda__bubble-chart\" *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\n                <div *ngIf=\"lb.dataSource.hasBubbles\" class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <aw-bubble-chart-wrapper>\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                    </aw-chart-tippy>\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </section>\n\n            <section *ngIf=\"lb.dataSource.hasSimilarItems\" id=\"related-item-container\" class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.similarItemsSectionTitle}}</div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <!--<ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">-->\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n            </section>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n        [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\" [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n            <div class=\"aw-scheda__tree-content-loading\" *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\" [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n            </div>\n            <div class=\"aw-scheda__tree-content\" [ngStyle]=\"{ \n                    'max-height': lb.dataSource.treeMaxHeight, \n                    'overflow': 'auto' \n                }\">\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\" [emit]=\"lb.widgets['aw-tree'].emit\"\n                    *ngIf=\"!lb.dataSource.sidebarCollapsed\"></n7-tree>\n            </div>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper-loading\" *ngIf=\"lb.dataSource.contentIsLoading\">\n            <!--\n                <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'content-placeholder-title'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }]\n            }\"></n7-content-placeholder>\n            -->\n        </div>\n        <div class=\"aw-scheda__scheda-wrapper\" *ngIf=\"!lb.dataSource.contentIsLoading\">\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\" class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n\n            <div *ngIf=\"!lb.dataSource.currentId\" class=\"aw-scheda__intro-text\" [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <n7-image-viewer *ngIf=\"lb.dataSource.hasImage\" [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\" *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\" *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section class=\"aw-scheda__bubble-chart\" *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\n                <div *ngIf=\"lb.dataSource.hasBubbles\" class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <aw-bubble-chart-wrapper>\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                    </aw-chart-tippy>\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </section>\n\n            <section *ngIf=\"lb.dataSource.hasSimilarItems && lb.dataSource.hasBubbles\" id=\"related-item-container\" class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.similarItemsSectionTitle}}</div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <!--<ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">-->\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n            </section>\n        </div>\n    </div>\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -9258,7 +9270,7 @@ var facetsConfig = {
         order: {
             type: 'text',
             // score | text | date
-            key: 'label',
+            key: 'label_sort',
             // docPath, elastic key, ecc
             direction: 'ASC' // ASC | DESC
         },
@@ -9291,17 +9303,17 @@ class AwSearchLayoutDS extends LayoutDataSource {
         this.sidebarIsSticky = false;
         this.isFirstLoading = true;
         this.resultsLoading = false;
-        this.orderBy = 'label';
+        this.orderBy = 'label_sort';
         this.orderDirection = 'ASC';
         this.orderByLabel = 'Ordina per';
         this.orderByOptions = [
             {
-                value: 'label_ASC',
+                value: 'label_sort_ASC',
                 label: 'Ordine alfabetico (A→Z)',
                 selected: true
             },
             {
-                value: 'label_DESC',
+                value: 'label_sort_DESC',
                 label: 'Ordine alfabetico (Z→A)',
                 selected: false
             }
@@ -9385,7 +9397,10 @@ class AwSearchLayoutDS extends LayoutDataSource {
      * @return {?}
      */
     onOrderByChange(payload) {
-        const [orderBy, direction] = payload.split('_');
+        /** @type {?} */
+        const orderBy = payload.substring(0, payload.lastIndexOf("_"));
+        /** @type {?} */
+        const direction = payload.substring(payload.lastIndexOf("_") + 1);
         // set selected
         this.orderByOptions.forEach((/**
          * @param {?} option
@@ -10179,6 +10194,14 @@ class SmartBreadcrumbsComponent {
                 appendTo: document.body // silence tippy interactive warning
             });
         });
+        this.getSidePadding = (/**
+         * @param {?} node
+         * @return {?}
+         */
+        node => {
+            return ((+window.getComputedStyle(node, null).getPropertyValue('padding-left').match(/\d+/)[0])
+                + (+window.getComputedStyle(node, null).getPropertyValue('padding-right').match(/\d+/)[0]));
+        });
     }
     /**
      * @return {?}
@@ -10186,11 +10209,12 @@ class SmartBreadcrumbsComponent {
     ngAfterViewInit() {
         if (this.bcdiv && this.bcol) {
             /** @type {?} */
-            var parentWidth = this.bcdiv.nativeElement.clientWidth;
+            var parentWidth = this.bcdiv.nativeElement.clientWidth - this.getSidePadding(this.bcdiv.nativeElement);
             /** @type {?} */
             var childWidth = this.bcol.nativeElement.clientWidth;
             /** @type {?} */
             var liArray = this.bcol.nativeElement.children;
+            console.log({ parentWidth, childWidth });
             if (parentWidth === childWidth) { // collapse condition
                 // collapse condition
                 /** @type {?} */
@@ -10204,10 +10228,12 @@ class SmartBreadcrumbsComponent {
                     tippyData.className = 'n7-smart-breadcrumbs__tippy-content';
                     tippyData.appendChild(liArray[i].cloneNode(true)); // add <li> to tippy data (<ol>)
                     liArray[i].children[0].innerText = '…'; // convert to ellipsis
+                    liArray[i].className = 'n7-breadcrumbs__item-ellipsis'; // set class to list item
                     this.tippyBuilder(liArray[i], tippyData); // append tooltip to ellipsis
+                    // this.data.items[i].classes = 'n7-breadcrumbs__label-ellipsis'   // set class to ellipsis anchor
                     i++;
                     // update widths
-                    parentWidth = this.bcdiv.nativeElement.clientWidth;
+                    parentWidth = this.bcdiv.nativeElement.clientWidth - this.getSidePadding(this.bcdiv.nativeElement);
                     childWidth = this.bcol.nativeElement.clientWidth;
                 }
             }
@@ -10226,7 +10252,7 @@ class SmartBreadcrumbsComponent {
 SmartBreadcrumbsComponent.decorators = [
     { type: Component, args: [{
                 selector: 'n7-smart-breadcrumbs',
-                template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\n    <nav class=\"n7-breadcrumbs__nav\">\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\n                <n7-anchor-wrapper [classes]=\"'n7-breadcrumbs__label'\"\n                [data]=\"item.anchor\"\n                (clicked)=\"onClick($event)\">\n                    {{ item.label }}\n                </n7-anchor-wrapper>\n            </li>\n        </ol>\n    </nav>\n</div>"
+                template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\n    <nav class=\"n7-breadcrumbs__nav\">\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\n                <n7-anchor-wrapper [classes]=\"item.classes\"\n                [data]=\"item.anchor\"\n                (clicked)=\"onClick($event)\">\n                    {{ item.label }}\n                </n7-anchor-wrapper>\n            </li>\n        </ol>\n    </nav>\n</div>"
             }] }
 ];
 SmartBreadcrumbsComponent.propDecorators = {
@@ -10246,6 +10272,8 @@ if (false) {
     SmartBreadcrumbsComponent.prototype.bcdiv;
     /** @type {?} */
     SmartBreadcrumbsComponent.prototype.tippyBuilder;
+    /** @type {?} */
+    SmartBreadcrumbsComponent.prototype.getSidePadding;
 }
 
 /**

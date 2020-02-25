@@ -51,4 +51,5 @@ export declare class SmartBreadcrumbsComponent implements AfterViewInit {
     ngAfterViewInit(): void;
     onClick(payload: any): void;
     tippyBuilder: (node: any, content: any) => void;
+    getSidePadding: (node: any) => number;
 }
