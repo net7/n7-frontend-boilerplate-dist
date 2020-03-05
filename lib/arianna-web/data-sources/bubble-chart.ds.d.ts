@@ -14,7 +14,7 @@ export declare class AwBubbleChartDS extends DataSource {
         smallView: {
             data: any;
             containerId: string;
-            setDraw: (draw: any) => any;
+            setDraw: (draw: any) => void;
             colorMatch: {
                 domain: any[];
                 range: any[];
@@ -28,7 +28,7 @@ export declare class AwBubbleChartDS extends DataSource {
             shuffle: any;
         };
         containerId: string;
-        setDraw: (draw: any) => any;
+        setDraw: (draw: any) => void;
         colorMatch: {
             domain: any[];
             range: any[];

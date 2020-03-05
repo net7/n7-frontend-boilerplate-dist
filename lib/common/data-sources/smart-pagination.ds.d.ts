@@ -14,6 +14,10 @@ export declare class SmartPaginationDS extends DataSource {
                 href: any;
                 queryParams: any;
                 payload?: undefined;
+            } | {
+                payload?: undefined;
+                href?: undefined;
+                queryParams?: undefined;
             };
         };
         prev: {
@@ -29,6 +33,10 @@ export declare class SmartPaginationDS extends DataSource {
                 href: any;
                 queryParams: any;
                 payload?: undefined;
+            } | {
+                payload?: undefined;
+                href?: undefined;
+                queryParams?: undefined;
             };
         };
         next: {
@@ -44,6 +52,10 @@ export declare class SmartPaginationDS extends DataSource {
                 href: any;
                 queryParams: any;
                 payload?: undefined;
+            } | {
+                payload?: undefined;
+                href?: undefined;
+                queryParams?: undefined;
             };
         };
         last: {
@@ -59,6 +71,10 @@ export declare class SmartPaginationDS extends DataSource {
                 href: any;
                 queryParams: any;
                 payload?: undefined;
+            } | {
+                payload?: undefined;
+                href?: undefined;
+                queryParams?: undefined;
             };
         };
         links: any[];

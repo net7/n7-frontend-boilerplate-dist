@@ -6,13 +6,16 @@ import { ReplaySubject, empty, of, Subject, forkJoin, fromEvent, merge } from 'r
 import { map, catchError, tap, takeUntil, filter, debounceTime } from 'rxjs/operators';
 import { NavigationStart, Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-import { LayoutBuilder, LayoutDataSource, EventHandler, DataSource } from '@n7-frontend/core';
+import { LayoutBuilder, EventHandler, DataSource } from '@n7-frontend/core';
+import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
 import tippy, { hideAll } from 'tippy.js';
 import { get, cloneDeep } from 'lodash';
 import slug from 'slug';
+import { DataSource as DataSource$1 } from '@n7-frontend/core/dist/data-source';
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/configuration.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class ConfigurationService {
@@ -28,12 +31,12 @@ class ConfigurationService {
          * @param {?} value
          * @return {?}
          */
-        (key, value) => this.defaults[key] = value);
+        (key, value) => { this.defaults[key] = value; });
     }
 }
 ConfigurationService.decorators = [
     { type: Injectable, args: [{
-                providedIn: 'root'
+                providedIn: 'root',
             },] }
 ];
 /** @nocollapse */ ConfigurationService.ngInjectableDef = ɵɵdefineInjectable({ factory: function ConfigurationService_Factory() { return new ConfigurationService(); }, token: ConfigurationService, providedIn: "root" });
@@ -51,6 +54,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/layouts-configuration.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class LayoutsConfigurationService {
@@ -70,13 +74,13 @@ class LayoutsConfigurationService {
          * @param {?} value
          * @return {?}
          */
-        (key, value) => this.defaults[key] = value);
+        (key, value) => { this.defaults[key] = value; });
         if (this.config.layouts) {
             Object.keys(this.config.layouts).forEach((/**
              * @param {?} key
              * @return {?}
              */
-            key => {
+            (key) => {
                 this.set(key, this.config.layouts[key]);
             }));
         }
@@ -84,7 +88,7 @@ class LayoutsConfigurationService {
 }
 LayoutsConfigurationService.decorators = [
     { type: Injectable, args: [{
-                providedIn: 'root'
+                providedIn: 'root',
             },] }
 ];
 /** @nocollapse */
@@ -111,6 +115,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/main-state.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainStateService {
@@ -198,7 +203,7 @@ class MainStateService {
 }
 MainStateService.decorators = [
     { type: Injectable, args: [{
-                providedIn: 'root'
+                providedIn: 'root',
             },] }
 ];
 /** @nocollapse */ MainStateService.ngInjectableDef = ɵɵdefineInjectable({ factory: function MainStateService_Factory() { return new MainStateService(); }, token: MainStateService, providedIn: "root" });
@@ -229,11 +234,12 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/communication-providers/apollo/config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
 const ApolloProviderConfig = {
-    'getLastPosts': {
+    getLastPosts: {
         queryName: 'getLastPosts',
         queryBody: `
       {
@@ -242,9 +248,9 @@ const ApolloProviderConfig = {
           title
         }
       }
-    `
+    `,
     },
-    'getTree': {
+    getTree: {
         queryName: 'getTreeOfItems',
         queryBody: `
     {
@@ -301,9 +307,9 @@ const ApolloProviderConfig = {
         }
       }
     }
-    `
+    `,
     },
-    'globalFilter': {
+    globalFilter: {
         queryName: 'globalFilter',
         queryBody: `{
       globalFilter(__PARAMS__){
@@ -345,9 +351,9 @@ const ApolloProviderConfig = {
           }
         }
       }
-      }`
+      }`,
     },
-    'getEntityDetails': {
+    getEntityDetails: {
         queryName: 'getEntity',
         queryBody: `{
       getEntity(__PARAMS__){
@@ -412,9 +418,9 @@ const ApolloProviderConfig = {
         }
       }
     }
-    `
+    `,
     },
-    'getItem': {
+    getItem: {
         queryName: 'getItem',
         queryBody: `{
       getItem(__PARAMS__) {
@@ -466,9 +472,9 @@ const ApolloProviderConfig = {
           link
         }
       }
-    }`
+    }`,
     },
-    'getNode': {
+    getNode: {
         queryName: 'getNode',
         queryBody: `{
       getNode(__PARAMS__) {
@@ -561,9 +567,9 @@ const ApolloProviderConfig = {
           }
         }
       }
-    }`
+    }`,
     },
-    'autoComplete': {
+    autoComplete: {
         queryName: 'autoComplete',
         queryBody: `{
       autoComplete(__PARAMS__){
@@ -616,9 +622,9 @@ const ApolloProviderConfig = {
           }
         }
       }
-    }`
+    }`,
     },
-    'search': {
+    search: {
         queryName: 'search',
         queryBody: `{
       search(__PARAMS__){
@@ -747,9 +753,9 @@ const ApolloProviderConfig = {
           }
         }
       }
-    }`
+    }`,
     },
-    'getMissingBubble': {
+    getMissingBubble: {
         queryName: 'getEntity',
         queryBody: `{
       getEntity(__PARAMS__){
@@ -757,12 +763,13 @@ const ApolloProviderConfig = {
         id
         typeOfEntity
       }
-    }`
-    }
+    }`,
+    },
 };
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/communication-providers/apollo/apollo.provider.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class ApolloProvider {
@@ -833,7 +840,7 @@ class ApolloProvider {
          * @param {?} key
          * @return {?}
          */
-        key => {
+        (key) => {
             if (Array.isArray(params[key])) {
                 /** @type {?} */
                 const arrStr = [];
@@ -841,19 +848,17 @@ class ApolloProvider {
                  * @param {?} val
                  * @return {?}
                  */
-                val => {
+                (val) => {
                     if (typeof val === 'object') {
                         /** @type {?} */
                         const subParamsStr = this.makeParamsStr(val);
                         arrStr.push(`{ ${subParamsStr} }`);
                     }
+                    else if (typeof val === 'number' || typeof val === 'boolean' || val === null) {
+                        arrStr.push(`${val}`);
+                    }
                     else {
-                        if (typeof val === 'number' || typeof val === 'boolean' || val === null) {
-                            arrStr.push(`${val}`);
-                        }
-                        else {
-                            arrStr.push(`"${val}"`);
-                        }
+                        arrStr.push(`"${val}"`);
                     }
                 }));
                 paramsStr.push(`${key}: [${arrStr.join(',')}]`);
@@ -866,13 +871,11 @@ class ApolloProvider {
             else if (typeof params[key] === 'string' && key.indexOf('$') === 0) {
                 paramsStr.push(`${key.replace('$', '')}: ${params[key]}`);
             }
+            else if (typeof params[key] === 'number' || typeof params[key] === 'boolean' || params[key] === null) {
+                paramsStr.push(`${key}: ${params[key]}`);
+            }
             else {
-                if (typeof params[key] === 'number' || typeof params[key] === 'boolean' || params[key] === null) {
-                    paramsStr.push(`${key}: ${params[key]}`);
-                }
-                else {
-                    paramsStr.push(`${key}: "${params[key]}"`);
-                }
+                paramsStr.push(`${key}: "${params[key]}"`);
             }
         }));
         return paramsStr.join(' ');
@@ -880,7 +883,7 @@ class ApolloProvider {
 }
 ApolloProvider.decorators = [
     { type: Injectable, args: [{
-                providedIn: 'root'
+                providedIn: 'root',
             },] }
 ];
 /** @nocollapse */
@@ -909,15 +912,17 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/communication-providers/rest/config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
 const RestProviderConfig = {
-    'getLastPosts': 'posts',
+    getLastPosts: 'posts',
 };
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/communication-providers/rest/rest.provider.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class RestProvider {
@@ -941,7 +946,8 @@ class RestProvider {
      * @return {?}
      */
     request$(requestId, options = {}) {
-        let { params, method, httpOptions, urlParams = '' } = options;
+        const { params, httpOptions, urlParams = '', } = options;
+        let { method } = options;
         /** @type {?} */
         let point = RestProviderConfig[requestId];
         // default method
@@ -958,17 +964,15 @@ class RestProvider {
         if (method === 'POST' || method === 'PUT') {
             return this.http[method.toLowerCase()](this.providerConfig.baseUrl + point, params, httpOptions);
         }
-        else if (method === 'GET' || method === 'DELETE') {
+        if (method === 'GET' || method === 'DELETE') {
             return this.http[method.toLowerCase()](this.providerConfig.baseUrl + point + urlParams, httpOptions);
         }
-        else {
-            throw Error(`Rest method ${method} not supported`);
-        }
+        throw Error(`Rest method ${method} not supported`);
     }
 }
 RestProvider.decorators = [
     { type: Injectable, args: [{
-                providedIn: 'root'
+                providedIn: 'root',
             },] }
 ];
 /** @nocollapse */
@@ -997,6 +1001,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/communication.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class CommunicationService {
@@ -1024,11 +1029,12 @@ class CommunicationService {
      * @return {?}
      */
     request$(requestId, options = {}, provider) {
-        provider = provider || this.defaultProvider;
-        if (!this[provider])
-            throw Error(`There is no ${provider} provider`);
+        /** @type {?} */
+        const activeProvider = provider || this.defaultProvider;
+        if (!this[activeProvider])
+            throw Error(`There is no ${activeProvider} provider`);
         const { onError } = options;
-        return this[provider].request$(requestId, options)
+        return this[activeProvider].request$(requestId, options)
             .pipe(catchError((/**
          * @param {?} error
          * @return {?}
@@ -1052,7 +1058,7 @@ class CommunicationService {
 }
 CommunicationService.decorators = [
     { type: Injectable, args: [{
-                providedIn: 'root'
+                providedIn: 'root',
             },] }
 ];
 /** @nocollapse */
@@ -1092,6 +1098,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/abstract-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -1110,12 +1117,6 @@ class AbstractLayout {
      * @protected
      * @return {?}
      */
-    initPayload() { }
-    ;
-    /**
-     * @protected
-     * @return {?}
-     */
     onInit() {
         // on ready
         this.lb.ready$.subscribe((/**
@@ -1124,12 +1125,16 @@ class AbstractLayout {
         () => {
             this.lb.eventHandler.emitInner('init', this.initPayload());
         }));
+        /** @type {?} */
+        const LayoutDS = this.config.layoutDS;
+        /** @type {?} */
+        const LayoutEH = this.config.layoutEH;
         this.lb.init({
             widgetsConfig: this.widgets,
             widgetsDataSources: this.config.widgetsDataSources,
             widgetsEventHandlers: this.config.widgetsEventHandlers,
-            dataSource: new this.config.layoutDS(),
-            eventHandler: new this.config.layoutEH(),
+            dataSource: new LayoutDS(),
+            eventHandler: new LayoutEH(),
         });
     }
     /**
@@ -1153,11 +1158,17 @@ if (false) {
     AbstractLayout.prototype.widgets;
     /** @type {?} */
     AbstractLayout.prototype.lb;
-    /* Skipping unhandled member: ;*/
+    /**
+     * @abstract
+     * @protected
+     * @return {?}
+     */
+    AbstractLayout.prototype.initPayload = function () { };
 }
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/main-layout/main-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainLayoutDS extends LayoutDataSource {
@@ -1165,7 +1176,7 @@ class MainLayoutDS extends LayoutDataSource {
      * @param {?} __0
      * @return {?}
      */
-    onInit({ configuration, mainState, router, options, titleService, route }) {
+    onInit({ configuration, mainState, router, options, titleService, route, }) {
         this.configuration = configuration;
         this.mainState = mainState;
         this.router = router;
@@ -1174,32 +1185,32 @@ class MainLayoutDS extends LayoutDataSource {
         this.options = options;
         // update header
         if (this.configuration.get('header')) {
-            this.one('header').update({ 'items': this.configuration.get('header') });
+            this.one('header').update({ items: this.configuration.get('header') });
         }
         if (this.configuration.get('footer')) {
-            this.one('footer').update({ 'items': this.configuration.get('footer') });
+            this.one('footer').update({ items: this.configuration.get('footer') });
         }
         // main state updates
         this.mainState.get$('headTitle').subscribe((/**
          * @param {?} val
          * @return {?}
          */
-        val => this.titleService.setTitle(val)));
+        (val) => this.titleService.setTitle(val)));
         this.mainState.get$('pageTitle').subscribe((/**
          * @param {?} val
          * @return {?}
          */
-        val => this.pageTitle = val));
+        (val) => { this.pageTitle = val; }));
         this.mainState.get$('subnav').subscribe((/**
          * @param {?} val
          * @return {?}
          */
-        val => this.one('subnav').update(val)));
+        (val) => this.one('subnav').update(val)));
         this.mainState.get$('breadcrumbs').subscribe((/**
          * @param {?} val
          * @return {?}
          */
-        val => this.one('breadcrumbs').update(val)));
+        (val) => this.one('breadcrumbs').update(val)));
         // mainState test
         /* this.mainState.addCustom('customNav', new Subject());
         this.mainState.get$('pageTitle').subscribe(val => console.log('pageTitle', val));
@@ -1233,8 +1244,8 @@ class MainLayoutDS extends LayoutDataSource {
             if (queryParams) {
                 this.router.navigate(path, {
                     relativeTo: this.route,
-                    queryParams: queryParams,
-                    queryParamsHandling: 'merge'
+                    queryParams,
+                    queryParamsHandling: 'merge',
                 });
             }
             else {
@@ -1294,6 +1305,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/json-config.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class JsonConfigService {
@@ -1312,14 +1324,13 @@ class JsonConfigService {
      */
     load(path, staticConfig) {
         return this.http.get(path).pipe(catchError((/**
-         * @param {?} error
          * @return {?}
          */
-        (error) => of({}))), tap((/**
+        () => of({}))), tap((/**
          * @param {?} response
          * @return {?}
          */
-        response => this._handleResponse(response, staticConfig)))).toPromise();
+        (response) => this._handleResponse(response, staticConfig)))).toPromise();
     }
     /**
      * @private
@@ -1334,7 +1345,7 @@ class JsonConfigService {
              * @param {?} key
              * @return {?}
              */
-            key => this.config.set(key, staticConfig[key])));
+            (key) => this.config.set(key, staticConfig[key])));
         }
         // set loaded json config
         if (response) {
@@ -1342,7 +1353,7 @@ class JsonConfigService {
              * @param {?} key
              * @return {?}
              */
-            key => this.config.set(key, response[key])));
+            (key) => this.config.set(key, response[key])));
             // config keys colors
             if (response['config-keys']) {
                 /** @type {?} */
@@ -1355,7 +1366,7 @@ class JsonConfigService {
                  * @param {?} key
                  * @return {?}
                  */
-                key => {
+                (key) => {
                     /** @type {?} */
                     const configKey = response['config-keys'][key] || {};
                     /** @type {?} */
@@ -1377,7 +1388,7 @@ class JsonConfigService {
 }
 JsonConfigService.decorators = [
     { type: Injectable, args: [{
-                providedIn: 'root'
+                providedIn: 'root',
             },] }
 ];
 /** @nocollapse */
@@ -1401,23 +1412,24 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
  * @record
  */
-function IFacetInputData() { }
+function FacetInputData() { }
 if (false) {
     /** @type {?} */
-    IFacetInputData.prototype.value;
+    FacetInputData.prototype.value;
     /** @type {?} */
-    IFacetInputData.prototype.label;
+    FacetInputData.prototype.label;
     /** @type {?} */
-    IFacetInputData.prototype.counter;
+    FacetInputData.prototype.counter;
     /** @type {?|undefined} */
-    IFacetInputData.prototype.hidden;
+    FacetInputData.prototype.hidden;
     /** @type {?|undefined} */
-    IFacetInputData.prototype.options;
+    FacetInputData.prototype.options;
 }
 /**
  * @abstract
@@ -1431,7 +1443,7 @@ class FacetInput {
         this.update = (/**
          * @return {?}
          */
-        () => this.output = this.transform());
+        () => { this.output = this.transform(); });
         this.getId = (/**
          * @return {?}
          */
@@ -1487,15 +1499,15 @@ class FacetInput {
          * @param {?} newData
          * @return {?}
          */
-        (newData) => this.data = newData);
+        (newData) => { this.data = newData; });
         this.config = config;
         this._setId();
-        FacetInput.index++;
+        FacetInput.index += 1;
     }
     /**
      * @return {?}
      */
-    clear() { }
+    clear() { return null; }
     /**
      * @private
      * @return {?}
@@ -1577,6 +1589,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input-checkbox.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetInputCheckbox extends FacetInput {
@@ -1592,21 +1605,17 @@ class FacetInputCheckbox extends FacetInput {
          * @param {?} index
          * @return {?}
          */
-        ({ label, value }, index) => {
-            // normalize value
-            value = '' + value;
-            return {
-                type: 'checkbox',
-                id: this.getId() + '-' + index,
-                label: label,
-                payload: {
-                    facetId,
-                    source: 'input-checkbox',
-                    value
-                },
-                _meta: { facetId, value }
-            };
-        }));
+        ({ label, value }, index) => ({
+            type: 'checkbox',
+            id: `${this.getId()}-${index}`,
+            label,
+            payload: {
+                facetId,
+                source: 'input-checkbox',
+                value: `${value}`,
+            },
+            _meta: { facetId, value: `${value}` },
+        })));
     }
     /**
      * @param {?} facetValue
@@ -1618,7 +1627,7 @@ class FacetInputCheckbox extends FacetInput {
          * @param {?} config
          * @return {?}
          */
-        config => {
+        (config) => {
             if (isArray && Array.isArray(facetValue) && facetValue.indexOf(config._meta.value) !== -1) {
                 config.checked = true;
             }
@@ -1634,6 +1643,7 @@ class FacetInputCheckbox extends FacetInput {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/helpers.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -1653,7 +1663,7 @@ var helpers = {
          * @param {?} index
          * @return {?}
          */
-        (word, index) => index === 0 ? this.ucFirst(word) : word)).join(' ');
+        (word, index) => (index === 0 ? this.ucFirst(word) : word))).join(' ');
     },
     /**
      * @param {?} str
@@ -1688,26 +1698,23 @@ var helpers = {
      */
     escapeDoubleQuotes(str) {
         if (str.search(/\\?(")([\w\s]+)\\?(")/g) >= 0) {
-            //match piece of string between double quotes
-            return str.replace(/\\?(")([\w\s]+)\\?(")/g, "\\$1$2\\$3"); // thanks @slevithan!
+            // match piece of string between double quotes
+            return str.replace(/\\?(")([\w\s]+)\\?(")/g, '\\$1$2\\$3'); // thanks @slevithan!
         }
-        else {
-            return str.replace(/\\([\s\S])|(")/g, "\\\\\\$1$2"); // thanks @slevithan!
-        }
+        return str.replace(/\\([\s\S])|(")/g, '\\\\\\$1$2'); // thanks @slevithan!
     },
     /**
      * @param {?} str
      * @return {?}
      */
     unescapeDoubleQuotes(str) {
-        if (str && str != "")
-            str = str.replace(/\\*(")/g, "$1"); // thanks @slevithan!
-        return str;
-    }
+        return (str && str !== '') ? str.replace(/\\*(")/g, '$1') : str; // thanks @slevithan!
+    },
 };
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input-text.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetInputText extends FacetInput {
@@ -1721,7 +1728,7 @@ class FacetInputText extends FacetInput {
         /** @type {?} */
         const payload = {
             facetId,
-            source: 'input-text'
+            source: 'input-text',
         };
         return {
             type: 'text',
@@ -1733,7 +1740,7 @@ class FacetInputText extends FacetInput {
             inputPayload: Object.assign({}, payload, { trigger: 'input' }),
             enterPayload: Object.assign({}, payload, { trigger: 'enter' }),
             iconPayload: Object.assign({}, payload, { trigger: 'icon' }),
-            _meta: { facetId }
+            _meta: { facetId },
         };
     }
     /**
@@ -1747,6 +1754,7 @@ class FacetInputText extends FacetInput {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input-link.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -1774,7 +1782,7 @@ class FacetInputLink extends FacetInput {
                 break;
             }
             // normalize value
-            value = '' + value;
+            value = `${value}`;
             options = options || {};
             /** @type {?} */
             const classes = [];
@@ -1792,11 +1800,11 @@ class FacetInputLink extends FacetInput {
                 payload: {
                     facetId,
                     source: 'input-link',
-                    value
+                    value,
                 },
                 icon: options.icon || null,
                 classes: classes.join(' '),
-                _meta: { facetId, value }
+                _meta: { facetId, value },
             });
         }
         /* const results: any[] = this.data.map(({ label, value, counter, hidden, options }) => {
@@ -1835,7 +1843,7 @@ class FacetInputLink extends FacetInput {
          * @param {?} item
          * @return {?}
          */
-        item => item.id === 'empty'))[0];
+        (item) => item.id === 'empty'))[0];
         if (this.isEmpty) {
             if (itemEmpty) {
                 itemEmpty.classes = 'empty-text-link';
@@ -1849,7 +1857,7 @@ class FacetInputLink extends FacetInput {
                     id: emptyId,
                     text: label,
                     classes: 'empty-text-link',
-                    _meta: { facetId: emptyId, value: null }
+                    _meta: { facetId: emptyId, value: null },
                 });
             }
         }
@@ -1867,7 +1875,7 @@ class FacetInputLink extends FacetInput {
          * @param {?} config
          * @return {?}
          */
-        config => {
+        (config) => {
             /** @type {?} */
             const isActive = this._isActive(facetValue, config._meta.value);
             /** @type {?} */
@@ -1877,7 +1885,7 @@ class FacetInputLink extends FacetInput {
                  * @param {?} className
                  * @return {?}
                  */
-                className => className !== 'is-active'));
+                (className) => className !== 'is-active'));
             }
             else if (classes.indexOf('is-active') === -1) {
                 classes.push('is-active');
@@ -1893,8 +1901,8 @@ class FacetInputLink extends FacetInput {
      */
     _isActive(facetValue, value) {
         this.facetValue = facetValue;
-        return ((Array.isArray(facetValue) && facetValue.indexOf(value) !== -1) ||
-            (facetValue === value));
+        return ((Array.isArray(facetValue) && facetValue.indexOf(value) !== -1)
+            || (facetValue === value));
     }
     /**
      * @return {?}
@@ -1913,6 +1921,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input-select.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetInputSelect extends FacetInput {
@@ -1934,14 +1943,14 @@ class FacetInputSelect extends FacetInput {
              */
             ({ value, label }) => ({
                 // normalize value
-                value: '' + value,
-                label
+                value: `${value}`,
+                label,
             }))) : [],
             payload: {
                 facetId,
                 source: 'input-select',
             },
-            _meta: { facetId }
+            _meta: { facetId },
         };
     }
     /**
@@ -1954,22 +1963,24 @@ class FacetInputSelect extends FacetInput {
          * @param {?} option
          * @return {?}
          */
-        option => option.value === facetValue))
+        (option) => option.value === facetValue))
             .forEach((/**
          * @param {?} option
          * @return {?}
          */
-        option => option.selected = true));
+        (option) => { option.selected = true; }));
     }
 }
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/search.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -1977,7 +1988,7 @@ const INPUTS_MAP = {
     checkbox: FacetInputCheckbox,
     text: FacetInputText,
     link: FacetInputLink,
-    select: FacetInputSelect
+    select: FacetInputSelect,
 };
 /** @type {?} */
 const FILTERS_MAP = {
@@ -1987,59 +1998,59 @@ const FILTERS_MAP = {
     '>=': '_filterDataGreaterOrEquals',
     '<=': '_filterDataLessOrEquals',
     '<>': '_filterDataNotEqual',
-    'LIKE': '_filterDataLike'
+    LIKE: '_filterDataLike',
 };
 /**
  * @record
  */
-function ISearchConfig() { }
+function SearchConfig() { }
 if (false) {
     /** @type {?} */
-    ISearchConfig.prototype.totalCount;
+    SearchConfig.prototype.totalCount;
     /** @type {?} */
-    ISearchConfig.prototype.facets;
+    SearchConfig.prototype.facets;
     /** @type {?} */
-    ISearchConfig.prototype.page;
+    SearchConfig.prototype.page;
     /** @type {?} */
-    ISearchConfig.prototype.results;
+    SearchConfig.prototype.results;
     /** @type {?} */
-    ISearchConfig.prototype.fields;
+    SearchConfig.prototype.fields;
 }
 /**
  * @record
  */
-function IFacet() { }
+function Facet() { }
 if (false) {
     /** @type {?} */
-    IFacet.prototype.id;
+    Facet.prototype.id;
     /** @type {?} */
-    IFacet.prototype.type;
+    Facet.prototype.type;
     /** @type {?} */
-    IFacet.prototype.operator;
+    Facet.prototype.operator;
     /** @type {?|undefined} */
-    IFacet.prototype.hasStaticData;
+    Facet.prototype.hasStaticData;
     /** @type {?|undefined} */
-    IFacet.prototype.searchData;
+    Facet.prototype.searchData;
     /** @type {?|undefined} */
-    IFacet.prototype.data;
+    Facet.prototype.data;
 }
 /**
  * @record
  */
-function IFilter() { }
+function Filter() { }
 if (false) {
     /** @type {?} */
-    IFilter.prototype.facetId;
+    Filter.prototype.facetId;
     /** @type {?} */
-    IFilter.prototype.value;
+    Filter.prototype.value;
     /** @type {?} */
-    IFilter.prototype.searchIn;
+    Filter.prototype.searchIn;
     /** @type {?|undefined} */
-    IFilter.prototype.isArray;
+    Filter.prototype.isArray;
     /** @type {?|undefined} */
-    IFilter.prototype.context;
+    Filter.prototype.context;
     /** @type {?|undefined} */
-    IFilter.prototype.target;
+    Filter.prototype.target;
 }
 class SearchModel {
     /**
@@ -2087,7 +2098,7 @@ class SearchModel {
          * @param {?} results
          * @return {?}
          */
-        results => this._results$.next(results));
+        (results) => this._results$.next(results));
         this._id = id;
         this._config = config;
         this._setFilters();
@@ -2097,6 +2108,7 @@ class SearchModel {
         this._setInputsData();
         this._setTotalCount();
         // query params control
+        /* eslint-disable @typescript-eslint/no-use-before-define */
         if (SearchService.queryParams) {
             this.updateFiltersFromQueryParams(SearchService.queryParams);
             SearchService.queryParams = null;
@@ -2115,16 +2127,16 @@ class SearchModel {
          * @param {?} filter
          * @return {?}
          */
-        filter => {
+        (filter) => {
             if (Array.isArray(filter.value) && remove) {
                 filter.value = filter.value.filter((/**
                  * @param {?} item
                  * @return {?}
                  */
-                item => item !== value));
+                (item) => item !== value));
             }
-            else if (Array.isArray(filter.value) &&
-                filter.value.indexOf(value) === -1) {
+            else if (Array.isArray(filter.value)
+                && filter.value.indexOf(value) === -1) {
                 filter.value.push(value);
             }
             else {
@@ -2163,12 +2175,12 @@ class SearchModel {
              * @param {?} filter
              * @return {?}
              */
-            filter => {
+            (filter) => {
                 if (filter.isArray) {
                     filter.value = value ? value.split(',') : [];
                 }
                 else {
-                    filter.value = value ? value : null;
+                    filter.value = value || null;
                 }
             }));
         }));
@@ -2215,7 +2227,7 @@ class SearchModel {
          * @param {?} facet
          * @return {?}
          */
-        facet => facet.id === facetId));
+        (facet) => facet.id === facetId));
         if (!selectedFacets.length) {
             throw Error(`Facet with id '${facetId}' does not exists`);
         }
@@ -2223,7 +2235,7 @@ class SearchModel {
          * @param {?} facet
          * @return {?}
          */
-        facet => (facet.data = data)));
+        (facet) => { facet.data = data; }));
     }
     /**
      * @return {?}
@@ -2233,7 +2245,7 @@ class SearchModel {
          * @param {?} filter
          * @return {?}
          */
-        filter => (filter.value = null)));
+        (filter) => { filter.value = null; }));
     }
     /**
      * @return {?}
@@ -2248,12 +2260,12 @@ class SearchModel {
              * @param {?} filter
              * @return {?}
              */
-            filter => filter.context !== 'internal'))
+            (filter) => filter.context !== 'internal'))
                 .map((/**
              * @param {?} __0
              * @return {?}
              */
-            ({ facetId, value, searchIn }) => ({ facetId, value, searchIn })))
+            ({ facetId, value, searchIn }) => ({ facetId, value, searchIn }))),
         };
     }
     /**
@@ -2265,11 +2277,9 @@ class SearchModel {
          * @param {?} filter
          * @return {?}
          */
-        filter => {
-            return (filter.context === 'internal' &&
-                ((Array.isArray(filter.value) && filter.value.length) ||
-                    (!Array.isArray(filter.value) && filter.value)));
-        }))
+        (filter) => (filter.context === 'internal'
+            && ((Array.isArray(filter.value) && filter.value.length)
+                || (!Array.isArray(filter.value) && filter.value)))))
             .map((/**
          * @param {?} __0
          * @return {?}
@@ -2287,9 +2297,11 @@ class SearchModel {
          * @param {?} filter
          * @return {?}
          */
-        filter => (queryParams[filter.facetId] = Array.isArray(filter.value)
-            ? filter.value.join(',')
-            : filter.value)));
+        (filter) => {
+            queryParams[filter.facetId] = Array.isArray(filter.value)
+                ? filter.value.join(',')
+                : filter.value;
+        }));
         return queryParams;
     }
     /**
@@ -2301,7 +2313,7 @@ class SearchModel {
          * @param {?} filter
          * @return {?}
          */
-        filter => filter.facetId === facetId));
+        (filter) => filter.facetId === facetId));
     }
     /**
      * @param {?} facetId
@@ -2312,7 +2324,7 @@ class SearchModel {
          * @param {?} input
          * @return {?}
          */
-        input => input.getFacetId() === facetId))[0];
+        (input) => input.getFacetId() === facetId))[0];
     }
     /**
      * @param {?} facetId
@@ -2332,7 +2344,7 @@ class SearchModel {
          * @param {?} input
          * @return {?}
          */
-        input => input.getTarget() === target));
+        (input) => input.getTarget() === target));
         /** @type {?} */
         const targetInput = this.getInputByFacetId(target);
         /** @type {?} */
@@ -2340,7 +2352,7 @@ class SearchModel {
          * @param {?} f
          * @return {?}
          */
-        f => f.id === target))[0];
+        (f) => f.id === target))[0];
         /** @type {?} */
         const facetData = facet.data;
         /** @type {?} */
@@ -2349,13 +2361,12 @@ class SearchModel {
          * @param {?} input
          * @return {?}
          */
-        input => {
+        (input) => {
             /** @type {?} */
             const filter = this.getFiltersByFacetId(input.getFacetId())[0];
             /** @type {?} */
             const searchIn = input.getSearchIn();
-            /** @type {?} */
-            const value = filter.value;
+            const { value } = filter;
             searchIns.push([searchIn, value]);
         }));
         // filter
@@ -2363,7 +2374,7 @@ class SearchModel {
          * @param {?} item
          * @return {?}
          */
-        item => this._filterData(searchIns, item)));
+        (item) => this._filterData(searchIns, item)));
         // update
         targetInput.setData(facetData);
         if (targetInput.getConfig().emptyState) {
@@ -2372,7 +2383,7 @@ class SearchModel {
              * @param {?} data
              * @return {?}
              */
-            data => !data.hidden)).length;
+            (data) => !data.hidden)).length;
             targetInput.setIsEmpty(isEmpty);
         }
         targetInput.update();
@@ -2421,8 +2432,7 @@ class SearchModel {
          * @param {?} input
          * @return {?}
          */
-        input => {
-            input.clear();
+        (input) => {
         }));
     }
     /**
@@ -2484,30 +2494,24 @@ class SearchModel {
         if (Array.isArray(refValue)) {
             if (Array.isArray(value)) {
                 /** @type {?} */
-                let inArray = value.length === 0 ? true : false;
+                let inArray = value.length === 0;
                 refValue.forEach((/**
                  * @param {?} rv
                  * @return {?}
                  */
-                rv => {
+                (rv) => {
                     if (value.indexOf(rv) !== -1) {
                         inArray = true;
                     }
                 }));
                 return !(inArray);
             }
-            else {
-                return !(value && refValue.indexOf(value) !== -1);
-            }
+            return !(value && refValue.indexOf(value) !== -1);
         }
-        else {
-            if (Array.isArray(value)) {
-                return !(!value.length || value.indexOf(refValue) !== -1);
-            }
-            else {
-                return !(value && value === refValue);
-            }
+        if (Array.isArray(value)) {
+            return !(!value.length || value.indexOf(refValue) !== -1);
         }
+        return !(value && value === refValue);
     }
     /**
      * @private
@@ -2576,9 +2580,9 @@ class SearchModel {
      * @return {?}
      */
     _filterDataLike(value, refValue) {
-        if (value &&
-            typeof value === 'string' &&
-            typeof refValue === 'string') {
+        if (value
+            && typeof value === 'string'
+            && typeof refValue === 'string') {
             /** @type {?} */
             const haystack = refValue.toLowerCase();
             /** @type {?} */
@@ -2596,12 +2600,12 @@ class SearchModel {
          * @param {?} field
          * @return {?}
          */
-        field => {
+        (field) => {
             field.inputs.forEach((/**
              * @param {?} input
              * @return {?}
              */
-            input => this._filters.push(Object.assign({}, input.filterConfig, { facetId: input.facetId, value: input.filterConfig.isArray ? [] : null }))));
+            (input) => this._filters.push(Object.assign({}, input.filterConfig, { facetId: input.facetId, value: input.filterConfig.isArray ? [] : null }))));
         }));
     }
     /**
@@ -2643,11 +2647,11 @@ class SearchModel {
              */
             (inputConfig, inputIndex) => {
                 /** @type {?} */
-                const inputModel = INPUTS_MAP[inputConfig.type];
-                if (!inputModel) {
+                const InputModel = INPUTS_MAP[inputConfig.type];
+                if (!InputModel) {
                     throw Error(`Input type ${inputConfig.type} not supported`);
                 }
-                this._inputs.push(new inputModel(Object.assign({}, inputConfig, { inputIndex, sectionIndex })));
+                this._inputs.push(new InputModel(Object.assign({}, inputConfig, { inputIndex, sectionIndex })));
             }));
         }));
     }
@@ -2660,7 +2664,7 @@ class SearchModel {
          * @param {?} facet
          * @return {?}
          */
-        facet => this.setInputData(facet.id, facet.data)));
+        (facet) => this.setInputData(facet.id, facet.data)));
     }
     /**
      * @private
@@ -2673,7 +2677,7 @@ class SearchModel {
          * @param {?} f
          * @return {?}
          */
-        f => {
+        (f) => {
             /** @type {?} */
             const facetConfig = Object.assign({}, f);
             if (!f.hasStaticData) {
@@ -2687,12 +2691,12 @@ class SearchModel {
                  * @param {?} dataItem
                  * @return {?}
                  */
-                dataItem => typeof dataItem.searchData !== 'undefined'))
+                (dataItem) => typeof dataItem.searchData !== 'undefined'))
                     .forEach((/**
                  * @param {?} dataItem
                  * @return {?}
                  */
-                dataItem => {
+                (dataItem) => {
                     delete dataItem.searchData;
                 }));
             }
@@ -2796,7 +2800,7 @@ class SearchService {
 SearchService.queryParams = null;
 SearchService.decorators = [
     { type: Injectable, args: [{
-                providedIn: 'root'
+                providedIn: 'root',
             },] }
 ];
 /** @nocollapse */ SearchService.ngInjectableDef = ɵɵdefineInjectable({ factory: function SearchService_Factory() { return new SearchService(); }, token: SearchService, providedIn: "root" });
@@ -2812,11 +2816,13 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/main-layout/main-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainLayoutEH extends EventHandler {
@@ -2873,7 +2879,7 @@ class MainLayoutEH extends EventHandler {
          * @param {?} params
          * @return {?}
          */
-        params => {
+        (params) => {
             if (Object.keys(params).length)
                 return true;
             return false;
@@ -2881,7 +2887,7 @@ class MainLayoutEH extends EventHandler {
          * @param {?} params
          * @return {?}
          */
-        params => {
+        (params) => {
             this.emitGlobal('queryparams', params);
             // to use in searchs
             SearchService.queryParams = params;
@@ -2891,12 +2897,11 @@ class MainLayoutEH extends EventHandler {
          * @param {?} event
          * @return {?}
          */
-        event => event instanceof NavigationStart)))
+        (event) => event instanceof NavigationStart)))
             .subscribe((/**
-         * @param {?} event
          * @return {?}
          */
-        (event) => {
+        () => {
             this.dataSource.onRouterChanged();
         }));
     }
@@ -2910,7 +2915,7 @@ class MainLayoutEH extends EventHandler {
          * @param {?} val
          * @return {?}
          */
-        val => {
+        (val) => {
             this.emitOuter('currentnavchange', val);
         }));
     }
@@ -2940,6 +2945,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/header.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class HeaderDS extends DataSource {
@@ -2960,7 +2966,7 @@ class HeaderDS extends DataSource {
          * @param {?} item
          * @return {?}
          */
-        item => {
+        (item) => {
             if (item._meta.id === payload) {
                 item.classes = 'is-current';
             }
@@ -2973,6 +2979,7 @@ class HeaderDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/subnav.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SubnavDS extends DataSource {
@@ -2984,7 +2991,7 @@ class SubnavDS extends DataSource {
     transform(data) {
         return {
             classes: 'main-subnav',
-            items: data
+            items: data,
         };
     }
     /**
@@ -2996,7 +3003,7 @@ class SubnavDS extends DataSource {
          * @param {?} item
          * @return {?}
          */
-        item => {
+        (item) => {
             if (item._meta.id === id) {
                 item.classes = 'is-current';
                 item._meta.isActive = true;
@@ -3015,12 +3022,13 @@ class SubnavDS extends DataSource {
          * @param {?} item
          * @return {?}
          */
-        item => item._meta.isActive))[0] || null;
+        (item) => item._meta.isActive))[0] || null;
     }
 }
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/breadcrumbs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class BreadcrumbsDS extends DataSource {
@@ -3036,6 +3044,7 @@ class BreadcrumbsDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/facets.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetsDS extends DataSource {
@@ -3057,6 +3066,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/facets-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -3079,7 +3089,9 @@ class FacetsWrapperDS extends DataSource {
          * @param {?} queryParams
          * @return {?}
          */
-        (queryParams) => this.searchModel.updateFiltersFromQueryParams(queryParams));
+        (queryParams) => {
+            this.searchModel.updateFiltersFromQueryParams(queryParams);
+        });
         this.getInputByFacetId = (/**
          * @param {?} facetId
          * @return {?}
@@ -3089,11 +3101,15 @@ class FacetsWrapperDS extends DataSource {
          * @param {?} target
          * @return {?}
          */
-        (target) => this.searchModel.filterTarget(target));
+        (target) => {
+            this.searchModel.filterTarget(target);
+        });
         this.updateInputsFromFilters = (/**
          * @return {?}
          */
-        () => this.searchModel.updateInputsFromFilters());
+        () => {
+            this.searchModel.updateInputsFromFilters();
+        });
     }
     /**
      * @protected
@@ -3109,7 +3125,7 @@ class FacetsWrapperDS extends DataSource {
         /** @type {?} */
         const fields = this.searchModel.getFields();
         /** @type {?} */
-        let groups = [];
+        const groups = [];
         fields.forEach((/**
          * @param {?} fieldConfig
          * @param {?} fieldIndex
@@ -3123,23 +3139,23 @@ class FacetsWrapperDS extends DataSource {
             const header = this._headerConfig(fieldConfig.header, groupId);
             // inputs config
             /** @type {?} */
-            let sections = [];
+            const sections = [];
             this.searchModel.getInputs()
                 .filter((/**
              * @param {?} input
              * @return {?}
              */
-            input => input.getSectionIndex() === fieldIndex))
+            (input) => input.getSectionIndex() === fieldIndex))
                 .map((/**
              * @param {?} input
              * @return {?}
              */
-            input => {
+            (input) => {
                 input.update();
                 return {
                     facetId: input.getFacetId(),
                     type: input.getType(),
-                    output: input.getOutput()
+                    output: input.getOutput(),
                 };
             }))
                 .forEach((/**
@@ -3151,8 +3167,8 @@ class FacetsWrapperDS extends DataSource {
                     classes: this._getSectionClasses(type),
                     inputs: Array.isArray(output) ? output : [output],
                     _meta: {
-                        facetId
-                    }
+                        facetId,
+                    },
                 });
             }));
             groups.push({
@@ -3161,13 +3177,13 @@ class FacetsWrapperDS extends DataSource {
                 classes: `n7-facets-wrapper__${groupId}`,
                 isOpen: true,
                 _meta: {
-                    groupId
-                }
+                    groupId,
+                },
             });
         }));
         return {
             groups,
-            classes: `n7-facets-wrapper__${this.searchModel.getId()}`
+            classes: `n7-facets-wrapper__${this.searchModel.getId()}`,
         };
     }
     /**
@@ -3179,7 +3195,7 @@ class FacetsWrapperDS extends DataSource {
          * @param {?} group
          * @return {?}
          */
-        group => {
+        (group) => {
             if (group._meta.groupId === eventPayload.groupId) {
                 group.isOpen = !group.isOpen;
                 group.header.iconRight = group.isOpen ? HEADER_ICON_OPEN : HEADER_ICON_CLOSE;
@@ -3193,15 +3209,15 @@ class FacetsWrapperDS extends DataSource {
     onFacetChange({ eventPayload }) {
         const { facetId, source, trigger } = eventPayload.inputPayload;
         /** @type {?} */
-        const filter = this.searchModel.getFiltersByFacetId(facetId)[0] || {};
+        const filter = this.searchModel.getFiltersByFacetId(facetId)[0] || { value: null };
         /** @type {?} */
-        const filterValue = filter['value'];
+        const filterValue = filter.value;
         /** @type {?} */
         let remove = false;
         /** @type {?} */
         let value = eventPayload.inputPayload.value || eventPayload.value;
         // normalize
-        value = '' + value;
+        value = `${value}`;
         // remove control
         if (Array.isArray(filterValue)) {
             remove = filterValue.indexOf(value) !== -1;
@@ -3228,22 +3244,22 @@ class FacetsWrapperDS extends DataSource {
          * @param {?} group
          * @return {?}
          */
-        group => group.facet))
+        (group) => group.facet))
             .map((/**
          * @param {?} facet
          * @return {?}
          */
-        facet => facet.sections))
-            .map((/**
+        (facet) => facet.sections))
+            .forEach((/**
          * @param {?} sections
          * @return {?}
          */
-        sections => {
+        (sections) => {
             sections.forEach((/**
              * @param {?} section
              * @return {?}
              */
-            section => {
+            (section) => {
                 if (section._meta.facetId === target) {
                     /** @type {?} */
                     const inputOutput = input.getOutput();
@@ -3262,33 +3278,33 @@ class FacetsWrapperDS extends DataSource {
          * @param {?} input
          * @return {?}
          */
-        input => input.getType() === 'link'))
+        (input) => input.getType() === 'link'))
             .map((/**
          * @param {?} input
          * @return {?}
          */
-        input => input.getFacetId()));
+        (input) => input.getFacetId()));
         this.output.groups
             .map((/**
          * @param {?} group
          * @return {?}
          */
-        group => group.facet))
+        (group) => group.facet))
             .map((/**
          * @param {?} facet
          * @return {?}
          */
-        facet => facet.sections))
-            .map((/**
+        (facet) => facet.sections))
+            .forEach((/**
          * @param {?} sections
          * @return {?}
          */
-        sections => {
+        (sections) => {
             sections.forEach((/**
              * @param {?} section
              * @return {?}
              */
-            section => {
+            (section) => {
                 if (linksFacetIds.indexOf(section._meta.facetId) !== -1) {
                     /** @type {?} */
                     const input = this.searchModel.getInputByFacetId(section._meta.facetId);
@@ -3308,10 +3324,10 @@ class FacetsWrapperDS extends DataSource {
     _getSectionClasses(type) {
         /** @type {?} */
         const classesMap = {
-            'text': 'text',
-            'checkbox': 'checkboxes',
-            'link': 'links',
-            'select': 'select'
+            text: 'text',
+            checkbox: 'checkboxes',
+            link: 'links',
+            select: 'select',
         };
         return `n7-facet__section-input-${classesMap[type]}`;
     }
@@ -3329,11 +3345,11 @@ class FacetsWrapperDS extends DataSource {
             payload: {
                 source: 'group-header',
                 id: `${groupId}-header`,
-                groupId: groupId
+                groupId,
             },
             _meta: {
-                id: `${groupId}-header`
-            }
+                id: `${groupId}-header`,
+            },
         } : null;
     }
 }
@@ -3356,6 +3372,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/footer.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FooterDS extends DataSource {
@@ -3366,7 +3383,7 @@ class FooterDS extends DataSource {
      */
     transform(data) {
         if (!data) {
-            return;
+            return null;
         }
         return data.items;
     }
@@ -3374,6 +3391,7 @@ class FooterDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/smart-pagination.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SmartPaginationDS extends DataSource {
@@ -3390,16 +3408,7 @@ class SmartPaginationDS extends DataSource {
          */
         (tp, cp, pl, m, href, qp) => {
             /** @type {?} */
-            const result = []
-            /*
-              tp - total pages
-              cp - current page
-              pl - page limit
-              m - pagination mode (href or payloads)
-              href - href for anchor wrapper
-              qp - query params for pagination
-            */
-            ;
+            const result = [];
             /*
                   tp - total pages
                   cp - current page
@@ -3416,10 +3425,9 @@ class SmartPaginationDS extends DataSource {
             if (limit) {
                 /** @type {?} */
                 let lp;
+                // last page
                 /** @type {?} */
-                let //last page
-                fp // first page
-                ;
+                let fp;
                 if (cp > Math.floor(limit / 2)) {
                     if (tp === 2) {
                         lp = tp;
@@ -3439,48 +3447,48 @@ class SmartPaginationDS extends DataSource {
                 else {
                     // when currentPage is before half-point
                     // (example: [ 1 ][!2!][ 3 ][ 4 ][ 5 ])
-                    lp = limit++;
+                    lp = limit + 1;
                     fp = 1;
                 }
-                for (let i = fp; i <= lp; i++) {
+                for (let i = fp; i <= lp; i += 1) {
                     result.push({
                         text: String(i),
-                        classes: cp == i ? 'is-active' : '',
-                        anchor: cp != i ? this._getPaginationAnchor(i, m, href, qp) : null
+                        classes: cp === i ? 'is-active' : '',
+                        anchor: cp !== i ? this._getPaginationAnchor(i, m, href, qp) : null,
                     });
                 }
             }
             else {
                 result.push({
                     text: '1',
-                    classes: cp == 1 ? 'is-active' : '',
-                    anchor: cp !== 1 ? this._getPaginationAnchor(1, m, href, qp) : null
+                    classes: cp === 1 ? 'is-active' : '',
+                    anchor: cp !== 1 ? this._getPaginationAnchor(1, m, href, qp) : null,
                 });
-                for (let i = 1; i < tp; i++) {
+                for (let i = 1; i < tp; i += 1) {
                     result.push({
                         text: String(i + 1),
-                        classes: cp == i + 1 ? 'is-active' : '',
-                        anchor: cp !== i + 1 ? this._getPaginationAnchor(i + 1, m, href, qp) : null
+                        classes: cp === i + 1 ? 'is-active' : '',
+                        anchor: cp !== i + 1 ? this._getPaginationAnchor(i + 1, m, href, qp) : null,
                     });
                 }
             }
             return {
                 links: result,
                 first: {
-                    classes: cp == 1 ? 'is-disabled' : '',
-                    anchor: cp != 1 ? this._getPaginationAnchor(1, m, href, qp) : null
+                    classes: cp === 1 ? 'is-disabled' : '',
+                    anchor: cp !== 1 ? this._getPaginationAnchor(1, m, href, qp) : null,
                 },
                 prev: {
-                    classes: cp == 1 ? 'is-disabled' : '',
-                    anchor: cp != 1 ? this._getPaginationAnchor(cp / 1 - 1, m, href, qp) : null
+                    classes: cp === 1 ? 'is-disabled' : '',
+                    anchor: cp !== 1 ? this._getPaginationAnchor(cp / 1 - 1, m, href, qp) : null,
                 },
                 next: {
-                    classes: cp == tp ? 'is-disabled' : '',
-                    anchor: cp != tp ? this._getPaginationAnchor(cp / 1 + 1, m, href, qp) : null
+                    classes: cp === tp ? 'is-disabled' : '',
+                    anchor: cp !== tp ? this._getPaginationAnchor(cp / 1 + 1, m, href, qp) : null,
                 },
                 last: {
-                    classes: cp == tp ? 'is-disabled' : '',
-                    anchor: cp != tp ? this._getPaginationAnchor(tp, m, href, qp) : null
+                    classes: cp === tp ? 'is-disabled' : '',
+                    anchor: cp !== tp ? this._getPaginationAnchor(tp, m, href, qp) : null,
                 },
             };
         });
@@ -3491,31 +3499,31 @@ class SmartPaginationDS extends DataSource {
      * @return {?}
      */
     transform(data) {
-        const { totalPages, currentPage, pageLimit, sizes } = data;
-        const { mode, href, queryParams } = this.options
-        // ===== WARNINGS =====
-        ;
+        const { totalPages, currentPage, pageLimit, sizes, } = data;
+        const { mode, href, queryParams } = this.options;
         // ===== WARNINGS =====
         if (!['href', 'payload'].includes(mode)) {
             console.warn('(smart-pagination) The "mode" option is incorrect. Please specify "href" or "payload" as the mode option.');
         }
-        const { links, first, prev, next, last } = this.paginationBuilder(totalPages, currentPage, pageLimit, mode, href, queryParams);
+        const { links, first, prev, next, last, } = this.paginationBuilder(totalPages, +currentPage, pageLimit, mode, href, queryParams);
         return {
-            first, prev, next, last, links,
+            first,
+            prev,
+            next,
+            last,
+            links,
             select: sizes ? {
                 label: 'Numero di risultati',
                 options: sizes.list.map((/**
                  * @param {?} s
                  * @return {?}
                  */
-                s => {
-                    return {
-                        text: s,
-                        selected: s == sizes.active,
-                    };
-                })),
-                payload: 'select-size'
-            } : null
+                (s) => ({
+                    text: s,
+                    selected: s === sizes.active,
+                }))),
+                payload: 'select-size',
+            } : null,
         };
     }
     /**
@@ -3530,16 +3538,17 @@ class SmartPaginationDS extends DataSource {
         switch (mode) {
             case 'payload':
                 return {
-                    payload: { source: 'pagination', page }
+                    payload: { source: 'pagination', page },
                 };
             case 'href':
                 return {
                     href: queryParams ? href : href + page,
-                    queryParams: queryParams ? Object.assign({}, queryParams, { page: page }) : null
+                    queryParams: queryParams ? Object.assign({}, queryParams, { page }) : null,
                 };
             default:
                 break;
         }
+        return {};
     }
 }
 if (false) {
@@ -3552,10 +3561,12 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     HeaderDS: HeaderDS,
     SubnavDS: SubnavDS,
     BreadcrumbsDS: BreadcrumbsDS,
@@ -3567,6 +3578,7 @@ var DS = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/header.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class HeaderEH extends EventHandler {
@@ -3592,6 +3604,7 @@ class HeaderEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/subnav.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SubnavEH extends EventHandler {
@@ -3622,6 +3635,7 @@ class SubnavEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/breadcrumbs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class BreadcrumbsEH extends EventHandler {
@@ -3652,29 +3666,7 @@ class BreadcrumbsEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class FacetsEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                // TODO
-                default:
-                    break;
-            }
-        }));
-    }
-}
-
-/**
- * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/facets-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetsWrapperEH extends EventHandler {
@@ -3696,25 +3688,27 @@ class FacetsWrapperEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'facets-wrapper.facet':
-                    // empty payload control
-                    if (!payload.eventPayload.inputPayload) {
-                        return;
-                    }
-                    const { facetId } = payload.eventPayload.inputPayload;
-                    /** @type {?} */
-                    const input = this.dataSource.getInputByFacetId(facetId);
-                    /** @type {?} */
-                    const context = input.getContext();
-                    this._facetsChanged = true;
-                    // update
-                    this.dataSource.onFacetChange(payload);
-                    // internal
-                    if (context === 'internal') {
-                        this.internalFacetsChange$.next(input.getTarget());
-                        // external
-                    }
-                    else {
-                        this.externalFacetsChange$.next();
+                    {
+                        // empty payload control
+                        if (!payload.eventPayload.inputPayload) {
+                            return;
+                        }
+                        const { facetId } = payload.eventPayload.inputPayload;
+                        /** @type {?} */
+                        const input = this.dataSource.getInputByFacetId(facetId);
+                        /** @type {?} */
+                        const context = input.getContext();
+                        this._facetsChanged = true;
+                        // update
+                        this.dataSource.onFacetChange(payload);
+                        // internal
+                        if (context === 'internal') {
+                            this.internalFacetsChange$.next(input.getTarget());
+                            // external
+                        }
+                        else {
+                            this.externalFacetsChange$.next();
+                        }
                     }
                     break;
                 case 'facets-wrapper.facetheader':
@@ -3750,7 +3744,7 @@ class FacetsWrapperEH extends EventHandler {
                          * @param {?} filter
                          * @return {?}
                          */
-                        filter => {
+                        (filter) => {
                             /** @type {?} */
                             const input = this.dataSource.searchModel.getInputByFacetId(filter.facetId);
                             /** @type {?} */
@@ -3769,7 +3763,7 @@ class FacetsWrapperEH extends EventHandler {
          * @param {?} target
          * @return {?}
          */
-        target => {
+        (target) => {
             this.dataSource.filterTarget(target);
             this.dataSource.updateFilteredTarget(target);
         }));
@@ -3786,7 +3780,7 @@ class FacetsWrapperEH extends EventHandler {
              * @param {?} key
              * @return {?}
              */
-            key => queryParams[key] = queryParams[key] || null));
+            (key) => { queryParams[key] = queryParams[key] || null; }));
             // signal
             this.emitOuter('facetschange');
             // reset page
@@ -3795,7 +3789,7 @@ class FacetsWrapperEH extends EventHandler {
             this.emitGlobal('navigate', {
                 handler: 'router',
                 path: [],
-                queryParams
+                queryParams,
             });
         }));
     }
@@ -3820,6 +3814,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/footer.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FooterEH extends EventHandler {
@@ -3833,6 +3828,7 @@ class FooterEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/smart-pagination.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SmartPaginationEH extends EventHandler {
@@ -3862,14 +3858,15 @@ class SmartPaginationEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     HeaderEH: HeaderEH,
     SubnavEH: SubnavEH,
     BreadcrumbsEH: BreadcrumbsEH,
-    FacetsEH: FacetsEH,
     FacetsWrapperEH: FacetsWrapperEH,
     FooterEH: FooterEH,
     SmartPaginationEH: SmartPaginationEH
@@ -3877,19 +3874,20 @@ var EH = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/main-layout/main-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
 const MainLayoutConfig = {
     layoutId: 'main-layout',
     widgets: [{
-            id: 'header'
+            id: 'header',
         }, {
-            id: 'subnav'
+            id: 'subnav',
         }, {
-            id: 'breadcrumbs'
+            id: 'breadcrumbs',
         }, {
-            id: 'footer'
+            id: 'footer',
         }],
     layoutDS: MainLayoutDS,
     layoutEH: MainLayoutEH,
@@ -3897,11 +3895,12 @@ const MainLayoutConfig = {
     widgetsEventHandlers: EH,
     options: {
     // TODO
-    }
+    },
 };
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/main-layout/main-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainLayoutComponent extends AbstractLayout {
@@ -3952,7 +3951,7 @@ class MainLayoutComponent extends AbstractLayout {
 MainLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'main-layout',
-                template: "<div class=\"n7-main-layout\" id=\"main-layout\">\n    <div class=\"n7-page-content\">\n        <n7-header\n            [data]=\"lb.widgets['header'].ds.out$ | async\"\n            [emit]=\"lb.widgets['header'].emit\">\n        </n7-header>\n        <main class=\"n7-content\">\n            <div class=\"n7-top-page-bar\">\n                <div class=\"n7-top-page-bar__main\"></div>\n            </div>\n            <div class=\"n7-alert-bar\">\n                <!--<n7-alert\n                [attr.id]=\"'main-layout-alert'\"\n                [data]=\"lb.dataSource.alertData$ | async\"\n                [emit]=\"lb.dataSource.closeAlert.bind(lb.dataSource)\"></n7-alert>-->\n            </div>\n            <ng-content></ng-content>\n        </main>\n    </div>\n    <n7-footer \n        [data]=\"lb.widgets['footer'].ds.out$ | async\" \n        [emit]=\"lb.widgets['footer'].emit\">\n    </n7-footer>\n</div>"
+                template: "<div class=\"n7-main-layout\" id=\"main-layout\">\r\n    <div class=\"n7-page-content\">\r\n        <n7-header\r\n            [data]=\"lb.widgets['header'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['header'].emit\">\r\n        </n7-header>\r\n        <main class=\"n7-content\">\r\n            <div class=\"n7-top-page-bar\">\r\n                <div class=\"n7-top-page-bar__main\"></div>\r\n            </div>\r\n            <div class=\"n7-alert-bar\">\r\n                <!--<n7-alert\r\n                [attr.id]=\"'main-layout-alert'\"\r\n                [data]=\"lb.dataSource.alertData$ | async\"\r\n                [emit]=\"lb.dataSource.closeAlert.bind(lb.dataSource)\"></n7-alert>-->\r\n            </div>\r\n            <ng-content></ng-content>\r\n        </main>\r\n    </div>\r\n    <n7-footer \r\n        [data]=\"lb.widgets['footer'].ds.out$ | async\" \r\n        [emit]=\"lb.widgets['footer'].emit\">\r\n    </n7-footer>\r\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -3999,6 +3998,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/page404-layout/page404-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class Page404LayoutDS extends LayoutDataSource {
@@ -4017,6 +4017,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/page404-layout/page404-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class Page404LayoutEH extends EventHandler {
@@ -4052,7 +4053,7 @@ class Page404LayoutEH extends EventHandler {
             case 'global.navigate':
               this.dataSource.onNavigate(payload);
               break;
-              
+    
             default:
               break;
           }
@@ -4069,6 +4070,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/page404-layout/page404-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -4081,11 +4083,12 @@ const Page404LayoutConfig = {
     widgetsEventHandlers: EH,
     options: {
     // TODO
-    }
+    },
 };
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/page404-layout/page404-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class Page404LayoutComponent extends AbstractLayout {
@@ -4120,7 +4123,7 @@ class Page404LayoutComponent extends AbstractLayout {
 Page404LayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'n7-page404-layout',
-                template: "<div class=\"n7-page404-layout\">\n    404 - Resource not found\n</div>"
+                template: "<div class=\"n7-page404-layout\">\r\n    404 - Resource not found\r\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -4130,6 +4133,7 @@ Page404LayoutComponent.ctorParameters = () => [
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/components/facets-wrapper/facets-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetsWrapperComponent {
@@ -4159,7 +4163,7 @@ class FacetsWrapperComponent {
 FacetsWrapperComponent.decorators = [
     { type: Component, args: [{
                 selector: 'n7-facets-wrapper',
-                template: "<div *ngIf=\"data\" class=\"n7-facets-wrapper {{ data.classes || '' }}\">\n    <div *ngFor=\"let group of data.groups\" class=\"n7-facets-wrapper__group {{ group.classes || '' }}\">\n        <n7-facet-header\n            [data]=\"group.header\"\n            [emit]=\"headerEmit.bind(this)\"\n        ></n7-facet-header>\n\n        <n7-facet\n            *ngIf=\"group.isOpen\"\n            [data]=\"group.facet\"\n            [emit]=\"facetEmit.bind(this)\"\n        ></n7-facet>\n    </div>\n</div>"
+                template: "<div *ngIf=\"data\" class=\"n7-facets-wrapper {{ data.classes || '' }}\">\r\n    <div *ngFor=\"let group of data.groups\" class=\"n7-facets-wrapper__group {{ group.classes || '' }}\">\r\n        <n7-facet-header\r\n            [data]=\"group.header\"\r\n            [emit]=\"headerEmit.bind(this)\"\r\n        ></n7-facet-header>\r\n\r\n        <n7-facet\r\n            *ngIf=\"group.isOpen\"\r\n            [data]=\"group.facet\"\r\n            [emit]=\"facetEmit.bind(this)\"\r\n        ></n7-facet>\r\n    </div>\r\n</div>"
             }] }
 ];
 FacetsWrapperComponent.propDecorators = {
@@ -4175,6 +4179,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/components/smart-pagination/smart-pagination.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SmartPaginationComponent {
@@ -4195,7 +4200,7 @@ class SmartPaginationComponent {
 SmartPaginationComponent.decorators = [
     { type: Component, args: [{
                 selector: 'n7-smart-pagination',
-                template: "<div class=\"n7-smart-pagination\" *ngIf=\"data\">\n  <n7-pagination\n    [data]=\"data\"\n    [emit]=\"emit\">\n  </n7-pagination>\n</div>"
+                template: "<div class=\"n7-smart-pagination\" *ngIf=\"data\">\r\n  <n7-pagination\r\n    [data]=\"data\"\r\n    [emit]=\"emit\">\r\n  </n7-pagination>\r\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -4213,6 +4218,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/n7-boilerplate-common.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -4235,8 +4241,8 @@ class N7BoilerplateCommonModule {
                 ConfigurationService,
                 LayoutsConfigurationService,
                 CommunicationService,
-                { provide: 'config', useValue: config }
-            ]
+                { provide: 'config', useValue: config },
+            ],
         };
     }
 }
@@ -4246,15 +4252,16 @@ N7BoilerplateCommonModule.decorators = [
                 imports: [
                     CommonModule,
                     HttpClientModule,
-                    DvComponentsLibModule
+                    DvComponentsLibModule,
                 ],
                 providers: [],
-                exports: COMPONENTS
+                exports: COMPONENTS,
             },] }
 ];
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaLayoutDS extends LayoutDataSource {
@@ -4296,8 +4303,8 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                 pageLimit: 5,
                 sizes: {
                     list: [10, 25, 50],
-                    active: this.pageSize
-                }
+                    active: this.pageSize,
+                },
             });
         });
         this.handlePageNavigation = (/**
@@ -4326,11 +4333,9 @@ class AwEntitaLayoutDS extends LayoutDataSource {
          * @param {?} tab
          * @return {?}
          */
-        tab => {
+        (tab) => {
             this.selectedTab = tab;
             this.updateWidgets(this.myResponse);
-            /** @type {?} */
-            const page = tab === 'oggetti-collegati' ? '/1' : '';
             if (tab === 'oggetti-collegati') {
                 this.one('aw-linked-objects').updateOptions({
                     context: this.selectedTab,
@@ -4342,15 +4347,15 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                 });
                 this.one('aw-linked-objects').update({ items: this.myResponse.relatedItems });
             }
-            else if (tab == "overview") {
+            else if (tab === 'overview') {
                 this.one('aw-linked-objects').updateOptions({
                     size: 3,
                     config: this.configuration,
-                    context: 'entita'
+                    context: 'entita',
                 });
                 this.one('aw-linked-objects').update({ items: this.myResponse.relatedItems });
             }
-            if (tab == "overview" || tab == "entita-collegate") {
+            if (tab === 'overview' || tab === 'entita-collegate') {
                 setTimeout((/**
                  * @return {?}
                  */
@@ -4362,7 +4367,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
      * @param {?} __0
      * @return {?}
      */
-    onInit({ configuration, mainState, router, route, location, options, titleService, communication }) {
+    onInit({ configuration, mainState, router, route, location, options, titleService, communication, }) {
         this.route = route;
         this.communication = communication;
         this.configuration = configuration;
@@ -4371,19 +4376,19 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         this.router = router;
         this.location = location;
         this.titleService = titleService;
-        this.currentId = "";
+        this.currentId = '';
         this.currentPage = +this.route.snapshot.queryParams.page;
-        this.bubblesEnabled = this.configuration.get('features-enabled') ? this.configuration.get('features-enabled')['bubblechart'] : false;
-        this.bubblesSize = this.configuration.get('entita-layout') ? this.configuration.get('entita-layout')['entitiesQuerySize'] : this.bubblesSize;
+        this.bubblesEnabled = this.configuration.get('features-enabled') ? this.configuration.get('features-enabled').bubblechart : false;
+        this.bubblesSize = this.configuration.get('entita-layout') ? this.configuration.get('entita-layout').entitiesQuerySize : this.bubblesSize;
         this.one('aw-bubble-chart').updateOptions({
             selectable: false,
             simple: true,
             config: this.configuration,
             limit: this.configuration.get('bubble-chart').bubbleLimit,
-            smallChartSize: this.configuration.get('entita-layout').overview.smallChartSize
+            smallChartSize: this.configuration.get('entita-layout').overview.smallChartSize,
         });
         this.one('aw-chart-tippy').updateOptions({
-            basePath: this.configuration.get('paths')['entitaBasePath']
+            basePath: this.configuration.get('paths').entitaBasePath,
         });
         // navigation update
         this.mainState.updateCustom('currentNav', 'entita');
@@ -4404,7 +4409,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
              * @return {?}
              */
             (error) => console.error(error)),
-            params: { entityId: id, entitiesListSize: this.bubblesSize }
+            params: { entityId: id, entitiesListSize: this.bubblesSize },
         });
     }
     /**
@@ -4421,20 +4426,20 @@ class AwEntitaLayoutDS extends LayoutDataSource {
          * @param {?} k
          * @return {?}
          */
-        k => {
-            if (Array.isArray(data[k]) && data[k].length == 0) {
+        (k) => {
+            if (Array.isArray(data[k]) && data[k].length === 0) {
                 data[k] = null;
             }
         }));
         this.one('aw-entita-nav').update({
             data,
             selected,
-            basePath: this.getNavBasePath()
+            basePath: this.getNavBasePath(),
         });
         this.updateComponent('aw-entita-metadata-viewer', this.myResponse.fields, {
             context: this.selectedTab,
             config: this.configuration,
-            labels: this.configuration.get("labels")
+            labels: this.configuration.get('labels'),
         });
         this.drawPagination();
     }
@@ -4467,13 +4472,12 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                  * @param {?} error
                  * @return {?}
                  */
-                error => console.error(error)),
-                params: { entityId: id, entitiesListSize: this.bubblesSize }
+                (error) => console.error(error)),
+                params: { entityId: id, entitiesListSize: this.bubblesSize },
             });
         }
-        else {
-            this.pageTitle = 'Entità Test';
-        }
+        this.pageTitle = 'Entità Test';
+        return of(null);
     }
     /**
      * @param {?} res
@@ -4481,14 +4485,14 @@ class AwEntitaLayoutDS extends LayoutDataSource {
      */
     loadContent(res) {
         /** @type {?} */
-        const config = this.configuration.get("config-keys")[res.typeOfEntity];
+        const config = this.configuration.get('config-keys')[res.typeOfEntity];
         // console.log('(entita) Apollo responded with: ', { res })
         this.myResponse = res;
         if ((res.fields || []).filter((/**
          * @param {?} field
          * @return {?}
          */
-        field => ((this.configuration.get('entita-layout') || {}).overview || {}).campi.includes(field.key))).length > 0) {
+        (field) => ((this.configuration.get('entita-layout') || {}).overview || {}).campi.includes(field.key))).length > 0) {
             // look at the response array, filtered by configuration values.
             // if the filtered response has some values, show the fields section.
             this.showFields = true;
@@ -4500,12 +4504,12 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             // always render nav header
             icon: config ? config.icon : '',
             text: this.myResponse.label,
-            color: config['class-name']
+            color: config['class-name'],
         };
         this.one('aw-entita-nav').updateOptions({ bubblesEnabled: this.bubblesEnabled });
-        this.one('aw-entita-metadata-viewer').updateOptions({ context: this.selectedTab, labels: this.configuration.get("labels"), config: this.configuration });
+        this.one('aw-entita-metadata-viewer').updateOptions({ context: this.selectedTab, labels: this.configuration.get('labels'), config: this.configuration });
         this.one('aw-entita-metadata-viewer').update(res.fields);
-        if (this.selectedTab == 'oggetti-collegati') {
+        if (this.selectedTab === 'oggetti-collegati') {
             this.one('aw-linked-objects').updateOptions({
                 context: this.selectedTab,
                 config: this.configuration,
@@ -4519,7 +4523,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             this.one('aw-linked-objects').updateOptions({
                 size: 3,
                 config: this.configuration,
-                context: 'entita'
+                context: 'entita',
             });
         }
         this.one('aw-linked-objects').update({ items: res.relatedItems });
@@ -4535,13 +4539,13 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         return {
             href: [
                 this.configuration.get('paths').entitaBasePath,
-                this.currentId + '/',
+                `${this.currentId}/`,
                 this.currentSlug,
-                '/oggetti-collegati/'
+                '/oggetti-collegati/',
             ].join(''),
             queryParams: {
-                page: this.currentPage
-            }
+                page: this.currentPage,
+            },
         };
     }
     /**
@@ -4550,8 +4554,8 @@ class AwEntitaLayoutDS extends LayoutDataSource {
     getNavBasePath() {
         return [
             this.configuration.get('paths').entitaBasePath,
-            this.currentId + '/',
-            this.currentSlug
+            `${this.currentId}/`,
+            this.currentSlug,
         ].join('');
     }
 }
@@ -4627,6 +4631,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaLayoutEH extends EventHandler {
@@ -4637,12 +4642,11 @@ class AwEntitaLayoutEH extends EventHandler {
          * @param {?} v
          * @return {?}
          */
-        v => {
+        (v) => {
             this.dataSource.pageSize = v;
             this.dataSource.handleNavUpdate('oggetti-collegati');
         });
     }
-    // private selectedTab: string;
     /**
      * @return {?}
      */
@@ -4657,7 +4661,7 @@ class AwEntitaLayoutEH extends EventHandler {
                     this.dataSource.onInit(payload);
                     this.configuration = payload.configuration;
                     this.route = payload.route;
-                    this.entityId = this.route.snapshot.params.id || "";
+                    this.entityId = this.route.snapshot.params.id || '';
                     this.dataSource.currentPage = this.route.snapshot.params.page || 1;
                     this.listenRoute(this.entityId);
                     break;
@@ -4688,34 +4692,38 @@ class AwEntitaLayoutEH extends EventHandler {
                         this.dataSource.handleNavUpdate(payload);
                     }
                     break;
-                case 'aw-linked-objects.change': // changed page size value (pagination)
-                    this.dataSource.pageSize = payload;
-                    this.dataSource.currentPage = 1; // reset page
-                    // reset page
-                    /** @type {?} */
-                    const options = {
-                        context: this.dataSource.selectedTab,
-                        config: this.dataSource.configuration,
-                        page: this.dataSource.currentPage,
-                        pagination: true,
-                        size: this.dataSource.pageSize,
-                    };
-                    this.dataSource.updateComponent('aw-linked-objects', { items: this.dataSource.myResponse.relatedItems }, options);
+                case 'aw-linked-objects.change':
+                    { // changed page size value (pagination)
+                        this.dataSource.pageSize = payload;
+                        this.dataSource.currentPage = 1; // reset page
+                        // reset page
+                        /** @type {?} */
+                        const options = {
+                            context: this.dataSource.selectedTab,
+                            config: this.dataSource.configuration,
+                            page: this.dataSource.currentPage,
+                            pagination: true,
+                            size: this.dataSource.pageSize,
+                        };
+                        this.dataSource.updateComponent('aw-linked-objects', { items: this.dataSource.myResponse.relatedItems }, options);
+                    }
                     break;
                 case 'aw-bubble-chart.bubble-tooltip-goto-click':
-                    const { id, label } = payload;
-                    this.emitGlobal('navigate', {
-                        handler: 'router',
-                        path: [
-                            this.configuration.get('paths').entitaBasePath,
-                            id,
-                            helpers.slugify(label),
-                            'overview'
-                        ]
-                    });
+                    {
+                        const { id, label } = payload;
+                        this.emitGlobal('navigate', {
+                            handler: 'router',
+                            path: [
+                                this.configuration.get('paths').entitaBasePath,
+                                id,
+                                helpers.slugify(label),
+                                'overview',
+                            ],
+                        });
+                    }
                     break;
                 case 'aw-bubble-chart.bubble-filtered':
-                    if (this.dataSource.selectedTab == "overview" || this.dataSource.selectedTab == "entita-collegate") {
+                    if (this.dataSource.selectedTab === 'overview' || this.dataSource.selectedTab === 'entita-collegate') {
                         this.emitOuter('filterbubbleresponse', payload.relatedEntities);
                     }
                     break;
@@ -4744,7 +4752,7 @@ class AwEntitaLayoutEH extends EventHandler {
          * @param {?} page
          * @return {?}
          */
-        page => {
+        (page) => {
             if (this.dataSource.currentPage !== page) {
                 this.dataSource.currentPage = page;
                 this.dataSource.handlePageNavigation();
@@ -4755,7 +4763,7 @@ class AwEntitaLayoutEH extends EventHandler {
          * @param {?} params
          * @return {?}
          */
-        params => {
+        (params) => {
             // look for id
             if (params.get('id')) {
                 if (this.dataSource.currentId === params.get('id') && !forceReload) {
@@ -4769,7 +4777,7 @@ class AwEntitaLayoutEH extends EventHandler {
                  * @param {?} res
                  * @return {?}
                  */
-                res => {
+                (res) => {
                     if (res) {
                         this.dataSource.loadContent(res);
                         // remove the entity of this page
@@ -4778,7 +4786,7 @@ class AwEntitaLayoutEH extends EventHandler {
                          * @param {?} entity
                          * @return {?}
                          */
-                        entity => entity.id !== params.get('id')));
+                        (entity) => entity.id !== params.get('id')));
                         this.dataSource.updateWidgets(res);
                         if (selectedItem) {
                             this.emitOuter('selectItem', selectedItem);
@@ -4823,9 +4831,9 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/linked-objects.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-// used for cherry-picking object keys from app-config.json
 class AwLinkedObjectsDS extends DataSource {
     constructor() {
         super(...arguments);
@@ -4854,13 +4862,12 @@ class AwLinkedObjectsDS extends DataSource {
             else {
                 this.loadedData.actions[1].disabled = false;
             }
-            return;
         });
         this.handleIncomingData = (/**
          * @param {?} incomingData
          * @return {?}
          */
-        incomingData => {
+        (incomingData) => {
             /*
               Called by infinite scroller, adds the incoming
               data to the linked objects component.
@@ -4876,7 +4883,7 @@ class AwLinkedObjectsDS extends DataSource {
          * @param {?} data
          * @return {?}
          */
-        data => {
+        (data) => {
             /*
                   Dynamically returns the data object for each HTML component
                   data: {
@@ -4884,29 +4891,23 @@ class AwLinkedObjectsDS extends DataSource {
                     pagination: { first, last, links, next, prev, select }
                   }
                 */
+            const { config } = this.options;
+            // app-config.json
             /** @type {?} */
-            const config = this.options.config;
+            const paths = config.get('item-preview');
+            // item preview dynamic paths
+            const { totalCount } = data;
+            // total amount of items available on backend
             /** @type {?} */
-            const // app-config.json
-            paths = config.get('item-preview');
+            const page = this.currentPage;
+            // current page (if using pagination)
+            const { context } = this;
+            // parent layout name
             /** @type {?} */
-            const // item preview dynamic paths
-            totalCount = data.totalCount;
+            const size = this.pageSize;
+            // items per page (if using pagination)
             /** @type {?} */
-            const // total amount of items available on backend
-            totalPages = this.totalPages;
-            /** @type {?} */
-            const // calculated number of pages
-            page = this.currentPage;
-            /** @type {?} */
-            const // current page (if using pagination)
-            context = this.context;
-            /** @type {?} */
-            const // parent layout name
-            size = this.pageSize;
-            /** @type {?} */
-            const // items per page (if using pagination)
-            labels = config.get('labels');
+            const labels = config.get('labels');
             const { dynamicPagination } = this.options;
             /** @type {?} */
             const keys = config ? config.get('config-keys') : {};
@@ -4918,9 +4919,9 @@ class AwLinkedObjectsDS extends DataSource {
             let d = data.items ? data.items : data.relatedItems;
             if (config) {
                 // dynamic search for max-item-length
-                if (config.get(context + '-layout')) {
-                    lengthLimit = config.get(context + '-layout')['max-item-length'];
-                    resultsLimit = config.get(context + '-layout')['results-limit'];
+                if (config.get(`${context}-layout`)) {
+                    lengthLimit = config.get(`${context}-layout`)['max-item-length'];
+                    resultsLimit = config.get(`${context}-layout`)['results-limit'];
                 }
             }
             // resize data
@@ -4937,40 +4938,43 @@ class AwLinkedObjectsDS extends DataSource {
              * @param {?} info
              * @return {?}
              */
-            info => info.key));
+            (info) => info.key));
             d.forEach((/**
              * @param {?} el
              * @return {?}
              */
-            el => {
+            (el) => {
                 /** @type {?} */
                 const itemData = el.item ? el.item : el;
                 /** @type {?} */
                 const infoData = get(el, paths.metadata.info.data, itemData.fields);
                 /** @type {?} */
-                const infoDataItems = infoData ? infoData.filter((/**
-                 * @param {?} data
-                 * @return {?}
-                 */
-                data => enabledKeys.indexOf(data.key) !== -1)) : [];
+                const infoDataItems = infoData
+                    ? infoData.filter((/**
+                     * @param {?} info
+                     * @return {?}
+                     */
+                    (info) => enabledKeys.indexOf(info.key) !== -1))
+                    : [];
                 /** @type {?} */
                 const toeData = get(el, paths.metadata.toe.data, itemData.relatedTypesOfEntity);
                 /** @type {?} */
                 const breadcrumbs = get(el, paths.metadata.breadcrumbs.data, itemData.breadcrumbs);
                 if (['entita', 'search'].includes(context)) {
-                    if (itemData.typeOfEntity && itemData.typeOfEntity != "") {
-                        infoDataItems.push({ "key": "Tipo di entità", "value": keys[itemData.typeOfEntity]['singular-label'] });
+                    if (itemData.typeOfEntity && itemData.typeOfEntity !== '') {
+                        infoDataItems.push({ key: 'Tipo di entità', value: keys[itemData.typeOfEntity]['singular-label'] });
                     }
                 }
                 /** @type {?} */
                 let classes = ['entita', 'search', 'oggetti-collegati'].includes(context) ? 'is-fullwidth' : '';
-                classes += itemData.typeOfEntity ? ' is-' + config.get('config-keys')[itemData.typeOfEntity]['class-name'] : ' is-oggetto-culturale';
-                //consider the lenght of <em> tags to exclude from count
+                classes += itemData.typeOfEntity ? ` is-${config.get('config-keys')[itemData.typeOfEntity]['class-name']}` : ' is-oggetto-culturale';
+                // consider the lenght of <em> tags to exclude from count
                 /** @type {?} */
                 const highlights = get(el, paths.title, itemData.label).match(/<em>/g) ? get(el, paths.title, itemData.label).match(/<em>/g).length * 9 : 0;
                 /** @type {?} */
-                const itemTitle = +paths.title.maxLength && get(el, paths.title, itemData.label).length > +paths.title.maxLength + highlights
-                    ? get(el, paths.title, itemData.label).slice(0, +paths.title.maxLength + highlights) + '…'
+                const itemTitle = +paths.title.maxLength
+                    && get(el, paths.title, itemData.label).length > +paths.title.maxLength + highlights
+                    ? `${get(el, paths.title, itemData.label).slice(0, +paths.title.maxLength + highlights)}…`
                     : get(el, paths.title, itemData.label);
                 /** @type {?} */
                 const itemId = get(el, paths.payload, itemData.id);
@@ -4980,36 +4984,44 @@ class AwLinkedObjectsDS extends DataSource {
                 const itemHref = [
                     itemType ? config.get('paths').entitaBasePath : config.get('paths').schedaBasePath,
                     itemId,
-                    helpers.slugify(itemTitle)
+                    helpers.slugify(itemTitle),
                 ].join('/');
                 /** @type {?} */
+                let text;
+                if (!paths.text) {
+                    text = null;
+                }
+                else if (+paths.text.maxLength
+                    && get(el, paths.text.data, itemData.text).length > +paths.text.maxLength) {
+                    text = `${get(el, paths.text.data, itemData.text).slice(0, +paths.text.maxLength)}…`;
+                }
+                else {
+                    text = get(el, paths.text.data, itemData.text);
+                }
+                /** @type {?} */
                 const item = {
+                    text,
+                    classes,
+                    breadcrumbs,
                     image: get(el, paths.image, itemData.image),
                     title: itemTitle,
-                    text: !paths.text ? null : // make text block (in config) optional
-                        +paths.text.maxLength && get(el, paths.text.data, itemData.text).length > +paths.text.maxLength ?
-                            get(el, paths.text.data, itemData.text).slice(0, +paths.text.maxLength) + '…' :
-                            get(el, paths.text.data, itemData.text),
                     anchor: {
-                        href: itemHref
+                        href: itemHref,
                     },
-                    // payload: { id: _get(el, paths.payload, el.item.id), type: el.item.typeOfEntity, title: itemTitle },
-                    classes: classes,
                     metadata: infoDataItems.length || toeData ? [] : null,
-                    breadcrumbs: breadcrumbs
                 };
                 // metadata
                 if (infoDataItems.length) {
                     item.metadata.push({
                         classes: 'aw-item-preview_metadata',
                         items: infoDataItems.map((/**
-                         * @param {?} data
+                         * @param {?} infoDItem
                          * @return {?}
                          */
-                        data => ({
-                            label: helpers.prettifySnakeCase(data.key, labels[data.key]),
-                            value: data.value
-                        })))
+                        (infoDItem) => ({
+                            label: helpers.prettifySnakeCase(infoDItem.key, labels[infoDItem.key]),
+                            value: infoDItem.value,
+                        }))),
                     });
                 }
                 if (toeData) {
@@ -5019,37 +5031,35 @@ class AwLinkedObjectsDS extends DataSource {
                          * @param {?} toe
                          * @return {?}
                          */
-                        toe => {
-                            return {
-                                // persona: 6, Organizz: 12, Luoghi: 2, Concetti: 32
-                                value: get(toe, paths.metadata.toe.value, toe.count),
-                                // icon: 'n7-icon-bell' // TODO: link icon to config key
-                                icon: keys[get(toe, paths.metadata.toe.icon, toe.type)]
-                                    ? keys[get(toe, paths.metadata.toe.icon, toe.type)].icon
-                                    : '',
-                                classes: 'color-' + keys[get(toe, paths.metadata.toe.icon, toe.type)]['class-name']
-                            };
-                        }))
+                        (toe) => ({
+                            // persona: 6, Organizz: 12, Luoghi: 2, Concetti: 32
+                            value: get(toe, paths.metadata.toe.value, toe.count),
+                            // icon: 'n7-icon-bell' // TODO: link icon to config key
+                            icon: keys[get(toe, paths.metadata.toe.icon, toe.type)]
+                                ? keys[get(toe, paths.metadata.toe.icon, toe.type)].icon
+                                : '',
+                            classes: `color-${keys[get(toe, paths.metadata.toe.icon, toe.type)]['class-name']}`,
+                        }))),
                     });
                 }
                 // breadcrumbs
                 if (breadcrumbs) {
-                    item['breadcrumbs'] = {
+                    item.breadcrumbs = {
                         // n7-breadcrumbs uses this as it's own data
                         items: get(el, paths.metadata.breadcrumbs.data, el.item.breadcrumbs).map((/**
                          * @param {?} crumb
                          * @return {?}
                          */
-                        crumb => {
+                        (crumb) => {
                             /** @type {?} */
                             const label = get(crumb, paths.metadata.breadcrumbs.label, crumb.label);
                             return {
                                 label,
                                 anchor: {
-                                    href: itemHref
-                                }
+                                    href: itemHref,
+                                },
                             };
-                        }))
+                        })),
                     };
                 }
                 result.push(item);
@@ -5058,11 +5068,11 @@ class AwLinkedObjectsDS extends DataSource {
                 /** @type {?} */
                 const actions = [
                     {
-                        label: 'Mostra Tutti (' + totalCount + ')'
+                        label: `Mostra Tutti (${totalCount})`,
                     },
-                    lengthLimit ?
-                        {
-                            label: 'Mostra Altri (' + resultsLimit + ')',
+                    lengthLimit
+                        ? {
+                            label: `Mostra Altri (${resultsLimit})`,
                             disabled: false,
                         } : null,
                 ];
@@ -5070,7 +5080,7 @@ class AwLinkedObjectsDS extends DataSource {
                     result,
                     actions,
                     isLoading: false,
-                    fallback: config.get('home-layout')['linked-objects-fallback']
+                    fallback: config.get('home-layout')['linked-objects-fallback'],
                 };
             }
             return { previews: result };
@@ -5111,7 +5121,7 @@ class AwLinkedObjectsDS extends DataSource {
         const { href, queryParams } = this.options.paginationParams;
         return {
             href: queryParams ? href : href + page,
-            queryParams: queryParams ? Object.assign({}, queryParams, { page: page }) : null
+            queryParams: queryParams ? Object.assign({}, queryParams, { page }) : null,
         };
     }
 }
@@ -5145,9 +5155,10 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/autocomplete-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-class AwAutocompleteWrapperDS extends DataSource {
+class AwAutocompleteWrapperDS extends DataSource$1 {
     constructor() {
         super(...arguments);
         this.stringTrim = (/**
@@ -5161,10 +5172,9 @@ class AwAutocompleteWrapperDS extends DataSource {
               TODO: Do not cut the string in the middle of an HTML tag!
             */
             if (string.length > limit) {
-                return string.slice(0, limit) + '…';
+                return `${string.slice(0, limit)}…`;
             }
-            else
-                return string;
+            return string;
         });
     }
     /**
@@ -5173,14 +5183,13 @@ class AwAutocompleteWrapperDS extends DataSource {
      * @return {?}
      */
     transform(data) {
-        const { key, response } = data;
+        const { response } = data;
         if (!response) {
             return { suggestion: [], loading: true };
         }
         /** @type {?} */
         const suggestion = [];
-        /** @type {?} */
-        const config = this.options.config;
+        const { config } = this.options;
         /** @type {?} */
         const maxLength = (config.get('home-layout')['max-item-length'] || 20);
         /** @type {?} */
@@ -5188,13 +5197,14 @@ class AwAutocompleteWrapperDS extends DataSource {
          * @param {?} el
          * @return {?}
          */
-        el => typeof el.entity == 'object'));
+        (el) => typeof el.entity === 'object'));
+        // eslint-disable-next-line consistent-return
         fResults.forEach((/**
          * @param {?} el
          * @return {?}
          */
-        el => {
-            if (el.entity.id == 'fallback') { // build and return fallback data
+        (el) => {
+            if (el.entity.id === 'fallback') { // build and return fallback data
                 suggestion.push({
                     text: el.entity.label,
                     payload: 'fallback-simple-autocomplete',
@@ -5206,8 +5216,8 @@ class AwAutocompleteWrapperDS extends DataSource {
             suggestion.push({
                 text,
                 anchor: {
-                    payload: el.entity.id
-                }
+                    payload: el.entity.id,
+                },
             });
         }));
         return { suggestion };
@@ -5223,6 +5233,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/bubble-chart.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwBubbleChartDS extends DataSource {
@@ -5236,39 +5247,41 @@ class AwBubbleChartDS extends DataSource {
         // list of selected bubbles
         this.filters = []; // list of active filters to show only some TypeOfEntity(s)
         // list of active filters to show only some TypeOfEntity(s)
-        this.closedEyes = []; // array of the activated eye filters 
-        // array of the activated eye filters 
+        this.closedEyes = []; // array of the activated eye filters
+        // array of the activated eye filters
         this.tippyList = []; // list of tippy instances
         this.updateChart = (/**
          * @param {?} res
          * @return {?}
          */
-        res => {
+        (res) => {
             /*
-              Redraws the graph with the incoming data.
-              "res" should be Apollo's "response.entitiesData".
-              When res is passed as null, the chart is rendered with the previous data.
-            */
+                  Redraws the graph with the incoming data.
+                  "res" should be Apollo's "response.entitiesData".
+                  When res is passed as null, the chart is rendered with the previous data.
+                */
+            /** @type {?} */
+            let response = res;
             if (res === null) {
-                res = this.chartData;
+                response = this.chartData;
             }
             else {
                 this.chartData = res;
             }
             if (this.filters.length > 0) { // apply filters to the response
-                res = this.chartData.filter((/**
+                response = this.chartData.filter((/**
                  * @param {?} el
                  * @return {?}
                  */
-                el => !this.filters.includes(el.entity.typeOfEntity.replace(/ /g, '-'))));
+                (el) => !this.filters.includes(el.entity.typeOfEntity.replace(/ /g, '-'))));
             }
             if (!this.draw) {
-                this.update(this.smartSlice(res)); // component self-update
+                this.update(this.smartSlice(response)); // component self-update
             }
             else {
                 this.output.selected = this.selected;
-                this.output.data = this.smartSlice(res);
-                this.output.smallView.data = this.smartSlice(res, this.options.smallChartSize);
+                this.output.data = this.smartSlice(response);
+                this.output.smallView.data = this.smartSlice(response, this.options.smallChartSize);
                 this.draw();
             }
         });
@@ -5279,19 +5292,17 @@ class AwBubbleChartDS extends DataSource {
          */
         (d, length) => {
             /** @type {?} */
-            const l = length ? length : this.options.limit;
+            const l = length || this.options.limit;
             if (l && l < d.length) {
                 return d.slice(0, l);
             }
-            else {
-                return d;
-            }
+            return d;
         });
         this.handleBubbleClick = (/**
          * @param {?} payload
          * @return {?}
          */
-        payload => {
+        (payload) => {
             /*
                   Toggles the selection of the clicked bubble.
                 */
@@ -5324,7 +5335,7 @@ class AwBubbleChartDS extends DataSource {
          * @param {?} k
          * @return {?}
          */
-        k => {
+        (k) => {
             domain.push(k.replace(/-/g, ' '));
             range.push(((colorConfig[k] || {}).color || {}).hex);
         }));
@@ -5335,22 +5346,16 @@ class AwBubbleChartDS extends DataSource {
              * @param {?} draw
              * @return {?}
              */
-            draw => this.draw = draw),
+            (draw) => { this.draw = draw; }),
             colorMatch: { domain, range },
             selected: this.selected,
-            sizeRange: [.5, 500],
+            sizeRange: [0.5, 500],
             fontRendering,
             height: 500,
             width: 500,
             transition,
             shuffle,
-        }
-        /*
-        Two data streams are ouputted.
-        The default stream is for the normal visualization,
-        "smallView" is used for a compressed view of the same data.
-        */
-        ;
+        };
         /*
         Two data streams are ouputted.
         The default stream is for the normal visualization,
@@ -5382,6 +5387,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/chart-tippy.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwChartTippyDS extends DataSource {
@@ -5393,18 +5399,16 @@ class AwChartTippyDS extends DataSource {
     transform(data) {
         // ====== DATA ======
         const { bubbles, selected } = data;
-        const { basePath, selectable } = this.options
-        // ==================
-        ;
+        const { basePath, selectable } = this.options;
         // ==================
         /** @type {?} */
         const templates = bubbles.map((/**
          * @param {?} b
          * @return {?}
          */
-        b => {
+        (b) => {
             const { count, entity } = b;
-            const { id, label, typeOfEntity } = entity;
+            const { id, label } = entity;
             return {
                 id,
                 selectable,
@@ -5412,8 +5416,8 @@ class AwChartTippyDS extends DataSource {
                 text: `È collegato a ${count} oggetti culturali`,
                 isSelected: selected.includes(id),
                 anchorData: {
-                    href: `${basePath}${id}/${helpers.slugify(label)}`
-                }
+                    href: `${basePath}${id}/${helpers.slugify(label)}`,
+                },
             };
         }));
         return templates;
@@ -5422,6 +5426,7 @@ class AwChartTippyDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/hero.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHeroDS extends DataSource {
@@ -5435,7 +5440,7 @@ class AwHeroDS extends DataSource {
      * @return {?}
      */
     transform(data) {
-        const { title, text, button, backgroundImage, input } = data;
+        const { title, text, button, backgroundImage, input, } = data;
         return {
             title,
             text,
@@ -5443,13 +5448,13 @@ class AwHeroDS extends DataSource {
             button: {
                 text: button.text,
                 anchor: {
-                    payload: 'cerca'
-                }
+                    payload: 'cerca',
+                },
             },
             input: {
                 placeholder: input.placeholder,
-                payload: 'cerca-in-maxxi'
-            }
+                payload: 'cerca-in-maxxi',
+            },
         };
     }
 }
@@ -5460,21 +5465,22 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/table.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwTableDS extends DataSource {
     /**
      * @protected
-     * @param {?} data
      * @return {?}
      */
-    transform(data) {
+    transform() {
         return TABLE_MOCK;
     }
 }
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/home-hero-patrimonio.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeHeroPatrimonioDS extends DataSource {
@@ -5490,6 +5496,7 @@ class AwHomeHeroPatrimonioDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/home-facets-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeFacetsWrapperDS extends DataSource {
@@ -5499,8 +5506,8 @@ class AwHomeFacetsWrapperDS extends DataSource {
         // autocomplete data for each facet
         this.lockedFacets = {}; // locked means that the eye cannot be closed
         // locked means that the eye cannot be closed
-        this.lastData = {}; // store the last response so the component can be rendered again with the same data
         // store the last response so the component can be rendered again with the same data
+        this.lastData = {};
         this.closedEyes = []; // list of closed eyes
         // list of closed eyes
         this.openTippy = ''; // tipe of entity of the currently open tippy
@@ -5510,18 +5517,19 @@ class AwHomeFacetsWrapperDS extends DataSource {
          */
         (id) => {
             /*
-              Builds or updates Tippy for the input in use (id)
-            */
-            id = id.replace(/ /g, '-');
+                  Builds or updates Tippy for the input in use (id)
+                */
+            /** @type {?} */
+            const newId = id.replace(/ /g, '-');
             // create data for this facet
-            if (!this.autoComplete[id]) {
-                this.autoComplete[id] = {
+            if (!this.autoComplete[newId]) {
+                this.autoComplete[newId] = {
                     tippy: undefined,
                     // tippy data / config
-                    open: true // show or hide tippy
+                    open: true,
                 };
                 /** @type {?} */
-                const ac = this.autoComplete[id];
+                const ac = this.autoComplete[newId];
                 /** @type {?} */
                 const getContent = (/**
                  * @return {?}
@@ -5533,8 +5541,9 @@ class AwHomeFacetsWrapperDS extends DataSource {
                     return contentNode;
                 });
                 if (!ac.tippy) {
+                    // target the correct this.autoComplete[id] input class
                     /** @type {?} */
-                    const target = document.getElementsByClassName(id)[1];
+                    const target = document.getElementsByClassName(newId)[1];
                     ac.tippy = tippy(target, {
                         content: getContent(),
                         trigger: 'manual',
@@ -5549,7 +5558,7 @@ class AwHomeFacetsWrapperDS extends DataSource {
                 }
             }
             /** @type {?} */
-            const ac = this.autoComplete[id];
+            const ac = this.autoComplete[newId];
             if (ac.tippy) {
                 ac.tippy.show();
             }
@@ -5559,10 +5568,11 @@ class AwHomeFacetsWrapperDS extends DataSource {
          * @return {?}
          */
         (id) => {
-            id = id.replace(/ /g, '-');
-            if (this.autoComplete[id]) {
+            /** @type {?} */
+            const newId = id.replace(/ /g, '-');
+            if (this.autoComplete[newId]) {
                 /** @type {?} */
-                const ac = this.autoComplete[id];
+                const ac = this.autoComplete[newId];
                 if (ac.tippy) {
                     ac.tippy.hide();
                 }
@@ -5583,20 +5593,15 @@ class AwHomeFacetsWrapperDS extends DataSource {
         const inputs = [];
         /** @type {?} */
         const facetData = data;
-        /** @type {?} */
-        const lockedFacets = this.lockedFacets // locked means that the eye cannot be closed
-        ;
+        const { lockedFacets } = this;
         // locked means that the eye cannot be closed
-        /** @type {?} */
-        const closedEyes = this.closedEyes // list of closed eyes
-        // when facet data changes, destroy every tippy and reset autocomplete data.
-        ;
+        const { closedEyes } = this;
         // when facet data changes, destroy every tippy and reset autocomplete data.
         Object.keys(this.autoComplete).forEach((/**
          * @param {?} id
          * @return {?}
          */
-        id => {
+        (id) => {
             if (this.autoComplete[id] && this.autoComplete[id].tippy) {
                 this.autoComplete[id].tippy.destroy(); // destroy
             }
@@ -5623,29 +5628,30 @@ class AwHomeFacetsWrapperDS extends DataSource {
       
              The first case is managed by pushing the selected bubble's ID to the corresponding array
              of lockedFacets.
-             The second case is managed by pushing a "LOCK_LAST" string to the lockedFacets array of the last
+             The second case is managed by pushing a "LOCK_LAST" string
+             to the lockedFacets array of the last
              enabled facet.
             */
             Object.keys(lockedFacets).forEach((/**
              * @param {?} key
              * @return {?}
              */
-            key => {
+            (key) => {
                 // clear all locked facets arrays from "LOCK_LAST" values (reset all locks)
                 /** @type {?} */
-                let index = lockedFacets[key].indexOf('LOCK_LAST');
+                const index = lockedFacets[key].indexOf('LOCK_LAST');
                 if (index >= 0) {
                     lockedFacets[key].splice(index, 1);
                 }
             }));
             if (closedEyes) {
-                if (closedEyes.length == facetData.length - 1) {
+                if (closedEyes.length === facetData.length - 1) {
                     /** @type {?} */
-                    let lastFacet = facetData.find((/**
+                    const lastFacet = facetData.find((/**
                      * @param {?} f
                      * @return {?}
                      */
-                    f => !closedEyes.includes(f.type.replace(/ /g, '-'))));
+                    (f) => !closedEyes.includes(f.type.replace(/ /g, '-'))));
                     if (lastFacet) {
                         if (closedEyes[lastFacet.type]) {
                             lockedFacets[lastFacet.type].push('LOCK_LAST');
@@ -5691,11 +5697,11 @@ class AwHomeFacetsWrapperDS extends DataSource {
                 text: facet.label,
                 additionalText: facet.count,
                 iconRight: facet.enabled ? 'n7-icon-eye' : 'n7-icon-eye-slash',
-                classes: headerClasses.join(' ') +
-                    (facet.locked
+                classes: headerClasses.join(' ')
+                    + (facet.locked
                         ? ' is-blocked'
                         : ' not-blocked'),
-                payload: facet.locked === true ? null : facet.type.replace(/ /g, '-')
+                payload: facet.locked === true ? null : facet.type.replace(/ /g, '-'),
             });
             // make array of inputs data
             inputs.push({
@@ -5708,28 +5714,23 @@ class AwHomeFacetsWrapperDS extends DataSource {
                                 placeholder: facet['input-placeholder'],
                                 icon: 'n7-icon-search',
                                 disabled: !facet.enabled,
-                                inputPayload: String(facet.type.replace(/ /g, '-')) + '-search',
-                                iconPayload: String(facet.type.replace(/ /g, '-')) + '-search',
-                                enterPayload: String(facet.type.replace(/ /g, '-')) + '-search',
-                                classes: String(facet.type.replace(' ', '-')) + '-search'
-                            }
-                        ]
-                    }
-                ]
+                                inputPayload: `${String(facet.type.replace(/ /g, '-'))}-search`,
+                                iconPayload: `${String(facet.type.replace(/ /g, '-'))}-search`,
+                                enterPayload: `${String(facet.type.replace(/ /g, '-'))}-search`,
+                                classes: `${String(facet.type.replace(' ', '-'))}-search`,
+                            },
+                        ],
+                    },
+                ],
             });
         }));
         // zipping arrays to render widgets with separate data (see home-layout.html)
-        /** @type {?} */
-        const widgetData = [];
-        headers.map((/**
+        return headers.map((/**
          * @param {?} h
          * @param {?} i
          * @return {?}
          */
-        (h, i) => {
-            widgetData.push({ header: h, input: inputs[i] });
-        }));
-        return widgetData;
+        (h, i) => ({ header: h, input: inputs[i] })));
     }
 }
 if (false) {
@@ -5754,6 +5755,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/home-item-tags-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeItemTagsWrapperDS extends DataSource {
@@ -5769,6 +5771,7 @@ class AwHomeItemTagsWrapperDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/home-autocomplete.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeAutocompleteDS extends DataSource {
@@ -5807,7 +5810,7 @@ class AwHomeAutocompleteDS extends DataSource {
                     icon,
                     classes: `color-${groupConfig['class-name']}`,
                     items: [],
-                    type: groupId
+                    type: groupId,
                 };
             }
             if (itemIds.indexOf(currentItem.id) === -1) {
@@ -5828,8 +5831,8 @@ class AwHomeAutocompleteDS extends DataSource {
                     title: currentItem.label,
                     metadata,
                     anchor: {
-                        href: `${paths[entity ? 'entitaBasePath' : 'schedaBasePath']}/${currentItem.id}/${helpers.slugify(currentItem.label)}`
-                    }
+                        href: `${paths[entity ? 'entitaBasePath' : 'schedaBasePath']}/${currentItem.id}/${helpers.slugify(currentItem.label)}`,
+                    },
                 });
             }
         }));
@@ -5838,13 +5841,13 @@ class AwHomeAutocompleteDS extends DataSource {
          * @param {?} key
          * @return {?}
          */
-        key => ({
+        (key) => ({
             group: {
                 title: groups[key].title,
                 icon: groups[key].icon,
-                classes: groups[key].classes
+                classes: groups[key].classes,
             },
-            items: groups[key].items
+            items: groups[key].items,
         })));
         return {
             results: grouplist,
@@ -5854,30 +5857,31 @@ class AwHomeAutocompleteDS extends DataSource {
                     anchor: {
                         href: paths.searchBasePath,
                         queryParams: {
-                            query
-                        }
-                    }
-                }
+                            query,
+                        },
+                    },
+                },
             } : {
                 showMore: {
-                    text: `Cerca in tutti i campi`,
+                    text: 'Cerca in tutti i campi',
                     anchor: {
                         href: paths.searchBasePath,
                         queryParams: {
                             query,
                             // Query string
-                            'query-all': 1 // "Cerca in tutti i campi delle schede"
-                        }
-                    }
-                }
+                            'query-all': 1,
+                        },
+                    },
+                },
             },
-            fallback: ((config.get('home-layout') || {})['top-hero'] || {}).fallback
+            fallback: ((config.get('home-layout') || {})['top-hero'] || {}).fallback,
         };
     }
 }
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/entita-nav.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaNavDS extends DataSource {
@@ -5888,57 +5892,55 @@ class AwEntitaNavDS extends DataSource {
      */
     transform(param) {
         if (!param) {
-            return;
+            return null;
         }
-        /** @type {?} */
-        const data = param.data;
-        /** @type {?} */
-        const selected = param.selected;
+        const { data } = param;
+        const { selected } = param;
         /** @type {?} */
         const navigation = { items: [], payload: 'entita-nav' };
         navigation.items.push({
             text: 'OVERVIEW',
-            anchor: { href: param.basePath + '/overview' },
-            classes: selected === 'overview' ? 'is-selected' : ''
+            anchor: { href: `${param.basePath}/overview` },
+            classes: selected === 'overview' ? 'is-selected' : '',
         });
         if (data.fields && data.fields.length > 0) {
             navigation.items.push({
                 text: 'CAMPI',
-                anchor: { href: param.basePath + '/campi' },
-                classes: selected === 'campi' ? 'is-selected' : ''
+                anchor: { href: `${param.basePath}/campi` },
+                classes: selected === 'campi' ? 'is-selected' : '',
             });
         }
         if (data.relatedItems) {
             navigation.items.push({
                 text: 'OGGETTI COLLEGATI',
                 anchor: {
-                    href: param.basePath + '/oggetti-collegati',
+                    href: `${param.basePath}/oggetti-collegati`,
                     queryParams: {
-                        page: 1
-                    }
+                        page: 1,
+                    },
                 },
-                classes: selected === 'oggetti-collegati' ? 'is-selected' : ''
+                classes: selected === 'oggetti-collegati' ? 'is-selected' : '',
             });
         }
-        if (data.relatedEntities && this.options['bubblesEnabled']) {
+        if (data.relatedEntities && this.options.bubblesEnabled) {
             navigation.items.push({
                 text: 'ENTITÀ COLLEGATE',
-                anchor: { href: param.basePath + '/entita-collegate' },
-                classes: selected === 'entita-collegate' ? 'is-selected' : ''
+                anchor: { href: `${param.basePath}/entita-collegate` },
+                classes: selected === 'entita-collegate' ? 'is-selected' : '',
             });
         }
         if (data.extraTab) {
             navigation.items.push({
                 text: 'MAXXI',
-                anchor: { href: param.basePath + '/maxxi' },
-                classes: selected === 'maxxi' ? 'is-selected' : ''
+                anchor: { href: `${param.basePath}/maxxi` },
+                classes: selected === 'maxxi' ? 'is-selected' : '',
             });
         }
         if (data.wikiTab) {
             navigation.items.push({
                 text: 'WIKIPEDIA',
-                anchor: { href: param.basePath + '/wiki' },
-                classes: selected === 'wiki' ? 'is-selected' : ''
+                anchor: { href: `${param.basePath}/wiki` },
+                classes: selected === 'wiki' ? 'is-selected' : '',
             });
         }
         return navigation;
@@ -5947,6 +5949,7 @@ class AwEntitaNavDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/entita-metadata-viewer.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaMetadataViewerDS extends DataSource {
@@ -5964,19 +5967,20 @@ class AwEntitaMetadataViewerDS extends DataSource {
               Access and use this.options if the rendering
               changes based on context.
             */
-        let { context, labels, config } = this.options;
-        labels = labels || {};
+        const { context, config } = this.options;
+        /** @type {?} */
+        const labels = this.options.labels || {};
         /** @type {?} */
         let unpackedData = [];
-        if (context == 'overview' && data) {
+        if (context === 'overview' && data) {
             /** @type {?} */
-            let configuredKeys = ((config.get('entita-layout') || {}).overview || {}).campi;
+            const configuredKeys = ((config.get('entita-layout') || {}).overview || {}).campi;
             /** @type {?} */
-            let filteredData = data.filter((/**
+            const filteredData = data.filter((/**
              * @param {?} d
              * @return {?}
              */
-            d => configuredKeys.includes(d.key)));
+            (d) => configuredKeys.includes(d.key)));
             unpackedData = AwEntitaMetadataViewerDS.unpackFields(filteredData);
         }
         else {
@@ -5987,24 +5991,25 @@ class AwEntitaMetadataViewerDS extends DataSource {
          * @param {?} section
          * @return {?}
          */
-        section => {
+        (section) => {
             section.items
                 .filter((/**
              * @param {?} item
              * @return {?}
              */
-            item => item.label))
+            (item) => item.label))
                 .forEach((/**
              * @param {?} item
              * @return {?}
              */
-            item => item.label = helpers.prettifySnakeCase(item.label, labels[item.label])));
+            (item) => {
+                item.label = helpers.prettifySnakeCase(item.label, labels[item.label]);
+            }));
         }));
         return {
-            group: unpackedData
+            group: unpackedData,
         };
     }
-    // tslint:disable-next-line: member-ordering
     /**
      * @param {?} fields
      * @return {?}
@@ -6024,15 +6029,13 @@ class AwEntitaMetadataViewerDS extends DataSource {
              * @param {?} el
              * @return {?}
              */
-            el => {
-                return { label: el.key, value: el.value };
-            }));
+            (el) => ({ label: el.key, value: el.value })));
             return [{ items: extracted }];
         }
         if (!fields) {
             return [];
         } // if is empty → quit
-        for (let i = 0; i < fields.length; i++) {
+        for (let i = 0; i < fields.length; i += 1) {
             /** @type {?} */
             const thisField = fields[i];
             // rename current field
@@ -6042,8 +6045,7 @@ class AwEntitaMetadataViewerDS extends DataSource {
             /** @type {?} */
             const label = thisField.key;
             // item label
-            /** @type {?} */
-            const value = thisField.value;
+            const { value } = thisField;
             // item value
             /** @type {?} */
             const group = thisField.fields;
@@ -6077,31 +6079,37 @@ class AwEntitaMetadataViewerDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/tree.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-class AwTreeDS extends DataSource {
+class AwTreeDS extends DataSource$1 {
     constructor() {
         super(...arguments);
+        this.transform = (/**
+         * @param {?} data
+         * @return {?}
+         */
+        (data) => data);
         this._getCachedData = (/**
          * @return {?}
          */
-        () => {
-            return AwTreeDS.dataCache[this.rootId];
-        });
+        () => AwTreeDS.dataCache[this.rootId]);
         this._normalize = (/**
          * @param {?} __0
          * @return {?}
          */
-        ({ id, label, icon, img, branches }) => {
+        ({ id, label, icon, img, branches, }) => {
             /** @type {?} */
             const hasBranches = !!(Array.isArray(branches) && branches.length);
-            this._getCachedData().flatData[id] = { id, label, icon, img, hasBranches };
+            this._getCachedData().flatData[id] = {
+                id, label, icon, img, hasBranches,
+            };
             if (hasBranches) {
                 branches.forEach((/**
                  * @param {?} data
                  * @return {?}
                  */
-                data => {
+                (data) => {
                     this._getCachedData().flatIds.push([id, data.id]);
                     this._normalize(data);
                 }));
@@ -6111,19 +6119,17 @@ class AwTreeDS extends DataSource {
          * @param {?} id
          * @return {?}
          */
-        (id) => {
-            return this._getCachedData().flatIds
-                .filter((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ([, childId]) => childId === id))
-                .map((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ([parentId]) => parentId))[0] || null;
-        });
+        (id) => this._getCachedData().flatIds
+            .filter((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ([, childId]) => childId === id))
+            .map((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ([parentId]) => parentId))[0] || null);
         this._getTreePath = (/**
          * @param {?} id
          * @return {?}
@@ -6195,7 +6201,7 @@ class AwTreeDS extends DataSource {
          * @return {?}
          */
         (id, inPath) => {
-            const { label, icon, img, hasBranches } = this._getCachedData().flatData[id];
+            const { label, icon, img, hasBranches, } = this._getCachedData().flatData[id];
             /** @type {?} */
             const defaultIcon = inPath ? 'n7-icon-angle-down' : 'n7-icon-angle-right';
             /** @type {?} */
@@ -6215,26 +6221,15 @@ class AwTreeDS extends DataSource {
                     icon: icon || defaultIcon,
                     payload: {
                         source: 'toggle',
-                        id: id,
-                    }
+                        id,
+                    },
                 } : null,
                 meta: id,
                 anchor: {
-                    href: `${this.basePath}/${id}/${helpers.slugify(label)}`
-                }
+                    href: `${this.basePath}/${id}/${helpers.slugify(label)}`,
+                },
             };
         });
-    }
-    /**
-     * @protected
-     * @param {?} tree
-     * @return {?}
-     */
-    transform(tree) {
-        if (!tree) {
-            return;
-        }
-        return tree;
     }
     /**
      * @param {?} data
@@ -6299,7 +6294,7 @@ class AwTreeDS extends DataSource {
              * @param {?} item
              * @return {?}
              */
-            item => {
+            (item) => {
                 /** @type {?} */
                 const founded = item.meta === this.activeId;
                 /** @type {?} */
@@ -6353,6 +6348,11 @@ if (false) {
     AwTreeDS.prototype.activeId;
     /**
      * @type {?}
+     * @protected
+     */
+    AwTreeDS.prototype.transform;
+    /**
+     * @type {?}
      * @private
      */
     AwTreeDS.prototype._getCachedData;
@@ -6385,6 +6385,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/sidebar-header.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSidebarHeaderDS extends DataSource {
@@ -6399,7 +6400,7 @@ class AwSidebarHeaderDS extends DataSource {
             text: data.text || '',
             iconRight: 'n7-icon-angle-left',
             classes: 'is-expanded',
-            payload: 'header'
+            payload: 'header',
         };
     }
     /**
@@ -6422,35 +6423,44 @@ class AwSidebarHeaderDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/scheda-breadcrumbs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaBreadcrumbsDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        return data;
+    constructor() {
+        super(...arguments);
+        this.transform = (/**
+         * @param {?} data
+         * @return {?}
+         */
+        (data) => data);
     }
     /**
      * @return {?}
      */
     toggleSidebar() {
         /** @type {?} */
-        let sidebarData = this.output;
-        if (sidebarData.classes == "is-expanded") {
-            sidebarData.classes = "is-collapsed";
+        const sidebarData = this.output;
+        if (sidebarData.classes === 'is-expanded') {
+            sidebarData.classes = 'is-collapsed';
         }
         else {
-            sidebarData.classes = "is-expanded";
+            sidebarData.classes = 'is-expanded';
         }
         this.update(sidebarData);
     }
 }
+if (false) {
+    /**
+     * @type {?}
+     * @protected
+     */
+    AwSchedaBreadcrumbsDS.prototype.transform;
+}
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/scheda-metadata.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaMetadataDS extends DataSource {
@@ -6463,32 +6473,38 @@ class AwSchedaMetadataDS extends DataSource {
         let { labels } = this.options;
         labels = labels || {};
         /** @type {?} */
-        let group = { group: [] };
+        const group = { group: [] };
         if (data.fields) {
             data.fields.forEach((/**
              * @param {?} field
              * @return {?}
              */
-            field => {
+            (field) => {
                 /** @type {?} */
-                let items = [];
+                const items = [];
                 if (field.fields) {
                     field.fields.forEach((/**
                      * @param {?} item
                      * @return {?}
                      */
-                    item => {
-                        items.push({ label: helpers.prettifySnakeCase(item.key, labels[item.key]), value: item.value });
+                    (item) => {
+                        items.push({
+                            label: helpers.prettifySnakeCase(item.key, labels[item.key]),
+                            value: item.value
+                        });
                     }));
                     group.group.push({
+                        items,
                         title: field.label,
-                        items: items
                     });
                 }
                 else {
-                    items.push({ label: helpers.prettifySnakeCase(field.key, labels[field.key]), value: field.value });
+                    items.push({
+                        label: helpers.prettifySnakeCase(field.key, labels[field.key]),
+                        value: field.value
+                    });
                     group.group.push({
-                        items: items
+                        items,
                     });
                 }
             }));
@@ -6499,6 +6515,7 @@ class AwSchedaMetadataDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/scheda-image.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaImageDS extends DataSource {
@@ -6514,6 +6531,7 @@ class AwSchedaImageDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/scheda-inner-title.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaInnerTitleDS extends DataSource {
@@ -6529,6 +6547,7 @@ class AwSchedaInnerTitleDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/search-layout-tabs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutTabsDS extends DataSource {
@@ -6538,24 +6557,23 @@ class AwSearchLayoutTabsDS extends DataSource {
     }
     /**
      * @protected
-     * @param {?} data
      * @return {?}
      */
-    transform(data) {
+    transform() {
         return {
             items: [{
                     text: 'LISTA',
                     payload: 'list',
-                    classes: this.selected === 'list' ? 'is-selected' : ''
+                    classes: this.selected === 'list' ? 'is-selected' : '',
                 }, {
                     text: 'GRAFICO',
                     payload: 'chart',
-                    classes: this.selected === 'chart' ? 'is-selected' : ''
+                    classes: this.selected === 'chart' ? 'is-selected' : '',
                 }, {
                     text: 'TIMELINE',
                     payload: 'timeline',
-                    classes: this.selected === 'timeline' ? 'is-selected' : ''
-                }]
+                    classes: this.selected === 'timeline' ? 'is-selected' : '',
+                }],
         };
     }
     /**
@@ -6576,10 +6594,12 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     AwLinkedObjectsDS: AwLinkedObjectsDS,
     AwAutocompleteWrapperDS: AwAutocompleteWrapperDS,
     AwBubbleChartDS: AwBubbleChartDS,
@@ -6603,6 +6623,7 @@ var DS$1 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/linked-objects.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwLinkedObjectsEH extends EventHandler {
@@ -6612,7 +6633,7 @@ class AwLinkedObjectsEH extends EventHandler {
          * @param {?} target
          * @return {?}
          */
-        target => {
+        (target) => {
             const { totalObjects, loadedData } = this.dataSource;
             /** @type {?} */
             const loadedTotal = Array.isArray(loadedData.result) ? loadedData.result.length : 0;
@@ -6623,10 +6644,11 @@ class AwLinkedObjectsEH extends EventHandler {
               Check if the target element is scrolled near the end while data is not already loading.
               If the condition is met, a request for more data is sent.
             */
-            if (target.scrollTop + target.clientHeight >= target.scrollHeight - 150 && this.dataSource.loadedData.isLoading == false) {
+            if (target.scrollTop + target.clientHeight >= target.scrollHeight - 150
+                && this.dataSource.loadedData.isLoading === false) {
                 this.dataSource.loadedData.isLoading = true;
                 this.emitOuter('datarequest', {
-                    currentPage: this.dataSource.currentPage
+                    currentPage: this.dataSource.currentPage,
                 });
             }
         });
@@ -6659,13 +6681,16 @@ class AwLinkedObjectsEH extends EventHandler {
                     // ask home-layout for more data
                     this.dataSource.checkForMore(false);
                     this.emitOuter('datarequest', {
-                        currentPage: this.dataSource.currentPage
+                        currentPage: this.dataSource.currentPage,
                     });
                     break;
                 case 'aw-home-layout.dataresponse':
-                    // handle incoming data from home-layout
-                    let { res } = payload;
-                    this.dataSource.handleIncomingData(res);
+                    {
+                        // handle incoming data from home-layout
+                        const { res } = payload;
+                        this.dataSource.handleIncomingData(res);
+                    }
+                    break;
                 case 'aw-home-layout.scroll':
                     this.handleScroll(payload);
                     break;
@@ -6682,6 +6707,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/autocomplete-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwAutocompleteWrapperEH extends EventHandler {
@@ -6710,6 +6736,7 @@ class AwAutocompleteWrapperEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/bubble-chart.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwBubbleChartEH extends EventHandler {
@@ -6720,7 +6747,7 @@ class AwBubbleChartEH extends EventHandler {
          * @param {?} id
          * @return {?}
          */
-        id => {
+        (id) => {
             /*
               Expects the ID of a bubble.
               Updates the graph with a new request
@@ -6732,7 +6759,7 @@ class AwBubbleChartEH extends EventHandler {
          * @param {?} f
          * @return {?}
          */
-        f => {
+        (f) => {
             /*
               Toggle the clicked eye-filter in the filteres array and
               redraw the graph.
@@ -6757,44 +6784,37 @@ class AwBubbleChartEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'aw-bubble-chart.click':
-                    if (this.dataSource.options.selectable != false) {
+                    if (this.dataSource.options.selectable !== false) {
                         this.toggleSelection(payload);
                     }
                     this.emitOuter('lockfilter', this.dataSource.chartData.find((/**
                      * @param {?} el
                      * @return {?}
                      */
-                    el => payload == el.entity.id)));
+                    (el) => payload === el.entity.id)));
                     break;
-                case 'aw-bubble-chart.d3end': // end of d3.js draw()
-                    // end of d3.js draw()
-                    /** @type {?} */
-                    let filteredChartData;
-                    if (this.dataSource.filters.length > 0) { // apply filters to the data before adding tooltips
-                        filteredChartData = this.dataSource.chartData.filter((/**
-                         * @param {?} el
-                         * @return {?}
-                         */
-                        el => !this.dataSource.filters.includes(el.entity.typeOfEntity.replace(/ /g, '-'))));
+                case 'aw-bubble-chart.d3end':
+                    { // end of d3.js draw()
+                        // end of d3.js draw()
+                        /** @type {?} */
+                        let filteredChartData;
+                        // apply filters to the data before adding tooltips
+                        if (this.dataSource.filters.length > 0) {
+                            filteredChartData = this.dataSource.chartData.filter((/**
+                             * @param {?} el
+                             * @return {?}
+                             */
+                            (el) => !this.dataSource.filters.includes(el.entity.typeOfEntity.replace(/ /g, '-'))));
+                        }
+                        else {
+                            filteredChartData = this.dataSource.chartData;
+                        }
+                        this.emitOuter('d3end', {
+                            bubbles: this.dataSource.smartSlice(filteredChartData),
+                            selected: this.dataSource.selected,
+                        });
                     }
-                    else {
-                        filteredChartData = this.dataSource.chartData;
-                    }
-                    this.emitOuter('d3end', {
-                        bubbles: this.dataSource.smartSlice(filteredChartData),
-                        selected: this.dataSource.selected
-                    });
                     break;
-                // case 'aw-bubble-chart.bubble-tooltip-goto-click':
-                //   this.emitOuter('bubble-tooltip-goto-click', {
-                //     id: this.dataSource.focusedBubble,
-                //     label: this.dataSource.focusedBubbleLabel
-                //   });
-                //   break;
-                // case 'aw-bubble-chart.bubble-tooltip-select-click':
-                //   this.toggleSelection(this.dataSource.focusedBubble)
-                //   this.emitOuter('lockfilter', this.dataSource.chartData.find(el => this.dataSource.focusedBubble == el.entity.id))
-                //   break;
                 default:
                     console.warn('unhandled inner event of type', type, 'with payload', payload);
                     break;
@@ -6807,19 +6827,21 @@ class AwBubbleChartEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'aw-home-layout.select':
-                    const { id } = payload;
-                    this.toggleSelection(id);
-                    /** @type {?} */
-                    const foundBubble = this.dataSource.chartData.find((/**
-                     * @param {?} el
-                     * @return {?}
-                     */
-                    el => id == el.entity.id));
-                    if (foundBubble) {
-                        this.emitOuter('lockfilter', foundBubble);
-                    }
-                    else {
-                        console.warn('Unable to determine which bubble was selected.');
+                    {
+                        const { id } = payload;
+                        this.toggleSelection(id);
+                        /** @type {?} */
+                        const foundBubble = this.dataSource.chartData.find((/**
+                         * @param {?} el
+                         * @return {?}
+                         */
+                        (el) => id === el.entity.id));
+                        if (foundBubble) {
+                            this.emitOuter('lockfilter', foundBubble);
+                        }
+                        else {
+                            console.warn('Unable to determine which bubble was selected.');
+                        }
                     }
                     break;
                 case 'aw-home-layout.tagclick':
@@ -6859,6 +6881,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/chart-tippy.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwChartTippyEH extends EventHandler {
@@ -6869,7 +6892,7 @@ class AwChartTippyEH extends EventHandler {
          * @param {?} bubbles
          * @return {?}
          */
-        bubbles => {
+        (bubbles) => {
             /*
               Destroys every existing tooltip,
               then creates a new Tippy instance for each bubble.
@@ -6879,7 +6902,7 @@ class AwChartTippyEH extends EventHandler {
              * @param {?} t
              * @return {?}
              */
-            t => { if (t) {
+            (t) => { if (t) {
                 t.destroy();
             } }));
             this.tippyList = [];
@@ -6888,10 +6911,10 @@ class AwChartTippyEH extends EventHandler {
              * @param {?} b
              * @return {?}
              */
-            b => {
+            (b) => {
                 // give a tooltip to each bubble
                 /** @type {?} */
-                let target = document.getElementById(`g_${b.entity.id}`);
+                const target = document.getElementById(`g_${b.entity.id}`);
                 if (target) {
                     this.tippyList.push(// add this tippy to the array of instances
                     tippy(target, {
@@ -6964,6 +6987,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/hero.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHeroEH extends EventHandler {
@@ -6990,7 +7014,7 @@ class AwHeroEH extends EventHandler {
                     this.emitOuter('enter', payload);
                     break;
                 default:
-                    console.log('(hero) unhandled event of type', type);
+                    console.warn('(hero) unhandled event of type', type);
                     break;
             }
         }));
@@ -6999,6 +7023,7 @@ class AwHeroEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/home-facets-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeFacetsWrapperEH extends EventHandler {
@@ -7009,13 +7034,13 @@ class AwHomeFacetsWrapperEH extends EventHandler {
          * @param {?} type
          * @return {?}
          */
-        type => {
+        (type) => {
             /*
               Toggles the status of the selected eye, then reloads the component.
             */
             if (this.dataSource.closedEyes) {
                 /** @type {?} */
-                let i = this.dataSource.closedEyes.indexOf(type);
+                const i = this.dataSource.closedEyes.indexOf(type);
                 if (i >= 0) { // if the eye was closed
                     this.dataSource.closedEyes.splice(i, 1); // open the eye
                 }
@@ -7032,7 +7057,7 @@ class AwHomeFacetsWrapperEH extends EventHandler {
          * @param {?} selectedBubble
          * @return {?}
          */
-        selectedBubble => {
+        (selectedBubble) => {
             /*
               Adds (or removes) the ID of the selected bubble from the array of that type of entity.
               Example:
@@ -7043,14 +7068,13 @@ class AwHomeFacetsWrapperEH extends EventHandler {
             */
             selectedBubble.entity.id.replace(/ /g, '-'); // fix for space in ID
             // fix for space in ID
-            const { id, typeOfEntity } = selectedBubble.entity // payload is the selected bubble
-            ;
+            const { id, typeOfEntity } = selectedBubble.entity;
             if (!this.dataSource.lockedFacets[typeOfEntity]) {
                 this.dataSource.lockedFacets[typeOfEntity] = [];
             }
             if (this.dataSource.lockedFacets[typeOfEntity].includes(id)) {
                 /** @type {?} */
-                let i = this.dataSource.lockedFacets[typeOfEntity].indexOf(id);
+                const i = this.dataSource.lockedFacets[typeOfEntity].indexOf(id);
                 this.dataSource.lockedFacets[typeOfEntity].splice(i, 1);
             }
             else {
@@ -7067,7 +7091,7 @@ class AwHomeFacetsWrapperEH extends EventHandler {
          * @param {?} payload
          * @return {?}
          */
-        payload => {
+        (payload) => {
             this.emitOuter('change', payload);
         }));
         this.innerEvents$.subscribe((/**
@@ -7121,7 +7145,7 @@ class AwHomeFacetsWrapperEH extends EventHandler {
                      * @param {?} key
                      * @return {?}
                      */
-                    key => {
+                    (key) => {
                         if (this.dataSource.lockedFacets[key].includes(payload)) {
                             this.dataSource.lockedFacets[key].splice(this.dataSource.lockedFacets[key].indexOf(payload), 1);
                         }
@@ -7134,16 +7158,18 @@ class AwHomeFacetsWrapperEH extends EventHandler {
                     this.dataSource.update(this.dataSource.lastData);
                     break;
                 case 'aw-home-layout.facetclick':
-                    let { openTippy } = this.dataSource;
-                    if (this.dataSource.lockedFacets[openTippy]) {
-                        if (this.dataSource.lockedFacets[openTippy].indexOf(payload) == -1) {
-                            this.dataSource.lockedFacets[openTippy].push(payload);
+                    {
+                        const { openTippy } = this.dataSource;
+                        if (this.dataSource.lockedFacets[openTippy]) {
+                            if (this.dataSource.lockedFacets[openTippy].indexOf(payload) === -1) {
+                                this.dataSource.lockedFacets[openTippy].push(payload);
+                            }
                         }
+                        else {
+                            this.dataSource.lockedFacets[openTippy] = [payload];
+                        }
+                        this.dataSource.update(this.dataSource.lastData);
                     }
-                    else {
-                        this.dataSource.lockedFacets[openTippy] = [payload];
-                    }
-                    this.dataSource.update(this.dataSource.lastData);
                     break;
                 default:
                     break;
@@ -7165,6 +7191,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/home-hero-patrimonio.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeHeroPatrimonioEH extends EventHandler {
@@ -7178,6 +7205,7 @@ class AwHomeHeroPatrimonioEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/home-item-tags-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeItemTagsWrapperEH extends EventHandler {
@@ -7191,7 +7219,7 @@ class AwHomeItemTagsWrapperEH extends EventHandler {
          */
         (event) => {
             switch (event.type) {
-                case "aw-home-item-tags-wrapper.click":
+                case 'aw-home-item-tags-wrapper.click':
                     this.emitOuter('click', event.payload);
                     break;
                 default:
@@ -7199,13 +7227,14 @@ class AwHomeItemTagsWrapperEH extends EventHandler {
             }
         }));
         /* this.outerEvents$.subscribe(event => {
-        
+    
         }); */
     }
 }
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/home-autocomplete.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeAutocompleteEH extends EventHandler {
@@ -7219,7 +7248,7 @@ class AwHomeAutocompleteEH extends EventHandler {
          */
         ({ type, payload }) => {
             switch (type) {
-                case "aw-home-autocomplete.click":
+                case 'aw-home-autocomplete.click':
                     this.emitOuter('click', payload);
                     break;
                 default:
@@ -7231,6 +7260,7 @@ class AwHomeAutocompleteEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/entita-nav.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaNavEH extends EventHandler {
@@ -7255,7 +7285,7 @@ class AwEntitaNavEH extends EventHandler {
         /*
     
         this.outerEvents$.subscribe(event => {
-          
+    
         });
         */
     }
@@ -7263,6 +7293,7 @@ class AwEntitaNavEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/scheda-breadcrumbs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaSidebarEH extends EventHandler {
@@ -7275,19 +7306,17 @@ class AwSchedaSidebarEH extends EventHandler {
          * @return {?}
          */
         ({ type, payload }) => {
-            if (type == 'aw-sidebar-header.click') {
+            if (type === 'aw-sidebar-header.click') {
                 this.dataSource.toggleSidebar();
                 this.emitOuter(type, payload);
             }
         }));
-        /* this.outerEvents$.subscribe(event => {
-        
-        }); */
     }
 }
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/sidebar-header.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSidebarHeaderEH extends EventHandler {
@@ -7300,19 +7329,20 @@ class AwSidebarHeaderEH extends EventHandler {
          * @return {?}
          */
         ({ type, payload }) => {
-            if (type == 'aw-sidebar-header.click') {
+            if (type === 'aw-sidebar-header.click') {
                 this.dataSource.toggleSidebar();
                 this.emitOuter('click', payload);
             }
         }));
         /* this.outerEvents$.subscribe(event => {
-        
+    
         }); */
     }
 }
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/tree.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwTreeEH extends EventHandler {
@@ -7324,7 +7354,7 @@ class AwTreeEH extends EventHandler {
          * @param {?} __0
          * @return {?}
          */
-        ({ type, payload }) => {
+        ({ payload }) => {
             switch (payload.source) {
                 case 'toggle':
                     this.dataSource.build(payload.id);
@@ -7346,13 +7376,15 @@ class AwTreeEH extends EventHandler {
                     this.dataSource.build(payload);
                     break;
                 case 'aw-scheda-layout.navigationresponse':
-                    if (payload.currentItem) {
-                        this.dataSource.setActive(payload.currentItem);
+                    {
+                        if (payload.currentItem) {
+                            this.dataSource.setActive(payload.currentItem);
+                        }
+                        /** @type {?} */
+                        const currentId = payload.currentItem || payload.tree.id;
+                        this.dataSource.load(payload);
+                        this.dataSource.build(currentId);
                     }
-                    /** @type {?} */
-                    const currentId = payload.currentItem || payload.tree.id;
-                    this.dataSource.load(payload);
-                    this.dataSource.build(currentId);
                     break;
                 case 'aw-scheda-layout.routechanged':
                     // has output (not first load)
@@ -7370,6 +7402,7 @@ class AwTreeEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/search-layout-tabs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutTabsEH extends EventHandler {
@@ -7383,6 +7416,7 @@ class AwSearchLayoutTabsEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/table.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwTableEH extends EventHandler {
@@ -7392,11 +7426,11 @@ class AwTableEH extends EventHandler {
     listen() {
         /*
         this.innerEvents$.subscribe(event => {
-          
+    
         });
     
         this.outerEvents$.subscribe(event => {
-          
+    
         });
         */
     }
@@ -7404,10 +7438,12 @@ class AwTableEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     AwLinkedObjectsEH: AwLinkedObjectsEH,
     AwAutocompleteWrapperEH: AwAutocompleteWrapperEH,
     AwBubbleChartEH: AwBubbleChartEH,
@@ -7427,6 +7463,7 @@ var EH$1 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -7441,7 +7478,7 @@ const AwEntitaLayoutConfig = {
         {
             id: 'n7-smart-pagination',
             dataSource: SmartPaginationDS,
-            eventHandler: SmartPaginationEH
+            eventHandler: SmartPaginationEH,
         },
     ],
     layoutDS: AwEntitaLayoutDS,
@@ -7450,11 +7487,12 @@ const AwEntitaLayoutConfig = {
     widgetsEventHandlers: EH$1,
     options: {
     // TODO
-    }
+    },
 };
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaLayoutComponent extends AbstractLayout {
@@ -7516,7 +7554,7 @@ class AwEntitaLayoutComponent extends AbstractLayout {
 AwEntitaLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-entita-layout',
-                template: "<div class=\"aw-entity n7-side-auto-padding\" *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-title-wrapper-loading\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\"\n            class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-nav-loading\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2]\"\n            [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-nav'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <!-- lb.dataSource.selectedTab -->\n    <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content-loading\">\n        <div class=\"aw-entity__content-loading-title\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\"></n7-content-placeholder>\n        </div>\n\n        <div class=\"aw-entity__content-loading-items\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n            [data]=\"{\n                blocks: [\n                {\n                    classes: 'entity-placeholder-item-preview'\n                }\n                ]\n            }\"></n7-content-placeholder>\n        </div>\n    </div>\n\n    <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content\">\n        <section>\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\n                class=\"aw-entity__content-section\" [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <a *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/wiki']\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                    <a *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/maxxi']\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n            </div>\n\n            <ng-container *ngIf=\"\n            ((lb.dataSource.myResponse.fields || []).length > 0 && lb.dataSource.selectedTab == 'campi') ||\n            (lb.dataSource.showFields && lb.dataSource.selectedTab == 'overview')\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                    [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'campi'\">\n                    <div class=\"aw-entity__content-section-header\">\n                        <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                        <a class=\"n7-btn n7-btn-light\" [routerLink]=\"[lb.dataSource.getNavBasePath() + 'campi']\">\n                            TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\n                        </a>\n                    </div>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async \">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <a *ngIf=\"lb.dataSource.selectedTab === 'overview' \"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/oggetti-collegati/']\"\n                        [queryParams]=\"{ page: 1 }\" class=\"n7-btn n7-btn-light\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <div class=\"aw-entity__content-item-previews\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n                <n7-smart-pagination \n                    *ngIf=\"lb.dataSource.selectedTab === 'oggetti-collegati'\"\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview aw-bubble-chart__{{lb.dataSource.selectedTab}}\"\n                *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.myResponse.relatedEntities\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <a *ngIf=\"lb.dataSource.selectedTab == 'overview'\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/entita-collegate']\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <!-- Small Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper-small\" *ngIf=\"lb.dataSource.selectedTab == 'overview'\">\n                    <aw-bubble-chart-wrapper>\n                        <!-- Tippy template moved to end of HTML -->\n                        <n7-bubble-chart [data]=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.smallView\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n                <!-- Big Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper\" *ngIf=\"lb.dataSource.selectedTab == 'entita-collegate'\">\n                    <aw-bubble-chart-wrapper>\n                        <!-- Tippy template moved to end of HTML -->\n                        <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                *ngIf=\"lb.dataSource.myResponse.extraTab\" [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n                *ngIf=\"lb.dataSource.myResponse.wikiTab\" [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{ lb.dataSource.myResponse.wikiTab.url }}\n                </a>\n            </div>\n        </section>\n    </div>\n    <!-- Template for bubble chart tooltips -->\n    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\" [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n    </aw-chart-tippy>\n</div>"
+                template: "<div class=\"aw-entity n7-side-auto-padding\" *ngIf=\"lb.dataSource\">\r\n\r\n    <div class=\"aw-entity__sidebar\">\r\n        <!-- Custom header -->\r\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-title-wrapper-loading\">\r\n            <n7-content-placeholder [data]=\"{\r\n                blocks: [{\r\n                    classes: 'entity-placeholder-title'\r\n                }]\r\n            }\">\r\n            </n7-content-placeholder>\r\n        </div>\r\n        <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\"\r\n            class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\r\n            <h1 class=\"aw-entity__sidebar-title\">\r\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\r\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\r\n            </h1>\r\n        </div>\r\n        <!-- Navigation -->\r\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-nav-loading\">\r\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2]\"\r\n            [data]=\"{\r\n                blocks: [{\r\n                    classes: 'entity-placeholder-nav'\r\n                }]\r\n            }\">\r\n            </n7-content-placeholder>\r\n        </div>\r\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" [emit]=\"lb.widgets['aw-entita-nav'].emit\">\r\n        </n7-nav>\r\n    </div>\r\n\r\n    <!-- lb.dataSource.selectedTab -->\r\n    <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content-loading\">\r\n        <div class=\"aw-entity__content-loading-title\">\r\n            <n7-content-placeholder [data]=\"{\r\n                blocks: [{\r\n                    classes: 'entity-placeholder-title'\r\n                }]\r\n            }\"></n7-content-placeholder>\r\n        </div>\r\n\r\n        <div class=\"aw-entity__content-loading-items\">\r\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\r\n            [data]=\"{\r\n                blocks: [\r\n                {\r\n                    classes: 'entity-placeholder-item-preview'\r\n                }\r\n                ]\r\n            }\"></n7-content-placeholder>\r\n        </div>\r\n    </div>\r\n\r\n    <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content\">\r\n        <section>\r\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\r\n                class=\"aw-entity__content-section\" [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\r\n                <div class=\"aw-entity__overview-description\">\r\n                    {{lb.dataSource.myResponse.extraTab}}\r\n                </div>\r\n                <div class=\"aw-entity-layout__button-wrapper\">\r\n                    <a *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\r\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/wiki']\">\r\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\r\n                    </a>\r\n                    <a *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\r\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/maxxi']\">\r\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\r\n                    </a>\r\n                </div>\r\n            </div>\r\n\r\n            <ng-container *ngIf=\"\r\n            ((lb.dataSource.myResponse.fields || []).length > 0 && lb.dataSource.selectedTab == 'campi') ||\r\n            (lb.dataSource.showFields && lb.dataSource.selectedTab == 'overview')\">\r\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\r\n                    [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'campi'\">\r\n                    <div class=\"aw-entity__content-section-header\">\r\n                        <h2 class=\"aw-entity__content-section-title\">Campi</h2>\r\n                        <a class=\"n7-btn n7-btn-light\" [routerLink]=\"[lb.dataSource.getNavBasePath() + 'campi']\">\r\n                            TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\r\n                        </a>\r\n                    </div>\r\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\r\n                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async \">\r\n                    </n7-metadata-viewer>\r\n                </div>\r\n            </ng-container>\r\n\r\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\r\n                *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\"\r\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\r\n                <div class=\"aw-entity__content-section-header\">\r\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\r\n\r\n                    <a *ngIf=\"lb.dataSource.selectedTab === 'overview' \"\r\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/oggetti-collegati/']\"\r\n                        [queryParams]=\"{ page: 1 }\" class=\"n7-btn n7-btn-light\">\r\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\r\n                    </a>\r\n                </div>\r\n                <div class=\"aw-entity__content-item-previews\">\r\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\r\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\r\n                        </n7-smart-breadcrumbs>\r\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\r\n                        </n7-item-preview>\r\n                    </ng-container>\r\n                </div>\r\n                <n7-smart-pagination \r\n                    *ngIf=\"lb.dataSource.selectedTab === 'oggetti-collegati'\"\r\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\r\n                </n7-smart-pagination>\r\n            </div>\r\n\r\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview aw-bubble-chart__{{lb.dataSource.selectedTab}}\"\r\n                *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.myResponse.relatedEntities\"\r\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\r\n                <div class=\"aw-entity__content-section-header\">\r\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\r\n                    <a *ngIf=\"lb.dataSource.selectedTab == 'overview'\" class=\"n7-btn n7-btn-light\"\r\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/entita-collegate']\">\r\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\r\n                    </a>\r\n                </div>\r\n                <!-- Small Bubble Chart -->\r\n                <div class=\"aw-entity__bubble-chart-wrapper-small\" *ngIf=\"lb.dataSource.selectedTab == 'overview'\">\r\n                    <aw-bubble-chart-wrapper>\r\n                        <!-- Tippy template moved to end of HTML -->\r\n                        <n7-bubble-chart [data]=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.smallView\"\r\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\r\n                        </n7-bubble-chart>\r\n                    </aw-bubble-chart-wrapper>\r\n                </div>\r\n                <!-- Big Bubble Chart -->\r\n                <div class=\"aw-entity__bubble-chart-wrapper\" *ngIf=\"lb.dataSource.selectedTab == 'entita-collegate'\">\r\n                    <aw-bubble-chart-wrapper>\r\n                        <!-- Tippy template moved to end of HTML -->\r\n                        <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\r\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\r\n                        </n7-bubble-chart>\r\n                    </aw-bubble-chart-wrapper>\r\n                </div>\r\n            </div>\r\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\r\n                *ngIf=\"lb.dataSource.myResponse.extraTab\" [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\r\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\r\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\r\n                </div>\r\n                <div>\r\n                    {{lb.dataSource.myResponse.extraTab}}\r\n                </div>\r\n            </div>\r\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\r\n                *ngIf=\"lb.dataSource.myResponse.wikiTab\" [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\r\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\r\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\r\n                </div>\r\n                <div>\r\n                    {{lb.dataSource.myResponse.wikiTab.text}}\r\n                </div>\r\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\r\n                    {{ lb.dataSource.myResponse.wikiTab.url }}\r\n                </a>\r\n            </div>\r\n        </section>\r\n    </div>\r\n    <!-- Template for bubble chart tooltips -->\r\n    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\" [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\r\n    </aw-chart-tippy>\r\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -7575,6 +7613,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeLayoutDS extends LayoutDataSource {
@@ -7609,20 +7648,19 @@ class AwHomeLayoutDS extends LayoutDataSource {
             this.one(id).update(data);
         });
     }
-    // store the first array of bubbles, to find them in case of zero results (entities data returned as empty array from backend)
     // ========================
     /**
      * @param {?} __0
      * @return {?}
      */
-    onInit({ communication, mainState, configuration, tippy }) {
+    onInit({ communication, mainState, configuration, tippy, }) {
         this.communication = communication;
         this.configuration = configuration;
         // this.facetData = [];
         this.mainState = mainState;
         this.tippy = tippy;
         this.resultsLimit = this.configuration.get('home-layout')['results-limit'];
-        this.bubblesEnabled = this.configuration.get('features-enabled') ? this.configuration.get('features-enabled')['bubblechart'] : false;
+        this.bubblesEnabled = this.configuration.get('features-enabled') ? this.configuration.get('features-enabled').bubblechart : false;
         this.one('aw-hero').update(this.configuration.get('home-layout')['top-hero']);
         this.one('aw-home-hero-patrimonio').update(this.configuration.get('home-layout')['bottom-hero']);
         // update streams
@@ -7631,16 +7669,16 @@ class AwHomeLayoutDS extends LayoutDataSource {
         this.mainState.updateCustom('currentNav', 'home');
         // listen autocomplete changes
         this._listenAutoCompleteChanges();
-        this.outerLinks = this.configuration.get('home-layout')['outer-links']['test'];
-        this.outerLinksTitle = this.configuration.get('home-layout')['outer-links']['title'];
+        this.outerLinks = this.configuration.get('home-layout')['outer-links'].test;
+        this.outerLinksTitle = this.configuration.get('home-layout')['outer-links'].title;
         this.one('aw-bubble-chart').updateOptions({
             selectable: true,
             config: this.configuration,
-            limit: this.configuration.get('bubble-chart').bubbleLimit
+            limit: this.configuration.get('bubble-chart').bubbleLimit,
         });
         this.one('aw-chart-tippy').updateOptions({
-            basePath: this.configuration.get('paths')['entitaBasePath'],
-            selectable: true
+            basePath: this.configuration.get('paths').entitaBasePath,
+            selectable: true,
         });
     }
     /**
@@ -7662,7 +7700,7 @@ class AwHomeLayoutDS extends LayoutDataSource {
              * @return {?}
              */
             (error) => console.error(error)),
-            params
+            params,
         });
     }
     /**
@@ -7676,7 +7714,7 @@ class AwHomeLayoutDS extends LayoutDataSource {
              */
             (error) => console.error(error)),
             params: {
-                entitiesListSize: this.configuration.get('bubble-chart')['bubbleLimit']
+                entitiesListSize: this.configuration.get('bubble-chart').bubbleLimit,
             },
         });
     }
@@ -7707,7 +7745,6 @@ class AwHomeLayoutDS extends LayoutDataSource {
         if (!response || !response.itemsPagination) {
             return;
         }
-        ;
         /** @type {?} */
         let numOfItems = response.itemsPagination.totalCount;
         if (numOfItems > 0) {
@@ -7718,15 +7755,15 @@ class AwHomeLayoutDS extends LayoutDataSource {
                 numOfThousand += 1;
             }
             /** @type {?} */
-            let numOfItemsTmpStr = numOfItems + '';
+            let numOfItemsTmpStr = `${numOfItems}`;
             if (numOfItems < 10)
-                numOfItemsTmpStr = '00' + numOfItems;
+                numOfItemsTmpStr = `00${numOfItems}`;
             else if (numOfItems < 100)
-                numOfItemsTmpStr = '0' + numOfItems;
+                numOfItemsTmpStr = `0${numOfItems}`;
             if (numOfThousand > 0)
-                this.numOfItemsStr = numOfThousand + '.' + numOfItemsTmpStr;
+                this.numOfItemsStr = `${numOfThousand}.${numOfItemsTmpStr}`;
             else
-                this.numOfItemsStr = numOfItems + '';
+                this.numOfItemsStr = `${numOfItems}`;
         }
         else {
             this.numOfItemsStr = '0';
@@ -7759,32 +7796,20 @@ class AwHomeLayoutDS extends LayoutDataSource {
      */
     handleFacetSearchChange(change) {
         /** @type {?} */
-        var payload = change.inputPayload;
-        /** @type {?} */
-        var value = change.value;
+        const payload = change.inputPayload;
+        const { value } = change;
         // store the entered text in facetInputs
         this.facetInputs[payload] = value;
-    }
-    /**
-     * @param {?} enter
-     * @return {?}
-     */
-    handleFacetSearchEnter(enter) {
-        /** @type {?} */
-        var payload = enter.inputPayload;
-        // get the text entered in this input
-        /** @type {?} */
-        var value = this.facetInputs[payload];
     }
     /**
      * @return {?}
      */
     renderItemTags() {
         /*
-                    Try to build an item tag for each selected query looking at the data from the
-                    first response. If the needed bubble data cannot be found, ask the backend
-                    for that bubble's data.
-                */
+                  Try to build an item tag for each selected query looking at the data from the
+                  first response. If the needed bubble data cannot be found, ask the backend
+                  for that bubble's data.
+              */
         /** @type {?} */
         const queryList = [];
         // list of pending queries
@@ -7794,14 +7819,14 @@ class AwHomeLayoutDS extends LayoutDataSource {
          * @param {?} b
          * @return {?}
          */
-        b => {
+        (b) => {
             // try to get the data of each selected bubble
             /** @type {?} */
             const theBubble = this.firstBubbleResponse.find((/**
              * @param {?} el
              * @return {?}
              */
-            el => el.entity.id === b));
+            (el) => el.entity.id === b));
             if (theBubble) { // if a bubble was found
                 // if a bubble was found
                 /** @type {?} */
@@ -7810,7 +7835,7 @@ class AwHomeLayoutDS extends LayoutDataSource {
                     label: theBubble.entity.label,
                     icon: 'n7-icon-close',
                     payload: b,
-                    classes: `tag-${bubbleConfig['class-name']}`
+                    classes: `tag-${bubbleConfig['class-name']}`,
                 });
             }
             else { // if the bubble was not found, make a query
@@ -7825,19 +7850,19 @@ class AwHomeLayoutDS extends LayoutDataSource {
              * @param {?} forkres
              * @return {?}
              */
-            forkres => {
+            (forkres) => {
                 forkres.forEach((/**
                  * @param {?} r
                  * @return {?}
                  */
-                r => {
+                (r) => {
                     /** @type {?} */
                     const bubbleConfig = this.configuration.get('config-keys')[r.typeOfEntity];
                     tagsData.push({
                         label: r.label,
                         icon: 'n7-icon-close',
                         payload: r.id,
-                        classes: `tag-${bubbleConfig['class-name']}`
+                        classes: `tag-${bubbleConfig['class-name']}`,
                     });
                 }));
                 this.one('aw-home-item-tags-wrapper').update(tagsData);
@@ -7853,10 +7878,11 @@ class AwHomeLayoutDS extends LayoutDataSource {
      */
     onHeroChange(value) {
         if (value) {
-            value = helpers.escapeDoubleQuotes(value);
-            this.autocompleteChanged$.next(value);
+            /** @type {?} */
+            const escapedValue = helpers.escapeDoubleQuotes(value);
+            this.autocompleteChanged$.next(escapedValue);
             this.homeAutocompleteIsLoading = true;
-            this.homeAutocompleteQuery = value;
+            this.homeAutocompleteQuery = escapedValue;
             if (!this.autocompletePopoverOpen) {
                 this._toggleAutocompletePopover();
             }
@@ -7909,13 +7935,13 @@ class AwHomeLayoutDS extends LayoutDataSource {
             keys: this.configuration.get('config-keys'),
             config: this.configuration,
             labels: this.configuration.get('labels'),
-            paths: this.configuration.get('paths')
+            paths: this.configuration.get('paths'),
         });
         this.autocompleteChanged$.pipe(debounceTime(500), takeUntil(this.destroyed$)).subscribe((/**
          * @param {?} value
          * @return {?}
          */
-        value => {
+        (value) => {
             this.communication.request$('autoComplete', {
                 onError: (/**
                  * @param {?} error
@@ -7924,8 +7950,8 @@ class AwHomeLayoutDS extends LayoutDataSource {
                 (error) => console.error(error)),
                 params: {
                     input: value,
-                    itemsPagination: { offset: 0, limit: this.configuration.get('home-layout')['results-limit'] }
-                }
+                    itemsPagination: { offset: 0, limit: this.configuration.get('home-layout')['results-limit'] },
+                },
             }).subscribe((/**
              * @param {?} response
              * @return {?}
@@ -7934,7 +7960,7 @@ class AwHomeLayoutDS extends LayoutDataSource {
                 this.homeAutocompleteIsLoading = false;
                 this.one('aw-home-autocomplete').update({
                     response,
-                    query: value
+                    query: value,
                 });
             }));
         }));
@@ -7948,7 +7974,7 @@ class AwHomeLayoutDS extends LayoutDataSource {
             /** @type {?} */
             const template = document.getElementById('aw-home-advanced-autocomplete-popover');
             template.style.display = 'block';
-            this.autocompletePopover = this.tippy('.aw-home__top-hero .n7-hero__input', {
+            const [popOver] = this.tippy('.aw-home__top-hero .n7-hero__input', {
                 content: template,
                 trigger: 'manual',
                 interactive: true,
@@ -7961,8 +7987,9 @@ class AwHomeLayoutDS extends LayoutDataSource {
                 onHidden: (/**
                  * @return {?}
                  */
-                () => this.autocompletePopoverOpen = false),
-            })[0];
+                () => { this.autocompletePopoverOpen = false; }),
+            });
+            this.autocompletePopover = popOver;
         }
         if (this.autocompletePopoverOpen) {
             this.autocompletePopover.hide();
@@ -8053,6 +8080,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/home-layout/home-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeLayoutEH extends EventHandler {
@@ -8063,26 +8091,26 @@ class AwHomeLayoutEH extends EventHandler {
          * @param {?} payload
          * @return {?}
          */
-        payload => {
+        (payload) => {
             this.emitOuter('facetclick', payload);
         });
         this.handleChartSelection = (/**
          * @param {?} payload
          * @return {?}
          */
-        payload => {
+        (payload) => {
             /** @type {?} */
             const selectedEntitiesIds = payload;
             this.dataSource.selectedBubbles = payload;
             this.dataSource.resultsListIsLoading = true;
             this.dataSource.makeRequest$('globalFilter', {
                 selectedEntitiesIds,
-                entitiesListSize: this.configuration.get('bubble-chart')['bubbleLimit']
+                entitiesListSize: this.configuration.get('bubble-chart').bubbleLimit,
             }).subscribe((/**
              * @param {?} res
              * @return {?}
              */
-            res => {
+            (res) => {
                 this.dataSource.resultsListIsLoading = false;
                 if (res && res.entitiesData.length > 0) {
                     // if some linked objects exist for the selected entities:
@@ -8099,9 +8127,9 @@ class AwHomeLayoutEH extends EventHandler {
                      * @param {?} b
                      * @return {?}
                      */
-                    b => {
+                    (b) => {
                         /** @type {?} */
-                        let params = { entityId: b, entitiesListSize: 1 };
+                        const params = { entityId: b, entitiesListSize: 1 };
                         queryList.push(// make a query for each selected bubble
                         this.dataSource.makeRequest$('getMissingBubble', params));
                     }));
@@ -8110,14 +8138,14 @@ class AwHomeLayoutEH extends EventHandler {
                      * @param {?} forkres
                      * @return {?}
                      */
-                    forkres => {
+                    (forkres) => {
                         /** @type {?} */
-                        let customBubbles = [];
+                        const customBubbles = [];
                         forkres.forEach((/**
                          * @param {?} r
                          * @return {?}
                          */
-                        r => { customBubbles.push({ count: 0, entity: r }); }));
+                        (r) => { customBubbles.push({ count: 0, entity: r }); }));
                         this.emitOuter('filterbubbleresponse', customBubbles);
                         this.dataSource.renderPreviewsFromApolloQuery(res);
                         this.dataSource.renderItemTags();
@@ -8144,22 +8172,24 @@ class AwHomeLayoutEH extends EventHandler {
                 case 'aw-home-layout.outerlinkclick':
                     this.emitGlobal('navigate', {
                         handler: 'router',
-                        path: payload
+                        path: payload,
                     });
                     break;
                 case 'aw-home-layout.destroy':
                     this.dataSource.onDestroy();
                     break;
                 case 'aw-home-layout.bubbleresultsviewallclick':
-                    /** @type {?} */
-                    const entityLinks = this.dataSource.selectedBubbles.join(',');
-                    /** @type {?} */
-                    const basePath = this.configuration.get('paths').searchBasePath;
-                    this.emitGlobal('navigate', {
-                        handler: 'router',
-                        path: [basePath],
-                        queryParams: { 'entity-links': entityLinks }
-                    });
+                    {
+                        /** @type {?} */
+                        const entityLinks = this.dataSource.selectedBubbles.join(',');
+                        /** @type {?} */
+                        const basePath = this.configuration.get('paths').searchBasePath;
+                        this.emitGlobal('navigate', {
+                            handler: 'router',
+                            path: [basePath],
+                            queryParams: { 'entity-links': entityLinks },
+                        });
+                    }
                     break;
                 case 'aw-home-layout.clearselection':
                     this.emitOuter('clearselection');
@@ -8182,13 +8212,15 @@ class AwHomeLayoutEH extends EventHandler {
                     this.emitOuter('select', payload);
                     break;
                 case 'aw-hero.enter':
-                    /** @type {?} */
-                    const query = payload.value;
-                    this.emitGlobal('navigate', {
-                        handler: 'router',
-                        path: [this.configuration.get('paths').searchBasePath],
-                        queryParams: { query }
-                    });
+                    {
+                        /** @type {?} */
+                        const query = payload.value;
+                        this.emitGlobal('navigate', {
+                            handler: 'router',
+                            path: [this.configuration.get('paths').searchBasePath],
+                            queryParams: { query },
+                        });
+                    }
                     break;
                 case 'aw-hero.change':
                     this.dataSource.autocompleteValue = payload.value;
@@ -8198,8 +8230,8 @@ class AwHomeLayoutEH extends EventHandler {
                     this.emitOuter('togglefilter', payload);
                     break;
                 case 'aw-home-facets-wrapper.change':
-                    if (!payload.value ||
-                        (typeof payload.value === 'string' && payload.value.trim().length === 0)) {
+                    if (!payload.value
+                        || (typeof payload.value === 'string' && payload.value.trim().length === 0)) {
                         this.emitOuter('facetswrapperclose', { facetId: payload });
                     }
                     else if (payload.value) {
@@ -8207,36 +8239,34 @@ class AwHomeLayoutEH extends EventHandler {
                         // clear autocomplete results
                         this.dataSource.updateComponent('aw-autocomplete-wrapper', { key: payload.value, response: null });
                         /** @type {?} */
-                        let params = {
+                        const params = {
                             input: payload.value,
                             typeOfEntity: payload.inputPayload.replace(/-search/g, '').replace(/-/g, ' '),
                             itemsPagination: {
-                                offset: 0, limit: this.configuration.get('home-layout')['results-limit']
-                            }
+                                offset: 0, limit: this.configuration.get('home-layout')['results-limit'],
+                            },
                         };
                         this.dataSource.makeRequest$('autoComplete', params).subscribe((/**
                          * @param {?} response
                          * @return {?}
                          */
-                        response => {
+                        (response) => {
                             if (response.results.length < 1) {
                                 /** @type {?} */
-                                let fallback = {
+                                const fallback = {
                                     totalcount: 0,
                                     results: [
                                         {
                                             entity: {
                                                 id: 'fallback',
                                                 label: // use fallback string from configuration
-                                                this.configuration.get('home-layout')['autocomplete-fallback'] ?
-                                                    this.configuration.get('home-layout')['autocomplete-fallback'] :
-                                                    'Nessun risultato trovato'
-                                            }
-                                        }
-                                    ]
-                                }
-                                // this.emitOuter('facetswrapperresponse', { facetId: payload, response: fallback })
-                                ;
+                                                this.configuration.get('home-layout')['autocomplete-fallback']
+                                                    ? this.configuration.get('home-layout')['autocomplete-fallback']
+                                                    : 'Nessun risultato trovato',
+                                            },
+                                        },
+                                    ],
+                                };
                                 // this.emitOuter('facetswrapperresponse', { facetId: payload, response: fallback })
                                 this.dataSource.updateComponent('aw-autocomplete-wrapper', { key: payload.value, response: fallback }, { config: this.configuration });
                             }
@@ -8244,79 +8274,79 @@ class AwHomeLayoutEH extends EventHandler {
                                 // this.emitOuter('facetswrapperresponse', { facetId: payload, response })
                                 this.dataSource.updateComponent('aw-autocomplete-wrapper', // ID
                                 { key: payload.value, response }, // DATA
-                                { config: this.configuration } // OPTIONS
-                                );
+                                { config: this.configuration });
                             }
                         }));
                     }
-                    break;
-                case 'aw-home-facets-wrapper.enter':
-                    this.dataSource.handleFacetSearchEnter(payload);
                     break;
                 case 'aw-home-item-tags-wrapper.click':
                     this.emitOuter('tagclick', payload);
                     break;
                 case 'aw-linked-objects.datarequest':
-                    const { currentPage } = payload;
-                    /** @type {?} */
-                    const params = {
-                        selectedEntitiesIds: this.dataSource.selectedBubbles,
-                        itemsPagination: {
-                            offset: currentPage * this.dataSource.resultsLimit,
-                            limit: this.dataSource.resultsLimit
-                        }
-                    };
-                    this.dataSource.makeRequest$('globalFilter', params).subscribe((/**
-                     * @param {?} res
-                     * @return {?}
-                     */
-                    res => {
-                        if (res) {
-                            this.emitOuter('dataresponse', { res });
-                        }
-                        else {
-                            console.log('Unable to fetch additional data.');
-                        }
-                    }));
+                    {
+                        const { currentPage } = payload;
+                        /** @type {?} */
+                        const params = {
+                            selectedEntitiesIds: this.dataSource.selectedBubbles,
+                            itemsPagination: {
+                                offset: currentPage * this.dataSource.resultsLimit,
+                                limit: this.dataSource.resultsLimit,
+                            },
+                        };
+                        this.dataSource.makeRequest$('globalFilter', params).subscribe((/**
+                         * @param {?} res
+                         * @return {?}
+                         */
+                        (res) => {
+                            if (res) {
+                                this.emitOuter('dataresponse', { res });
+                            }
+                            else {
+                                console.warn('Unable to fetch additional data.');
+                            }
+                        }));
+                    }
                     break;
                 case 'aw-autocomplete-wrapper.clickresult':
                     this.handleSimpleAutocompleteClick(payload);
                     break;
                 case 'aw-home-autocomplete.click':
-                    const { source, type } = payload;
-                    /** @type {?} */
-                    let basePath;
-                    if (source === "item") {
-                        if (type === "oggetto-culturale") {
-                            basePath = this.configuration.get("paths").schedaBasePath;
-                        }
-                        else {
-                            basePath = this.configuration.get("paths").entitaBasePath;
-                        }
-                        this.emitGlobal('navigate', {
-                            handler: 'router',
-                            path: [basePath, payload.id, helpers.slugify(payload.title)]
-                        });
-                    }
-                    else if (source === "showMore") {
+                    {
+                        const { source, type: payloadType } = payload;
                         /** @type {?} */
-                        const query = this.dataSource.homeAutocompleteQuery;
-                        basePath = this.configuration.get("paths").searchBasePath;
-                        this.emitGlobal('navigate', {
-                            handler: 'router',
-                            path: [basePath],
-                            queryParams: { query }
-                        });
-                    }
-                    else if (source === "extendsearch") { // click on <Cerca in tutti i campi> (call to action)
-                        this.emitGlobal('navigate', {
-                            handler: 'router',
-                            path: [this.configuration.get('paths').searchBasePath],
-                            queryParams: {
-                                query: this.dataSource.autocompleteValue,
-                                "query-all": 1
+                        let basePath;
+                        if (source === 'item') {
+                            if (payloadType === 'oggetto-culturale') {
+                                basePath = this.configuration.get('paths').schedaBasePath;
                             }
-                        });
+                            else {
+                                basePath = this.configuration.get('paths').entitaBasePath;
+                            }
+                            this.emitGlobal('navigate', {
+                                handler: 'router',
+                                path: [basePath, payload.id, helpers.slugify(payload.title)],
+                            });
+                        }
+                        else if (source === 'showMore') {
+                            /** @type {?} */
+                            const query = this.dataSource.homeAutocompleteQuery;
+                            basePath = this.configuration.get('paths').searchBasePath;
+                            this.emitGlobal('navigate', {
+                                handler: 'router',
+                                path: [basePath],
+                                queryParams: { query },
+                            });
+                        }
+                        else if (source === 'extendsearch') { // click on <Cerca in tutti i campi> (call to action)
+                            this.emitGlobal('navigate', {
+                                handler: 'router',
+                                path: [this.configuration.get('paths').searchBasePath],
+                                queryParams: {
+                                    query: this.dataSource.autocompleteValue,
+                                    'query-all': 1,
+                                },
+                            });
+                        }
                     }
                     break;
                 case 'aw-bubble-chart.selection':
@@ -8325,16 +8355,6 @@ class AwHomeLayoutEH extends EventHandler {
                 case 'aw-bubble-chart.lockfilter':
                     this.emitOuter('lockfilter', payload); // let aw-home-facets-wrapper handle this event
                     break;
-                // case 'aw-bubble-chart.bubble-tooltip-goto-click':
-                //   this.emitGlobal('navigate', {
-                //     handler: 'router',
-                //     path: [
-                //       this.configuration.get('paths').entitaBasePath,
-                //       payload.id,
-                //       helpers.slugify(payload.label)
-                //     ]
-                //   });
-                //   break;
                 default:
                     // console.warn('(home) unhandled outer event of type', type)
                     break;
@@ -8367,7 +8387,7 @@ class AwHomeLayoutEH extends EventHandler {
      * @return {?}
      */
     outerLinkClick(type, payload) {
-        window.open(payload, "_blank");
+        window.open(payload, '_blank');
     }
 }
 if (false) {
@@ -8394,6 +8414,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/home-layout/home-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -8424,11 +8445,12 @@ const AwHomeLayoutConfig = {
     widgetsEventHandlers: EH$1,
     options: {
     // TODO
-    }
+    },
 };
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeLayoutComponent extends AbstractLayout {
@@ -8457,7 +8479,7 @@ class AwHomeLayoutComponent extends AbstractLayout {
             router: this.router,
             communication: this.communication,
             options: this.config.options || {},
-            tippy: tippy,
+            tippy,
         };
     }
     /**
@@ -8476,7 +8498,7 @@ class AwHomeLayoutComponent extends AbstractLayout {
 AwHomeLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-home-layout',
-                template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper n7-side-auto-padding\"\n        [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length > 0 }\" *ngIf=\"lb.dataSource.bubblesEnabled\">\n        <div class=\"aw-home__facets-wrapper-loading\" *ngIf=\"!(lb.widgets['aw-home-facets-wrapper'].ds.out$ | async)\">\n            <n7-content-placeholder *ngFor=\"let i of [0,1,2,3]\" [data]=\"{\n                blocks: [{\n                    classes: 'facet-placeholder-header'\n                }, {\n                    classes: 'facet-placeholder-input'\n                }] \n            }\"></n7-content-placeholder>\n        </div>\n        <div class=\"aw-home__facets-wrapper\" *ngIf=\"!!(lb.widgets['aw-home-facets-wrapper'].ds.out$ | async)\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div class=\"aw-home__bubble-chart-wrapper-loading\" *ngIf=\"!(lb.widgets['aw-bubble-chart'].ds.out$ | async)\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [\n                    {\n                        classes: 'facet-placeholder-item-1'\n                    }\n                ]\n            }\"></n7-content-placeholder>\n        </div>\n        <div class=\"aw-home__bubble-chart-wrapper\" *ngIf=\"!!(lb.widgets['aw-bubble-chart'].ds.out$ | async)\"\n            [style.overflow]=\"lb.dataSource.loadingBubbles ? 'visible' : 'hidden'\">\n            <aw-bubble-chart-wrapper>\n                <aw-chart-tippy \n                    [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                </aw-chart-tippy>\n                <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n\n        <!-- Linked objects -->\n        <ng-container *ngIf=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.selected.length > 0;\">\n            <div class=\"aw-home__bubble-results\" id=\"home-bubble-results\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\" class=\"aw-home__bubble-results-title-wrapper\">\n                    <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">\n                            {{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span>\n                    </h1>\n                </div>\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n\n                <div class=\"aw-home__bubble-results-list-wrapper\">\n                    <div class=\"aw-home__bubble-results-list-loading\" *ngIf=\"lb.dataSource.resultsListIsLoading\">\n                        <n7-content-placeholder [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                        <n7-content-placeholder [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                        <n7-content-placeholder [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                        <n7-content-placeholder [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                        <n7-content-placeholder [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                    </div>\n                    <div *ngIf=\"!lb.dataSource.resultsListIsLoading\" class=\"aw-home__bubble-results-list\"\n                        [attr.id]=\"'bubble-results-list'\" (scroll)=\"lb.eventHandler.emitOuter('scroll', $event.target)\">\n\n                        <div class=\"aw-home__bubble-results-fallback\"\n                            *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length < 1;\">\n                            <p class=\"aw-home__bubble-results-fallback-text\">\n                                {{ (lb.widgets['aw-linked-objects'].ds.out$ | async)?.fallback }}\n                            </p>\n                            <button class=\"n7-btn aw-home__bubble-results-reset\"\n                                (click)=\"lb.eventHandler.emitInner('clearselection')\">\n                                Resetta la ricerca\n                            </button>\n                        </div>\n\n                        <ng-container\n                            *ngFor=\"let widgetData of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.result;\">\n                            <n7-item-preview [data]=\"widgetData\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n\n                        <ng-container *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.isLoading\">\n                            <div class=\"aw-home__bubble-results-list-loader\">\n                                <n7-loader [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.loaderData\">\n                                </n7-loader>\n                            </div>\n                        </ng-container>\n                    </div>\n                    <div [ngClass]=\"{ 'is-visible' : lb.dataSource.hasScrollBackground }\"\n                        class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                </div>\n                <!-- aw-linked-objects__actions -->\n                <ng-container\n                    *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length > 0 && !lb.dataSource.resultsListIsLoading\">\n                    <div *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.actions as action\"\n                        class=\"aw-home__bubble-results-list-actions\">\n                        <button (click)=\"lb.eventHandler.emitInner('bubbleresultsviewallclick')\"\n                            class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\">\n                            {{action[0].label}}\n                        </button>\n                    </div>\n                </ng-container>\n\n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Outer links -->\n    <div *ngIf=\"lb.dataSource.outerLinks && lb.dataSource.outerLinks.length > 0\" class=\"aw-home__outer-links\">\n        <section class=\"aw-home__outer-links-wrapper n7-side-auto-padding\">\n            <h2 class=\"aw-home__outer-links-title\" *ngIf=\"lb.dataSource.outerLinksTitle\">\n                {{ lb.dataSource.outerLinksTitle }}\n            </h2>\n            <div class=\"aw-home__outer-links-items\">\n                <!-- Item preview -->\n                <n7-item-preview *ngFor=\"let outerLink of lb.dataSource.outerLinks\" [data]=\"outerLink\"\n                    [emit]=\"lb.eventHandler.outerLinkClick.bind(lb.eventHandler)\">\n                </n7-item-preview>\n                <!-- END // Item preview -->\n            </div>\n        </section>\n    </div>\n    <!-- END // Outer links -->\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Adavanced autocomplete popover  -->\n    <div class=\"aw-home__advanced-autocomplete\" id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <div class=\"aw-home__advanced-autocomplete-loader\" *ngIf=\"lb.dataSource.homeAutocompleteIsLoading\">\n            <n7-loader [data]=\"{}\"></n7-loader>\n        </div>\n        <n7-advanced-autocomplete *ngIf=\"!lb.dataSource.homeAutocompleteIsLoading\"\n            [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n\n    <!-- Simple autocomplete popover. DO NOT CHANGE parent div class! -->\n    <!-- Creating one template for each facet -->\n    <div *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\"\n        class=\"aw-home__simple-autocomplete aw-simple-autocomplete__template\" style=\"display: none;\">\n        <div class=\"aw-home__simple-autocomplete-content aw-simple-autocomplete__tippy-wrapper\">\n            <div class=\"aw-home__simple-autocomplete-loader aw-simple-autocomplete__tippy-wrapper-loader\"\n                *ngIf=\"(lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async)?.loading\">\n                <n7-loader [data]=\"{}\"></n7-loader>\n            </div>\n            <n7-simple-autocomplete *ngIf=\"!(lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async)?.loading\"\n                [data]=\"lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-autocomplete-wrapper'].emit\">\n            </n7-simple-autocomplete>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\r\n    <!-- Hero section at the top of the page -->\r\n    <div class=\"aw-home__top-hero\">\r\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\r\n        </n7-hero>\r\n    </div>\r\n\r\n    <!-- Bubble chart -->\r\n    <div class=\"aw-home__bubble-wrapper n7-side-auto-padding\"\r\n        [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length > 0 }\" *ngIf=\"lb.dataSource.bubblesEnabled\">\r\n        <div class=\"aw-home__facets-wrapper-loading\" *ngIf=\"!(lb.widgets['aw-home-facets-wrapper'].ds.out$ | async)\">\r\n            <n7-content-placeholder *ngFor=\"let i of [0,1,2,3]\" [data]=\"{\r\n                blocks: [{\r\n                    classes: 'facet-placeholder-header'\r\n                }, {\r\n                    classes: 'facet-placeholder-input'\r\n                }] \r\n            }\"></n7-content-placeholder>\r\n        </div>\r\n        <div class=\"aw-home__facets-wrapper\" *ngIf=\"!!(lb.widgets['aw-home-facets-wrapper'].ds.out$ | async)\">\r\n            <span class=\"aw-home__facet\"\r\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\r\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\r\n                </n7-facet-header>\r\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\r\n                </n7-facet>\r\n            </span>\r\n        </div>\r\n\r\n        <div class=\"aw-home__bubble-chart-wrapper-loading\" *ngIf=\"!(lb.widgets['aw-bubble-chart'].ds.out$ | async)\">\r\n            <n7-content-placeholder [data]=\"{\r\n                blocks: [\r\n                    {\r\n                        classes: 'facet-placeholder-item-1'\r\n                    }\r\n                ]\r\n            }\"></n7-content-placeholder>\r\n        </div>\r\n        <div class=\"aw-home__bubble-chart-wrapper\" *ngIf=\"!!(lb.widgets['aw-bubble-chart'].ds.out$ | async)\"\r\n            [style.overflow]=\"lb.dataSource.loadingBubbles ? 'visible' : 'hidden'\">\r\n            <aw-bubble-chart-wrapper>\r\n                <aw-chart-tippy \r\n                    [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\r\n                </aw-chart-tippy>\r\n                <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\r\n                </n7-bubble-chart>\r\n            </aw-bubble-chart-wrapper>\r\n        </div>\r\n\r\n        <!-- Linked objects -->\r\n        <ng-container *ngIf=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.selected.length > 0;\">\r\n            <div class=\"aw-home__bubble-results\" id=\"home-bubble-results\">\r\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\" class=\"aw-home__bubble-results-title-wrapper\">\r\n                    <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">\r\n                            {{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span>\r\n                    </h1>\r\n                </div>\r\n                <div class=\"aw-home__bubble-tags-wrapper\">\r\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\r\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\r\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\r\n                        </n7-tag>\r\n                        <br>\r\n                    </ng-container>\r\n                </div>\r\n\r\n                <div class=\"aw-home__bubble-results-list-wrapper\">\r\n                    <div class=\"aw-home__bubble-results-list-loading\" *ngIf=\"lb.dataSource.resultsListIsLoading\">\r\n                        <n7-content-placeholder [data]=\"{\r\n                            blocks: [{\r\n                                classes: 'search-result-placeholder-title'\r\n                            }, {\r\n                                classes: 'search-result-placeholder-metadata'\r\n                            }]\r\n                        }\"></n7-content-placeholder>\r\n                        <n7-content-placeholder [data]=\"{\r\n                            blocks: [{\r\n                                classes: 'search-result-placeholder-title'\r\n                            }, {\r\n                                classes: 'search-result-placeholder-metadata'\r\n                            }]\r\n                        }\"></n7-content-placeholder>\r\n                        <n7-content-placeholder [data]=\"{\r\n                            blocks: [{\r\n                                classes: 'search-result-placeholder-title'\r\n                            }, {\r\n                                classes: 'search-result-placeholder-metadata'\r\n                            }]\r\n                        }\"></n7-content-placeholder>\r\n                        <n7-content-placeholder [data]=\"{\r\n                            blocks: [{\r\n                                classes: 'search-result-placeholder-title'\r\n                            }, {\r\n                                classes: 'search-result-placeholder-metadata'\r\n                            }]\r\n                        }\"></n7-content-placeholder>\r\n                        <n7-content-placeholder [data]=\"{\r\n                            blocks: [{\r\n                                classes: 'search-result-placeholder-title'\r\n                            }, {\r\n                                classes: 'search-result-placeholder-metadata'\r\n                            }]\r\n                        }\"></n7-content-placeholder>\r\n                    </div>\r\n                    <div *ngIf=\"!lb.dataSource.resultsListIsLoading\" class=\"aw-home__bubble-results-list\"\r\n                        [attr.id]=\"'bubble-results-list'\" (scroll)=\"lb.eventHandler.emitOuter('scroll', $event.target)\">\r\n\r\n                        <div class=\"aw-home__bubble-results-fallback\"\r\n                            *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length < 1;\">\r\n                            <p class=\"aw-home__bubble-results-fallback-text\">\r\n                                {{ (lb.widgets['aw-linked-objects'].ds.out$ | async)?.fallback }}\r\n                            </p>\r\n                            <button class=\"n7-btn aw-home__bubble-results-reset\"\r\n                                (click)=\"lb.eventHandler.emitInner('clearselection')\">\r\n                                Resetta la ricerca\r\n                            </button>\r\n                        </div>\r\n\r\n                        <ng-container\r\n                            *ngFor=\"let widgetData of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.result;\">\r\n                            <n7-item-preview [data]=\"widgetData\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\r\n                            </n7-item-preview>\r\n                        </ng-container>\r\n\r\n                        <ng-container *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.isLoading\">\r\n                            <div class=\"aw-home__bubble-results-list-loader\">\r\n                                <n7-loader [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.loaderData\">\r\n                                </n7-loader>\r\n                            </div>\r\n                        </ng-container>\r\n                    </div>\r\n                    <div [ngClass]=\"{ 'is-visible' : lb.dataSource.hasScrollBackground }\"\r\n                        class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\r\n                </div>\r\n                <!-- aw-linked-objects__actions -->\r\n                <ng-container\r\n                    *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length > 0 && !lb.dataSource.resultsListIsLoading\">\r\n                    <div *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.actions as action\"\r\n                        class=\"aw-home__bubble-results-list-actions\">\r\n                        <button (click)=\"lb.eventHandler.emitInner('bubbleresultsviewallclick')\"\r\n                            class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\">\r\n                            {{action[0].label}}\r\n                        </button>\r\n                    </div>\r\n                </ng-container>\r\n\r\n            </div>\r\n        </ng-container>\r\n    </div>\r\n\r\n    <!-- Outer links -->\r\n    <div *ngIf=\"lb.dataSource.outerLinks && lb.dataSource.outerLinks.length > 0\" class=\"aw-home__outer-links\">\r\n        <section class=\"aw-home__outer-links-wrapper n7-side-auto-padding\">\r\n            <h2 class=\"aw-home__outer-links-title\" *ngIf=\"lb.dataSource.outerLinksTitle\">\r\n                {{ lb.dataSource.outerLinksTitle }}\r\n            </h2>\r\n            <div class=\"aw-home__outer-links-items\">\r\n                <!-- Item preview -->\r\n                <n7-item-preview *ngFor=\"let outerLink of lb.dataSource.outerLinks\" [data]=\"outerLink\"\r\n                    [emit]=\"lb.eventHandler.outerLinkClick.bind(lb.eventHandler)\">\r\n                </n7-item-preview>\r\n                <!-- END // Item preview -->\r\n            </div>\r\n        </section>\r\n    </div>\r\n    <!-- END // Outer links -->\r\n\r\n    <!-- Hero section at the bottom of the page -->\r\n    <div class=\"aw-home__bottom-hero\">\r\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\r\n        </n7-hero>\r\n    </div>\r\n\r\n    <!-- Adavanced autocomplete popover  -->\r\n    <div class=\"aw-home__advanced-autocomplete\" id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\r\n        <div class=\"aw-home__advanced-autocomplete-loader\" *ngIf=\"lb.dataSource.homeAutocompleteIsLoading\">\r\n            <n7-loader [data]=\"{}\"></n7-loader>\r\n        </div>\r\n        <n7-advanced-autocomplete *ngIf=\"!lb.dataSource.homeAutocompleteIsLoading\"\r\n            [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\r\n        </n7-advanced-autocomplete>\r\n    </div>\r\n\r\n    <!-- Simple autocomplete popover. DO NOT CHANGE parent div class! -->\r\n    <!-- Creating one template for each facet -->\r\n    <div *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\"\r\n        class=\"aw-home__simple-autocomplete aw-simple-autocomplete__template\" style=\"display: none;\">\r\n        <div class=\"aw-home__simple-autocomplete-content aw-simple-autocomplete__tippy-wrapper\">\r\n            <div class=\"aw-home__simple-autocomplete-loader aw-simple-autocomplete__tippy-wrapper-loader\"\r\n                *ngIf=\"(lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async)?.loading\">\r\n                <n7-loader [data]=\"{}\"></n7-loader>\r\n            </div>\r\n            <n7-simple-autocomplete *ngIf=\"!(lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async)?.loading\"\r\n                [data]=\"lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async\"\r\n                [emit]=\"lb.widgets['aw-autocomplete-wrapper'].emit\">\r\n            </n7-simple-autocomplete>\r\n        </div>\r\n    </div>\r\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -8512,6 +8534,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaLayoutDS extends LayoutDataSource {
@@ -8533,7 +8556,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
      * @param {?} __0
      * @return {?}
      */
-    onInit({ configuration, mainState, router, options, titleService, communication }) {
+    onInit({ configuration, mainState, router, options, titleService, communication, }) {
         this.configuration = configuration;
         this.mainState = mainState;
         this.router = router;
@@ -8541,19 +8564,19 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         this.communication = communication;
         this.options = options;
         this.sidebarCollapsed = false;
-        this.bubbleChartSectionTitle = this.configuration.get('scheda-layout')['bubble-chart']['title'];
-        this.similarItemsSectionTitle = this.configuration.get('scheda-layout')['related-items']['title'];
-        this.metadataSectionTitle = this.configuration.get('scheda-layout')['metadata']['title'];
+        this.bubbleChartSectionTitle = this.configuration.get('scheda-layout')['bubble-chart'].title;
+        this.similarItemsSectionTitle = this.configuration.get('scheda-layout')['related-items'].title;
+        this.metadataSectionTitle = this.configuration.get('scheda-layout').metadata.title;
         this.hasSimilarItems = false;
-        this.bubblesEnabled = this.configuration.get('features-enabled') ? this.configuration.get('features-enabled')['bubblechart'] : false;
+        this.bubblesEnabled = this.configuration.get('features-enabled') ? this.configuration.get('features-enabled').bubblechart : false;
         this.one('aw-bubble-chart').updateOptions({
             selectable: false,
             simple: true,
             config: this.configuration,
-            limit: this.configuration.get('bubble-chart').bubbleLimit
+            limit: this.configuration.get('bubble-chart').bubbleLimit,
         });
         this.one('aw-chart-tippy').updateOptions({
-            basePath: this.configuration.get('paths')['entitaBasePath']
+            basePath: this.configuration.get('paths').entitaBasePath,
         });
         this.emptyLabel = this.configuration.get('scheda-layout')['empty-label'];
         this.mainState.update('headTitle', 'Arianna Web > Patrimonio');
@@ -8582,7 +8605,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
              * @return {?}
              */
             (error) => console.error(error)),
-            params: { treeId: id }
+            params: { treeId: id },
         });
     }
     /**
@@ -8612,7 +8635,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
              * @return {?}
              */
             (error) => console.error(error)),
-            params: { id: id, maxSimilarItems: maxSimilarItems }
+            params: { id, maxSimilarItems },
         });
     }
     /**
@@ -8628,9 +8651,9 @@ class AwSchedaLayoutDS extends LayoutDataSource {
             this.hasImage = !!response.image;
             this.contentParts = [];
             /** @type {?} */
-            const content = {};
+            const content = { content: null };
             if (response.text) {
-                content['content'] = response.text;
+                content.content = response.text;
             }
             this.contentParts.push(content);
             if (response.image) {
@@ -8660,10 +8683,10 @@ class AwSchedaLayoutDS extends LayoutDataSource {
                     main: {
                         text: response.title || response.label,
                         classes: 'bold',
-                    }
+                    },
                 },
                 tools: response.subTitle,
-                actions: {}
+                actions: {},
             };
             this.one('aw-scheda-inner-title').update(titleObj);
             this.one('aw-scheda-metadata').updateOptions({ labels: this.configuration.get('labels') });
@@ -8671,23 +8694,23 @@ class AwSchedaLayoutDS extends LayoutDataSource {
             // Breadcrumb section
             /** @type {?} */
             const breadcrumbs = {
-                items: []
+                items: [],
             };
             if (response.breadcrumbs) {
                 response.breadcrumbs.forEach((/**
                  * @param {?} element
                  * @return {?}
                  */
-                element => {
+                (element) => {
                     breadcrumbs.items.push({
                         label: element.label,
                         anchor: {
                             href: [
                                 this.configuration.get('paths').schedaBasePath,
-                                element.link + '/',
-                                helpers.slugify(element.label)
-                            ].join('')
-                        }
+                                `${element.link}/`,
+                                helpers.slugify(element.label),
+                            ].join(''),
+                        },
                     });
                 }));
                 this.one('aw-scheda-breadcrumbs').update(breadcrumbs);
@@ -8733,24 +8756,24 @@ class AwSchedaLayoutDS extends LayoutDataSource {
             /** @type {?} */
             const windowBottom = window.scrollY + window.innerHeight;
             /** @type {?} */
-            const wrapper = document.getElementsByClassName('sticky-parent')[0];
+            const wrapper = (/** @type {?} */ (document.getElementsByClassName('sticky-parent')[0]));
             /** @type {?} */
-            const wrapperTop = wrapper['offsetTop'];
+            const wrapperTop = wrapper.offsetTop;
             /** @type {?} */
             const wrapperBottom = wrapperTop + wrapper.clientHeight;
             this.sidebarIsSticky = wrapperTop <= windowTop;
             // tree height control
             if (this.sidebarIsSticky && windowBottom < wrapperBottom) {
-                this.treeMaxHeight = (windowBottom - windowTop - 50) + 'px';
+                this.treeMaxHeight = `${windowBottom - windowTop - 50}px`;
             }
             else if (this.sidebarIsSticky && windowBottom >= wrapperBottom) {
-                this.treeMaxHeight = (wrapperBottom - windowTop - 50) + 'px';
+                this.treeMaxHeight = `${wrapperBottom - windowTop - 50}px`;
             }
             else if (windowBottom < wrapperBottom) {
-                this.treeMaxHeight = (windowBottom - wrapperTop - 50) + 'px';
+                this.treeMaxHeight = `${windowBottom - wrapperTop - 50}px`;
             }
             else {
-                this.treeMaxHeight = (wrapperBottom - wrapperTop - 50) + 'px';
+                this.treeMaxHeight = `${wrapperBottom - wrapperTop - 50}px`;
             }
         }));
     }
@@ -8840,6 +8863,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaLayoutEH extends EventHandler {
@@ -8858,16 +8882,18 @@ class AwSchedaLayoutEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'aw-scheda-layout.init':
-                    this.dataSource.onInit(payload);
-                    this.configuration = payload.configuration;
-                    this.route = payload.route;
-                    /** @type {?} */
-                    const paramId = this.route.snapshot.params.id || '';
-                    if (paramId) {
-                        this.dataSource.currentId = paramId;
+                    {
+                        this.dataSource.onInit(payload);
+                        this.configuration = payload.configuration;
+                        this.route = payload.route;
+                        /** @type {?} */
+                        const paramId = this.route.snapshot.params.id || '';
+                        if (paramId) {
+                            this.dataSource.currentId = paramId;
+                        }
+                        this.listenRoute();
+                        this.loadNavigation(paramId);
                     }
-                    this.listenRoute();
-                    this.loadNavigation(paramId);
                     break;
                 case 'aw-scheda-layout.destroy':
                     this.destroyed$.next();
@@ -8890,16 +8916,18 @@ class AwSchedaLayoutEH extends EventHandler {
                     this.dataSource.collapseSidebar();
                     break;
                 case 'aw-bubble-chart.bubble-tooltip-goto-click':
-                    const { id, label } = payload;
-                    this.emitGlobal('navigate', {
-                        handler: 'router',
-                        path: [
-                            this.configuration.get('paths').entitaBasePath,
-                            id,
-                            helpers.slugify(label),
-                            'overview'
-                        ]
-                    });
+                    {
+                        const { id, label } = payload;
+                        this.emitGlobal('navigate', {
+                            handler: 'router',
+                            path: [
+                                this.configuration.get('paths').entitaBasePath,
+                                id,
+                                helpers.slugify(label),
+                                'overview',
+                            ],
+                        });
+                    }
                     break;
                 default:
                     break;
@@ -8915,7 +8943,7 @@ class AwSchedaLayoutEH extends EventHandler {
          * @param {?} params
          * @return {?}
          */
-        params => {
+        (params) => {
             /** @type {?} */
             const paramId = params.get('id');
             if (paramId) {
@@ -8960,7 +8988,7 @@ class AwSchedaLayoutEH extends EventHandler {
                 this.emitOuter('navigationresponse', {
                     tree: this.dataSource.getTree(),
                     currentItem: selectedItem,
-                    basePath: this.configuration.get('paths').schedaBasePath
+                    basePath: this.configuration.get('paths').schedaBasePath,
                 });
             }
         }));
@@ -8986,6 +9014,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -9004,7 +9033,7 @@ const AwPatrimonioLayoutConfig = {
         { id: 'aw-scheda-inner-title' },
         { id: 'aw-bubble-chart' },
         { id: 'aw-chart-tippy' },
-        { id: 'aw-linked-objects' }
+        { id: 'aw-linked-objects' },
     ],
     layoutDS: AwSchedaLayoutDS,
     layoutEH: AwSchedaLayoutEH,
@@ -9012,11 +9041,12 @@ const AwPatrimonioLayoutConfig = {
     widgetsEventHandlers: EH$1,
     options: {
     // TODO
-    }
+    },
 };
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaLayoutComponent extends AbstractLayout {
@@ -9073,7 +9103,7 @@ class AwSchedaLayoutComponent extends AbstractLayout {
 AwSchedaLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-scheda-layout',
-                template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n        [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\" [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n            <div class=\"aw-scheda__tree-content-loading\" *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\" [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n            </div>\n            <div class=\"aw-scheda__tree-content\" [ngStyle]=\"{ \n                    'max-height': lb.dataSource.treeMaxHeight, \n                    'overflow': 'auto' \n                }\">\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\" [emit]=\"lb.widgets['aw-tree'].emit\"\n                    *ngIf=\"!lb.dataSource.sidebarCollapsed\"></n7-tree>\n            </div>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper-loading\" *ngIf=\"lb.dataSource.contentIsLoading\">\n            <!--\n                <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'content-placeholder-title'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }]\n            }\"></n7-content-placeholder>\n            -->\n        </div>\n        <div class=\"aw-scheda__scheda-wrapper\" *ngIf=\"!lb.dataSource.contentIsLoading\">\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\" class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n\n            <div *ngIf=\"!lb.dataSource.currentId\" class=\"aw-scheda__intro-text\" [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <n7-image-viewer *ngIf=\"lb.dataSource.hasImage\" [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\" *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\" *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section class=\"aw-scheda__bubble-chart\" *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\n                <div *ngIf=\"lb.dataSource.hasBubbles\" class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <aw-bubble-chart-wrapper>\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                    </aw-chart-tippy>\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </section>\n\n            <section *ngIf=\"lb.dataSource.hasSimilarItems && lb.dataSource.hasBubbles\" id=\"related-item-container\" class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.similarItemsSectionTitle}}</div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <!--<ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">-->\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n            </section>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\r\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\r\n        [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\r\n        <!-- Left sidebar: tree -->\r\n        <div class=\"aw-scheda__tree sticky-target\" [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\r\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\r\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\r\n            <div class=\"aw-scheda__tree-content-loading\" *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\r\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\" [data]=\"{\r\n                    blocks: [{\r\n                        classes: 'tree-placeholder-item'\r\n                    }]\r\n                }\"></n7-content-placeholder>\r\n            </div>\r\n            <div class=\"aw-scheda__tree-content\" [ngStyle]=\"{ \r\n                    'max-height': lb.dataSource.treeMaxHeight, \r\n                    'overflow': 'auto' \r\n                }\">\r\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\" [emit]=\"lb.widgets['aw-tree'].emit\"\r\n                    *ngIf=\"!lb.dataSource.sidebarCollapsed\"></n7-tree>\r\n            </div>\r\n        </div>\r\n\r\n        <!-- Scheda details -->\r\n        <div class=\"aw-scheda__scheda-wrapper-loading\" *ngIf=\"lb.dataSource.contentIsLoading\">\r\n            <!--\r\n                <n7-content-placeholder [data]=\"{\r\n                blocks: [{\r\n                    classes: 'content-placeholder-title'\r\n                }, {\r\n                    classes: 'content-placeholder-item-preview'\r\n                }, {\r\n                    classes: 'content-placeholder-item-preview'\r\n                }, {\r\n                    classes: 'content-placeholder-item-preview'\r\n                }, {\r\n                    classes: 'content-placeholder-item-preview'\r\n                }, {\r\n                    classes: 'content-placeholder-item-preview'\r\n                }, {\r\n                    classes: 'content-placeholder-item-preview'\r\n                }]\r\n            }\"></n7-content-placeholder>\r\n            -->\r\n        </div>\r\n        <div class=\"aw-scheda__scheda-wrapper\" *ngIf=\"!lb.dataSource.contentIsLoading\">\r\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\r\n                [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\r\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\r\n            </n7-smart-breadcrumbs>\r\n\r\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\" class=\"aw-scheda__fake-breadcrumbs\">\r\n            </div>\r\n\r\n            <div *ngIf=\"!lb.dataSource.currentId\" class=\"aw-scheda__intro-text\" [innerHTML]=\"lb.dataSource.emptyLabel\">\r\n            </div>\r\n\r\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\r\n            </n7-inner-title>\r\n\r\n            <n7-image-viewer *ngIf=\"lb.dataSource.hasImage\" [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\r\n            </n7-image-viewer>\r\n\r\n            <section class=\"aw-scheda__description\" *ngIf=\"lb.dataSource.contentParts.content\">\r\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\r\n                    <div [innerHTML]=\"part.content\"></div>\r\n                </div>\r\n            </section>\r\n\r\n            <section class=\"aw-scheda__metadata\" *ngIf=\"lb.dataSource.hasMetadata\">\r\n                <div class=\"aw-scheda__inner-title\">\r\n                    {{lb.dataSource.metadataSectionTitle}}\r\n                </div>\r\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\r\n                </n7-metadata-viewer>\r\n            </section>\r\n\r\n            <section class=\"aw-scheda__bubble-chart\" *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\r\n                <div *ngIf=\"lb.dataSource.hasBubbles\" class=\"aw-scheda__inner-title\">\r\n                    {{lb.dataSource.bubbleChartSectionTitle}}\r\n                </div>\r\n                <aw-bubble-chart-wrapper>\r\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\r\n                        [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\r\n                    </aw-chart-tippy>\r\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\r\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\r\n                    </n7-bubble-chart>\r\n                </aw-bubble-chart-wrapper>\r\n            </section>\r\n\r\n            <section *ngIf=\"lb.dataSource.hasSimilarItems && lb.dataSource.hasBubbles\" id=\"related-item-container\" class=\"aw-scheda__related\">\r\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.similarItemsSectionTitle}}</div>\r\n                <div class=\"aw-scheda__related-items n7-grid-2\">\r\n                    <!--<ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">-->\r\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\r\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\r\n                        </n7-item-preview>\r\n                    </ng-container>\r\n                </div>\r\n            </section>\r\n        </div>\r\n    </div>\r\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -9126,6 +9156,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-facets.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var facetsConfig = {
@@ -9133,7 +9164,7 @@ var facetsConfig = {
     facets: [
         {
             id: 'query',
-            type: 'value'
+            type: 'value',
         },
         {
             id: 'query-all',
@@ -9142,29 +9173,29 @@ var facetsConfig = {
             data: [
                 {
                     value: '1',
-                    label: 'Cerca in tutti campi delle schede'
-                }
-            ]
+                    label: 'Cerca in tutti campi delle schede',
+                },
+            ],
         },
         {
             id: 'query-links',
-            type: 'value'
+            type: 'value',
         },
         {
             id: 'entity-types',
             type: 'value',
             operator: 'OR',
             limit: 10,
-            order: 'count'
+            order: 'count',
         },
         {
             id: 'entity-search',
-            type: 'value'
+            type: 'value',
         },
         {
             id: 'entity-links',
             type: 'value',
-            searchData: ['entity-type']
+            searchData: ['entity-type'],
         },
     ],
     fields: [
@@ -9181,10 +9212,10 @@ var facetsConfig = {
                         searchIn: [
                             {
                                 key: 'label.ngrams',
-                                operator: 'LIKE'
-                            }
-                        ]
-                    }
+                                operator: 'LIKE',
+                            },
+                        ],
+                    },
                 },
                 {
                     type: 'checkbox',
@@ -9193,10 +9224,10 @@ var facetsConfig = {
                         searchIn: [
                             {
                                 key: 'label.ngrams^5,text^4,fields.*^3',
-                                operator: '='
-                            }
-                        ]
-                    }
+                                operator: '=',
+                            },
+                        ],
+                    },
                 },
                 {
                     type: 'link',
@@ -9206,17 +9237,17 @@ var facetsConfig = {
                         searchIn: [
                             {
                                 key: 'source.entityType',
-                                operator: '='
-                            }
-                        ]
-                    }
-                }
-            ]
+                                operator: '=',
+                            },
+                        ],
+                    },
+                },
+            ],
         },
         {
             header: {
                 label: 'Relazione con',
-                classes: 'related-class'
+                classes: 'related-class',
             },
             inputs: [
                 {
@@ -9229,10 +9260,10 @@ var facetsConfig = {
                         searchIn: [
                             {
                                 key: 'searchData.entity-type',
-                                operator: '='
-                            }
-                        ]
-                    }
+                                operator: '=',
+                            },
+                        ],
+                    },
                 },
                 {
                     type: 'text',
@@ -9247,16 +9278,16 @@ var facetsConfig = {
                         searchIn: [
                             {
                                 key: 'label',
-                                operator: 'LIKE'
-                            }
-                        ]
-                    }
+                                operator: 'LIKE',
+                            },
+                        ],
+                    },
                 },
                 {
                     type: 'link',
                     facetId: 'entity-links',
                     emptyState: {
-                        label: 'La tua ricerca non ha dato risultati, prova a cambiare i filtri'
+                        label: 'La tua ricerca non ha dato risultati, prova a cambiare i filtri',
                     },
                     filterConfig: {
                         isArray: true,
@@ -9264,12 +9295,12 @@ var facetsConfig = {
                         searchIn: [
                             {
                                 key: 'relatedEntities.id',
-                                operator: '='
-                            }
-                        ]
-                    }
-                }
-            ]
+                                operator: '=',
+                            },
+                        ],
+                    },
+                },
+            ],
         },
     ],
     results: {
@@ -9278,21 +9309,22 @@ var facetsConfig = {
             // score | text | date
             key: 'label_sort',
             // docPath, elastic key, ecc
-            direction: 'ASC' // ASC | DESC
+            direction: 'ASC',
         },
         fields: [
             {
                 id: 'description',
                 highlight: true,
-                limit: 200
-            }
-        ]
+                limit: 200,
+            },
+        ],
     },
-    page: { offset: 0, limit: 10 }
+    page: { offset: 0, limit: 10 },
 };
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -9317,20 +9349,20 @@ class AwSearchLayoutDS extends LayoutDataSource {
                 value: 'label_sort_ASC',
                 label: 'Ordine alfabetico (A→Z)',
                 type: 'text',
-                selected: true
+                selected: true,
             },
             {
                 value: 'label_sort_DESC',
                 label: 'Ordine alfabetico (Z→A)',
                 type: 'text',
-                selected: false
+                selected: false,
             },
             {
                 value: '_score_DESC',
                 label: 'Ordine per pertinenza',
                 type: 'score',
-                selected: false
-            }
+                selected: false,
+            },
         ];
         this.drawPagination = (/**
          * @return {?}
@@ -9348,8 +9380,8 @@ class AwSearchLayoutDS extends LayoutDataSource {
                 pageLimit: 5,
                 sizes: {
                     list: [10, 25, 50],
-                    active: this.pageSize
-                }
+                    active: this.pageSize,
+                },
             });
         });
         this.getSearchModelId = (/**
@@ -9361,7 +9393,7 @@ class AwSearchLayoutDS extends LayoutDataSource {
      * @param {?} __0
      * @return {?}
      */
-    onInit({ configuration, mainState, options, communication, search }) {
+    onInit({ configuration, mainState, options, communication, search, }) {
         this.configuration = configuration;
         this.mainState = mainState;
         this.communication = communication;
@@ -9412,17 +9444,17 @@ class AwSearchLayoutDS extends LayoutDataSource {
      */
     onOrderByChange(payload) {
         /** @type {?} */
-        const orderBy = payload.substring(0, payload.lastIndexOf("_"));
+        const orderBy = payload.substring(0, payload.lastIndexOf('_'));
         /** @type {?} */
-        const direction = payload.substring(payload.lastIndexOf("_") + 1);
+        const direction = payload.substring(payload.lastIndexOf('_') + 1);
         /** @type {?} */
-        let type = "";
+        let type = '';
         // set selected
         this.orderByOptions.forEach((/**
          * @param {?} option
          * @return {?}
          */
-        option => {
+        (option) => {
             if (option.value === payload) {
                 option.selected = true;
                 type = option.type;
@@ -9442,7 +9474,6 @@ class AwSearchLayoutDS extends LayoutDataSource {
      * @return {?}
      */
     onPageSizeChange(size) {
-        console.log('on page size change');
         this.pageSize = size;
         return this._updateSearchPage(this.currentPage);
     }
@@ -9497,15 +9528,15 @@ class AwSearchLayoutDS extends LayoutDataSource {
         const requestParams = this.searchModel.getRequestParams();
         /** @type {?} */
         const requestPayload = {
-            searchParameters: Object.assign({ totalCount: 100 }, requestParams)
+            searchParameters: Object.assign({ totalCount: 100 }, requestParams),
         };
         return this.communication.request$('search', {
             onError: (/**
              * @param {?} error
              * @return {?}
              */
-            error => console.error(error)),
-            params: requestPayload
+            (error) => console.error(error)),
+            params: requestPayload,
         }).pipe(tap((/**
          * @param {?} __0
          * @return {?}
@@ -9535,9 +9566,9 @@ class AwSearchLayoutDS extends LayoutDataSource {
                 pagination: true,
                 paginationParams: this._getPaginationParams(),
                 dynamicPagination: {
-                    total: totalCount
+                    total: totalCount,
                 },
-                size: this.pageSize
+                size: this.pageSize,
             });
             this.drawPagination();
             this.one('aw-linked-objects').update({ items: this._normalizeItems(results.items) });
@@ -9574,17 +9605,17 @@ class AwSearchLayoutDS extends LayoutDataSource {
          * @param {?} f
          * @return {?}
          */
-        f => Array.isArray(f.data)))
+        (f) => Array.isArray(f.data)))
             .forEach((/**
          * @param {?} f
          * @return {?}
          */
-        f => {
+        (f) => {
             f.data.forEach((/**
              * @param {?} dataItem
              * @return {?}
              */
-            dataItem => {
+            (dataItem) => {
                 /** @type {?} */
                 const key = dataItem.label;
                 dataItem.label = helpers.prettifySnakeCase(key, this.prettifyLabels[key]);
@@ -9602,23 +9633,23 @@ class AwSearchLayoutDS extends LayoutDataSource {
          * @param {?} f
          * @return {?}
          */
-        f => f.id === 'query-links'))
+        (f) => f.id === 'query-links'))
             .forEach((/**
          * @param {?} f
          * @return {?}
          */
-        f => {
+        (f) => {
             f.data.forEach((/**
              * @param {?} dataItem
              * @return {?}
              */
-            dataItem => {
+            (dataItem) => {
                 /** @type {?} */
                 const config = this.configKeys[dataItem.value];
                 if (config) {
                     dataItem.options = {
                         icon: config.icon,
-                        classes: `color-${config['class-name']}`
+                        classes: `color-${config['class-name']}`,
                     };
                 }
             }));
@@ -9634,7 +9665,7 @@ class AwSearchLayoutDS extends LayoutDataSource {
          * @param {?} singleItem
          * @return {?}
          */
-        singleItem => ({ item: Object.assign({}, singleItem) })));
+        (singleItem) => ({ item: Object.assign({}, singleItem) })));
     }
     /**
      * @private
@@ -9654,7 +9685,9 @@ class AwSearchLayoutDS extends LayoutDataSource {
             /** @type {?} */
             const windowOffsetTop = window.pageYOffset;
             /** @type {?} */
-            const wrapperOffsetTop = document.getElementsByClassName('sticky-parent')[0]['offsetTop'];
+            const stickyParent = (/** @type {?} */ (document.getElementsByClassName('sticky-parent')[0]));
+            /** @type {?} */
+            const wrapperOffsetTop = stickyParent ? stickyParent.offsetTop : 0;
             this.sidebarIsSticky = wrapperOffsetTop <= windowOffsetTop;
         }));
     }
@@ -9671,7 +9704,7 @@ class AwSearchLayoutDS extends LayoutDataSource {
          * @param {?} key
          * @return {?}
          */
-        key => queryParams[key] = queryParams[key] || null));
+        (key) => { queryParams[key] = queryParams[key] || null; }));
         // aditional params
         queryParams.orderby = this.orderBy;
         queryParams.orderdirection = this.orderDirection;
@@ -9679,7 +9712,7 @@ class AwSearchLayoutDS extends LayoutDataSource {
         queryParams.limit = this.pageSize;
         return {
             queryParams,
-            href: this.configuration.get('paths').searchBasePath
+            href: this.configuration.get('paths').searchBasePath,
         };
     }
 }
@@ -9768,6 +9801,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutEH extends EventHandler {
@@ -9860,8 +9894,7 @@ class AwSearchLayoutEH extends EventHandler {
          * @return {?}
          */
         () => {
-            /** @type {?} */
-            const searchModel = this.dataSource.searchModel;
+            const { searchModel } = this.dataSource;
             /** @type {?} */
             const requestParams = searchModel.getRequestParams();
             /** @type {?} */
@@ -9870,7 +9903,7 @@ class AwSearchLayoutEH extends EventHandler {
              * @param {?} key
              * @return {?}
              */
-            key => queryParams[key] = queryParams[key] || null));
+            (key) => { queryParams[key] = queryParams[key] || null; }));
             // aditional params
             queryParams.orderby = this.dataSource.orderBy;
             queryParams.orderdirection = this.dataSource.orderDirection;
@@ -9880,7 +9913,7 @@ class AwSearchLayoutEH extends EventHandler {
             this.emitGlobal('navigate', {
                 handler: 'router',
                 path: [],
-                queryParams
+                queryParams,
             });
         }));
     }
@@ -9893,7 +9926,7 @@ class AwSearchLayoutEH extends EventHandler {
          * @param {?} params
          * @return {?}
          */
-        params => {
+        (params) => {
             this.emitOuter('queryparamschange', params);
             // aditional params control
             if (params.orderby && params.orderdirection) {
@@ -9939,6 +9972,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -9955,7 +9989,7 @@ const AwSearchLayoutConfig = {
         {
             id: 'n7-smart-pagination',
             dataSource: SmartPaginationDS,
-            eventHandler: SmartPaginationEH
+            eventHandler: SmartPaginationEH,
         },
     ],
     layoutDS: AwSearchLayoutDS,
@@ -9964,11 +9998,12 @@ const AwSearchLayoutConfig = {
     widgetsEventHandlers: EH$1,
     options: {
     // TODO
-    }
+    },
 };
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutComponent extends AbstractLayout {
@@ -10022,7 +10057,7 @@ class AwSearchLayoutComponent extends AbstractLayout {
 AwSearchLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-search-layout',
-                template: "<div class=\"aw-search n7-side-auto-padding\" id=\"search-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n        <!--\n        <div class=\"aw-search__header-right\">\n            <n7-nav\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\n            </n7-nav>\n        </div>\n        -->\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar sticky-target\"\n            [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                        for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                        id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\" [value]=\"option.value\"\n                            [selected]=\"option.selected\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper\">\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                    <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                    </n7-smart-breadcrumbs>\n                    <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\" class=\"n7-btn aw-search__fallback-button\"\n                            (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"aw-search n7-side-auto-padding\" id=\"search-layout\">\r\n    <div class=\"aw-search__header\">\r\n        <div class=\"aw-search__header-left\">\r\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\r\n        </div>\r\n        <!--\r\n        <div class=\"aw-search__header-right\">\r\n            <n7-nav\r\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\r\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\r\n            </n7-nav>\r\n        </div>\r\n        -->\r\n    </div>\r\n    <div class=\"aw-search__content-wrapper sticky-parent\">\r\n        <!-- Left sidebar: facets -->\r\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar-loading sticky-target\">\r\n            <div class=\"aw-search__facets-loading\">\r\n                <n7-content-placeholder [data]=\"{\r\n                    blocks: [{\r\n                        classes: 'search-placeholder-facet-input'\r\n                    }, {\r\n                        classes: 'search-placeholder-facet-check'\r\n                    }, {\r\n                        classes: 'search-placeholder-facet-item'\r\n                    }, {\r\n                        classes: 'search-placeholder-facet-item'\r\n                    }, {\r\n                        classes: 'search-placeholder-facet-item'\r\n                    }, {\r\n                        classes: 'search-placeholder-facet-item'\r\n                    }, {\r\n                        classes: 'search-placeholder-facet-item'\r\n                    }]\r\n                }\">\r\n                </n7-content-placeholder>\r\n            </div>\r\n        </div>\r\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar sticky-target\"\r\n            [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\r\n            <div class=\"aw-search__facets\">\r\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['facets-wrapper'].emit\">\r\n                </n7-facets-wrapper>\r\n            </div>\r\n        </div>\r\n        <div class=\"aw-search__content\">\r\n            <div class=\"aw-search__results-header\">\r\n                <div class=\"aw-search__results-header-left\">\r\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__total\">\r\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\r\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\r\n                    </h3>\r\n                </div>\r\n                <div class=\"aw-search__results-header-right\">\r\n                    <label class=\"aw-search__results-select-orderby-label\"\r\n                        for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\r\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\r\n                        id=\"aw-search__results-select-orderby\">\r\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\" [value]=\"option.value\"\r\n                            [selected]=\"option.selected\">\r\n                            {{ option.label }}</option>\r\n                    </select>\r\n                </div>\r\n            </div>\r\n            <!-- Search details -->\r\n            <div *ngIf=\"lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper-loading\">\r\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\r\n                    blocks: [\r\n                        { classes: 'search-result-placeholder-title' },\r\n                        { classes: 'search-result-placeholder-metadata' },\r\n                        { classes: 'search-result-placeholder-metadata' },\r\n                        { classes: 'search-result-placeholder-metadata' }\r\n                    ]\r\n                }\"></n7-content-placeholder>\r\n            </div>\r\n            <div *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper\">\r\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\r\n                    <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\r\n                    </n7-smart-breadcrumbs>\r\n                    <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\r\n                    </n7-item-preview>\r\n                </ng-container>\r\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\r\n                    <div class=\"aw-search__fallback\">\r\n                        <p class=\"aw-search__fallback-string\">\r\n                            {{ lb.dataSource.fallback }}\r\n                        </p>\r\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\" class=\"n7-btn aw-search__fallback-button\"\r\n                            (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\r\n                            Resetta la ricerca\r\n                        </button>\r\n                    </div>\r\n                </ng-container>\r\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\r\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\r\n                </n7-smart-pagination>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -10069,6 +10104,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/components/chart-tippy/chart-tippy.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class ChartTippyComponent {
@@ -10084,7 +10120,7 @@ class ChartTippyComponent {
 ChartTippyComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-chart-tippy',
-                template: "<div *ngIf=\"data\" style=\"display: none;\">\n  <div *ngFor=\"let d of data\" id=\"template__{{d.id}}\" class=\"bubble-chart__tippy-template\">\n    <div id=\"bubble-popup-menu\" class=\"aw-bubble-popup-menu\">\n      <h2 class=\"aw-bubble-popup-menu__title\">{{ d.title }}</h2>\n      <p class=\"aw-bubble-popup-menu__text\">\n        {{ d.text }}\n      </p>\n      <div class=\"aw-bubble-popup-menu__actions\">\n        <n7-anchor-wrapper [classes]=\"'aw-bubble-popup-menu__link'\" [data]=\"d.anchorData\">\n          Vai alla scheda\n        </n7-anchor-wrapper>\n        <span *ngIf=\"d.selectable\" class=\"aw-bubble-popup-menu__link\" (click)=\"onClick('select', {id: d.id})\">\n          {{ d.isSelected ? 'Deseleziona' : 'Seleziona'}}\n        </span>\n      </div>\n    </div>\n  </div>\n</div>"
+                template: "<div *ngIf=\"data\" style=\"display: none;\">\r\n  <div *ngFor=\"let d of data\" id=\"template__{{d.id}}\" class=\"bubble-chart__tippy-template\">\r\n    <div id=\"bubble-popup-menu\" class=\"aw-bubble-popup-menu\">\r\n      <h2 class=\"aw-bubble-popup-menu__title\">{{ d.title }}</h2>\r\n      <p class=\"aw-bubble-popup-menu__text\">\r\n        {{ d.text }}\r\n      </p>\r\n      <div class=\"aw-bubble-popup-menu__actions\">\r\n        <n7-anchor-wrapper [classes]=\"'aw-bubble-popup-menu__link'\" [data]=\"d.anchorData\">\r\n          Vai alla scheda\r\n        </n7-anchor-wrapper>\r\n        <span *ngIf=\"d.selectable\" class=\"aw-bubble-popup-menu__link\" (click)=\"onClick('select', {id: d.id})\">\r\n          {{ d.isSelected ? 'Deseleziona' : 'Seleziona'}}\r\n        </span>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</div>"
             }] }
 ];
 ChartTippyComponent.propDecorators = {
@@ -10103,6 +10139,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/components/bubble-chart-wrapper/bubble-chart-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class BubbleChartWrapperComponent {
@@ -10118,7 +10155,7 @@ class BubbleChartWrapperComponent {
 BubbleChartWrapperComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-bubble-chart-wrapper',
-                template: "<div class=\"aw-bubble-chart-wrapper\">\n    <ng-content></ng-content>\n</div>"
+                template: "<div class=\"aw-bubble-chart-wrapper\">\r\n    <ng-content></ng-content>\r\n</div>"
             }] }
 ];
 BubbleChartWrapperComponent.propDecorators = {
@@ -10137,6 +10174,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/components/smart-breadcrumbs/smart-breadcrumbs.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -10149,28 +10187,28 @@ if (false) {
  *
  * @record
  */
-function ISmartBreadcrumbsItem() { }
+function SmartBreadcrumbsItem() { }
 if (false) {
     /**
      * item's label
      * @type {?}
      */
-    ISmartBreadcrumbsItem.prototype.label;
+    SmartBreadcrumbsItem.prototype.label;
     /**
      * action click's payload
      * @type {?}
      */
-    ISmartBreadcrumbsItem.prototype.payload;
+    SmartBreadcrumbsItem.prototype.payload;
     /**
      * additional html classes
      * @type {?|undefined}
      */
-    ISmartBreadcrumbsItem.prototype.classes;
+    SmartBreadcrumbsItem.prototype.classes;
     /**
      * additional info useful for the component's logic
      * @type {?|undefined}
      */
-    ISmartBreadcrumbsItem.prototype._meta;
+    SmartBreadcrumbsItem.prototype._meta;
 }
 /**
  * Interface for BreadcrumbsComponent's "Data"
@@ -10180,79 +10218,83 @@ if (false) {
  *
  * @record
  */
-function ISmartBreadcrumbsData() { }
+function SmartBreadcrumbsData() { }
 if (false) {
     /**
      * each item renders a breadcrumb level
      * @type {?}
      */
-    ISmartBreadcrumbsData.prototype.items;
+    SmartBreadcrumbsData.prototype.items;
     /**
      * additional html classes
      * @type {?|undefined}
      */
-    ISmartBreadcrumbsData.prototype.classes;
+    SmartBreadcrumbsData.prototype.classes;
 }
 class SmartBreadcrumbsComponent {
     constructor() {
+        /**
+         * Builds tippy data for a node.
+         */
         this.tippyBuilder = (/**
          * @param {?} node
          * @param {?} content
          * @return {?}
          */
-        (node, content) => {
-            /*
-                Builds tippy data for a node.
-            */
-            tippy(node, {
-                content,
-                interactive: true,
-                arrow: true,
-                theme: 'light-border no-padding',
-                appendTo: document.body // silence tippy interactive warning
-            });
+        (node, content) => tippy(node, {
+            content,
+            interactive: true,
+            arrow: true,
+            theme: 'light-border no-padding',
+            appendTo: document.body,
+        }));
+        this.getWidths = (/**
+         * @param {?} parent
+         * @param {?} child
+         * @return {?}
+         */
+        (parent, child) => {
+            /** @type {?} */
+            const pw = parent.nativeElement.clientWidth;
+            /** @type {?} */
+            const cw = child.nativeElement.clientWidth;
+            /** @type {?} */
+            const pp = this.getSidePadding(parent.nativeElement);
+            return { parentWidth: pw - pp, childWidth: cw };
         });
         this.getSidePadding = (/**
          * @param {?} node
          * @return {?}
          */
-        node => {
-            return ((+window.getComputedStyle(node, null).getPropertyValue('padding-left').match(/\d+/)[0])
-                + (+window.getComputedStyle(node, null).getPropertyValue('padding-right').match(/\d+/)[0]));
-        });
+        (node) => (
+        // returns an integer representing the sum of left and right paddings
+        (+window.getComputedStyle(node, null).getPropertyValue('padding-left').match(/\d+/)[0])
+            + (+window.getComputedStyle(node, null).getPropertyValue('padding-right').match(/\d+/)[0])));
     }
     /**
      * @return {?}
      */
     ngAfterViewInit() {
         if (this.bcdiv && this.bcol) {
+            let { parentWidth, childWidth } = this.getWidths(this.bcdiv, this.bcol);
             /** @type {?} */
-            var parentWidth = this.bcdiv.nativeElement.clientWidth - this.getSidePadding(this.bcdiv.nativeElement);
-            /** @type {?} */
-            var childWidth = this.bcol.nativeElement.clientWidth;
-            /** @type {?} */
-            var liArray = this.bcol.nativeElement.children;
-            console.log({ parentWidth, childWidth });
+            const liArray = this.bcol.nativeElement.children;
             if (parentWidth === childWidth) { // collapse condition
                 // collapse condition
                 /** @type {?} */
-                let i = 1 // Skip element in position 0
-                ;
+                let i = 1;
                 while (parentWidth === childWidth && i < liArray.length - 1) { // Skip last element
                     // Skip last element
                     /** @type {?} */
-                    let tippyData = document.createElement('ol') // initialize tippy data
-                    ;
+                    const tippyData = document.createElement('ol');
                     tippyData.className = 'n7-smart-breadcrumbs__tippy-content';
                     tippyData.appendChild(liArray[i].cloneNode(true)); // add <li> to tippy data (<ol>)
                     liArray[i].children[0].innerText = '…'; // convert to ellipsis
                     liArray[i].className = 'n7-breadcrumbs__item-ellipsis'; // set class to list item
                     this.tippyBuilder(liArray[i], tippyData); // append tooltip to ellipsis
-                    // this.data.items[i].classes = 'n7-breadcrumbs__label-ellipsis'   // set class to ellipsis anchor
-                    i++;
+                    i += 1;
                     // update widths
-                    parentWidth = this.bcdiv.nativeElement.clientWidth - this.getSidePadding(this.bcdiv.nativeElement);
-                    childWidth = this.bcol.nativeElement.clientWidth;
+                    ({ parentWidth, childWidth } = this.getWidths(this.bcdiv, this.bcol));
                 }
             }
         }
@@ -10270,7 +10312,7 @@ class SmartBreadcrumbsComponent {
 SmartBreadcrumbsComponent.decorators = [
     { type: Component, args: [{
                 selector: 'n7-smart-breadcrumbs',
-                template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\n    <nav class=\"n7-breadcrumbs__nav\">\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\n                <n7-anchor-wrapper [classes]=\"item.classes\"\n                [data]=\"item.anchor\"\n                (clicked)=\"onClick($event)\">\n                    {{ item.label }}\n                </n7-anchor-wrapper>\n            </li>\n        </ol>\n    </nav>\n</div>"
+                template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\r\n    <nav class=\"n7-breadcrumbs__nav\">\r\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\r\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\r\n                <n7-anchor-wrapper [classes]=\"item.classes\"\r\n                [data]=\"item.anchor\"\r\n                (clicked)=\"onClick($event)\">\r\n                    {{ item.label }}\r\n                </n7-anchor-wrapper>\r\n            </li>\r\n        </ol>\r\n    </nav>\r\n</div>"
             }] }
 ];
 SmartBreadcrumbsComponent.propDecorators = {
@@ -10288,14 +10330,20 @@ if (false) {
     SmartBreadcrumbsComponent.prototype.bcol;
     /** @type {?} */
     SmartBreadcrumbsComponent.prototype.bcdiv;
-    /** @type {?} */
+    /**
+     * Builds tippy data for a node.
+     * @type {?}
+     */
     SmartBreadcrumbsComponent.prototype.tippyBuilder;
+    /** @type {?} */
+    SmartBreadcrumbsComponent.prototype.getWidths;
     /** @type {?} */
     SmartBreadcrumbsComponent.prototype.getSidePadding;
 }
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/n7-boilerplate-arianna-web.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -10306,7 +10354,7 @@ const COMPONENTS$1 = [
     AwSearchLayoutComponent,
     BubbleChartWrapperComponent,
     ChartTippyComponent,
-    SmartBreadcrumbsComponent
+    SmartBreadcrumbsComponent,
 ];
 class N7BoilerplateAriannaWebModule {
 }
@@ -10320,28 +10368,29 @@ N7BoilerplateAriannaWebModule.decorators = [
                     N7BoilerplateCommonModule,
                 ],
                 providers: [],
-                exports: COMPONENTS$1
+                exports: COMPONENTS$1,
             },] }
 ];
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/components/data-widget-wrapper/data-widget-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
  * @record
  */
-function IDataWidgetWrapperData() { }
+function DataWidgetWrapperData() { }
 if (false) {
     /** @type {?|undefined} */
-    IDataWidgetWrapperData.prototype.classes;
+    DataWidgetWrapperData.prototype.classes;
 }
 class DataWidgetWrapperComponent {
 }
 DataWidgetWrapperComponent.decorators = [
     { type: Component, args: [{
                 selector: 'dv-data-widget-wrapper',
-                template: "<div class=\"dv-data-widget-wrapper {{ data && data.classes || '' }}\">\n    <ng-content></ng-content>\n</div>"
+                template: "<div class=\"dv-data-widget-wrapper {{ data && data.classes || '' }}\">\r\n    <ng-content></ng-content>\r\n</div>"
             }] }
 ];
 DataWidgetWrapperComponent.propDecorators = {
@@ -10354,49 +10403,50 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/components/datepicker-wrapper/datepicker-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
  * @record
  */
-function IDatepickerWrapperData() { }
+function DatepickerWrapperData() { }
 if (false) {
     /** @type {?} */
-    IDatepickerWrapperData.prototype.select;
+    DatepickerWrapperData.prototype.select;
     /** @type {?} */
-    IDatepickerWrapperData.prototype.datepicker;
+    DatepickerWrapperData.prototype.datepicker;
     /** @type {?|undefined} */
-    IDatepickerWrapperData.prototype.payload;
+    DatepickerWrapperData.prototype.payload;
 }
 /**
  * @record
  */
-function ISelect() { }
+function Select() { }
 if (false) {
     /** @type {?} */
-    ISelect.prototype.id;
+    Select.prototype.id;
     /** @type {?} */
-    ISelect.prototype.hidden;
+    Select.prototype.hidden;
     /** @type {?|undefined} */
-    ISelect.prototype.icon;
+    Select.prototype.icon;
     /** @type {?} */
-    ISelect.prototype.label;
+    Select.prototype.label;
     /** @type {?} */
-    ISelect.prototype.items;
+    Select.prototype.items;
     /** @type {?|undefined} */
-    ISelect.prototype.classes;
+    Select.prototype.classes;
 }
 /**
  * @record
  */
-function IDropdownItems() { }
+function DropdownItems() { }
 if (false) {
     /** @type {?} */
-    IDropdownItems.prototype.text;
+    DropdownItems.prototype.text;
     /** @type {?} */
-    IDropdownItems.prototype.payload;
+    DropdownItems.prototype.payload;
     /** @type {?|undefined} */
-    IDropdownItems.prototype.classes;
+    DropdownItems.prototype.classes;
 }
 class DatepickerWrapperComponent {
     /**
@@ -10421,7 +10471,7 @@ class DatepickerWrapperComponent {
 DatepickerWrapperComponent.decorators = [
     { type: Component, args: [{
                 selector: 'dv-datepicker-wrapper',
-                template: "<div *ngIf=\"data\" class=\"dv-datepicker-wrapper {{ data.select.classes || '' }}\">\n    <div class=\"dv-datepicker-wrapper__label\" (click)=\"toggleDropDown(data.payload)\">\n        <input type=\"text\" [value]=\"data.select.label\" [readOnly]=\"true\"/>\n        <span class=\"{{data.select.icon}}\"></span>\n    </div>\n    <div class=\"dv-datepicker-wrapper__dropdown\" [hidden]=\"data.select.hidden\">\n        <ul class=\"dv-datepicker-wrapper__dropdown-list\">\n            <li class=\"dv-datepicker-wrapper__dropdown-list-option {{ opt.classes || '' }}\" *ngFor=\"let opt of data.select.items\" (click)=\"onClick(opt.payload)\">{{opt.text}}</li>\n        </ul>\n    </div>\n    <n7-datepicker\n        [data]=\"data.datepicker.data\"\n        [emit]=\"emit\">\n    </n7-datepicker>\n</div>\n"
+                template: "<div *ngIf=\"data\" class=\"dv-datepicker-wrapper {{ data.select.classes || '' }}\">\r\n    <div class=\"dv-datepicker-wrapper__label\" (click)=\"toggleDropDown(data.payload)\">\r\n        <input type=\"text\" [value]=\"data.select.label\" [readOnly]=\"true\"/>\r\n        <span class=\"{{data.select.icon}}\"></span>\r\n    </div>\r\n    <div class=\"dv-datepicker-wrapper__dropdown\" [hidden]=\"data.select.hidden\">\r\n        <ul class=\"dv-datepicker-wrapper__dropdown-list\">\r\n            <li class=\"dv-datepicker-wrapper__dropdown-list-option {{ opt.classes || '' }}\" *ngFor=\"let opt of data.select.items\" (click)=\"onClick(opt.payload)\">{{opt.text}}</li>\r\n        </ul>\r\n    </div>\r\n    <n7-datepicker\r\n        [data]=\"data.datepicker.data\"\r\n        [emit]=\"emit\">\r\n    </n7-datepicker>\r\n</div>\r\n"
             }] }
 ];
 DatepickerWrapperComponent.propDecorators = {
@@ -10437,6 +10487,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/example-layout/example-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvExampleLayoutDS extends LayoutDataSource {
@@ -10444,22 +10495,22 @@ class DvExampleLayoutDS extends LayoutDataSource {
         super(...arguments);
         this.Items = [
             {
-                text: "Last week",
-                payload: "Last week",
+                text: 'Last week',
+                payload: 'Last week',
             },
             {
-                text: "Last month",
-                payload: "Last month",
+                text: 'Last month',
+                payload: 'Last month',
             },
             {
-                text: "Last year",
-                payload: "Last year",
+                text: 'Last year',
+                payload: 'Last year',
             },
             {
-                text: "Select Date",
-                //this payload key is use for visualise the datepicker.
-                payload: "ByDate",
-            }
+                text: 'Select Date',
+                // this payload key is use for visualise the datepicker.
+                payload: 'ByDate',
+            },
         ];
         this.datepickerOptions = {
             dateFormat: 'Y-m-d',
@@ -10467,14 +10518,14 @@ class DvExampleLayoutDS extends LayoutDataSource {
         };
         this.datePickerExternalData = {
             select: {
-                id: "dv-select",
-                label: "Last week",
+                id: 'dv-select',
+                label: 'Last week',
                 items: this.Items,
             },
             datepicker: {
-                id: "datepicker",
+                id: 'datepicker',
                 libOptions: this.datepickerOptions,
-            }
+            },
         };
     }
     /**
@@ -10504,6 +10555,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/example-layout/example-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvExampleLayoutEH extends EventHandler {
@@ -10523,6 +10575,7 @@ class DvExampleLayoutEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/data-widget-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvDataWidgetDS extends DataSource {
@@ -10535,11 +10588,13 @@ class DvDataWidgetDS extends DataSource {
         if (!data) {
             return null;
         }
+        return null;
     }
 }
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/datepicker-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvDatepickerWrapperDS extends DataSource {
@@ -10554,20 +10609,19 @@ class DvDatepickerWrapperDS extends DataSource {
      */
     transform(data) {
         if (!data) {
-            return;
+            return null;
         }
-        ;
         return {
-            //set select option
+            // set select option
             select: {
                 id: data.select.id,
                 hidden: true,
-                icon: data.select.icon || "n7-icon-angle-down",
+                icon: data.select.icon || 'n7-icon-angle-down',
                 label: data.select.label,
                 items: data.select.items,
                 classes: data.select.classes,
             },
-            //set picker
+            // set picker
             datepicker: {
                 hidden: true,
                 data: {
@@ -10577,9 +10631,9 @@ class DvDatepickerWrapperDS extends DataSource {
                      * @param {?} datepicker
                      * @return {?}
                      */
-                    (datepicker) => this._datepicker = datepicker),
-                }
-            }
+                    (datepicker) => { this._datepicker = datepicker; }),
+                },
+            },
         };
     }
     /**
@@ -10634,111 +10688,92 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/graph.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvGraphDS extends DataSource {
     /**
      * @protected
-     * @param {?} data
      * @return {?}
      */
-    transform(data) {
+    transform() {
         return {
             containerId: 'test-Chart',
             libOptions: {
                 chart: {
-                    "height": 550,
-                    "width": 1500,
-                    "type": "area",
-                    "toolbar": { "show": true }
+                    height: 550,
+                    width: 1500,
+                    type: 'area',
+                    toolbar: { show: true },
                 },
-                dataLabels: { "enabled": false },
-                colors: ["rgba(15,200,255)"],
+                dataLabels: { enabled: false },
+                colors: ['rgba(15,200,255)'],
                 fill: {
-                    "colors": ["#0fc8ff"],
-                    "gradient": { "opacityFrom": 0.5, "opacityTo": 0.1 }
+                    colors: ['#0fc8ff'],
+                    gradient: { opacityFrom: 0.5, opacityTo: 0.1 },
                 },
-                stroke: { "curve": "straight", "width": [2, 1] },
+                stroke: { curve: 'straight', width: [2, 1] },
                 series: [
                     {
-                        "name": "Reddish value",
-                        "data": [["2019-08-01", "770.17"], ["2019-08-02", "645.03"],
-                            ["2019-08-03", "709.32"], ["2019-08-04", "708.11"],
-                            ["2019-08-05", "706.59"], ["2019-08-06", "607.28"],
-                            ["2019-08-07", "494.59"], ["2019-08-08", "636.81"],
-                            ["2019-08-09", "709.04"], ["2019-08-10", "717.31"],
-                            ["2019-08-11", "805.61"], ["2019-08-12", "758.60"],
-                            ["2019-08-13", "612.82"], ["2019-08-14", "608.90"],
-                            ["2019-08-15", "734.68"], ["2019-08-16", "838.54"],
-                            ["2019-08-17", "692.88"]]
+                        name: 'Reddish value',
+                        data: [['2019-08-01', '770.17'], ['2019-08-02', '645.03'],
+                            ['2019-08-03', '709.32'], ['2019-08-04', '708.11'],
+                            ['2019-08-05', '706.59'], ['2019-08-06', '607.28'],
+                            ['2019-08-07', '494.59'], ['2019-08-08', '636.81'],
+                            ['2019-08-09', '709.04'], ['2019-08-10', '717.31'],
+                            ['2019-08-11', '805.61'], ['2019-08-12', '758.60'],
+                            ['2019-08-13', '612.82'], ['2019-08-14', '608.90'],
+                            ['2019-08-15', '734.68'], ['2019-08-16', '838.54'],
+                            ['2019-08-17', '692.88']],
                     },
                 ],
                 grid: {
-                    "borderColor": "#e7e7e7",
-                    "strokeDashArray": 3,
-                    "xaxis": { "lines": { "show": true } }
+                    borderColor: '#e7e7e7',
+                    strokeDashArray: 3,
+                    xaxis: { lines: { show: true } },
                 },
-                markers: { "size": 3, "hover": { "size": 6 } },
+                markers: { size: 3, hover: { size: 6 } },
                 xaxis: {
-                    "axisBorder": { "show": true, "color": "#f4f6fc" },
-                    "labels": {},
-                    "type": "datetime", "tickAmount": 6
+                    axisBorder: { show: true, color: '#f4f6fc' },
+                    labels: {},
+                    type: 'datetime',
+                    tickAmount: 6,
                 },
                 yaxis: [
                     {
-                        "show": true,
-                        "showAlways": false,
-                        "opposite": false,
-                        "reversed": false,
-                        "logarithmic": false,
-                        "forceNiceScale": false,
-                        "floating": false,
-                        "labels": {
-                            "show": true,
-                            "minWidth": 0,
-                            "maxWidth": 160,
-                            "offsetX": 0,
-                            "offsetY": 0,
-                            "rotate": 0,
-                            "padding": 20,
-                            "style": { "colors": [], "fontSize": "11px", "cssClass": "" }
+                        show: true,
+                        showAlways: false,
+                        opposite: false,
+                        reversed: false,
+                        logarithmic: false,
+                        forceNiceScale: false,
+                        floating: false,
+                        labels: {
+                            show: true,
+                            minWidth: 0,
+                            maxWidth: 160,
+                            offsetX: 0,
+                            offsetY: 0,
+                            rotate: 0,
+                            padding: 20,
+                            style: { colors: [], fontSize: '11px', cssClass: '' },
                         },
-                        "axisBorder": { "show": true, "color": "#f4f6fc", "offsetX": 0, "offsetY": 0 },
-                        "axisTicks": { "show": false, "color": "#78909C", "width": 6, "offsetX": 0, "offsetY": 0 },
-                        "title": { "text": "P Totale °C", "rotate": 90, "offsetY": 0, "offsetX": 0, "style": { "fontSize": "11px", "cssClass": "" } },
-                        "tooltip": { "enabled": false, "offsetX": 0 },
-                        "crosshairs": { "show": true, "position": "front", "stroke": { "color": "#b6b6b6", "width": 1, "dashArray": 0 } }
-                    }
+                        axisBorder: {
+                            show: true, color: '#f4f6fc', offsetX: 0, offsetY: 0,
+                        },
+                        axisTicks: {
+                            show: false, color: '#78909C', width: 6, offsetX: 0, offsetY: 0,
+                        },
+                        title: {
+                            text: 'P Totale °C', rotate: 90, offsetY: 0, offsetX: 0, style: { fontSize: '11px', cssClass: '' },
+                        },
+                        tooltip: { enabled: false, offsetX: 0 },
+                        crosshairs: { show: true, position: 'front', stroke: { color: '#b6b6b6', width: 1, dashArray: 0 } },
+                    },
                 ],
-                legend: { "show": true },
+                legend: { show: true },
                 tooltip: {},
-                annotations: { "yaxis": [], "xaxis": [], "points": [] }
-            }
-        };
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class DvInnerTitleDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
-    transform(data) {
-        return {
-            title: {
-                main: {
-                    text: "Dipendenti",
-                    classes: "n7-main-widget-title",
-                },
-                secondary: {
-                    text: "Dipendeti al 10/10/10",
-                    classes: "n7-secondary-widget-title",
-                }
+                annotations: { yaxis: [], xaxis: [], points: [] },
             },
         };
     }
@@ -10746,25 +10781,53 @@ class DvInnerTitleDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/inner-title.ds.ts
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class DvInnerTitleDS extends DataSource {
+    /**
+     * @protected
+     * @return {?}
+     */
+    transform() {
+        return {
+            title: {
+                main: {
+                    text: 'Dipendenti',
+                    classes: 'n7-main-widget-title',
+                },
+                secondary: {
+                    text: 'Dipendeti al 10/10/10',
+                    classes: 'n7-secondary-widget-title',
+                },
+            },
+        };
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/widget.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvWidgetDS extends DataSource {
     /**
      * @protected
-     * @param {?} data
      * @return {?}
      */
-    transform(data) {
+    transform() {
         return DATA_WIDGET_MOCK;
     }
 }
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS$2 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     DvDataWidgetDS: DvDataWidgetDS,
     DvDatepickerWrapperDS: DvDatepickerWrapperDS,
     DvGraphDS: DvGraphDS,
@@ -10774,18 +10837,7 @@ var DS$2 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class DvDataWidgetEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-    }
-}
-
-/**
- * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/event-handlers/datepicker-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvDatepickerWrapperEH extends EventHandler {
@@ -10801,7 +10853,7 @@ class DvDatepickerWrapperEH extends EventHandler {
             switch (type) {
                 case 'dv-datepicker-wrapper.click':
                     this.dataSource.setLabel(payload);
-                    if (payload === "ByDate") {
+                    if (payload === 'ByDate') {
                         this.dataSource.openDatepicker();
                     }
                     else {
@@ -10814,6 +10866,8 @@ class DvDatepickerWrapperEH extends EventHandler {
                 case 'dv-datepicker-wrapper.change':
                     this.dataSource.setLabel(payload.dateStr);
                     break;
+                default:
+                    break;
             }
         }));
     }
@@ -10821,16 +10875,18 @@ class DvDatepickerWrapperEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH$2 = /*#__PURE__*/Object.freeze({
-    DvDataWidgetEH: DvDataWidgetEH,
+    __proto__: null,
     DvDatepickerWrapperEH: DvDatepickerWrapperEH
 });
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/example-layout/example-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -10852,16 +10908,23 @@ const DvExampleLayoutConfig = {
     widgetsEventHandlers: EH$2,
     options: {
     // TODO
-    }
+    },
 };
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/example-layout/example-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvExampleLayoutComponent extends AbstractLayout {
     constructor() {
         super(DvExampleLayoutConfig);
+    }
+    /**
+     * @return {?}
+     */
+    initPayload() {
+        return {};
     }
     /**
      * @return {?}
@@ -10879,7 +10942,7 @@ class DvExampleLayoutComponent extends AbstractLayout {
 DvExampleLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'dv-example-layout',
-                template: "<div class=\"dv-example-layout\" id=\"example-layout\">\n\n    <!-- Data widget wrapper with not-fixed height, two rows -->\n    <dv-data-widget-wrapper>\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-chart\n                    [data]=\"lb.widgets['dv-graph'].ds.out$ | async\">\n                </n7-chart>\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n\n    <!-- Data widget wrapper with fixed height, two rows -->\n    <dv-data-widget-wrapper [data]=\"{ classes: 'dv-data-widget-wrapper-fixed-height' }\">\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                Row content\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n\n    <!-- Data widget wrapper with fixed height, one row -->\n    <dv-data-widget-wrapper [data]=\"{ classes: 'dv-data-widget-wrapper-fixed-height' }\">\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n    \n    <dv-datepicker-wrapper \n        [data]=\"lb.widgets['dv-datepicker-wrapper'].ds.out$ | async\"\n        [emit]=\"lb.widgets['dv-datepicker-wrapper'].emit\">\n    </dv-datepicker-wrapper>\n</div>"
+                template: "<div class=\"dv-example-layout\" id=\"example-layout\">\r\n\r\n    <!-- Data widget wrapper with not-fixed height, two rows -->\r\n    <dv-data-widget-wrapper>\r\n        <div class=\"dv-data-widget-wrapper__title\">\r\n            <n7-inner-title\r\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\r\n            </n7-inner-title>\r\n        </div>\r\n        <div class=\"dv-data-widget-wrapper__content\">\r\n            <div class=\"dv-data-widget-wrapper__content-row\">\r\n                <n7-data-widget\r\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\r\n                </n7-data-widget>\r\n            </div>\r\n            <div class=\"dv-data-widget-wrapper__content-row\">\r\n                <n7-chart\r\n                    [data]=\"lb.widgets['dv-graph'].ds.out$ | async\">\r\n                </n7-chart>\r\n            </div>\r\n        </div>\r\n    </dv-data-widget-wrapper>\r\n\r\n    <!-- Data widget wrapper with fixed height, two rows -->\r\n    <dv-data-widget-wrapper [data]=\"{ classes: 'dv-data-widget-wrapper-fixed-height' }\">\r\n        <div class=\"dv-data-widget-wrapper__title\">\r\n            <n7-inner-title\r\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\r\n            </n7-inner-title>\r\n        </div>\r\n        <div class=\"dv-data-widget-wrapper__content\">\r\n            <div class=\"dv-data-widget-wrapper__content-row\">\r\n                <n7-data-widget\r\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\r\n                </n7-data-widget>\r\n            </div>\r\n            <div class=\"dv-data-widget-wrapper__content-row\">\r\n                Row content\r\n            </div>\r\n        </div>\r\n    </dv-data-widget-wrapper>\r\n\r\n    <!-- Data widget wrapper with fixed height, one row -->\r\n    <dv-data-widget-wrapper [data]=\"{ classes: 'dv-data-widget-wrapper-fixed-height' }\">\r\n        <div class=\"dv-data-widget-wrapper__title\">\r\n            <n7-inner-title\r\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\r\n            </n7-inner-title>\r\n        </div>\r\n        <div class=\"dv-data-widget-wrapper__content\">\r\n            <div class=\"dv-data-widget-wrapper__content-row\">\r\n                <n7-data-widget\r\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\r\n                </n7-data-widget>\r\n            </div>\r\n        </div>\r\n    </dv-data-widget-wrapper>\r\n    \r\n    <dv-datepicker-wrapper \r\n        [data]=\"lb.widgets['dv-datepicker-wrapper'].ds.out$ | async\"\r\n        [emit]=\"lb.widgets['dv-datepicker-wrapper'].emit\">\r\n    </dv-datepicker-wrapper>\r\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -10887,6 +10950,7 @@ DvExampleLayoutComponent.ctorParameters = () => [];
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/n7-boilerplate-data-viz.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -10906,12 +10970,13 @@ N7BoilerplateDataVizModule.decorators = [
                     N7BoilerplateCommonModule,
                 ],
                 providers: [],
-                exports: COMPONENTS$2
+                exports: COMPONENTS$2,
             },] }
 ];
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/n7-boilerplate-lib.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class N7BoilerplateLibModule {
@@ -10919,59 +10984,67 @@ class N7BoilerplateLibModule {
 N7BoilerplateLibModule.decorators = [
     { type: NgModule, args: [{
                 imports: [
-                    CommonModule
+                    CommonModule,
                 ],
                 providers: [],
                 exports: [
-                    //COMMON
+                    // COMMON
                     N7BoilerplateCommonModule,
-                    //AW
+                    // AW
                     N7BoilerplateAriannaWebModule,
-                    //DV
+                    // DV
                     N7BoilerplateDataVizModule,
-                ]
+                ],
             },] }
 ];
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: public-api.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: n7-frontend-boilerplate.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDataWidgetEH, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsEH, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, BubbleChartWrapperComponent as ɵq, ChartTippyComponent as ɵr, SmartBreadcrumbsComponent as ɵs, DataWidgetWrapperComponent as ɵt, DatepickerWrapperComponent as ɵu, DvExampleLayoutComponent as ɵv };
+export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, BubbleChartWrapperComponent as ɵq, ChartTippyComponent as ɵr, SmartBreadcrumbsComponent as ɵs, DataWidgetWrapperComponent as ɵt, DatepickerWrapperComponent as ɵu, DvExampleLayoutComponent as ɵv };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

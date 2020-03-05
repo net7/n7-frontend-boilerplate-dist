@@ -1,4 +1,4 @@
-import { LayoutDataSource } from '@n7-frontend/core';
+import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
 export declare class AwSchedaLayoutDS extends LayoutDataSource {
     static tree: any;
     private destroyed$;
@@ -28,7 +28,7 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
     contentIsLoading: boolean;
     currentId: string | null;
     emptyLabel: string;
-    onInit({ configuration, mainState, router, options, titleService, communication }: {
+    onInit({ configuration, mainState, router, options, titleService, communication, }: {
         configuration: any;
         mainState: any;
         router: any;

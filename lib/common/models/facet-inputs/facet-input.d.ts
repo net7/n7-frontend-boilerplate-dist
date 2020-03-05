@@ -1,4 +1,4 @@
-interface IFacetInputData {
+interface FacetInputData {
     value: string | number;
     label: string;
     counter: number;
@@ -10,14 +10,14 @@ export declare abstract class FacetInput {
     private id;
     protected config: any;
     protected output: any;
-    protected data: IFacetInputData[];
+    protected data: FacetInputData[];
     protected isEmpty: boolean;
     constructor(config: any);
     abstract setActive(facetValue: any): void;
     protected abstract transform(): any;
-    update: () => any;
+    update: () => void;
     getId: () => string;
-    getData: () => IFacetInputData[];
+    getData: () => FacetInputData[];
     getConfig: () => any;
     getFacetId: () => any;
     getInputIndex: () => any;
@@ -27,9 +27,9 @@ export declare abstract class FacetInput {
     getSearchIn: () => any;
     getType: () => any;
     getOutput: () => any;
-    clear(): void;
+    clear(): any;
     setIsEmpty: (empty: boolean) => void;
-    setData: (newData: IFacetInputData[]) => IFacetInputData[];
+    setData: (newData: FacetInputData[]) => void;
     private _setId;
 }
 export {};

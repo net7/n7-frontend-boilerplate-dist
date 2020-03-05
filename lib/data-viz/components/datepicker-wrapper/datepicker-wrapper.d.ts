@@ -1,23 +1,23 @@
-export interface IDatepickerWrapperData {
-    select: ISelect;
+export interface DatepickerWrapperData {
+    select: Select;
     datepicker: any;
     payload?: any;
 }
-interface ISelect {
+interface Select {
     id: string;
     hidden: boolean;
     icon?: string;
     label: string;
-    items: IDropdownItems[];
+    items: DropdownItems[];
     classes?: string;
 }
-interface IDropdownItems {
+interface DropdownItems {
     text: string;
     payload: any;
     classes?: string;
 }
 export declare class DatepickerWrapperComponent {
-    data: IDatepickerWrapperData;
+    data: DatepickerWrapperData;
     emit: any;
     onClick(payload: any): void;
     toggleDropDown(payload: any): void;

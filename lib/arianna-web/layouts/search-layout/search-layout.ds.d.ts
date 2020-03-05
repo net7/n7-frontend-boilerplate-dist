@@ -1,4 +1,4 @@
-import { LayoutDataSource } from '@n7-frontend/core';
+import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
 import { Observable } from 'rxjs';
 export declare class AwSearchLayoutDS extends LayoutDataSource {
     private destroyed$;
@@ -24,7 +24,7 @@ export declare class AwSearchLayoutDS extends LayoutDataSource {
     options: any;
     orderByLabel: string;
     orderByOptions: any;
-    onInit({ configuration, mainState, options, communication, search }: {
+    onInit({ configuration, mainState, options, communication, search, }: {
         configuration: any;
         mainState: any;
         options: any;

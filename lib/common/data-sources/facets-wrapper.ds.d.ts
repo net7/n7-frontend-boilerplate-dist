@@ -15,7 +15,7 @@ export declare class FacetsWrapperDS extends DataSource {
     updateFilteredTarget(target: any): void;
     updateInputLinks(): void;
     getRequestParams: () => {
-        facets: import("../services/search.service").IFacet[];
+        facets: import("../services/search.service").Facet[];
         page: any;
         results: any;
         filters: {

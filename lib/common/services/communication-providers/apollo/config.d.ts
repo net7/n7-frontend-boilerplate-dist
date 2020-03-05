@@ -1,37 +1,37 @@
 export declare const ApolloProviderConfig: {
-    'getLastPosts': {
+    getLastPosts: {
         queryName: string;
         queryBody: string;
     };
-    'getTree': {
+    getTree: {
         queryName: string;
         queryBody: string;
     };
-    'globalFilter': {
+    globalFilter: {
         queryName: string;
         queryBody: string;
     };
-    'getEntityDetails': {
+    getEntityDetails: {
         queryName: string;
         queryBody: string;
     };
-    'getItem': {
+    getItem: {
         queryName: string;
         queryBody: string;
     };
-    'getNode': {
+    getNode: {
         queryName: string;
         queryBody: string;
     };
-    'autoComplete': {
+    autoComplete: {
         queryName: string;
         queryBody: string;
     };
-    'search': {
+    search: {
         queryName: string;
         queryBody: string;
     };
-    'getMissingBubble': {
+    getMissingBubble: {
         queryName: string;
         queryBody: string;
     };

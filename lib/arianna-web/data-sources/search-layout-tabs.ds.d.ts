@@ -1,7 +1,7 @@
 import { DataSource } from '@n7-frontend/core';
 export declare class AwSearchLayoutTabsDS extends DataSource {
     private selected;
-    protected transform(data: any): {
+    protected transform(): {
         items: {
             text: string;
             payload: string;

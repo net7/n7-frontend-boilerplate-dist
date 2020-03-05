@@ -1,11 +1,11 @@
 import { OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { AbstractLayout } from '../../../common/models/abstract-layout';
 import { ConfigurationService } from '../../../common/services/configuration.service';
 import { LayoutsConfigurationService } from '../../../common/services/layouts-configuration.service';
 import { MainStateService } from '../../../common/services/main-state.service';
 import { SearchService } from '../../../common/services/search.service';
 import { CommunicationService } from '../../../common/services/communication.service';
-import { ActivatedRoute } from '@angular/router';
 export declare class AwSearchLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private configuration;
     private layoutsConfiguration;

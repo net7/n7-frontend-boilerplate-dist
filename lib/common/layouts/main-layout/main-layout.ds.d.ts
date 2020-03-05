@@ -1,4 +1,4 @@
-import { LayoutDataSource } from '@n7-frontend/core';
+import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
 export declare class MainLayoutDS extends LayoutDataSource {
     protected configuration: any;
     protected mainState: any;
@@ -7,7 +7,7 @@ export declare class MainLayoutDS extends LayoutDataSource {
     protected titleService: any;
     options: any;
     pageTitle: string;
-    onInit({ configuration, mainState, router, options, titleService, route }: {
+    onInit({ configuration, mainState, router, options, titleService, route, }: {
         configuration: any;
         mainState: any;
         router: any;

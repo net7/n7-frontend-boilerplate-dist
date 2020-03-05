@@ -8,7 +8,7 @@ import { ElementRef, AfterViewInit } from '@angular/core';
  * @property _meta (optional)
  *
  */
-export interface ISmartBreadcrumbsItem {
+export interface SmartBreadcrumbsItem {
     /**
      * item's label
      */
@@ -33,23 +33,30 @@ export interface ISmartBreadcrumbsItem {
  * @property classes (optional)
  *
  */
-export interface ISmartBreadcrumbsData {
+export interface SmartBreadcrumbsData {
     /**
      * each item renders a breadcrumb level
      */
-    items: ISmartBreadcrumbsItem[];
+    items: SmartBreadcrumbsItem[];
     /**
      * additional html classes
      */
     classes?: any;
 }
 export declare class SmartBreadcrumbsComponent implements AfterViewInit {
-    data: ISmartBreadcrumbsData;
+    data: SmartBreadcrumbsData;
     emit: any;
     bcol: ElementRef;
     bcdiv: ElementRef;
     ngAfterViewInit(): void;
     onClick(payload: any): void;
-    tippyBuilder: (node: any, content: any) => void;
+    /**
+     * Builds tippy data for a node.
+     */
+    tippyBuilder: (node: any, content: any) => import("tippy.js").Instance<import("tippy.js").Props>[];
+    getWidths: (parent: ElementRef<any>, child: ElementRef<any>) => {
+        parentWidth: number;
+        childWidth: any;
+    };
     getSidePadding: (node: any) => number;
 }

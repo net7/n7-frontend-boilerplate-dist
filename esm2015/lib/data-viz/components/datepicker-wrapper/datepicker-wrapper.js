@@ -1,49 +1,50 @@
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/components/datepicker-wrapper/datepicker-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 import { Component, Input } from '@angular/core';
 /**
  * @record
  */
-export function IDatepickerWrapperData() { }
+export function DatepickerWrapperData() { }
 if (false) {
     /** @type {?} */
-    IDatepickerWrapperData.prototype.select;
+    DatepickerWrapperData.prototype.select;
     /** @type {?} */
-    IDatepickerWrapperData.prototype.datepicker;
+    DatepickerWrapperData.prototype.datepicker;
     /** @type {?|undefined} */
-    IDatepickerWrapperData.prototype.payload;
+    DatepickerWrapperData.prototype.payload;
 }
 /**
  * @record
  */
-function ISelect() { }
+function Select() { }
 if (false) {
     /** @type {?} */
-    ISelect.prototype.id;
+    Select.prototype.id;
     /** @type {?} */
-    ISelect.prototype.hidden;
+    Select.prototype.hidden;
     /** @type {?|undefined} */
-    ISelect.prototype.icon;
+    Select.prototype.icon;
     /** @type {?} */
-    ISelect.prototype.label;
+    Select.prototype.label;
     /** @type {?} */
-    ISelect.prototype.items;
+    Select.prototype.items;
     /** @type {?|undefined} */
-    ISelect.prototype.classes;
+    Select.prototype.classes;
 }
 /**
  * @record
  */
-function IDropdownItems() { }
+function DropdownItems() { }
 if (false) {
     /** @type {?} */
-    IDropdownItems.prototype.text;
+    DropdownItems.prototype.text;
     /** @type {?} */
-    IDropdownItems.prototype.payload;
+    DropdownItems.prototype.payload;
     /** @type {?|undefined} */
-    IDropdownItems.prototype.classes;
+    DropdownItems.prototype.classes;
 }
 export class DatepickerWrapperComponent {
     /**
@@ -68,7 +69,7 @@ export class DatepickerWrapperComponent {
 DatepickerWrapperComponent.decorators = [
     { type: Component, args: [{
                 selector: 'dv-datepicker-wrapper',
-                template: "<div *ngIf=\"data\" class=\"dv-datepicker-wrapper {{ data.select.classes || '' }}\">\n    <div class=\"dv-datepicker-wrapper__label\" (click)=\"toggleDropDown(data.payload)\">\n        <input type=\"text\" [value]=\"data.select.label\" [readOnly]=\"true\"/>\n        <span class=\"{{data.select.icon}}\"></span>\n    </div>\n    <div class=\"dv-datepicker-wrapper__dropdown\" [hidden]=\"data.select.hidden\">\n        <ul class=\"dv-datepicker-wrapper__dropdown-list\">\n            <li class=\"dv-datepicker-wrapper__dropdown-list-option {{ opt.classes || '' }}\" *ngFor=\"let opt of data.select.items\" (click)=\"onClick(opt.payload)\">{{opt.text}}</li>\n        </ul>\n    </div>\n    <n7-datepicker\n        [data]=\"data.datepicker.data\"\n        [emit]=\"emit\">\n    </n7-datepicker>\n</div>\n"
+                template: "<div *ngIf=\"data\" class=\"dv-datepicker-wrapper {{ data.select.classes || '' }}\">\r\n    <div class=\"dv-datepicker-wrapper__label\" (click)=\"toggleDropDown(data.payload)\">\r\n        <input type=\"text\" [value]=\"data.select.label\" [readOnly]=\"true\"/>\r\n        <span class=\"{{data.select.icon}}\"></span>\r\n    </div>\r\n    <div class=\"dv-datepicker-wrapper__dropdown\" [hidden]=\"data.select.hidden\">\r\n        <ul class=\"dv-datepicker-wrapper__dropdown-list\">\r\n            <li class=\"dv-datepicker-wrapper__dropdown-list-option {{ opt.classes || '' }}\" *ngFor=\"let opt of data.select.items\" (click)=\"onClick(opt.payload)\">{{opt.text}}</li>\r\n        </ul>\r\n    </div>\r\n    <n7-datepicker\r\n        [data]=\"data.datepicker.data\"\r\n        [emit]=\"emit\">\r\n    </n7-datepicker>\r\n</div>\r\n"
             }] }
 ];
 DatepickerWrapperComponent.propDecorators = {
@@ -81,4 +82,4 @@ if (false) {
     /** @type {?} */
     DatepickerWrapperComponent.prototype.emit;
 }
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZGF0ZXBpY2tlci13cmFwcGVyLmpzIiwic291cmNlUm9vdCI6Im5nOi8vQG43LWZyb250ZW5kL2JvaWxlcnBsYXRlLyIsInNvdXJjZXMiOlsibGliL2RhdGEtdml6L2NvbXBvbmVudHMvZGF0ZXBpY2tlci13cmFwcGVyL2RhdGVwaWNrZXItd3JhcHBlci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7O0FBQUEsT0FBTyxFQUFFLFNBQVMsRUFBRSxLQUFLLEVBQUUsTUFBTSxlQUFlLENBQUM7Ozs7QUFFakQsNENBSUM7OztJQUhHLHdDQUFnQjs7SUFDaEIsNENBQWdCOztJQUNoQix5Q0FBYzs7Ozs7QUFHbEIsc0JBT0M7OztJQU5HLHFCQUFXOztJQUNYLHlCQUFnQjs7SUFDaEIsdUJBQWM7O0lBQ2Qsd0JBQWM7O0lBQ2Qsd0JBQXdCOztJQUN4QiwwQkFBaUI7Ozs7O0FBR3JCLDZCQUlDOzs7SUFIRyw4QkFBYTs7SUFDYixpQ0FBYTs7SUFDYixpQ0FBaUI7O0FBT3JCLE1BQU0sT0FBTywwQkFBMEI7Ozs7O0lBSW5DLE9BQU8sQ0FBQyxPQUFPO1FBQ1gsSUFBRyxDQUFDLElBQUksQ0FBQyxJQUFJO1lBQUUsT0FBTztRQUN0QixJQUFJLENBQUMsSUFBSSxDQUFDLE9BQU8sRUFBRSxPQUFPLENBQUMsQ0FBQztJQUNoQyxDQUFDOzs7OztJQUVELGNBQWMsQ0FBQyxPQUFPO1FBQ2xCLElBQUcsQ0FBQyxJQUFJLENBQUMsSUFBSTtZQUFFLE9BQU87UUFDdEIsSUFBSSxDQUFDLElBQUksQ0FBQyxRQUFRLEVBQUUsT0FBTyxDQUFDLENBQUM7SUFDakMsQ0FBQzs7O1lBaEJKLFNBQVMsU0FBQztnQkFDUCxRQUFRLEVBQUUsdUJBQXVCO2dCQUNqQyw2eUJBQXdDO2FBQzNDOzs7bUJBRUksS0FBSzttQkFDTCxLQUFLOzs7O0lBRE4sMENBQXNDOztJQUN0QywwQ0FBbUIiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBDb21wb25lbnQsIElucHV0IH0gZnJvbSAnQGFuZ3VsYXIvY29yZSc7XG5cbmV4cG9ydCBpbnRlcmZhY2UgSURhdGVwaWNrZXJXcmFwcGVyRGF0YSB7XG4gICAgc2VsZWN0OiBJU2VsZWN0LFxuICAgIGRhdGVwaWNrZXI6IGFueTtcbiAgICBwYXlsb2FkPzogYW55O1xufVxuXG5pbnRlcmZhY2UgSVNlbGVjdCB7XG4gICAgaWQ6IHN0cmluZyxcbiAgICBoaWRkZW46IGJvb2xlYW4sXG4gICAgaWNvbj86IHN0cmluZyxcbiAgICBsYWJlbDogc3RyaW5nLFxuICAgIGl0ZW1zOiBJRHJvcGRvd25JdGVtc1tdLFxuICAgIGNsYXNzZXM/OiBzdHJpbmcsXG59XG5cbmludGVyZmFjZSBJRHJvcGRvd25JdGVtcyB7XG4gICAgdGV4dDogc3RyaW5nLFxuICAgIHBheWxvYWQ6IGFueSxcbiAgICBjbGFzc2VzPzogc3RyaW5nLFxufVxuXG5AQ29tcG9uZW50KHtcbiAgICBzZWxlY3RvcjogJ2R2LWRhdGVwaWNrZXItd3JhcHBlcicsXG4gICAgdGVtcGxhdGVVcmw6ICcuL2RhdGVwaWNrZXItd3JhcHBlci5odG1sJyxcbn0pXG5leHBvcnQgY2xhc3MgRGF0ZXBpY2tlcldyYXBwZXJDb21wb25lbnR7XG4gICAgQElucHV0KCkgZGF0YTogSURhdGVwaWNrZXJXcmFwcGVyRGF0YTtcbiAgICBASW5wdXQoKSBlbWl0OiBhbnk7XG5cbiAgICBvbkNsaWNrKHBheWxvYWQpIHtcbiAgICAgICAgaWYoIXRoaXMuZW1pdCkgcmV0dXJuO1xuICAgICAgICB0aGlzLmVtaXQoJ2NsaWNrJywgcGF5bG9hZCk7XG4gICAgfVxuXG4gICAgdG9nZ2xlRHJvcERvd24ocGF5bG9hZCkge1xuICAgICAgICBpZighdGhpcy5lbWl0KSByZXR1cm47XG4gICAgICAgIHRoaXMuZW1pdCgndG9nZ2xlJywgcGF5bG9hZCk7XG4gICAgfVxuXG59XG4gICJdfQ==
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZGF0ZXBpY2tlci13cmFwcGVyLmpzIiwic291cmNlUm9vdCI6Im5nOi8vQG43LWZyb250ZW5kL2JvaWxlcnBsYXRlLyIsInNvdXJjZXMiOlsibGliL2RhdGEtdml6L2NvbXBvbmVudHMvZGF0ZXBpY2tlci13cmFwcGVyL2RhdGVwaWNrZXItd3JhcHBlci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7OztBQUFBLE9BQU8sRUFBRSxTQUFTLEVBQUUsS0FBSyxFQUFFLE1BQU0sZUFBZSxDQUFDOzs7O0FBRWpELDJDQUlDOzs7SUFIRyx1Q0FBZTs7SUFDZiwyQ0FBZ0I7O0lBQ2hCLHdDQUFjOzs7OztBQUdsQixxQkFPQzs7O0lBTkcsb0JBQVc7O0lBQ1gsd0JBQWdCOztJQUNoQixzQkFBYzs7SUFDZCx1QkFBYzs7SUFDZCx1QkFBdUI7O0lBQ3ZCLHlCQUFpQjs7Ozs7QUFHckIsNEJBSUM7OztJQUhHLDZCQUFhOztJQUNiLGdDQUFhOztJQUNiLGdDQUFpQjs7QUFPckIsTUFBTSxPQUFPLDBCQUEwQjs7Ozs7SUFLbkMsT0FBTyxDQUFDLE9BQU87UUFDYixJQUFJLENBQUMsSUFBSSxDQUFDLElBQUk7WUFBRSxPQUFPO1FBQ3ZCLElBQUksQ0FBQyxJQUFJLENBQUMsT0FBTyxFQUFFLE9BQU8sQ0FBQyxDQUFDO0lBQzlCLENBQUM7Ozs7O0lBRUQsY0FBYyxDQUFDLE9BQU87UUFDcEIsSUFBSSxDQUFDLElBQUksQ0FBQyxJQUFJO1lBQUUsT0FBTztRQUN2QixJQUFJLENBQUMsSUFBSSxDQUFDLFFBQVEsRUFBRSxPQUFPLENBQUMsQ0FBQztJQUMvQixDQUFDOzs7WUFqQkosU0FBUyxTQUFDO2dCQUNULFFBQVEsRUFBRSx1QkFBdUI7Z0JBQ2pDLDIwQkFBd0M7YUFDekM7OzttQkFFSSxLQUFLO21CQUVMLEtBQUs7Ozs7SUFGTiwwQ0FBcUM7O0lBRXJDLDBDQUFtQiIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IENvbXBvbmVudCwgSW5wdXQgfSBmcm9tICdAYW5ndWxhci9jb3JlJztcclxuXHJcbmV4cG9ydCBpbnRlcmZhY2UgRGF0ZXBpY2tlcldyYXBwZXJEYXRhIHtcclxuICAgIHNlbGVjdDogU2VsZWN0O1xyXG4gICAgZGF0ZXBpY2tlcjogYW55O1xyXG4gICAgcGF5bG9hZD86IGFueTtcclxufVxyXG5cclxuaW50ZXJmYWNlIFNlbGVjdCB7XHJcbiAgICBpZDogc3RyaW5nO1xyXG4gICAgaGlkZGVuOiBib29sZWFuO1xyXG4gICAgaWNvbj86IHN0cmluZztcclxuICAgIGxhYmVsOiBzdHJpbmc7XHJcbiAgICBpdGVtczogRHJvcGRvd25JdGVtc1tdO1xyXG4gICAgY2xhc3Nlcz86IHN0cmluZztcclxufVxyXG5cclxuaW50ZXJmYWNlIERyb3Bkb3duSXRlbXMge1xyXG4gICAgdGV4dDogc3RyaW5nO1xyXG4gICAgcGF5bG9hZDogYW55O1xyXG4gICAgY2xhc3Nlcz86IHN0cmluZztcclxufVxyXG5cclxuQENvbXBvbmVudCh7XHJcbiAgc2VsZWN0b3I6ICdkdi1kYXRlcGlja2VyLXdyYXBwZXInLFxyXG4gIHRlbXBsYXRlVXJsOiAnLi9kYXRlcGlja2VyLXdyYXBwZXIuaHRtbCcsXHJcbn0pXHJcbmV4cG9ydCBjbGFzcyBEYXRlcGlja2VyV3JhcHBlckNvbXBvbmVudCB7XHJcbiAgICBASW5wdXQoKSBkYXRhOiBEYXRlcGlja2VyV3JhcHBlckRhdGE7XHJcblxyXG4gICAgQElucHV0KCkgZW1pdDogYW55O1xyXG5cclxuICAgIG9uQ2xpY2socGF5bG9hZCkge1xyXG4gICAgICBpZiAoIXRoaXMuZW1pdCkgcmV0dXJuO1xyXG4gICAgICB0aGlzLmVtaXQoJ2NsaWNrJywgcGF5bG9hZCk7XHJcbiAgICB9XHJcblxyXG4gICAgdG9nZ2xlRHJvcERvd24ocGF5bG9hZCkge1xyXG4gICAgICBpZiAoIXRoaXMuZW1pdCkgcmV0dXJuO1xyXG4gICAgICB0aGlzLmVtaXQoJ3RvZ2dsZScsIHBheWxvYWQpO1xyXG4gICAgfVxyXG59XHJcbiJdfQ==

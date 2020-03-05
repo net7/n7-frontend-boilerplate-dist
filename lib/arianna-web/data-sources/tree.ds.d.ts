@@ -1,11 +1,11 @@
-import { DataSource } from '@n7-frontend/core';
+import { DataSource } from '@n7-frontend/core/dist/data-source';
 export declare class AwTreeDS extends DataSource {
     static dataCache: any;
     private basePath;
     private rootId;
     private currentId;
     private activeId;
-    protected transform(tree: any): any;
+    protected transform: (data: any) => any;
     load(data: any): void;
     build(id: any): void;
     setActive(id: any): void;

@@ -1,4 +1,5 @@
-import { LayoutDataSource } from '@n7-frontend/core';
+import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
+import { Observable } from 'rxjs';
 export declare class AwEntitaLayoutDS extends LayoutDataSource {
     protected configuration: any;
     protected mainState: any;
@@ -19,7 +20,7 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
     bubblesSize: number;
     bubblesEnabled: boolean;
     private communication;
-    onInit({ configuration, mainState, router, route, location, options, titleService, communication }: {
+    onInit({ configuration, mainState, router, route, location, options, titleService, communication, }: {
         configuration: any;
         mainState: any;
         router: any;
@@ -36,7 +37,7 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
     handleNavUpdate: (tab: any) => void;
     updateWidgets(data: any): void;
     updateBubbes(data: any): void;
-    loadItem(id: any, slug: any, tab: any): any;
+    loadItem(id: any, slug: any, tab: any): Observable<any>;
     loadContent(res: any): void;
     private _getPaginationParams;
     getNavBasePath(): string;

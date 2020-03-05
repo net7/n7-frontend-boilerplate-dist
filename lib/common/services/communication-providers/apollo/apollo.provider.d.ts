@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { ConfigurationService } from '../../configuration.service';
-import { ICommunicationProvider } from '../communication-provider.interface';
 import { Observable } from 'rxjs';
-export declare class ApolloProvider implements ICommunicationProvider {
+import { ConfigurationService } from '../../configuration.service';
+import { CommunicationProvider } from '../communication-provider.interface';
+export declare class ApolloProvider implements CommunicationProvider {
     private config;
     private http;
     private providerConfig;

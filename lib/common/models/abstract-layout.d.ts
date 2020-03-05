@@ -3,7 +3,7 @@ export declare abstract class AbstractLayout {
     protected widgets: any[];
     lb: any;
     constructor(config: any);
-    protected initPayload(): any;
+    protected abstract initPayload(): any;
     protected onInit(): void;
     protected onDestroy(): void;
 }

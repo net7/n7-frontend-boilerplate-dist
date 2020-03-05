@@ -1,7 +1,7 @@
+import { Observable } from 'rxjs';
 import { ConfigurationService } from './configuration.service';
 import { ApolloProvider } from './communication-providers/apollo/apollo.provider';
 import { RestProvider } from './communication-providers/rest/rest.provider';
-import { Observable } from 'rxjs';
 export declare class CommunicationService {
     private config;
     private apollo;

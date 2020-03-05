@@ -3,14 +3,14 @@ import { FacetInput } from '../models';
 export declare type FilterOperators = '=' | '>' | '<' | '>=' | '<=' | '<>' | 'LIKE';
 export declare type FacetTypes = 'value' | 'range';
 export declare type FacetOperators = 'OR' | 'AND';
-export interface ISearchConfig {
+export interface SearchConfig {
     totalCount: number;
     facets: any;
     page: any;
     results: any;
     fields: any;
 }
-export interface IFacet {
+export interface Facet {
     id: string;
     type: FacetTypes;
     operator: FacetOperators;
@@ -18,7 +18,7 @@ export interface IFacet {
     searchData?: string[];
     data?: any;
 }
-export interface IFilter {
+export interface Filter {
     facetId: string;
     value: number | string | (number | string)[] | null;
     searchIn: Array<{
@@ -38,12 +38,12 @@ export declare class SearchModel {
     private _totalCount;
     private _config;
     private _results$;
-    constructor(id: string, config: ISearchConfig);
+    constructor(id: string, config: SearchConfig);
     getId: () => string;
-    getFilters: () => IFilter[];
-    getFacets: () => IFacet[];
+    getFilters: () => Filter[];
+    getFacets: () => Facet[];
     getInputs: () => FacetInput[];
-    getConfig: () => ISearchConfig;
+    getConfig: () => SearchConfig;
     getTotalCount: () => number;
     getFields: () => any;
     getResults$: () => Subject<any[]>;
@@ -57,7 +57,7 @@ export declare class SearchModel {
     updateFacet(facetId: any, data: any): void;
     reset(): void;
     getRequestParams(): {
-        facets: IFacet[];
+        facets: Facet[];
         page: any;
         results: any;
         filters: {
@@ -78,7 +78,7 @@ export declare class SearchModel {
         }[];
     }[];
     filtersAsQueryParams(filters: any): any;
-    getFiltersByFacetId(facetId: string): IFilter[];
+    getFiltersByFacetId(facetId: string): Filter[];
     getInputByFacetId(facetId: string): FacetInput;
     setInputData(facetId: any, data: any): void;
     filterTarget(target: any): void;
@@ -107,7 +107,7 @@ export declare class SearchModel {
 export declare class SearchService {
     static queryParams: any;
     private _models;
-    add(id: string, config: ISearchConfig): void;
+    add(id: string, config: SearchConfig): void;
     remove(id: string): void;
     model(id: string): SearchModel;
 }

@@ -5,7 +5,10 @@ export declare class AwHomeFacetsWrapperDS extends DataSource {
     lastData: {};
     closedEyes: any[];
     openTippy: string;
-    protected transform(data: any): any[];
+    protected transform(data: any): {
+        header: any;
+        input: any;
+    }[];
     tippyMaker: (id: any) => void;
     tippyClose: (id: any) => void;
 }
