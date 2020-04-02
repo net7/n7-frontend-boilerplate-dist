@@ -16,7 +16,6 @@ import { DataSource as DataSource$1 } from '@n7-frontend/core/dist/data-source';
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/configuration.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var ConfigurationService = /** @class */ (function () {
@@ -57,7 +56,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/layouts-configuration.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var LayoutsConfigurationService = /** @class */ (function () {
@@ -117,7 +115,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/main-state.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MainStateService = /** @class */ (function () {
@@ -256,7 +253,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/communication-providers/apollo/config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -301,7 +297,6 @@ var ApolloProviderConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/communication-providers/apollo/apollo.provider.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var ApolloProvider = /** @class */ (function () {
@@ -452,7 +447,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/communication-providers/rest/config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -462,7 +456,6 @@ var RestProviderConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/communication-providers/rest/rest.provider.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var RestProvider = /** @class */ (function () {
@@ -544,7 +537,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/communication.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var CommunicationService = /** @class */ (function () {
@@ -650,7 +642,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/abstract-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -730,7 +721,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/main-layout/main-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MainLayoutDS = /** @class */ (function (_super) {
@@ -895,7 +885,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/json-config.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var JsonConfigService = /** @class */ (function () {
@@ -1012,7 +1001,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/facet-inputs/facet-input.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -1195,7 +1183,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/facet-inputs/facet-input-checkbox.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FacetInputCheckbox = /** @class */ (function (_super) {
@@ -1266,7 +1253,6 @@ var FacetInputCheckbox = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/helpers.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -1338,7 +1324,6 @@ var helpers = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/facet-inputs/facet-input-text.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FacetInputText = /** @class */ (function (_super) {
@@ -1391,7 +1376,6 @@ var FacetInputText = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/facet-inputs/facet-input-link.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -1592,7 +1576,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/facet-inputs/facet-input-select.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FacetInputSelect = /** @class */ (function (_super) {
@@ -1661,13 +1644,11 @@ var FacetInputSelect = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/search.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -2698,13 +2679,11 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/main-layout/main-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MainLayoutEH = /** @class */ (function (_super) {
@@ -2846,7 +2825,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/header.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var HeaderDS = /** @class */ (function (_super) {
@@ -2894,7 +2872,6 @@ var HeaderDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/subnav.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var SubnavDS = /** @class */ (function (_super) {
@@ -2960,7 +2937,6 @@ var SubnavDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/breadcrumbs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var BreadcrumbsDS = /** @class */ (function (_super) {
@@ -2986,7 +2962,6 @@ var BreadcrumbsDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/facets.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FacetsDS = /** @class */ (function (_super) {
@@ -3019,7 +2994,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/facets-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -3364,7 +3338,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/footer.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FooterDS = /** @class */ (function (_super) {
@@ -3393,7 +3366,6 @@ var FooterDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/smart-pagination.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var SmartPaginationDS = /** @class */ (function (_super) {
@@ -3579,12 +3551,10 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     HeaderDS: HeaderDS,
     SubnavDS: SubnavDS,
     BreadcrumbsDS: BreadcrumbsDS,
@@ -3596,7 +3566,6 @@ var DS = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/header.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var HeaderEH = /** @class */ (function (_super) {
@@ -3632,7 +3601,6 @@ var HeaderEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/subnav.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var SubnavEH = /** @class */ (function (_super) {
@@ -3673,7 +3641,6 @@ var SubnavEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/breadcrumbs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var BreadcrumbsEH = /** @class */ (function (_super) {
@@ -3714,7 +3681,6 @@ var BreadcrumbsEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/facets-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FacetsWrapperEH = /** @class */ (function (_super) {
@@ -3872,7 +3838,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/footer.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FooterEH = /** @class */ (function (_super) {
@@ -3894,7 +3859,6 @@ var FooterEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/smart-pagination.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var SmartPaginationEH = /** @class */ (function (_super) {
@@ -3934,12 +3898,10 @@ var SmartPaginationEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     HeaderEH: HeaderEH,
     SubnavEH: SubnavEH,
     BreadcrumbsEH: BreadcrumbsEH,
@@ -3950,7 +3912,6 @@ var EH = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/main-layout/main-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -3976,7 +3937,6 @@ var MainLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/main-layout/main-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MainLayoutComponent = /** @class */ (function (_super) {
@@ -4030,7 +3990,7 @@ var MainLayoutComponent = /** @class */ (function (_super) {
     MainLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'main-layout',
-                    template: "<div class=\"n7-main-layout\" id=\"main-layout\">\r\n    <div class=\"n7-page-content\">\r\n        <n7-header\r\n            [data]=\"lb.widgets['header'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['header'].emit\">\r\n        </n7-header>\r\n        <main class=\"n7-content\">\r\n            <div class=\"n7-top-page-bar\">\r\n                <div class=\"n7-top-page-bar__main\"></div>\r\n            </div>\r\n            <div class=\"n7-alert-bar\">\r\n                <!--<n7-alert\r\n                [attr.id]=\"'main-layout-alert'\"\r\n                [data]=\"lb.dataSource.alertData$ | async\"\r\n                [emit]=\"lb.dataSource.closeAlert.bind(lb.dataSource)\"></n7-alert>-->\r\n            </div>\r\n            <ng-content></ng-content>\r\n        </main>\r\n    </div>\r\n    <n7-footer \r\n        [data]=\"lb.widgets['footer'].ds.out$ | async\" \r\n        [emit]=\"lb.widgets['footer'].emit\">\r\n    </n7-footer>\r\n</div>"
+                    template: "<div class=\"n7-main-layout\" id=\"main-layout\">\n    <div class=\"n7-page-content\">\n        <n7-header\n            [data]=\"lb.widgets['header'].ds.out$ | async\"\n            [emit]=\"lb.widgets['header'].emit\">\n        </n7-header>\n        <main class=\"n7-content\">\n            <div class=\"n7-top-page-bar\">\n                <div class=\"n7-top-page-bar__main\"></div>\n            </div>\n            <div class=\"n7-alert-bar\">\n                <!--<n7-alert\n                [attr.id]=\"'main-layout-alert'\"\n                [data]=\"lb.dataSource.alertData$ | async\"\n                [emit]=\"lb.dataSource.closeAlert.bind(lb.dataSource)\"></n7-alert>-->\n            </div>\n            <ng-content></ng-content>\n        </main>\n    </div>\n    <n7-footer \n        [data]=\"lb.widgets['footer'].ds.out$ | async\" \n        [emit]=\"lb.widgets['footer'].emit\">\n    </n7-footer>\n</div>"
                 }] }
     ];
     /** @nocollapse */
@@ -4079,7 +4039,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/page404-layout/page404-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var Page404LayoutDS = /** @class */ (function (_super) {
@@ -4108,7 +4067,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/page404-layout/page404-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var Page404LayoutEH = /** @class */ (function (_super) {
@@ -4169,7 +4127,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/page404-layout/page404-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -4187,7 +4144,6 @@ var Page404LayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/page404-layout/page404-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var Page404LayoutComponent = /** @class */ (function (_super) {
@@ -4229,7 +4185,7 @@ var Page404LayoutComponent = /** @class */ (function (_super) {
     Page404LayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'n7-page404-layout',
-                    template: "<div class=\"n7-page404-layout\">\r\n    404 - Resource not found\r\n</div>"
+                    template: "<div class=\"n7-page404-layout\">\n    404 - Resource not found\n</div>"
                 }] }
     ];
     /** @nocollapse */
@@ -4241,7 +4197,6 @@ var Page404LayoutComponent = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/components/facets-wrapper/facets-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FacetsWrapperComponent = /** @class */ (function () {
@@ -4282,7 +4237,7 @@ var FacetsWrapperComponent = /** @class */ (function () {
     FacetsWrapperComponent.decorators = [
         { type: Component, args: [{
                     selector: 'n7-facets-wrapper',
-                    template: "<div *ngIf=\"data\" class=\"n7-facets-wrapper {{ data.classes || '' }}\">\r\n    <div *ngFor=\"let group of data.groups\" class=\"n7-facets-wrapper__group {{ group.classes || '' }}\">\r\n        <n7-facet-header\r\n            [data]=\"group.header\"\r\n            [emit]=\"headerEmit.bind(this)\"\r\n        ></n7-facet-header>\r\n\r\n        <n7-facet\r\n            *ngIf=\"group.isOpen\"\r\n            [data]=\"group.facet\"\r\n            [emit]=\"facetEmit.bind(this)\"\r\n        ></n7-facet>\r\n    </div>\r\n</div>"
+                    template: "<div *ngIf=\"data\" class=\"n7-facets-wrapper {{ data.classes || '' }}\">\n    <div *ngFor=\"let group of data.groups\" class=\"n7-facets-wrapper__group {{ group.classes || '' }}\">\n        <n7-facet-header\n            [data]=\"group.header\"\n            [emit]=\"headerEmit.bind(this)\"\n        ></n7-facet-header>\n\n        <n7-facet\n            *ngIf=\"group.isOpen\"\n            [data]=\"group.facet\"\n            [emit]=\"facetEmit.bind(this)\"\n        ></n7-facet>\n    </div>\n</div>"
                 }] }
     ];
     FacetsWrapperComponent.propDecorators = {
@@ -4300,7 +4255,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/components/smart-pagination/smart-pagination.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var SmartPaginationComponent = /** @class */ (function () {
@@ -4325,7 +4279,7 @@ var SmartPaginationComponent = /** @class */ (function () {
     SmartPaginationComponent.decorators = [
         { type: Component, args: [{
                     selector: 'n7-smart-pagination',
-                    template: "<div class=\"n7-smart-pagination\" *ngIf=\"data\">\r\n  <n7-pagination\r\n    [data]=\"data\"\r\n    [emit]=\"emit\">\r\n  </n7-pagination>\r\n</div>"
+                    template: "<div class=\"n7-smart-pagination\" *ngIf=\"data\">\n  <n7-pagination\n    [data]=\"data\"\n    [emit]=\"emit\">\n  </n7-pagination>\n</div>"
                 }] }
     ];
     /** @nocollapse */
@@ -4345,7 +4299,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/n7-boilerplate-common.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -4395,7 +4348,6 @@ var N7BoilerplateCommonModule = /** @class */ (function () {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwEntitaLayoutDS = /** @class */ (function (_super) {
@@ -4803,7 +4755,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwEntitaLayoutEH = /** @class */ (function (_super) {
@@ -5025,7 +4976,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/linked-objects.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwLinkedObjectsDS = /** @class */ (function (_super) {
@@ -5364,7 +5314,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/autocomplete-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwAutocompleteWrapperDS = /** @class */ (function (_super) {
@@ -5451,7 +5400,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/bubble-chart.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwBubbleChartDS = /** @class */ (function (_super) {
@@ -5616,7 +5564,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/chart-tippy.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwChartTippyDS = /** @class */ (function (_super) {
@@ -5665,7 +5612,6 @@ var AwChartTippyDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/hero.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHeroDS = /** @class */ (function (_super) {
@@ -5712,7 +5658,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/table.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwTableDS = /** @class */ (function (_super) {
@@ -5736,7 +5681,6 @@ var AwTableDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/home-hero-patrimonio.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeHeroPatrimonioDS = /** @class */ (function (_super) {
@@ -5762,7 +5706,6 @@ var AwHomeHeroPatrimonioDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/home-facets-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeFacetsWrapperDS = /** @class */ (function (_super) {
@@ -6032,7 +5975,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/home-item-tags-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeItemTagsWrapperDS = /** @class */ (function (_super) {
@@ -6058,7 +6000,6 @@ var AwHomeItemTagsWrapperDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/home-autocomplete.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeAutocompleteDS = /** @class */ (function (_super) {
@@ -6180,7 +6121,6 @@ var AwHomeAutocompleteDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/entita-nav.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwEntitaNavDS = /** @class */ (function (_super) {
@@ -6258,7 +6198,6 @@ var AwEntitaNavDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/entita-metadata-viewer.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwEntitaMetadataViewerDS = /** @class */ (function (_super) {
@@ -6402,7 +6341,6 @@ var AwEntitaMetadataViewerDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/tree.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwTreeDS = /** @class */ (function (_super) {
@@ -6738,7 +6676,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/sidebar-header.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSidebarHeaderDS = /** @class */ (function (_super) {
@@ -6789,7 +6726,6 @@ var AwSidebarHeaderDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/scheda-breadcrumbs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSchedaBreadcrumbsDS = /** @class */ (function (_super) {
@@ -6832,7 +6768,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/scheda-metadata.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSchedaMetadataDS = /** @class */ (function (_super) {
@@ -6897,7 +6832,6 @@ var AwSchedaMetadataDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/scheda-image.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSchedaImageDS = /** @class */ (function (_super) {
@@ -6923,7 +6857,6 @@ var AwSchedaImageDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/scheda-inner-title.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSchedaInnerTitleDS = /** @class */ (function (_super) {
@@ -6949,7 +6882,6 @@ var AwSchedaInnerTitleDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/search-layout-tabs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSearchLayoutTabsDS = /** @class */ (function (_super) {
@@ -7007,12 +6939,10 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS$1 = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     AwLinkedObjectsDS: AwLinkedObjectsDS,
     AwAutocompleteWrapperDS: AwAutocompleteWrapperDS,
     AwBubbleChartDS: AwBubbleChartDS,
@@ -7036,7 +6966,6 @@ var DS$1 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/linked-objects.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwLinkedObjectsEH = /** @class */ (function (_super) {
@@ -7129,7 +7058,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/autocomplete-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwAutocompleteWrapperEH = /** @class */ (function (_super) {
@@ -7168,7 +7096,6 @@ var AwAutocompleteWrapperEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/bubble-chart.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwBubbleChartEH = /** @class */ (function (_super) {
@@ -7322,7 +7249,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/chart-tippy.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwChartTippyEH = /** @class */ (function (_super) {
@@ -7439,7 +7365,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/hero.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHeroEH = /** @class */ (function (_super) {
@@ -7485,7 +7410,6 @@ var AwHeroEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/home-facets-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeFacetsWrapperEH = /** @class */ (function (_super) {
@@ -7662,7 +7586,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/home-hero-patrimonio.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeHeroPatrimonioEH = /** @class */ (function (_super) {
@@ -7684,7 +7607,6 @@ var AwHomeHeroPatrimonioEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/home-item-tags-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeItemTagsWrapperEH = /** @class */ (function (_super) {
@@ -7722,7 +7644,6 @@ var AwHomeItemTagsWrapperEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/home-autocomplete.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeAutocompleteEH = /** @class */ (function (_super) {
@@ -7758,7 +7679,6 @@ var AwHomeAutocompleteEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/entita-nav.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwEntitaNavEH = /** @class */ (function (_super) {
@@ -7801,7 +7721,6 @@ var AwEntitaNavEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/scheda-breadcrumbs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSchedaSidebarEH = /** @class */ (function (_super) {
@@ -7834,7 +7753,6 @@ var AwSchedaSidebarEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/sidebar-header.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSidebarHeaderEH = /** @class */ (function (_super) {
@@ -7870,7 +7788,6 @@ var AwSidebarHeaderEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/tree.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwTreeEH = /** @class */ (function (_super) {
@@ -7941,7 +7858,6 @@ var AwTreeEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/search-layout-tabs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSearchLayoutTabsEH = /** @class */ (function (_super) {
@@ -7963,7 +7879,6 @@ var AwSearchLayoutTabsEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/table.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwTableEH = /** @class */ (function (_super) {
@@ -7993,12 +7908,10 @@ var AwTableEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH$1 = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     AwLinkedObjectsEH: AwLinkedObjectsEH,
     AwAutocompleteWrapperEH: AwAutocompleteWrapperEH,
     AwBubbleChartEH: AwBubbleChartEH,
@@ -8018,7 +7931,6 @@ var EH$1 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -8047,7 +7959,6 @@ var AwEntitaLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwEntitaLayoutComponent = /** @class */ (function (_super) {
@@ -8120,7 +8031,7 @@ var AwEntitaLayoutComponent = /** @class */ (function (_super) {
     AwEntitaLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-entita-layout',
-                    template: "<div class=\"aw-entity n7-side-auto-padding\" *ngIf=\"lb.dataSource\">\r\n\r\n    <div class=\"aw-entity__sidebar\">\r\n        <!-- Custom header -->\r\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-title-wrapper-loading\">\r\n            <n7-content-placeholder [data]=\"{\r\n                blocks: [{\r\n                    classes: 'entity-placeholder-title'\r\n                }]\r\n            }\">\r\n            </n7-content-placeholder>\r\n        </div>\r\n        <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\"\r\n            class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\r\n            <h1 class=\"aw-entity__sidebar-title\">\r\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\r\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\r\n            </h1>\r\n        </div>\r\n        <!-- Navigation -->\r\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-nav-loading\">\r\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2]\"\r\n            [data]=\"{\r\n                blocks: [{\r\n                    classes: 'entity-placeholder-nav'\r\n                }]\r\n            }\">\r\n            </n7-content-placeholder>\r\n        </div>\r\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" [emit]=\"lb.widgets['aw-entita-nav'].emit\">\r\n        </n7-nav>\r\n    </div>\r\n\r\n    <!-- lb.dataSource.selectedTab -->\r\n    <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content-loading\">\r\n        <div class=\"aw-entity__content-loading-title\">\r\n            <n7-content-placeholder [data]=\"{\r\n                blocks: [{\r\n                    classes: 'entity-placeholder-title'\r\n                }]\r\n            }\"></n7-content-placeholder>\r\n        </div>\r\n\r\n        <div class=\"aw-entity__content-loading-items\">\r\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\r\n            [data]=\"{\r\n                blocks: [\r\n                {\r\n                    classes: 'entity-placeholder-item-preview'\r\n                }\r\n                ]\r\n            }\"></n7-content-placeholder>\r\n        </div>\r\n    </div>\r\n\r\n    <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content\">\r\n        <section>\r\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\r\n                class=\"aw-entity__content-section\" [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\r\n                <div class=\"aw-entity__overview-description\">\r\n                    {{lb.dataSource.myResponse.extraTab}}\r\n                </div>\r\n                <div class=\"aw-entity-layout__button-wrapper\">\r\n                    <a *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\r\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/wiki']\">\r\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\r\n                    </a>\r\n                    <a *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\r\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/maxxi']\">\r\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\r\n                    </a>\r\n                </div>\r\n            </div>\r\n\r\n            <ng-container *ngIf=\"\r\n            ((lb.dataSource.myResponse.fields || []).length > 0 && lb.dataSource.selectedTab == 'campi') ||\r\n            (lb.dataSource.showFields && lb.dataSource.selectedTab == 'overview')\">\r\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\r\n                    [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'campi'\">\r\n                    <div class=\"aw-entity__content-section-header\">\r\n                        <h2 class=\"aw-entity__content-section-title\">Campi</h2>\r\n                        <a class=\"n7-btn n7-btn-light\" [routerLink]=\"[lb.dataSource.getNavBasePath() + 'campi']\">\r\n                            TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\r\n                        </a>\r\n                    </div>\r\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\r\n                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async \">\r\n                    </n7-metadata-viewer>\r\n                </div>\r\n            </ng-container>\r\n\r\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\r\n                *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\"\r\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\r\n                <div class=\"aw-entity__content-section-header\">\r\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\r\n\r\n                    <a *ngIf=\"lb.dataSource.selectedTab === 'overview' \"\r\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/oggetti-collegati/']\"\r\n                        [queryParams]=\"{ page: 1 }\" class=\"n7-btn n7-btn-light\">\r\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\r\n                    </a>\r\n                </div>\r\n                <div class=\"aw-entity__content-item-previews\">\r\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\r\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\r\n                        </n7-smart-breadcrumbs>\r\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\r\n                        </n7-item-preview>\r\n                    </ng-container>\r\n                </div>\r\n                <n7-smart-pagination \r\n                    *ngIf=\"lb.dataSource.selectedTab === 'oggetti-collegati'\"\r\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\r\n                </n7-smart-pagination>\r\n            </div>\r\n\r\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview aw-bubble-chart__{{lb.dataSource.selectedTab}}\"\r\n                *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.myResponse.relatedEntities\"\r\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\r\n                <div class=\"aw-entity__content-section-header\">\r\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\r\n                    <a *ngIf=\"lb.dataSource.selectedTab == 'overview'\" class=\"n7-btn n7-btn-light\"\r\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/entita-collegate']\">\r\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\r\n                    </a>\r\n                </div>\r\n                <!-- Small Bubble Chart -->\r\n                <div class=\"aw-entity__bubble-chart-wrapper-small\" *ngIf=\"lb.dataSource.selectedTab == 'overview'\">\r\n                    <aw-bubble-chart-wrapper>\r\n                        <!-- Tippy template moved to end of HTML -->\r\n                        <n7-bubble-chart [data]=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.smallView\"\r\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\r\n                        </n7-bubble-chart>\r\n                    </aw-bubble-chart-wrapper>\r\n                </div>\r\n                <!-- Big Bubble Chart -->\r\n                <div class=\"aw-entity__bubble-chart-wrapper\" *ngIf=\"lb.dataSource.selectedTab == 'entita-collegate'\">\r\n                    <aw-bubble-chart-wrapper>\r\n                        <!-- Tippy template moved to end of HTML -->\r\n                        <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\r\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\r\n                        </n7-bubble-chart>\r\n                    </aw-bubble-chart-wrapper>\r\n                </div>\r\n            </div>\r\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\r\n                *ngIf=\"lb.dataSource.myResponse.extraTab\" [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\r\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\r\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\r\n                </div>\r\n                <div>\r\n                    {{lb.dataSource.myResponse.extraTab}}\r\n                </div>\r\n            </div>\r\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\r\n                *ngIf=\"lb.dataSource.myResponse.wikiTab\" [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\r\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\r\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\r\n                </div>\r\n                <div>\r\n                    {{lb.dataSource.myResponse.wikiTab.text}}\r\n                </div>\r\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\r\n                    {{ lb.dataSource.myResponse.wikiTab.url }}\r\n                </a>\r\n            </div>\r\n        </section>\r\n    </div>\r\n    <!-- Template for bubble chart tooltips -->\r\n    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\" [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\r\n    </aw-chart-tippy>\r\n</div>"
+                    template: "<div class=\"aw-entity n7-side-auto-padding\" *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-title-wrapper-loading\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\"\n            class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-nav-loading\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2]\"\n            [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-nav'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <!-- lb.dataSource.selectedTab -->\n    <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content-loading\">\n        <div class=\"aw-entity__content-loading-title\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\"></n7-content-placeholder>\n        </div>\n\n        <div class=\"aw-entity__content-loading-items\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n            [data]=\"{\n                blocks: [\n                {\n                    classes: 'entity-placeholder-item-preview'\n                }\n                ]\n            }\"></n7-content-placeholder>\n        </div>\n    </div>\n\n    <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content\">\n        <section>\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\n                class=\"aw-entity__content-section\" [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <a *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/wiki']\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                    <a *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/maxxi']\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n            </div>\n\n            <ng-container *ngIf=\"\n            ((lb.dataSource.myResponse.fields || []).length > 0 && lb.dataSource.selectedTab == 'campi') ||\n            (lb.dataSource.showFields && lb.dataSource.selectedTab == 'overview')\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                    [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'campi'\">\n                    <div class=\"aw-entity__content-section-header\">\n                        <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                        <a class=\"n7-btn n7-btn-light\" [routerLink]=\"[lb.dataSource.getNavBasePath() + 'campi']\">\n                            TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\n                        </a>\n                    </div>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async \">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <a *ngIf=\"lb.dataSource.selectedTab === 'overview' \"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/oggetti-collegati/']\"\n                        [queryParams]=\"{ page: 1 }\" class=\"n7-btn n7-btn-light\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <div class=\"aw-entity__content-item-previews\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n                <n7-smart-pagination \n                    *ngIf=\"lb.dataSource.selectedTab === 'oggetti-collegati'\"\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview aw-bubble-chart__{{lb.dataSource.selectedTab}}\"\n                *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.myResponse.relatedEntities\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <a *ngIf=\"lb.dataSource.selectedTab == 'overview'\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/entita-collegate']\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <!-- Small Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper-small\" *ngIf=\"lb.dataSource.selectedTab == 'overview'\">\n                    <aw-bubble-chart-wrapper>\n                        <!-- Tippy template moved to end of HTML -->\n                        <n7-bubble-chart [data]=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.smallView\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n                <!-- Big Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper\" *ngIf=\"lb.dataSource.selectedTab == 'entita-collegate'\">\n                    <aw-bubble-chart-wrapper>\n                        <!-- Tippy template moved to end of HTML -->\n                        <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                *ngIf=\"lb.dataSource.myResponse.extraTab\" [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n                *ngIf=\"lb.dataSource.myResponse.wikiTab\" [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{ lb.dataSource.myResponse.wikiTab.url }}\n                </a>\n            </div>\n        </section>\n    </div>\n    <!-- Template for bubble chart tooltips -->\n    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\" [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n    </aw-chart-tippy>\n</div>"
                 }] }
     ];
     /** @nocollapse */
@@ -8181,7 +8092,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeLayoutDS = /** @class */ (function (_super) {
@@ -8717,7 +8627,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/home-layout/home-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeLayoutEH = /** @class */ (function (_super) {
@@ -9070,7 +8979,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/home-layout/home-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -9106,7 +9014,6 @@ var AwHomeLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeLayoutComponent = /** @class */ (function (_super) {
@@ -9158,7 +9065,7 @@ var AwHomeLayoutComponent = /** @class */ (function (_super) {
     AwHomeLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-home-layout',
-                    template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\r\n    <!-- Hero section at the top of the page -->\r\n    <div class=\"aw-home__top-hero\">\r\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\r\n        </n7-hero>\r\n    </div>\r\n\r\n    <!-- Bubble chart -->\r\n    <div class=\"aw-home__bubble-wrapper n7-side-auto-padding\"\r\n        [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length > 0 }\" *ngIf=\"lb.dataSource.bubblesEnabled\">\r\n        <div class=\"aw-home__facets-wrapper-loading\" *ngIf=\"!(lb.widgets['aw-home-facets-wrapper'].ds.out$ | async)\">\r\n            <n7-content-placeholder *ngFor=\"let i of [0,1,2,3]\" [data]=\"{\r\n                blocks: [{\r\n                    classes: 'facet-placeholder-header'\r\n                }, {\r\n                    classes: 'facet-placeholder-input'\r\n                }] \r\n            }\"></n7-content-placeholder>\r\n        </div>\r\n        <div class=\"aw-home__facets-wrapper\" *ngIf=\"!!(lb.widgets['aw-home-facets-wrapper'].ds.out$ | async)\">\r\n            <span class=\"aw-home__facet\"\r\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\r\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\r\n                </n7-facet-header>\r\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\r\n                </n7-facet>\r\n            </span>\r\n        </div>\r\n\r\n        <div class=\"aw-home__bubble-chart-wrapper-loading\" *ngIf=\"!(lb.widgets['aw-bubble-chart'].ds.out$ | async)\">\r\n            <n7-content-placeholder [data]=\"{\r\n                blocks: [\r\n                    {\r\n                        classes: 'facet-placeholder-item-1'\r\n                    }\r\n                ]\r\n            }\"></n7-content-placeholder>\r\n        </div>\r\n        <div class=\"aw-home__bubble-chart-wrapper\" *ngIf=\"!!(lb.widgets['aw-bubble-chart'].ds.out$ | async)\"\r\n            [style.overflow]=\"lb.dataSource.loadingBubbles ? 'visible' : 'hidden'\">\r\n            <aw-bubble-chart-wrapper>\r\n                <aw-chart-tippy \r\n                    [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\r\n                </aw-chart-tippy>\r\n                <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\r\n                </n7-bubble-chart>\r\n            </aw-bubble-chart-wrapper>\r\n        </div>\r\n\r\n        <!-- Linked objects -->\r\n        <ng-container *ngIf=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.selected.length > 0;\">\r\n            <div class=\"aw-home__bubble-results\" id=\"home-bubble-results\">\r\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\" class=\"aw-home__bubble-results-title-wrapper\">\r\n                    <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">\r\n                            {{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span>\r\n                    </h1>\r\n                </div>\r\n                <div class=\"aw-home__bubble-tags-wrapper\">\r\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\r\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\r\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\r\n                        </n7-tag>\r\n                        <br>\r\n                    </ng-container>\r\n                </div>\r\n\r\n                <div class=\"aw-home__bubble-results-list-wrapper\">\r\n                    <div class=\"aw-home__bubble-results-list-loading\" *ngIf=\"lb.dataSource.resultsListIsLoading\">\r\n                        <n7-content-placeholder [data]=\"{\r\n                            blocks: [{\r\n                                classes: 'search-result-placeholder-title'\r\n                            }, {\r\n                                classes: 'search-result-placeholder-metadata'\r\n                            }]\r\n                        }\"></n7-content-placeholder>\r\n                        <n7-content-placeholder [data]=\"{\r\n                            blocks: [{\r\n                                classes: 'search-result-placeholder-title'\r\n                            }, {\r\n                                classes: 'search-result-placeholder-metadata'\r\n                            }]\r\n                        }\"></n7-content-placeholder>\r\n                        <n7-content-placeholder [data]=\"{\r\n                            blocks: [{\r\n                                classes: 'search-result-placeholder-title'\r\n                            }, {\r\n                                classes: 'search-result-placeholder-metadata'\r\n                            }]\r\n                        }\"></n7-content-placeholder>\r\n                        <n7-content-placeholder [data]=\"{\r\n                            blocks: [{\r\n                                classes: 'search-result-placeholder-title'\r\n                            }, {\r\n                                classes: 'search-result-placeholder-metadata'\r\n                            }]\r\n                        }\"></n7-content-placeholder>\r\n                        <n7-content-placeholder [data]=\"{\r\n                            blocks: [{\r\n                                classes: 'search-result-placeholder-title'\r\n                            }, {\r\n                                classes: 'search-result-placeholder-metadata'\r\n                            }]\r\n                        }\"></n7-content-placeholder>\r\n                    </div>\r\n                    <div *ngIf=\"!lb.dataSource.resultsListIsLoading\" class=\"aw-home__bubble-results-list\"\r\n                        [attr.id]=\"'bubble-results-list'\" (scroll)=\"lb.eventHandler.emitOuter('scroll', $event.target)\">\r\n\r\n                        <div class=\"aw-home__bubble-results-fallback\"\r\n                            *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length < 1;\">\r\n                            <p class=\"aw-home__bubble-results-fallback-text\">\r\n                                {{ (lb.widgets['aw-linked-objects'].ds.out$ | async)?.fallback }}\r\n                            </p>\r\n                            <button class=\"n7-btn aw-home__bubble-results-reset\"\r\n                                (click)=\"lb.eventHandler.emitInner('clearselection')\">\r\n                                Resetta la ricerca\r\n                            </button>\r\n                        </div>\r\n\r\n                        <ng-container\r\n                            *ngFor=\"let widgetData of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.result;\">\r\n                            <n7-item-preview [data]=\"widgetData\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\r\n                            </n7-item-preview>\r\n                        </ng-container>\r\n\r\n                        <ng-container *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.isLoading\">\r\n                            <div class=\"aw-home__bubble-results-list-loader\">\r\n                                <n7-loader [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.loaderData\">\r\n                                </n7-loader>\r\n                            </div>\r\n                        </ng-container>\r\n                    </div>\r\n                    <div [ngClass]=\"{ 'is-visible' : lb.dataSource.hasScrollBackground }\"\r\n                        class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\r\n                </div>\r\n                <!-- aw-linked-objects__actions -->\r\n                <ng-container\r\n                    *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length > 0 && !lb.dataSource.resultsListIsLoading\">\r\n                    <div *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.actions as action\"\r\n                        class=\"aw-home__bubble-results-list-actions\">\r\n                        <button (click)=\"lb.eventHandler.emitInner('bubbleresultsviewallclick')\"\r\n                            class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\">\r\n                            {{action[0].label}}\r\n                        </button>\r\n                    </div>\r\n                </ng-container>\r\n\r\n            </div>\r\n        </ng-container>\r\n    </div>\r\n\r\n    <!-- Outer links -->\r\n    <div *ngIf=\"lb.dataSource.outerLinks && lb.dataSource.outerLinks.length > 0\" class=\"aw-home__outer-links\">\r\n        <section class=\"aw-home__outer-links-wrapper n7-side-auto-padding\">\r\n            <h2 class=\"aw-home__outer-links-title\" *ngIf=\"lb.dataSource.outerLinksTitle\">\r\n                {{ lb.dataSource.outerLinksTitle }}\r\n            </h2>\r\n            <div class=\"aw-home__outer-links-items\">\r\n                <!-- Item preview -->\r\n                <n7-item-preview *ngFor=\"let outerLink of lb.dataSource.outerLinks\" [data]=\"outerLink\"\r\n                    [emit]=\"lb.eventHandler.outerLinkClick.bind(lb.eventHandler)\">\r\n                </n7-item-preview>\r\n                <!-- END // Item preview -->\r\n            </div>\r\n        </section>\r\n    </div>\r\n    <!-- END // Outer links -->\r\n\r\n    <!-- Hero section at the bottom of the page -->\r\n    <div class=\"aw-home__bottom-hero\">\r\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\r\n        </n7-hero>\r\n    </div>\r\n\r\n    <!-- Adavanced autocomplete popover  -->\r\n    <div class=\"aw-home__advanced-autocomplete\" id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\r\n        <div class=\"aw-home__advanced-autocomplete-loader\" *ngIf=\"lb.dataSource.homeAutocompleteIsLoading\">\r\n            <n7-loader [data]=\"{}\"></n7-loader>\r\n        </div>\r\n        <n7-advanced-autocomplete *ngIf=\"!lb.dataSource.homeAutocompleteIsLoading\"\r\n            [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\r\n        </n7-advanced-autocomplete>\r\n    </div>\r\n\r\n    <!-- Simple autocomplete popover. DO NOT CHANGE parent div class! -->\r\n    <!-- Creating one template for each facet -->\r\n    <div *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\"\r\n        class=\"aw-home__simple-autocomplete aw-simple-autocomplete__template\" style=\"display: none;\">\r\n        <div class=\"aw-home__simple-autocomplete-content aw-simple-autocomplete__tippy-wrapper\">\r\n            <div class=\"aw-home__simple-autocomplete-loader aw-simple-autocomplete__tippy-wrapper-loader\"\r\n                *ngIf=\"(lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async)?.loading\">\r\n                <n7-loader [data]=\"{}\"></n7-loader>\r\n            </div>\r\n            <n7-simple-autocomplete *ngIf=\"!(lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async)?.loading\"\r\n                [data]=\"lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async\"\r\n                [emit]=\"lb.widgets['aw-autocomplete-wrapper'].emit\">\r\n            </n7-simple-autocomplete>\r\n        </div>\r\n    </div>\r\n</div>"
+                    template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper n7-side-auto-padding\"\n        [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length > 0 }\" *ngIf=\"lb.dataSource.bubblesEnabled\">\n        <div class=\"aw-home__facets-wrapper-loading\" *ngIf=\"!(lb.widgets['aw-home-facets-wrapper'].ds.out$ | async)\">\n            <n7-content-placeholder *ngFor=\"let i of [0,1,2,3]\" [data]=\"{\n                blocks: [{\n                    classes: 'facet-placeholder-header'\n                }, {\n                    classes: 'facet-placeholder-input'\n                }] \n            }\"></n7-content-placeholder>\n        </div>\n        <div class=\"aw-home__facets-wrapper\" *ngIf=\"!!(lb.widgets['aw-home-facets-wrapper'].ds.out$ | async)\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div class=\"aw-home__bubble-chart-wrapper-loading\" *ngIf=\"!(lb.widgets['aw-bubble-chart'].ds.out$ | async)\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [\n                    {\n                        classes: 'facet-placeholder-item-1'\n                    }\n                ]\n            }\"></n7-content-placeholder>\n        </div>\n        <div class=\"aw-home__bubble-chart-wrapper\" *ngIf=\"!!(lb.widgets['aw-bubble-chart'].ds.out$ | async)\"\n            [style.overflow]=\"lb.dataSource.loadingBubbles ? 'visible' : 'hidden'\">\n            <aw-bubble-chart-wrapper>\n                <aw-chart-tippy \n                    [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                </aw-chart-tippy>\n                <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n\n        <!-- Linked objects -->\n        <ng-container *ngIf=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.selected.length > 0;\">\n            <div class=\"aw-home__bubble-results\" id=\"home-bubble-results\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\" class=\"aw-home__bubble-results-title-wrapper\">\n                    <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">\n                            {{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span>\n                    </h1>\n                </div>\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n\n                <div class=\"aw-home__bubble-results-list-wrapper\">\n                    <div class=\"aw-home__bubble-results-list-loading\" *ngIf=\"lb.dataSource.resultsListIsLoading\">\n                        <n7-content-placeholder [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                        <n7-content-placeholder [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                        <n7-content-placeholder [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                        <n7-content-placeholder [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                        <n7-content-placeholder [data]=\"{\n                            blocks: [{\n                                classes: 'search-result-placeholder-title'\n                            }, {\n                                classes: 'search-result-placeholder-metadata'\n                            }]\n                        }\"></n7-content-placeholder>\n                    </div>\n                    <div *ngIf=\"!lb.dataSource.resultsListIsLoading\" class=\"aw-home__bubble-results-list\"\n                        [attr.id]=\"'bubble-results-list'\" (scroll)=\"lb.eventHandler.emitOuter('scroll', $event.target)\">\n\n                        <div class=\"aw-home__bubble-results-fallback\"\n                            *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length < 1;\">\n                            <p class=\"aw-home__bubble-results-fallback-text\">\n                                {{ (lb.widgets['aw-linked-objects'].ds.out$ | async)?.fallback }}\n                            </p>\n                            <button class=\"n7-btn aw-home__bubble-results-reset\"\n                                (click)=\"lb.eventHandler.emitInner('clearselection')\">\n                                Resetta la ricerca\n                            </button>\n                        </div>\n\n                        <ng-container\n                            *ngFor=\"let widgetData of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.result;\">\n                            <n7-item-preview [data]=\"widgetData\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n\n                        <ng-container *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.isLoading\">\n                            <div class=\"aw-home__bubble-results-list-loader\">\n                                <n7-loader [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.loaderData\">\n                                </n7-loader>\n                            </div>\n                        </ng-container>\n                    </div>\n                    <div [ngClass]=\"{ 'is-visible' : lb.dataSource.hasScrollBackground }\"\n                        class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                </div>\n                <!-- aw-linked-objects__actions -->\n                <ng-container\n                    *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length > 0 && !lb.dataSource.resultsListIsLoading\">\n                    <div *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.actions as action\"\n                        class=\"aw-home__bubble-results-list-actions\">\n                        <button (click)=\"lb.eventHandler.emitInner('bubbleresultsviewallclick')\"\n                            class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\">\n                            {{action[0].label}}\n                        </button>\n                    </div>\n                </ng-container>\n\n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Outer links -->\n    <div *ngIf=\"lb.dataSource.outerLinks && lb.dataSource.outerLinks.length > 0\" class=\"aw-home__outer-links\">\n        <section class=\"aw-home__outer-links-wrapper n7-side-auto-padding\">\n            <h2 class=\"aw-home__outer-links-title\" *ngIf=\"lb.dataSource.outerLinksTitle\">\n                {{ lb.dataSource.outerLinksTitle }}\n            </h2>\n            <div class=\"aw-home__outer-links-items\">\n                <!-- Item preview -->\n                <n7-item-preview *ngFor=\"let outerLink of lb.dataSource.outerLinks\" [data]=\"outerLink\"\n                    [emit]=\"lb.eventHandler.outerLinkClick.bind(lb.eventHandler)\">\n                </n7-item-preview>\n                <!-- END // Item preview -->\n            </div>\n        </section>\n    </div>\n    <!-- END // Outer links -->\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Adavanced autocomplete popover  -->\n    <div class=\"aw-home__advanced-autocomplete\" id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <div class=\"aw-home__advanced-autocomplete-loader\" *ngIf=\"lb.dataSource.homeAutocompleteIsLoading\">\n            <n7-loader [data]=\"{}\"></n7-loader>\n        </div>\n        <n7-advanced-autocomplete *ngIf=\"!lb.dataSource.homeAutocompleteIsLoading\"\n            [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n\n    <!-- Simple autocomplete popover. DO NOT CHANGE parent div class! -->\n    <!-- Creating one template for each facet -->\n    <div *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\"\n        class=\"aw-home__simple-autocomplete aw-simple-autocomplete__template\" style=\"display: none;\">\n        <div class=\"aw-home__simple-autocomplete-content aw-simple-autocomplete__tippy-wrapper\">\n            <div class=\"aw-home__simple-autocomplete-loader aw-simple-autocomplete__tippy-wrapper-loader\"\n                *ngIf=\"(lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async)?.loading\">\n                <n7-loader [data]=\"{}\"></n7-loader>\n            </div>\n            <n7-simple-autocomplete *ngIf=\"!(lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async)?.loading\"\n                [data]=\"lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-autocomplete-wrapper'].emit\">\n            </n7-simple-autocomplete>\n        </div>\n    </div>\n</div>"
                 }] }
     ];
     /** @nocollapse */
@@ -9196,7 +9103,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSchedaLayoutDS = /** @class */ (function (_super) {
@@ -9565,7 +9471,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSchedaLayoutEH = /** @class */ (function (_super) {
@@ -9736,7 +9641,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -9768,7 +9672,6 @@ var AwPatrimonioLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSchedaLayoutComponent = /** @class */ (function (_super) {
@@ -9835,7 +9738,7 @@ var AwSchedaLayoutComponent = /** @class */ (function (_super) {
     AwSchedaLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-scheda-layout',
-                    template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\r\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\r\n        [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\r\n        <!-- Left sidebar: tree -->\r\n        <div class=\"aw-scheda__tree sticky-target\" [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\r\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\r\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\r\n            <div class=\"aw-scheda__tree-content-loading\" *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\r\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\" [data]=\"{\r\n                    blocks: [{\r\n                        classes: 'tree-placeholder-item'\r\n                    }]\r\n                }\"></n7-content-placeholder>\r\n            </div>\r\n            <div class=\"aw-scheda__tree-content\" [ngStyle]=\"{ \r\n                    'max-height': lb.dataSource.treeMaxHeight, \r\n                    'overflow': 'auto' \r\n                }\">\r\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\" [emit]=\"lb.widgets['aw-tree'].emit\"\r\n                    *ngIf=\"!lb.dataSource.sidebarCollapsed\"></n7-tree>\r\n            </div>\r\n        </div>\r\n\r\n        <!-- Scheda details -->\r\n        <div class=\"aw-scheda__scheda-wrapper-loading\" *ngIf=\"lb.dataSource.contentIsLoading\">\r\n            <!--\r\n                <n7-content-placeholder [data]=\"{\r\n                blocks: [{\r\n                    classes: 'content-placeholder-title'\r\n                }, {\r\n                    classes: 'content-placeholder-item-preview'\r\n                }, {\r\n                    classes: 'content-placeholder-item-preview'\r\n                }, {\r\n                    classes: 'content-placeholder-item-preview'\r\n                }, {\r\n                    classes: 'content-placeholder-item-preview'\r\n                }, {\r\n                    classes: 'content-placeholder-item-preview'\r\n                }, {\r\n                    classes: 'content-placeholder-item-preview'\r\n                }]\r\n            }\"></n7-content-placeholder>\r\n            -->\r\n        </div>\r\n        <div class=\"aw-scheda__scheda-wrapper\" *ngIf=\"!lb.dataSource.contentIsLoading\">\r\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\r\n                [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\r\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\r\n            </n7-smart-breadcrumbs>\r\n\r\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\" class=\"aw-scheda__fake-breadcrumbs\">\r\n            </div>\r\n\r\n            <div *ngIf=\"!lb.dataSource.currentId\" class=\"aw-scheda__intro-text\" [innerHTML]=\"lb.dataSource.emptyLabel\">\r\n            </div>\r\n\r\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\r\n            </n7-inner-title>\r\n\r\n            <n7-image-viewer *ngIf=\"lb.dataSource.hasImage\" [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\r\n            </n7-image-viewer>\r\n\r\n            <section class=\"aw-scheda__description\" *ngIf=\"lb.dataSource.contentParts.content\">\r\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\r\n                    <div [innerHTML]=\"part.content\"></div>\r\n                </div>\r\n            </section>\r\n\r\n            <section class=\"aw-scheda__metadata\" *ngIf=\"lb.dataSource.hasMetadata\">\r\n                <div class=\"aw-scheda__inner-title\">\r\n                    {{lb.dataSource.metadataSectionTitle}}\r\n                </div>\r\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\r\n                </n7-metadata-viewer>\r\n            </section>\r\n\r\n            <section class=\"aw-scheda__bubble-chart\" *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\r\n                <div *ngIf=\"lb.dataSource.hasBubbles\" class=\"aw-scheda__inner-title\">\r\n                    {{lb.dataSource.bubbleChartSectionTitle}}\r\n                </div>\r\n                <aw-bubble-chart-wrapper>\r\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\r\n                        [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\r\n                    </aw-chart-tippy>\r\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\r\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\r\n                    </n7-bubble-chart>\r\n                </aw-bubble-chart-wrapper>\r\n            </section>\r\n\r\n            <section *ngIf=\"lb.dataSource.hasSimilarItems && lb.dataSource.hasBubbles\" id=\"related-item-container\" class=\"aw-scheda__related\">\r\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.similarItemsSectionTitle}}</div>\r\n                <div class=\"aw-scheda__related-items n7-grid-2\">\r\n                    <!--<ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">-->\r\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\r\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\r\n                        </n7-item-preview>\r\n                    </ng-container>\r\n                </div>\r\n            </section>\r\n        </div>\r\n    </div>\r\n</div>"
+                    template: "<div class=\"aw-scheda\" id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n        [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\" [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n            <div class=\"aw-scheda__tree-content-loading\" *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\" [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n            </div>\n            <div class=\"aw-scheda__tree-content\" [ngStyle]=\"{ \n                    'max-height': lb.dataSource.treeMaxHeight, \n                    'overflow': 'auto' \n                }\">\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\" [emit]=\"lb.widgets['aw-tree'].emit\"\n                    *ngIf=\"!lb.dataSource.sidebarCollapsed\"></n7-tree>\n            </div>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper-loading\" *ngIf=\"lb.dataSource.contentIsLoading\">\n            <!--\n                <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'content-placeholder-title'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }]\n            }\"></n7-content-placeholder>\n            -->\n        </div>\n        <div class=\"aw-scheda__scheda-wrapper\" *ngIf=\"!lb.dataSource.contentIsLoading\">\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\" class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n\n            <div *ngIf=\"!lb.dataSource.currentId\" class=\"aw-scheda__intro-text\" [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <n7-image-viewer *ngIf=\"lb.dataSource.hasImage\" [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\" *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\" *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section class=\"aw-scheda__bubble-chart\" *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\n                <div *ngIf=\"lb.dataSource.hasBubbles\" class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <aw-bubble-chart-wrapper>\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                    </aw-chart-tippy>\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                        [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </section>\n\n            <section *ngIf=\"lb.dataSource.hasSimilarItems && lb.dataSource.hasBubbles\" id=\"related-item-container\" class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">{{lb.dataSource.similarItemsSectionTitle}}</div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <!--<ng-container *ngFor=\"let widgetData of lb.widgets['aw-linked-objects'].ds.out$ | async;\">-->\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n            </section>\n        </div>\n    </div>\n</div>"
                 }] }
     ];
     /** @nocollapse */
@@ -9890,7 +9793,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/search-layout/search-facets.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var facetsConfig = {
@@ -10039,11 +9941,11 @@ var facetsConfig = {
     ],
     results: {
         order: {
-            type: 'text',
+            type: 'score',
             // score | text | date
-            key: 'label_sort',
+            key: '_score',
             // docPath, elastic key, ecc
-            direction: 'ASC',
+            direction: 'DESC' // ASC | DESC
         },
         fields: [
             {
@@ -10058,7 +9960,6 @@ var facetsConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -10076,28 +9977,28 @@ var AwSearchLayoutDS = /** @class */ (function (_super) {
         _this.sidebarIsSticky = false;
         _this.isFirstLoading = true;
         _this.resultsLoading = false;
-        _this.orderBy = 'label_sort';
-        _this.orderDirection = 'ASC';
+        _this.orderBy = '_score';
+        _this.orderDirection = 'DESC';
         _this.orderByLabel = 'Ordina per';
         _this.orderByOptions = [
+            {
+                value: '_score_DESC',
+                label: 'Ordine per pertinenza',
+                type: 'score',
+                selected: true
+            },
             {
                 value: 'label_sort_ASC',
                 label: 'Ordine alfabetico (A→Z)',
                 type: 'text',
-                selected: true,
+                selected: false
             },
             {
                 value: 'label_sort_DESC',
                 label: 'Ordine alfabetico (Z→A)',
                 type: 'text',
-                selected: false,
-            },
-            {
-                value: '_score_DESC',
-                label: 'Ordine per pertinenza',
-                type: 'score',
-                selected: false,
-            },
+                selected: false
+            }
         ];
         _this.drawPagination = (/**
          * @return {?}
@@ -10612,7 +10513,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/search-layout/search-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSearchLayoutEH = /** @class */ (function (_super) {
@@ -10807,7 +10707,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/search-layout/search-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -10838,7 +10737,6 @@ var AwSearchLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSearchLayoutComponent = /** @class */ (function (_super) {
@@ -10903,7 +10801,7 @@ var AwSearchLayoutComponent = /** @class */ (function (_super) {
     AwSearchLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-search-layout',
-                    template: "<div class=\"aw-search n7-side-auto-padding\" id=\"search-layout\">\r\n    <div class=\"aw-search__header\">\r\n        <div class=\"aw-search__header-left\">\r\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\r\n        </div>\r\n        <!--\r\n        <div class=\"aw-search__header-right\">\r\n            <n7-nav\r\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\r\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\r\n            </n7-nav>\r\n        </div>\r\n        -->\r\n    </div>\r\n    <div class=\"aw-search__content-wrapper sticky-parent\">\r\n        <!-- Left sidebar: facets -->\r\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar-loading sticky-target\">\r\n            <div class=\"aw-search__facets-loading\">\r\n                <n7-content-placeholder [data]=\"{\r\n                    blocks: [{\r\n                        classes: 'search-placeholder-facet-input'\r\n                    }, {\r\n                        classes: 'search-placeholder-facet-check'\r\n                    }, {\r\n                        classes: 'search-placeholder-facet-item'\r\n                    }, {\r\n                        classes: 'search-placeholder-facet-item'\r\n                    }, {\r\n                        classes: 'search-placeholder-facet-item'\r\n                    }, {\r\n                        classes: 'search-placeholder-facet-item'\r\n                    }, {\r\n                        classes: 'search-placeholder-facet-item'\r\n                    }]\r\n                }\">\r\n                </n7-content-placeholder>\r\n            </div>\r\n        </div>\r\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar sticky-target\"\r\n            [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\r\n            <div class=\"aw-search__facets\">\r\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['facets-wrapper'].emit\">\r\n                </n7-facets-wrapper>\r\n            </div>\r\n        </div>\r\n        <div class=\"aw-search__content\">\r\n            <div class=\"aw-search__results-header\">\r\n                <div class=\"aw-search__results-header-left\">\r\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__total\">\r\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\r\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\r\n                    </h3>\r\n                </div>\r\n                <div class=\"aw-search__results-header-right\">\r\n                    <label class=\"aw-search__results-select-orderby-label\"\r\n                        for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\r\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\r\n                        id=\"aw-search__results-select-orderby\">\r\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\" [value]=\"option.value\"\r\n                            [selected]=\"option.selected\">\r\n                            {{ option.label }}</option>\r\n                    </select>\r\n                </div>\r\n            </div>\r\n            <!-- Search details -->\r\n            <div *ngIf=\"lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper-loading\">\r\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\r\n                    blocks: [\r\n                        { classes: 'search-result-placeholder-title' },\r\n                        { classes: 'search-result-placeholder-metadata' },\r\n                        { classes: 'search-result-placeholder-metadata' },\r\n                        { classes: 'search-result-placeholder-metadata' }\r\n                    ]\r\n                }\"></n7-content-placeholder>\r\n            </div>\r\n            <div *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper\">\r\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\r\n                    <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\r\n                    </n7-smart-breadcrumbs>\r\n                    <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\r\n                    </n7-item-preview>\r\n                </ng-container>\r\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\r\n                    <div class=\"aw-search__fallback\">\r\n                        <p class=\"aw-search__fallback-string\">\r\n                            {{ lb.dataSource.fallback }}\r\n                        </p>\r\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\" class=\"n7-btn aw-search__fallback-button\"\r\n                            (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\r\n                            Resetta la ricerca\r\n                        </button>\r\n                    </div>\r\n                </ng-container>\r\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\r\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\r\n                </n7-smart-pagination>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>"
+                    template: "<div class=\"aw-search n7-side-auto-padding\" id=\"search-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n        <!--\n        <div class=\"aw-search__header-right\">\n            <n7-nav\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\n            </n7-nav>\n        </div>\n        -->\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar sticky-target\"\n            [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                        for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                        id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\" [value]=\"option.value\"\n                            [selected]=\"option.selected\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper\">\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                    <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                    </n7-smart-breadcrumbs>\n                    <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\" class=\"n7-btn aw-search__fallback-button\"\n                            (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>"
                 }] }
     ];
     /** @nocollapse */
@@ -10952,7 +10850,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/components/chart-tippy/chart-tippy.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var ChartTippyComponent = /** @class */ (function () {
@@ -10974,7 +10871,7 @@ var ChartTippyComponent = /** @class */ (function () {
     ChartTippyComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-chart-tippy',
-                    template: "<div *ngIf=\"data\" style=\"display: none;\">\r\n  <div *ngFor=\"let d of data\" id=\"template__{{d.id}}\" class=\"bubble-chart__tippy-template\">\r\n    <div id=\"bubble-popup-menu\" class=\"aw-bubble-popup-menu\">\r\n      <h2 class=\"aw-bubble-popup-menu__title\">{{ d.title }}</h2>\r\n      <p class=\"aw-bubble-popup-menu__text\">\r\n        {{ d.text }}\r\n      </p>\r\n      <div class=\"aw-bubble-popup-menu__actions\">\r\n        <n7-anchor-wrapper [classes]=\"'aw-bubble-popup-menu__link'\" [data]=\"d.anchorData\">\r\n          Vai alla scheda\r\n        </n7-anchor-wrapper>\r\n        <span *ngIf=\"d.selectable\" class=\"aw-bubble-popup-menu__link\" (click)=\"onClick('select', {id: d.id})\">\r\n          {{ d.isSelected ? 'Deseleziona' : 'Seleziona'}}\r\n        </span>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</div>"
+                    template: "<div *ngIf=\"data\" style=\"display: none;\">\n  <div *ngFor=\"let d of data\" id=\"template__{{d.id}}\" class=\"bubble-chart__tippy-template\">\n    <div id=\"bubble-popup-menu\" class=\"aw-bubble-popup-menu\">\n      <h2 class=\"aw-bubble-popup-menu__title\">{{ d.title }}</h2>\n      <p class=\"aw-bubble-popup-menu__text\">\n        {{ d.text }}\n      </p>\n      <div class=\"aw-bubble-popup-menu__actions\">\n        <n7-anchor-wrapper [classes]=\"'aw-bubble-popup-menu__link'\" [data]=\"d.anchorData\">\n          Vai alla scheda\n        </n7-anchor-wrapper>\n        <span *ngIf=\"d.selectable\" class=\"aw-bubble-popup-menu__link\" (click)=\"onClick('select', {id: d.id})\">\n          {{ d.isSelected ? 'Deseleziona' : 'Seleziona'}}\n        </span>\n      </div>\n    </div>\n  </div>\n</div>"
                 }] }
     ];
     ChartTippyComponent.propDecorators = {
@@ -10995,7 +10892,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/components/bubble-chart-wrapper/bubble-chart-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var BubbleChartWrapperComponent = /** @class */ (function () {
@@ -11017,7 +10913,7 @@ var BubbleChartWrapperComponent = /** @class */ (function () {
     BubbleChartWrapperComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-bubble-chart-wrapper',
-                    template: "<div class=\"aw-bubble-chart-wrapper\">\r\n    <ng-content></ng-content>\r\n</div>"
+                    template: "<div class=\"aw-bubble-chart-wrapper\">\n    <ng-content></ng-content>\n</div>"
                 }] }
     ];
     BubbleChartWrapperComponent.propDecorators = {
@@ -11038,7 +10934,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/components/smart-breadcrumbs/smart-breadcrumbs.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -11184,7 +11079,7 @@ var SmartBreadcrumbsComponent = /** @class */ (function () {
     SmartBreadcrumbsComponent.decorators = [
         { type: Component, args: [{
                     selector: 'n7-smart-breadcrumbs',
-                    template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\r\n    <nav class=\"n7-breadcrumbs__nav\">\r\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\r\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\r\n                <n7-anchor-wrapper [classes]=\"item.classes\"\r\n                [data]=\"item.anchor\"\r\n                (clicked)=\"onClick($event)\">\r\n                    {{ item.label }}\r\n                </n7-anchor-wrapper>\r\n            </li>\r\n        </ol>\r\n    </nav>\r\n</div>"
+                    template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\n    <nav class=\"n7-breadcrumbs__nav\">\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\n                <n7-anchor-wrapper [classes]=\"item.classes\"\n                [data]=\"item.anchor\"\n                (clicked)=\"onClick($event)\">\n                    {{ item.label }}\n                </n7-anchor-wrapper>\n            </li>\n        </ol>\n    </nav>\n</div>"
                 }] }
     ];
     SmartBreadcrumbsComponent.propDecorators = {
@@ -11217,7 +11112,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/n7-boilerplate-arianna-web.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -11251,7 +11145,6 @@ var N7BoilerplateAriannaWebModule = /** @class */ (function () {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/components/data-widget-wrapper/data-widget-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -11268,7 +11161,7 @@ var DataWidgetWrapperComponent = /** @class */ (function () {
     DataWidgetWrapperComponent.decorators = [
         { type: Component, args: [{
                     selector: 'dv-data-widget-wrapper',
-                    template: "<div class=\"dv-data-widget-wrapper {{ data && data.classes || '' }}\">\r\n    <ng-content></ng-content>\r\n</div>"
+                    template: "<div class=\"dv-data-widget-wrapper {{ data && data.classes || '' }}\">\n    <ng-content></ng-content>\n</div>"
                 }] }
     ];
     DataWidgetWrapperComponent.propDecorators = {
@@ -11283,7 +11176,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/components/datepicker-wrapper/datepicker-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -11360,7 +11252,7 @@ var DatepickerWrapperComponent = /** @class */ (function () {
     DatepickerWrapperComponent.decorators = [
         { type: Component, args: [{
                     selector: 'dv-datepicker-wrapper',
-                    template: "<div *ngIf=\"data\" class=\"dv-datepicker-wrapper {{ data.select.classes || '' }}\">\r\n    <div class=\"dv-datepicker-wrapper__label\" (click)=\"toggleDropDown(data.payload)\">\r\n        <input type=\"text\" [value]=\"data.select.label\" [readOnly]=\"true\"/>\r\n        <span class=\"{{data.select.icon}}\"></span>\r\n    </div>\r\n    <div class=\"dv-datepicker-wrapper__dropdown\" [hidden]=\"data.select.hidden\">\r\n        <ul class=\"dv-datepicker-wrapper__dropdown-list\">\r\n            <li class=\"dv-datepicker-wrapper__dropdown-list-option {{ opt.classes || '' }}\" *ngFor=\"let opt of data.select.items\" (click)=\"onClick(opt.payload)\">{{opt.text}}</li>\r\n        </ul>\r\n    </div>\r\n    <n7-datepicker\r\n        [data]=\"data.datepicker.data\"\r\n        [emit]=\"emit\">\r\n    </n7-datepicker>\r\n</div>\r\n"
+                    template: "<div *ngIf=\"data\" class=\"dv-datepicker-wrapper {{ data.select.classes || '' }}\">\n    <div class=\"dv-datepicker-wrapper__label\" (click)=\"toggleDropDown(data.payload)\">\n        <input type=\"text\" [value]=\"data.select.label\" [readOnly]=\"true\"/>\n        <span class=\"{{data.select.icon}}\"></span>\n    </div>\n    <div class=\"dv-datepicker-wrapper__dropdown\" [hidden]=\"data.select.hidden\">\n        <ul class=\"dv-datepicker-wrapper__dropdown-list\">\n            <li class=\"dv-datepicker-wrapper__dropdown-list-option {{ opt.classes || '' }}\" *ngFor=\"let opt of data.select.items\" (click)=\"onClick(opt.payload)\">{{opt.text}}</li>\n        </ul>\n    </div>\n    <n7-datepicker\n        [data]=\"data.datepicker.data\"\n        [emit]=\"emit\">\n    </n7-datepicker>\n</div>\n"
                 }] }
     ];
     DatepickerWrapperComponent.propDecorators = {
@@ -11378,7 +11270,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/layout/example-layout/example-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvExampleLayoutDS = /** @class */ (function (_super) {
@@ -11452,7 +11343,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/layout/example-layout/example-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvExampleLayoutEH = /** @class */ (function (_super) {
@@ -11482,7 +11372,6 @@ var DvExampleLayoutEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/data-sources/data-widget-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvDataWidgetDS = /** @class */ (function (_super) {
@@ -11511,7 +11400,6 @@ var DvDataWidgetDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/data-sources/datepicker-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvDatepickerWrapperDS = /** @class */ (function (_super) {
@@ -11629,7 +11517,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/data-sources/graph.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvGraphDS = /** @class */ (function (_super) {
@@ -11731,7 +11618,6 @@ var DvGraphDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/data-sources/inner-title.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvInnerTitleDS = /** @class */ (function (_super) {
@@ -11766,7 +11652,6 @@ var DvInnerTitleDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/data-sources/widget.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvWidgetDS = /** @class */ (function (_super) {
@@ -11790,12 +11675,10 @@ var DvWidgetDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS$2 = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     DvDataWidgetDS: DvDataWidgetDS,
     DvDatepickerWrapperDS: DvDatepickerWrapperDS,
     DvGraphDS: DvGraphDS,
@@ -11805,7 +11688,6 @@ var DS$2 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/event-handlers/datepicker-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvDatepickerWrapperEH = /** @class */ (function (_super) {
@@ -11853,18 +11735,15 @@ var DvDatepickerWrapperEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH$2 = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     DvDatepickerWrapperEH: DvDatepickerWrapperEH
 });
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/layout/example-layout/example-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -11891,7 +11770,6 @@ var DvExampleLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/layout/example-layout/example-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvExampleLayoutComponent = /** @class */ (function (_super) {
@@ -11929,7 +11807,7 @@ var DvExampleLayoutComponent = /** @class */ (function (_super) {
     DvExampleLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'dv-example-layout',
-                    template: "<div class=\"dv-example-layout\" id=\"example-layout\">\r\n\r\n    <!-- Data widget wrapper with not-fixed height, two rows -->\r\n    <dv-data-widget-wrapper>\r\n        <div class=\"dv-data-widget-wrapper__title\">\r\n            <n7-inner-title\r\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\r\n            </n7-inner-title>\r\n        </div>\r\n        <div class=\"dv-data-widget-wrapper__content\">\r\n            <div class=\"dv-data-widget-wrapper__content-row\">\r\n                <n7-data-widget\r\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\r\n                </n7-data-widget>\r\n            </div>\r\n            <div class=\"dv-data-widget-wrapper__content-row\">\r\n                <n7-chart\r\n                    [data]=\"lb.widgets['dv-graph'].ds.out$ | async\">\r\n                </n7-chart>\r\n            </div>\r\n        </div>\r\n    </dv-data-widget-wrapper>\r\n\r\n    <!-- Data widget wrapper with fixed height, two rows -->\r\n    <dv-data-widget-wrapper [data]=\"{ classes: 'dv-data-widget-wrapper-fixed-height' }\">\r\n        <div class=\"dv-data-widget-wrapper__title\">\r\n            <n7-inner-title\r\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\r\n            </n7-inner-title>\r\n        </div>\r\n        <div class=\"dv-data-widget-wrapper__content\">\r\n            <div class=\"dv-data-widget-wrapper__content-row\">\r\n                <n7-data-widget\r\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\r\n                </n7-data-widget>\r\n            </div>\r\n            <div class=\"dv-data-widget-wrapper__content-row\">\r\n                Row content\r\n            </div>\r\n        </div>\r\n    </dv-data-widget-wrapper>\r\n\r\n    <!-- Data widget wrapper with fixed height, one row -->\r\n    <dv-data-widget-wrapper [data]=\"{ classes: 'dv-data-widget-wrapper-fixed-height' }\">\r\n        <div class=\"dv-data-widget-wrapper__title\">\r\n            <n7-inner-title\r\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\r\n            </n7-inner-title>\r\n        </div>\r\n        <div class=\"dv-data-widget-wrapper__content\">\r\n            <div class=\"dv-data-widget-wrapper__content-row\">\r\n                <n7-data-widget\r\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\r\n                </n7-data-widget>\r\n            </div>\r\n        </div>\r\n    </dv-data-widget-wrapper>\r\n    \r\n    <dv-datepicker-wrapper \r\n        [data]=\"lb.widgets['dv-datepicker-wrapper'].ds.out$ | async\"\r\n        [emit]=\"lb.widgets['dv-datepicker-wrapper'].emit\">\r\n    </dv-datepicker-wrapper>\r\n</div>"
+                    template: "<div class=\"dv-example-layout\" id=\"example-layout\">\n\n    <!-- Data widget wrapper with not-fixed height, two rows -->\n    <dv-data-widget-wrapper>\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-chart\n                    [data]=\"lb.widgets['dv-graph'].ds.out$ | async\">\n                </n7-chart>\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n\n    <!-- Data widget wrapper with fixed height, two rows -->\n    <dv-data-widget-wrapper [data]=\"{ classes: 'dv-data-widget-wrapper-fixed-height' }\">\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                Row content\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n\n    <!-- Data widget wrapper with fixed height, one row -->\n    <dv-data-widget-wrapper [data]=\"{ classes: 'dv-data-widget-wrapper-fixed-height' }\">\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n    \n    <dv-datepicker-wrapper \n        [data]=\"lb.widgets['dv-datepicker-wrapper'].ds.out$ | async\"\n        [emit]=\"lb.widgets['dv-datepicker-wrapper'].emit\">\n    </dv-datepicker-wrapper>\n</div>"
                 }] }
     ];
     /** @nocollapse */
@@ -11939,7 +11817,6 @@ var DvExampleLayoutComponent = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/n7-boilerplate-data-viz.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -11968,7 +11845,224 @@ var N7BoilerplateDataVizModule = /** @class */ (function () {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/n7-boilerplate-lib.module.ts
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var MrHomeLayoutDS = /** @class */ (function (_super) {
+    __extends(MrHomeLayoutDS, _super);
+    function MrHomeLayoutDS() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @return {?}
+     */
+    MrHomeLayoutDS.prototype.onInit = /**
+     * @return {?}
+     */
+    function () {
+        this.one('mr-dummy').update('world!');
+    };
+    return MrHomeLayoutDS;
+}(LayoutDataSource));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var MrHomeLayoutEH = /** @class */ (function (_super) {
+    __extends(MrHomeLayoutEH, _super);
+    function MrHomeLayoutEH() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @return {?}
+     */
+    MrHomeLayoutEH.prototype.listen = /**
+     * @return {?}
+     */
+    function () {
+        var _this = this;
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                case 'mr-home-layout.init':
+                    _this.dataSource.onInit(payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
+    };
+    return MrHomeLayoutEH;
+}(EventHandler));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var MrDummyDS = /** @class */ (function (_super) {
+    __extends(MrDummyDS, _super);
+    function MrDummyDS() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    MrDummyDS.prototype.transform = /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    function (data) {
+        return data;
+    };
+    return MrDummyDS;
+}(DataSource));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+
+var DS$3 = /*#__PURE__*/Object.freeze({
+    MrDummyDS: MrDummyDS
+});
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var MrDummyEH = /** @class */ (function (_super) {
+    __extends(MrDummyEH, _super);
+    function MrDummyEH() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * @return {?}
+     */
+    MrDummyEH.prototype.listen = /**
+     * @return {?}
+     */
+    function () {
+        // TODO
+    };
+    return MrDummyEH;
+}(EventHandler));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+
+var EH$3 = /*#__PURE__*/Object.freeze({
+    MrDummyEH: MrDummyEH
+});
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/** @type {?} */
+var MrHomeLayoutConfig = {
+    layoutId: 'mr-home-layout',
+    widgets: [{
+            id: 'mr-dummy',
+        }],
+    layoutDS: MrHomeLayoutDS,
+    layoutEH: MrHomeLayoutEH,
+    widgetsDataSources: DS$3,
+    widgetsEventHandlers: EH$3,
+    options: {
+    // TODO
+    },
+};
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var MrHomeLayoutComponent = /** @class */ (function (_super) {
+    __extends(MrHomeLayoutComponent, _super);
+    function MrHomeLayoutComponent(layoutsConfiguration) {
+        return _super.call(this, layoutsConfiguration.get('MrHomeLayoutConfig') || MrHomeLayoutConfig) || this;
+    }
+    /**
+     * @protected
+     * @return {?}
+     */
+    MrHomeLayoutComponent.prototype.initPayload = /**
+     * @protected
+     * @return {?}
+     */
+    function () {
+        return {
+            options: this.config.options || {}
+        };
+    };
+    /**
+     * @return {?}
+     */
+    MrHomeLayoutComponent.prototype.ngOnInit = /**
+     * @return {?}
+     */
+    function () {
+        this.onInit();
+    };
+    /**
+     * @return {?}
+     */
+    MrHomeLayoutComponent.prototype.ngOnDestroy = /**
+     * @return {?}
+     */
+    function () {
+        this.onDestroy();
+    };
+    MrHomeLayoutComponent.decorators = [
+        { type: Component, args: [{
+                    selector: 'mr-home-layout',
+                    template: "<div class=\"mr-home\" *ngIf=\"lb.dataSource\">\n    <h1>Hello {{ lb.widgets['mr-dummy'].ds.out$ | async }}</h1>\n</div>"
+                }] }
+    ];
+    /** @nocollapse */
+    MrHomeLayoutComponent.ctorParameters = function () { return [
+        { type: LayoutsConfigurationService }
+    ]; };
+    return MrHomeLayoutComponent;
+}(AbstractLayout));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/** @type {?} */
+var COMPONENTS$3 = [
+    MrHomeLayoutComponent,
+];
+var N7BoilerplateMurucaModule = /** @class */ (function () {
+    function N7BoilerplateMurucaModule() {
+    }
+    N7BoilerplateMurucaModule.decorators = [
+        { type: NgModule, args: [{
+                    declarations: COMPONENTS$3,
+                    imports: [
+                        CommonModule,
+                        DvComponentsLibModule,
+                        N7BoilerplateCommonModule,
+                    ],
+                    providers: [],
+                    exports: COMPONENTS$3,
+                },] }
+    ];
+    return N7BoilerplateMurucaModule;
+}());
+
+/**
+ * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var N7BoilerplateLibModule = /** @class */ (function () {
@@ -11987,6 +12081,8 @@ var N7BoilerplateLibModule = /** @class */ (function () {
                         N7BoilerplateAriannaWebModule,
                         // DV
                         N7BoilerplateDataVizModule,
+                        // MR
+                        N7BoilerplateMurucaModule,
                     ],
                 },] }
     ];
@@ -11995,51 +12091,48 @@ var N7BoilerplateLibModule = /** @class */ (function () {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/layout/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: public-api.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: n7-frontend-boilerplate.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, BubbleChartWrapperComponent as ɵq, ChartTippyComponent as ɵr, SmartBreadcrumbsComponent as ɵs, DataWidgetWrapperComponent as ɵt, DatepickerWrapperComponent as ɵu, DvExampleLayoutComponent as ɵv };
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+
+export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrDummyDS, MrDummyEH, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, BubbleChartWrapperComponent as ɵq, ChartTippyComponent as ɵr, SmartBreadcrumbsComponent as ɵs, DataWidgetWrapperComponent as ɵt, DatepickerWrapperComponent as ɵu, DvExampleLayoutComponent as ɵv, MrHomeLayoutComponent as ɵw };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

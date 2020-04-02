@@ -24,3 +24,4 @@ export { SearchService as ɵp } from './lib/common/services/search.service';
 export { DataWidgetWrapperComponent as ɵt } from './lib/data-viz/components/data-widget-wrapper/data-widget-wrapper';
 export { DatepickerWrapperComponent as ɵu } from './lib/data-viz/components/datepicker-wrapper/datepicker-wrapper';
 export { DvExampleLayoutComponent as ɵv } from './lib/data-viz/layout/example-layout/example-layout';
+export { MrHomeLayoutComponent as ɵw } from './lib/muruca/layouts/home-layout/home-layout';
