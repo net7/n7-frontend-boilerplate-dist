@@ -11,7 +11,7 @@ import { LayoutBuilder, EventHandler, DataSource } from '@n7-frontend/core';
 import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
 import tippy, { hideAll } from 'tippy.js';
 import { get, cloneDeep } from 'lodash';
-import slug from 'slug';
+import slugify from 'slugify';
 import { DataSource as DataSource$1 } from '@n7-frontend/core/dist/data-source';
 
 /**
@@ -1308,7 +1308,10 @@ var helpers = {
         var parsedDoc = domParser.parseFromString(str, 'text/html');
         /** @type {?} */
         var parsedString = parsedDoc.body.textContent || '';
-        return slug(parsedString, { lower: true });
+        return slugify(parsedString, {
+            remove: /[*+~.()'"!:@,]/g,
+            lower: true
+        });
     },
     browserIsIE: /**
      * @return {?}
@@ -2792,11 +2795,11 @@ var MainLayoutEH = /** @class */ (function (_super) {
          * @param {?} event
          * @return {?}
          */
-        function (event) { return event instanceof NavigationStart; })))
-            .subscribe((/**
+        function (event) { return event instanceof NavigationStart; }))).subscribe((/**
          * @return {?}
          */
         function () {
+            window.scrollTo(0, 0);
             _this.dataSource.onRouterChanged();
         }));
     };

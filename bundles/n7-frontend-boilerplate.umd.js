@@ -1,11 +1,11 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('@angular/common'), require('@angular/common/http'), require('@n7-frontend/components'), require('rxjs'), require('rxjs/operators'), require('@angular/router'), require('@angular/platform-browser'), require('@n7-frontend/core'), require('@n7-frontend/core/dist/layout-data-source'), require('tippy.js'), require('lodash'), require('slug'), require('@n7-frontend/core/dist/data-source')) :
-    typeof define === 'function' && define.amd ? define('@n7-frontend/boilerplate', ['exports', '@angular/core', '@angular/common', '@angular/common/http', '@n7-frontend/components', 'rxjs', 'rxjs/operators', '@angular/router', '@angular/platform-browser', '@n7-frontend/core', '@n7-frontend/core/dist/layout-data-source', 'tippy.js', 'lodash', 'slug', '@n7-frontend/core/dist/data-source'], factory) :
-    (global = global || self, factory((global['n7-frontend'] = global['n7-frontend'] || {}, global['n7-frontend'].boilerplate = {}), global.ng.core, global.ng.common, global.ng.common.http, global.components, global.rxjs, global.rxjs.operators, global.ng.router, global.ng.platformBrowser, global.core$1, global.layoutDataSource, global.tippy, global.lodash, global.slug, global.dataSource));
-}(this, (function (exports, core, common, http, components, rxjs, operators, router, platformBrowser, core$1, layoutDataSource, tippy, lodash, slug, dataSource) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('@angular/common'), require('@angular/common/http'), require('@n7-frontend/components'), require('rxjs'), require('rxjs/operators'), require('@angular/router'), require('@angular/platform-browser'), require('@n7-frontend/core'), require('@n7-frontend/core/dist/layout-data-source'), require('tippy.js'), require('lodash'), require('slugify'), require('@n7-frontend/core/dist/data-source')) :
+    typeof define === 'function' && define.amd ? define('@n7-frontend/boilerplate', ['exports', '@angular/core', '@angular/common', '@angular/common/http', '@n7-frontend/components', 'rxjs', 'rxjs/operators', '@angular/router', '@angular/platform-browser', '@n7-frontend/core', '@n7-frontend/core/dist/layout-data-source', 'tippy.js', 'lodash', 'slugify', '@n7-frontend/core/dist/data-source'], factory) :
+    (global = global || self, factory((global['n7-frontend'] = global['n7-frontend'] || {}, global['n7-frontend'].boilerplate = {}), global.ng.core, global.ng.common, global.ng.common.http, global.components, global.rxjs, global.rxjs.operators, global.ng.router, global.ng.platformBrowser, global.core$1, global.layoutDataSource, global.tippy, global.lodash, global.slugify, global.dataSource));
+}(this, (function (exports, core, common, http, components, rxjs, operators, router, platformBrowser, core$1, layoutDataSource, tippy, lodash, slugify, dataSource) { 'use strict';
 
     var tippy__default = 'default' in tippy ? tippy['default'] : tippy;
-    slug = slug && slug.hasOwnProperty('default') ? slug['default'] : slug;
+    slugify = slugify && slugify.hasOwnProperty('default') ? slugify['default'] : slugify;
 
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation. All rights reserved.
@@ -1515,7 +1515,10 @@
             var parsedDoc = domParser.parseFromString(str, 'text/html');
             /** @type {?} */
             var parsedString = parsedDoc.body.textContent || '';
-            return slug(parsedString, { lower: true });
+            return slugify(parsedString, {
+                remove: /[*+~.()'"!:@,]/g,
+                lower: true
+            });
         },
         browserIsIE: /**
          * @return {?}
@@ -2999,11 +3002,11 @@
              * @param {?} event
              * @return {?}
              */
-            function (event) { return event instanceof router.NavigationStart; })))
-                .subscribe((/**
+            function (event) { return event instanceof router.NavigationStart; }))).subscribe((/**
              * @return {?}
              */
             function () {
+                window.scrollTo(0, 0);
                 _this.dataSource.onRouterChanged();
             }));
         };
