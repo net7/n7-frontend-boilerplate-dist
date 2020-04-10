@@ -12,5 +12,4 @@ export declare class AwLinkedObjectsDS extends DataSource {
     checkForMore: (force?: boolean) => void;
     handleIncomingData: (incomingData: any) => void;
     private unpackData;
-    private _getPaginationAnchor;
 }
