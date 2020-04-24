@@ -6070,11 +6070,11 @@ class AwTreeDS extends DataSource$1 {
          * @param {?} __0
          * @return {?}
          */
-        ({ id, label, icon, img, branches, document_type: type, document_classification: classification }) => {
+        ({ id, label, icon, branches, document_type: type, document_classification: classification }) => {
             /** @type {?} */
             const hasBranches = !!(Array.isArray(branches) && branches.length);
             this._getCachedData().flatData[id] = {
-                id, label, icon, img, hasBranches, type, classification
+                id, label, icon, hasBranches, type, classification
             };
             if (hasBranches) {
                 branches.forEach((/**

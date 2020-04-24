@@ -6377,11 +6377,11 @@ var AwTreeDS = /** @class */ (function (_super) {
          * @return {?}
          */
         function (_a) {
-            var id = _a.id, label = _a.label, icon = _a.icon, img = _a.img, branches = _a.branches, type = _a.document_type, classification = _a.document_classification;
+            var id = _a.id, label = _a.label, icon = _a.icon, branches = _a.branches, type = _a.document_type, classification = _a.document_classification;
             /** @type {?} */
             var hasBranches = !!(Array.isArray(branches) && branches.length);
             _this._getCachedData().flatData[id] = {
-                id: id, label: label, icon: icon, img: img, hasBranches: hasBranches, type: type, classification: classification
+                id: id, label: label, icon: icon, hasBranches: hasBranches, type: type, classification: classification
             };
             if (hasBranches) {
                 branches.forEach((/**
