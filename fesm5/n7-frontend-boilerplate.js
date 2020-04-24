@@ -6887,79 +6887,10 @@ var AwSchedaImageDS = /** @class */ (function (_super) {
      * @return {?}
      */
     function (data) {
-        var _this = this;
-        /** @type {?} */
-        var tileSources = this.getTileSources(data.image);
-        return {
-            images: [],
-            viewerId: 'scheda-layout-viewer',
-            libOptions: {
-                tileSources: tileSources,
-                sequenceMode: true,
-                showReferenceStrip: true,
-                autoHideControls: false,
-                showNavigator: false,
-            },
-            _setViewer: (/**
-             * @param {?} viewer
-             * @return {?}
-             */
-            function (viewer) {
-                _this.instance = viewer;
-            }),
-        };
-    };
-    /**
-     * @return {?}
-     */
-    AwSchedaImageDS.prototype.hasInstance = /**
-     * @return {?}
-     */
-    function () {
-        return !!this.instance;
-    };
-    /**
-     * @param {?} data
-     * @return {?}
-     */
-    AwSchedaImageDS.prototype.updateImages = /**
-     * @param {?} data
-     * @return {?}
-     */
-    function (data) {
-        if (!this.instance)
-            return;
-        /** @type {?} */
-        var images = this.getTileSources(data.image);
-        this.instance.open(images);
-    };
-    /**
-     * @private
-     * @param {?} images
-     * @return {?}
-     */
-    AwSchedaImageDS.prototype.getTileSources = /**
-     * @private
-     * @param {?} images
-     * @return {?}
-     */
-    function (images) {
-        // FIXME: togliere replace
-        return images.map((/**
-         * @param {?} img
-         * @return {?}
-         */
-        function (img) { return img.replace('FIF', 'Deepzoom').replace('.tif', '.tif.dzi'); }));
+        return data;
     };
     return AwSchedaImageDS;
 }(DataSource));
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaImageDS.prototype.instance;
-}
 
 /**
  * @fileoverview added by tsickle
@@ -9663,15 +9594,24 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
                 content.content = response.text;
             }
             this.contentParts.push(content);
-            // image viewer
             if (response.image) {
                 /** @type {?} */
-                var viewerDataSource = this.getWidgetDataSource('aw-scheda-image');
-                if (!viewerDataSource.hasInstance()) {
-                    this.one('aw-scheda-image').update(response);
+                var images_1 = [{ type: 'image', url: response.image, buildPyramid: false }];
+                if (!this.imageViewerIstance) {
+                    this.one('aw-scheda-image').update({
+                        viewerId: 'scheda-layout-viewer',
+                        _setViewer: (/**
+                         * @param {?} viewer
+                         * @return {?}
+                         */
+                        function (viewer) {
+                            _this.imageViewerIstance = viewer;
+                            viewer.open(images_1);
+                        }),
+                    });
                 }
                 else {
-                    viewerDataSource.updateImages(response);
+                    this.imageViewerIstance.open(images_1);
                 }
             }
             /** @type {?} */

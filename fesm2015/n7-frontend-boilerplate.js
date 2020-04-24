@@ -6514,64 +6514,8 @@ class AwSchedaImageDS extends DataSource {
      * @return {?}
      */
     transform(data) {
-        /** @type {?} */
-        const tileSources = this.getTileSources(data.image);
-        return {
-            images: [],
-            viewerId: 'scheda-layout-viewer',
-            libOptions: {
-                tileSources,
-                sequenceMode: true,
-                showReferenceStrip: true,
-                autoHideControls: false,
-                showNavigator: false,
-            },
-            _setViewer: (/**
-             * @param {?} viewer
-             * @return {?}
-             */
-            (viewer) => {
-                this.instance = viewer;
-            }),
-        };
+        return data;
     }
-    /**
-     * @return {?}
-     */
-    hasInstance() {
-        return !!this.instance;
-    }
-    /**
-     * @param {?} data
-     * @return {?}
-     */
-    updateImages(data) {
-        if (!this.instance)
-            return;
-        /** @type {?} */
-        const images = this.getTileSources(data.image);
-        this.instance.open(images);
-    }
-    /**
-     * @private
-     * @param {?} images
-     * @return {?}
-     */
-    getTileSources(images) {
-        // FIXME: togliere replace
-        return images.map((/**
-         * @param {?} img
-         * @return {?}
-         */
-        (img) => img.replace('FIF', 'Deepzoom').replace('.tif', '.tif.dzi')));
-    }
-}
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaImageDS.prototype.instance;
 }
 
 /**
@@ -8954,15 +8898,24 @@ class AwSchedaLayoutDS extends LayoutDataSource {
                 content.content = response.text;
             }
             this.contentParts.push(content);
-            // image viewer
             if (response.image) {
                 /** @type {?} */
-                const viewerDataSource = this.getWidgetDataSource('aw-scheda-image');
-                if (!viewerDataSource.hasInstance()) {
-                    this.one('aw-scheda-image').update(response);
+                const images = [{ type: 'image', url: response.image, buildPyramid: false }];
+                if (!this.imageViewerIstance) {
+                    this.one('aw-scheda-image').update({
+                        viewerId: 'scheda-layout-viewer',
+                        _setViewer: (/**
+                         * @param {?} viewer
+                         * @return {?}
+                         */
+                        (viewer) => {
+                            this.imageViewerIstance = viewer;
+                            viewer.open(images);
+                        }),
+                    });
                 }
                 else {
-                    viewerDataSource.updateImages(response);
+                    this.imageViewerIstance.open(images);
                 }
             }
             /** @type {?} */
