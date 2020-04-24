@@ -10400,242 +10400,6 @@ if (false) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-class ChartTippyComponent {
-    /**
-     * @param {?} type
-     * @param {?} payload
-     * @return {?}
-     */
-    onClick(type, payload) {
-        this.emit(type, payload);
-    }
-}
-ChartTippyComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'aw-chart-tippy',
-                template: "<div *ngIf=\"data\" style=\"display: none;\">\n  <div *ngFor=\"let d of data\" id=\"template__{{d.id}}\" class=\"bubble-chart__tippy-template\">\n    <div id=\"bubble-popup-menu\" class=\"aw-bubble-popup-menu\">\n      <h2 class=\"aw-bubble-popup-menu__title\">{{ d.title }}</h2>\n      <p class=\"aw-bubble-popup-menu__text\">\n        {{ d.text }}\n      </p>\n\n      <div *ngIf=\"d.relation.value\" class=\"aw-bubble-popup-menu__relation\">\n        <p class=\"aw-bubble-popup-menu__relation-description\">Relazione con \n          <span class=\"aw-bubble-popup-menu__relation-key\">{{d.relation.key}}</span>: \n          <span class=\"aw-bubble-popup-menu__relation-label\"> {{d.relation.value}}</span>\n        </p>\n      </div>\n\n      <div class=\"aw-bubble-popup-menu__actions\">\n        <n7-anchor-wrapper [classes]=\"'aw-bubble-popup-menu__link'\" [data]=\"d.anchorData\">\n          Vai alla scheda\n        </n7-anchor-wrapper>\n        <span *ngIf=\"d.selectable\" class=\"aw-bubble-popup-menu__link\" (click)=\"onClick('select', {id: d.id})\">\n          {{ d.isSelected ? 'Deseleziona' : 'Seleziona'}}\n        </span>\n      </div>\n    </div>\n  </div>\n</div>"
-            }] }
-];
-ChartTippyComponent.propDecorators = {
-    data: [{ type: Input }],
-    emit: [{ type: Input }],
-    anchorData: [{ type: Input }]
-};
-if (false) {
-    /** @type {?} */
-    ChartTippyComponent.prototype.data;
-    /** @type {?} */
-    ChartTippyComponent.prototype.emit;
-    /** @type {?} */
-    ChartTippyComponent.prototype.anchorData;
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class BubbleChartWrapperComponent {
-    /**
-     * @param {?} type
-     * @param {?} payload
-     * @return {?}
-     */
-    onClick(type, payload) {
-        this.emit(type, payload);
-    }
-}
-BubbleChartWrapperComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'aw-bubble-chart-wrapper',
-                template: "<div class=\"aw-bubble-chart-wrapper\">\n    <ng-content></ng-content>\n</div>"
-            }] }
-];
-BubbleChartWrapperComponent.propDecorators = {
-    emit: [{ type: Input }],
-    container: [{ type: Input }],
-    buttons: [{ type: Input }]
-};
-if (false) {
-    /** @type {?} */
-    BubbleChartWrapperComponent.prototype.emit;
-    /** @type {?} */
-    BubbleChartWrapperComponent.prototype.container;
-    /** @type {?} */
-    BubbleChartWrapperComponent.prototype.buttons;
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * Interface for a single BreadcrumbsComponent's "Item"
- *
- * \@property label (required)
- * \@property payload (required)
- * \@property classes (optional)
- * \@property _meta (optional)
- *
- * @record
- */
-function SmartBreadcrumbsItem() { }
-if (false) {
-    /**
-     * item's label
-     * @type {?}
-     */
-    SmartBreadcrumbsItem.prototype.label;
-    /**
-     * action click's payload
-     * @type {?}
-     */
-    SmartBreadcrumbsItem.prototype.payload;
-    /**
-     * additional html classes
-     * @type {?|undefined}
-     */
-    SmartBreadcrumbsItem.prototype.classes;
-    /**
-     * additional info useful for the component's logic
-     * @type {?|undefined}
-     */
-    SmartBreadcrumbsItem.prototype._meta;
-}
-/**
- * Interface for BreadcrumbsComponent's "Data"
- *
- * \@property items (required)
- * \@property classes (optional)
- *
- * @record
- */
-function SmartBreadcrumbsData() { }
-if (false) {
-    /**
-     * each item renders a breadcrumb level
-     * @type {?}
-     */
-    SmartBreadcrumbsData.prototype.items;
-    /**
-     * additional html classes
-     * @type {?|undefined}
-     */
-    SmartBreadcrumbsData.prototype.classes;
-}
-class SmartBreadcrumbsComponent {
-    constructor() {
-        /**
-         * Builds tippy data for a node.
-         */
-        this.tippyBuilder = (/**
-         * @param {?} node
-         * @param {?} content
-         * @return {?}
-         */
-        (node, content) => tippy(node, {
-            content,
-            interactive: true,
-            arrow: true,
-            theme: 'light-border no-padding',
-            appendTo: document.body,
-        }));
-        this.getWidths = (/**
-         * @param {?} parent
-         * @param {?} child
-         * @return {?}
-         */
-        (parent, child) => {
-            /** @type {?} */
-            const pw = parent.nativeElement.clientWidth;
-            /** @type {?} */
-            const cw = child.nativeElement.clientWidth;
-            /** @type {?} */
-            const pp = this.getSidePadding(parent.nativeElement);
-            return { parentWidth: pw - pp, childWidth: cw };
-        });
-        this.getSidePadding = (/**
-         * @param {?} node
-         * @return {?}
-         */
-        (node) => (
-        // returns an integer representing the sum of left and right paddings
-        (+window.getComputedStyle(node, null).getPropertyValue('padding-left').match(/\d+/)[0])
-            + (+window.getComputedStyle(node, null).getPropertyValue('padding-right').match(/\d+/)[0])));
-    }
-    /**
-     * @return {?}
-     */
-    ngAfterViewInit() {
-        if (this.bcdiv && this.bcol) {
-            let { parentWidth, childWidth } = this.getWidths(this.bcdiv, this.bcol);
-            /** @type {?} */
-            const liArray = this.bcol.nativeElement.children;
-            if (parentWidth === childWidth) { // collapse condition
-                // collapse condition
-                /** @type {?} */
-                let i = 1;
-                while (parentWidth === childWidth && i < liArray.length - 1) { // Skip last element
-                    // Skip last element
-                    /** @type {?} */
-                    const tippyData = document.createElement('ol');
-                    tippyData.className = 'n7-smart-breadcrumbs__tippy-content';
-                    tippyData.appendChild(liArray[i].cloneNode(true)); // add <li> to tippy data (<ol>)
-                    liArray[i].children[0].innerText = '…'; // convert to ellipsis
-                    liArray[i].className = 'n7-breadcrumbs__item-ellipsis'; // set class to list item
-                    this.tippyBuilder(liArray[i], tippyData); // append tooltip to ellipsis
-                    i += 1;
-                    // update widths
-                    ({ parentWidth, childWidth } = this.getWidths(this.bcdiv, this.bcol));
-                }
-            }
-        }
-    }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
-    onClick(payload) {
-        if (!this.emit)
-            return;
-        this.emit('click', payload);
-    }
-}
-SmartBreadcrumbsComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'n7-smart-breadcrumbs',
-                template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\n    <nav class=\"n7-breadcrumbs__nav\">\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\n                <n7-anchor-wrapper [classes]=\"item.classes\"\n                [data]=\"item.anchor\"\n                (clicked)=\"onClick($event)\">\n                    {{ item.label }}\n                </n7-anchor-wrapper>\n            </li>\n        </ol>\n    </nav>\n</div>"
-            }] }
-];
-SmartBreadcrumbsComponent.propDecorators = {
-    data: [{ type: Input }],
-    emit: [{ type: Input }],
-    bcol: [{ type: ViewChild, args: ['bcol', { read: ElementRef, static: false },] }],
-    bcdiv: [{ type: ViewChild, args: ['bcdiv', { read: ElementRef, static: false },] }]
-};
-if (false) {
-    /** @type {?} */
-    SmartBreadcrumbsComponent.prototype.data;
-    /** @type {?} */
-    SmartBreadcrumbsComponent.prototype.emit;
-    /** @type {?} */
-    SmartBreadcrumbsComponent.prototype.bcol;
-    /** @type {?} */
-    SmartBreadcrumbsComponent.prototype.bcdiv;
-    /**
-     * Builds tippy data for a node.
-     * @type {?}
-     */
-    SmartBreadcrumbsComponent.prototype.tippyBuilder;
-    /** @type {?} */
-    SmartBreadcrumbsComponent.prototype.getWidths;
-    /** @type {?} */
-    SmartBreadcrumbsComponent.prototype.getSidePadding;
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 var facetsConfig$1 = {
     totalCount: 0,
     facets: [
@@ -11422,6 +11186,237 @@ if (false) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+class ChartTippyComponent {
+    /**
+     * @param {?} type
+     * @param {?} payload
+     * @return {?}
+     */
+    onClick(type, payload) {
+        this.emit(type, payload);
+    }
+}
+ChartTippyComponent.decorators = [
+    { type: Component, args: [{
+                selector: 'aw-chart-tippy',
+                template: "<div *ngIf=\"data\" style=\"display: none;\">\n  <div *ngFor=\"let d of data\" id=\"template__{{d.id}}\" class=\"bubble-chart__tippy-template\">\n    <div id=\"bubble-popup-menu\" class=\"aw-bubble-popup-menu\">\n      <h2 class=\"aw-bubble-popup-menu__title\">{{ d.title }}</h2>\n      <p class=\"aw-bubble-popup-menu__text\">\n        {{ d.text }}\n      </p>\n\n      <div *ngIf=\"d.relation.value\" class=\"aw-bubble-popup-menu__relation\">\n        <p class=\"aw-bubble-popup-menu__relation-description\">Relazione con \n          <span class=\"aw-bubble-popup-menu__relation-key\">{{d.relation.key}}</span>: \n          <span class=\"aw-bubble-popup-menu__relation-label\"> {{d.relation.value}}</span>\n        </p>\n      </div>\n\n      <div class=\"aw-bubble-popup-menu__actions\">\n        <n7-anchor-wrapper [classes]=\"'aw-bubble-popup-menu__link'\" [data]=\"d.anchorData\">\n          Vai alla scheda\n        </n7-anchor-wrapper>\n        <span *ngIf=\"d.selectable\" class=\"aw-bubble-popup-menu__link\" (click)=\"onClick('select', {id: d.id})\">\n          {{ d.isSelected ? 'Deseleziona' : 'Seleziona'}}\n        </span>\n      </div>\n    </div>\n  </div>\n</div>"
+            }] }
+];
+ChartTippyComponent.propDecorators = {
+    data: [{ type: Input }],
+    emit: [{ type: Input }],
+    anchorData: [{ type: Input }]
+};
+if (false) {
+    /** @type {?} */
+    ChartTippyComponent.prototype.data;
+    /** @type {?} */
+    ChartTippyComponent.prototype.emit;
+    /** @type {?} */
+    ChartTippyComponent.prototype.anchorData;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class BubbleChartWrapperComponent {
+    /**
+     * @param {?} type
+     * @param {?} payload
+     * @return {?}
+     */
+    onClick(type, payload) {
+        this.emit(type, payload);
+    }
+}
+BubbleChartWrapperComponent.decorators = [
+    { type: Component, args: [{
+                selector: 'aw-bubble-chart-wrapper',
+                template: "<div class=\"aw-bubble-chart-wrapper\">\n    <ng-content></ng-content>\n</div>"
+            }] }
+];
+BubbleChartWrapperComponent.propDecorators = {
+    emit: [{ type: Input }],
+    container: [{ type: Input }],
+    buttons: [{ type: Input }]
+};
+if (false) {
+    /** @type {?} */
+    BubbleChartWrapperComponent.prototype.emit;
+    /** @type {?} */
+    BubbleChartWrapperComponent.prototype.container;
+    /** @type {?} */
+    BubbleChartWrapperComponent.prototype.buttons;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/**
+ * Interface for a single BreadcrumbsComponent's "Item"
+ *
+ * \@property label (required)
+ * \@property payload (required)
+ * \@property classes (optional)
+ * \@property _meta (optional)
+ *
+ * @record
+ */
+function SmartBreadcrumbsItem() { }
+if (false) {
+    /**
+     * item's label
+     * @type {?}
+     */
+    SmartBreadcrumbsItem.prototype.label;
+    /**
+     * action click's payload
+     * @type {?}
+     */
+    SmartBreadcrumbsItem.prototype.payload;
+    /**
+     * additional html classes
+     * @type {?|undefined}
+     */
+    SmartBreadcrumbsItem.prototype.classes;
+    /**
+     * additional info useful for the component's logic
+     * @type {?|undefined}
+     */
+    SmartBreadcrumbsItem.prototype._meta;
+}
+/**
+ * Interface for BreadcrumbsComponent's "Data"
+ *
+ * \@property items (required)
+ * \@property classes (optional)
+ *
+ * @record
+ */
+function SmartBreadcrumbsData() { }
+if (false) {
+    /**
+     * each item renders a breadcrumb level
+     * @type {?}
+     */
+    SmartBreadcrumbsData.prototype.items;
+    /**
+     * additional html classes
+     * @type {?|undefined}
+     */
+    SmartBreadcrumbsData.prototype.classes;
+}
+class SmartBreadcrumbsComponent {
+    constructor() {
+        /**
+         * Builds tippy data for a node.
+         */
+        this.tippyBuilder = (/**
+         * @param {?} node
+         * @param {?} content
+         * @return {?}
+         */
+        (node, content) => tippy(node, {
+            content,
+            interactive: true,
+            arrow: true,
+            theme: 'light-border no-padding',
+            appendTo: document.body,
+        }));
+        this.getWidths = (/**
+         * @param {?} parent
+         * @param {?} child
+         * @return {?}
+         */
+        (parent, child) => {
+            /** @type {?} */
+            const pw = parent.nativeElement.clientWidth;
+            /** @type {?} */
+            const cw = child.nativeElement.clientWidth;
+            /** @type {?} */
+            const pp = this.getSidePadding(parent.nativeElement);
+            return { parentWidth: pw - pp, childWidth: cw };
+        });
+        this.getSidePadding = (/**
+         * @param {?} node
+         * @return {?}
+         */
+        (node) => (
+        // returns an integer representing the sum of left and right paddings
+        (+window.getComputedStyle(node, null).getPropertyValue('padding-left').match(/\d+/)[0])
+            + (+window.getComputedStyle(node, null).getPropertyValue('padding-right').match(/\d+/)[0])));
+    }
+    /**
+     * @return {?}
+     */
+    ngAfterViewInit() {
+        if (this.bcdiv && this.bcol) {
+            let { parentWidth, childWidth } = this.getWidths(this.bcdiv, this.bcol);
+            /** @type {?} */
+            const liArray = this.bcol.nativeElement.children;
+            if (parentWidth === childWidth) { // collapse condition
+                // collapse condition
+                /** @type {?} */
+                let i = 1;
+                while (parentWidth === childWidth && i < liArray.length - 1) { // Skip last element
+                    // Skip last element
+                    /** @type {?} */
+                    const tippyData = document.createElement('ol');
+                    tippyData.className = 'n7-smart-breadcrumbs__tippy-content';
+                    tippyData.appendChild(liArray[i].cloneNode(true)); // add <li> to tippy data (<ol>)
+                    liArray[i].children[0].innerText = '…'; // convert to ellipsis
+                    liArray[i].className = 'n7-breadcrumbs__item-ellipsis'; // set class to list item
+                    this.tippyBuilder(liArray[i], tippyData); // append tooltip to ellipsis
+                    i += 1;
+                    // update widths
+                    ({ parentWidth, childWidth } = this.getWidths(this.bcdiv, this.bcol));
+                }
+            }
+        }
+    }
+    /**
+     * @param {?} payload
+     * @return {?}
+     */
+    onClick(payload) {
+        if (!this.emit)
+            return;
+        this.emit('click', payload);
+    }
+}
+SmartBreadcrumbsComponent.decorators = [
+    { type: Component, args: [{
+                selector: 'n7-smart-breadcrumbs',
+                template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\n    <nav class=\"n7-breadcrumbs__nav\">\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\n                <n7-anchor-wrapper [classes]=\"item.classes\"\n                [data]=\"item.anchor\"\n                (clicked)=\"onClick($event)\">\n                    {{ item.label }}\n                </n7-anchor-wrapper>\n            </li>\n        </ol>\n    </nav>\n</div>"
+            }] }
+];
+SmartBreadcrumbsComponent.propDecorators = {
+    data: [{ type: Input }],
+    emit: [{ type: Input }],
+    bcol: [{ type: ViewChild, args: ['bcol', { read: ElementRef, static: false },] }],
+    bcdiv: [{ type: ViewChild, args: ['bcdiv', { read: ElementRef, static: false },] }]
+};
+if (false) {
+    /** @type {?} */
+    SmartBreadcrumbsComponent.prototype.data;
+    /** @type {?} */
+    SmartBreadcrumbsComponent.prototype.emit;
+    /** @type {?} */
+    SmartBreadcrumbsComponent.prototype.bcol;
+    /** @type {?} */
+    SmartBreadcrumbsComponent.prototype.bcdiv;
+    /**
+     * Builds tippy data for a node.
+     * @type {?}
+     */
+    SmartBreadcrumbsComponent.prototype.tippyBuilder;
+    /** @type {?} */
+    SmartBreadcrumbsComponent.prototype.getWidths;
+    /** @type {?} */
+    SmartBreadcrumbsComponent.prototype.getSidePadding;
+}
 
 /**
  * @fileoverview added by tsickle
@@ -13652,5 +13647,10 @@ N7BoilerplateLibModule.decorators = [
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrInnerTitleDS, MrItemPreviewsDS, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrStaticLayoutComponent as ɵba, MrSearchFacetsLayoutComponent as ɵbb, MrSearchTestLayoutComponent as ɵbc, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, AwGalleryLayoutComponent as ɵq, BubbleChartWrapperComponent as ɵr, ChartTippyComponent as ɵs, SmartBreadcrumbsComponent as ɵt, DataWidgetWrapperComponent as ɵu, DatepickerWrapperComponent as ɵv, DvExampleLayoutComponent as ɵw, MrHomeLayoutComponent as ɵx, MrSearchLayoutComponent as ɵy, MrGlossaryLayoutComponent as ɵz };
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+
+export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrInnerTitleDS, MrItemPreviewsDS, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, DatepickerWrapperComponent as ɵba, DvExampleLayoutComponent as ɵbb, MrHomeLayoutComponent as ɵbc, MrSearchLayoutComponent as ɵbd, MrGlossaryLayoutComponent as ɵbe, MrStaticLayoutComponent as ɵbf, MrSearchFacetsLayoutComponent as ɵbg, MrSearchTestLayoutComponent as ɵbh, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, AwGalleryLayoutComponent as ɵq, ConfigurationService as ɵr, LayoutsConfigurationService as ɵs, MainStateService as ɵt, CommunicationService as ɵu, SearchService as ɵv, BubbleChartWrapperComponent as ɵw, ChartTippyComponent as ɵx, SmartBreadcrumbsComponent as ɵy, DataWidgetWrapperComponent as ɵz };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

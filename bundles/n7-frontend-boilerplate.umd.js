@@ -11454,268 +11454,6 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
-    var ChartTippyComponent = /** @class */ (function () {
-        function ChartTippyComponent() {
-        }
-        /**
-         * @param {?} type
-         * @param {?} payload
-         * @return {?}
-         */
-        ChartTippyComponent.prototype.onClick = /**
-         * @param {?} type
-         * @param {?} payload
-         * @return {?}
-         */
-        function (type, payload) {
-            this.emit(type, payload);
-        };
-        ChartTippyComponent.decorators = [
-            { type: core.Component, args: [{
-                        selector: 'aw-chart-tippy',
-                        template: "<div *ngIf=\"data\" style=\"display: none;\">\n  <div *ngFor=\"let d of data\" id=\"template__{{d.id}}\" class=\"bubble-chart__tippy-template\">\n    <div id=\"bubble-popup-menu\" class=\"aw-bubble-popup-menu\">\n      <h2 class=\"aw-bubble-popup-menu__title\">{{ d.title }}</h2>\n      <p class=\"aw-bubble-popup-menu__text\">\n        {{ d.text }}\n      </p>\n\n      <div *ngIf=\"d.relation.value\" class=\"aw-bubble-popup-menu__relation\">\n        <p class=\"aw-bubble-popup-menu__relation-description\">Relazione con \n          <span class=\"aw-bubble-popup-menu__relation-key\">{{d.relation.key}}</span>: \n          <span class=\"aw-bubble-popup-menu__relation-label\"> {{d.relation.value}}</span>\n        </p>\n      </div>\n\n      <div class=\"aw-bubble-popup-menu__actions\">\n        <n7-anchor-wrapper [classes]=\"'aw-bubble-popup-menu__link'\" [data]=\"d.anchorData\">\n          Vai alla scheda\n        </n7-anchor-wrapper>\n        <span *ngIf=\"d.selectable\" class=\"aw-bubble-popup-menu__link\" (click)=\"onClick('select', {id: d.id})\">\n          {{ d.isSelected ? 'Deseleziona' : 'Seleziona'}}\n        </span>\n      </div>\n    </div>\n  </div>\n</div>"
-                    }] }
-        ];
-        ChartTippyComponent.propDecorators = {
-            data: [{ type: core.Input }],
-            emit: [{ type: core.Input }],
-            anchorData: [{ type: core.Input }]
-        };
-        return ChartTippyComponent;
-    }());
-    if (false) {
-        /** @type {?} */
-        ChartTippyComponent.prototype.data;
-        /** @type {?} */
-        ChartTippyComponent.prototype.emit;
-        /** @type {?} */
-        ChartTippyComponent.prototype.anchorData;
-    }
-
-    /**
-     * @fileoverview added by tsickle
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-    var BubbleChartWrapperComponent = /** @class */ (function () {
-        function BubbleChartWrapperComponent() {
-        }
-        /**
-         * @param {?} type
-         * @param {?} payload
-         * @return {?}
-         */
-        BubbleChartWrapperComponent.prototype.onClick = /**
-         * @param {?} type
-         * @param {?} payload
-         * @return {?}
-         */
-        function (type, payload) {
-            this.emit(type, payload);
-        };
-        BubbleChartWrapperComponent.decorators = [
-            { type: core.Component, args: [{
-                        selector: 'aw-bubble-chart-wrapper',
-                        template: "<div class=\"aw-bubble-chart-wrapper\">\n    <ng-content></ng-content>\n</div>"
-                    }] }
-        ];
-        BubbleChartWrapperComponent.propDecorators = {
-            emit: [{ type: core.Input }],
-            container: [{ type: core.Input }],
-            buttons: [{ type: core.Input }]
-        };
-        return BubbleChartWrapperComponent;
-    }());
-    if (false) {
-        /** @type {?} */
-        BubbleChartWrapperComponent.prototype.emit;
-        /** @type {?} */
-        BubbleChartWrapperComponent.prototype.container;
-        /** @type {?} */
-        BubbleChartWrapperComponent.prototype.buttons;
-    }
-
-    /**
-     * @fileoverview added by tsickle
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-    /**
-     * Interface for a single BreadcrumbsComponent's "Item"
-     *
-     * \@property label (required)
-     * \@property payload (required)
-     * \@property classes (optional)
-     * \@property _meta (optional)
-     *
-     * @record
-     */
-    function SmartBreadcrumbsItem() { }
-    if (false) {
-        /**
-         * item's label
-         * @type {?}
-         */
-        SmartBreadcrumbsItem.prototype.label;
-        /**
-         * action click's payload
-         * @type {?}
-         */
-        SmartBreadcrumbsItem.prototype.payload;
-        /**
-         * additional html classes
-         * @type {?|undefined}
-         */
-        SmartBreadcrumbsItem.prototype.classes;
-        /**
-         * additional info useful for the component's logic
-         * @type {?|undefined}
-         */
-        SmartBreadcrumbsItem.prototype._meta;
-    }
-    /**
-     * Interface for BreadcrumbsComponent's "Data"
-     *
-     * \@property items (required)
-     * \@property classes (optional)
-     *
-     * @record
-     */
-    function SmartBreadcrumbsData() { }
-    if (false) {
-        /**
-         * each item renders a breadcrumb level
-         * @type {?}
-         */
-        SmartBreadcrumbsData.prototype.items;
-        /**
-         * additional html classes
-         * @type {?|undefined}
-         */
-        SmartBreadcrumbsData.prototype.classes;
-    }
-    var SmartBreadcrumbsComponent = /** @class */ (function () {
-        function SmartBreadcrumbsComponent() {
-            var _this = this;
-            /**
-             * Builds tippy data for a node.
-             */
-            this.tippyBuilder = (/**
-             * @param {?} node
-             * @param {?} content
-             * @return {?}
-             */
-            function (node, content) { return tippy__default(node, {
-                content: content,
-                interactive: true,
-                arrow: true,
-                theme: 'light-border no-padding',
-                appendTo: document.body,
-            }); });
-            this.getWidths = (/**
-             * @param {?} parent
-             * @param {?} child
-             * @return {?}
-             */
-            function (parent, child) {
-                /** @type {?} */
-                var pw = parent.nativeElement.clientWidth;
-                /** @type {?} */
-                var cw = child.nativeElement.clientWidth;
-                /** @type {?} */
-                var pp = _this.getSidePadding(parent.nativeElement);
-                return { parentWidth: pw - pp, childWidth: cw };
-            });
-            this.getSidePadding = (/**
-             * @param {?} node
-             * @return {?}
-             */
-            function (node) { return (
-            // returns an integer representing the sum of left and right paddings
-            (+window.getComputedStyle(node, null).getPropertyValue('padding-left').match(/\d+/)[0])
-                + (+window.getComputedStyle(node, null).getPropertyValue('padding-right').match(/\d+/)[0])); });
-        }
-        /**
-         * @return {?}
-         */
-        SmartBreadcrumbsComponent.prototype.ngAfterViewInit = /**
-         * @return {?}
-         */
-        function () {
-            var _a;
-            if (this.bcdiv && this.bcol) {
-                var _b = this.getWidths(this.bcdiv, this.bcol), parentWidth = _b.parentWidth, childWidth = _b.childWidth;
-                /** @type {?} */
-                var liArray = this.bcol.nativeElement.children;
-                if (parentWidth === childWidth) { // collapse condition
-                    // collapse condition
-                    /** @type {?} */
-                    var i = 1;
-                    while (parentWidth === childWidth && i < liArray.length - 1) { // Skip last element
-                        // Skip last element
-                        /** @type {?} */
-                        var tippyData = document.createElement('ol');
-                        tippyData.className = 'n7-smart-breadcrumbs__tippy-content';
-                        tippyData.appendChild(liArray[i].cloneNode(true)); // add <li> to tippy data (<ol>)
-                        liArray[i].children[0].innerText = '…'; // convert to ellipsis
-                        liArray[i].className = 'n7-breadcrumbs__item-ellipsis'; // set class to list item
-                        this.tippyBuilder(liArray[i], tippyData); // append tooltip to ellipsis
-                        i += 1;
-                        // update widths
-                        (_a = this.getWidths(this.bcdiv, this.bcol), parentWidth = _a.parentWidth, childWidth = _a.childWidth);
-                    }
-                }
-            }
-        };
-        /**
-         * @param {?} payload
-         * @return {?}
-         */
-        SmartBreadcrumbsComponent.prototype.onClick = /**
-         * @param {?} payload
-         * @return {?}
-         */
-        function (payload) {
-            if (!this.emit)
-                return;
-            this.emit('click', payload);
-        };
-        SmartBreadcrumbsComponent.decorators = [
-            { type: core.Component, args: [{
-                        selector: 'n7-smart-breadcrumbs',
-                        template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\n    <nav class=\"n7-breadcrumbs__nav\">\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\n                <n7-anchor-wrapper [classes]=\"item.classes\"\n                [data]=\"item.anchor\"\n                (clicked)=\"onClick($event)\">\n                    {{ item.label }}\n                </n7-anchor-wrapper>\n            </li>\n        </ol>\n    </nav>\n</div>"
-                    }] }
-        ];
-        SmartBreadcrumbsComponent.propDecorators = {
-            data: [{ type: core.Input }],
-            emit: [{ type: core.Input }],
-            bcol: [{ type: core.ViewChild, args: ['bcol', { read: core.ElementRef, static: false },] }],
-            bcdiv: [{ type: core.ViewChild, args: ['bcdiv', { read: core.ElementRef, static: false },] }]
-        };
-        return SmartBreadcrumbsComponent;
-    }());
-    if (false) {
-        /** @type {?} */
-        SmartBreadcrumbsComponent.prototype.data;
-        /** @type {?} */
-        SmartBreadcrumbsComponent.prototype.emit;
-        /** @type {?} */
-        SmartBreadcrumbsComponent.prototype.bcol;
-        /** @type {?} */
-        SmartBreadcrumbsComponent.prototype.bcdiv;
-        /**
-         * Builds tippy data for a node.
-         * @type {?}
-         */
-        SmartBreadcrumbsComponent.prototype.tippyBuilder;
-        /** @type {?} */
-        SmartBreadcrumbsComponent.prototype.getWidths;
-        /** @type {?} */
-        SmartBreadcrumbsComponent.prototype.getSidePadding;
-    }
-
-    /**
-     * @fileoverview added by tsickle
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
     var facetsConfig$1 = {
         totalCount: 0,
         facets: [
@@ -12587,6 +12325,263 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
+    var ChartTippyComponent = /** @class */ (function () {
+        function ChartTippyComponent() {
+        }
+        /**
+         * @param {?} type
+         * @param {?} payload
+         * @return {?}
+         */
+        ChartTippyComponent.prototype.onClick = /**
+         * @param {?} type
+         * @param {?} payload
+         * @return {?}
+         */
+        function (type, payload) {
+            this.emit(type, payload);
+        };
+        ChartTippyComponent.decorators = [
+            { type: core.Component, args: [{
+                        selector: 'aw-chart-tippy',
+                        template: "<div *ngIf=\"data\" style=\"display: none;\">\n  <div *ngFor=\"let d of data\" id=\"template__{{d.id}}\" class=\"bubble-chart__tippy-template\">\n    <div id=\"bubble-popup-menu\" class=\"aw-bubble-popup-menu\">\n      <h2 class=\"aw-bubble-popup-menu__title\">{{ d.title }}</h2>\n      <p class=\"aw-bubble-popup-menu__text\">\n        {{ d.text }}\n      </p>\n\n      <div *ngIf=\"d.relation.value\" class=\"aw-bubble-popup-menu__relation\">\n        <p class=\"aw-bubble-popup-menu__relation-description\">Relazione con \n          <span class=\"aw-bubble-popup-menu__relation-key\">{{d.relation.key}}</span>: \n          <span class=\"aw-bubble-popup-menu__relation-label\"> {{d.relation.value}}</span>\n        </p>\n      </div>\n\n      <div class=\"aw-bubble-popup-menu__actions\">\n        <n7-anchor-wrapper [classes]=\"'aw-bubble-popup-menu__link'\" [data]=\"d.anchorData\">\n          Vai alla scheda\n        </n7-anchor-wrapper>\n        <span *ngIf=\"d.selectable\" class=\"aw-bubble-popup-menu__link\" (click)=\"onClick('select', {id: d.id})\">\n          {{ d.isSelected ? 'Deseleziona' : 'Seleziona'}}\n        </span>\n      </div>\n    </div>\n  </div>\n</div>"
+                    }] }
+        ];
+        ChartTippyComponent.propDecorators = {
+            data: [{ type: core.Input }],
+            emit: [{ type: core.Input }],
+            anchorData: [{ type: core.Input }]
+        };
+        return ChartTippyComponent;
+    }());
+    if (false) {
+        /** @type {?} */
+        ChartTippyComponent.prototype.data;
+        /** @type {?} */
+        ChartTippyComponent.prototype.emit;
+        /** @type {?} */
+        ChartTippyComponent.prototype.anchorData;
+    }
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var BubbleChartWrapperComponent = /** @class */ (function () {
+        function BubbleChartWrapperComponent() {
+        }
+        /**
+         * @param {?} type
+         * @param {?} payload
+         * @return {?}
+         */
+        BubbleChartWrapperComponent.prototype.onClick = /**
+         * @param {?} type
+         * @param {?} payload
+         * @return {?}
+         */
+        function (type, payload) {
+            this.emit(type, payload);
+        };
+        BubbleChartWrapperComponent.decorators = [
+            { type: core.Component, args: [{
+                        selector: 'aw-bubble-chart-wrapper',
+                        template: "<div class=\"aw-bubble-chart-wrapper\">\n    <ng-content></ng-content>\n</div>"
+                    }] }
+        ];
+        BubbleChartWrapperComponent.propDecorators = {
+            emit: [{ type: core.Input }],
+            container: [{ type: core.Input }],
+            buttons: [{ type: core.Input }]
+        };
+        return BubbleChartWrapperComponent;
+    }());
+    if (false) {
+        /** @type {?} */
+        BubbleChartWrapperComponent.prototype.emit;
+        /** @type {?} */
+        BubbleChartWrapperComponent.prototype.container;
+        /** @type {?} */
+        BubbleChartWrapperComponent.prototype.buttons;
+    }
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    /**
+     * Interface for a single BreadcrumbsComponent's "Item"
+     *
+     * \@property label (required)
+     * \@property payload (required)
+     * \@property classes (optional)
+     * \@property _meta (optional)
+     *
+     * @record
+     */
+    function SmartBreadcrumbsItem() { }
+    if (false) {
+        /**
+         * item's label
+         * @type {?}
+         */
+        SmartBreadcrumbsItem.prototype.label;
+        /**
+         * action click's payload
+         * @type {?}
+         */
+        SmartBreadcrumbsItem.prototype.payload;
+        /**
+         * additional html classes
+         * @type {?|undefined}
+         */
+        SmartBreadcrumbsItem.prototype.classes;
+        /**
+         * additional info useful for the component's logic
+         * @type {?|undefined}
+         */
+        SmartBreadcrumbsItem.prototype._meta;
+    }
+    /**
+     * Interface for BreadcrumbsComponent's "Data"
+     *
+     * \@property items (required)
+     * \@property classes (optional)
+     *
+     * @record
+     */
+    function SmartBreadcrumbsData() { }
+    if (false) {
+        /**
+         * each item renders a breadcrumb level
+         * @type {?}
+         */
+        SmartBreadcrumbsData.prototype.items;
+        /**
+         * additional html classes
+         * @type {?|undefined}
+         */
+        SmartBreadcrumbsData.prototype.classes;
+    }
+    var SmartBreadcrumbsComponent = /** @class */ (function () {
+        function SmartBreadcrumbsComponent() {
+            var _this = this;
+            /**
+             * Builds tippy data for a node.
+             */
+            this.tippyBuilder = (/**
+             * @param {?} node
+             * @param {?} content
+             * @return {?}
+             */
+            function (node, content) { return tippy__default(node, {
+                content: content,
+                interactive: true,
+                arrow: true,
+                theme: 'light-border no-padding',
+                appendTo: document.body,
+            }); });
+            this.getWidths = (/**
+             * @param {?} parent
+             * @param {?} child
+             * @return {?}
+             */
+            function (parent, child) {
+                /** @type {?} */
+                var pw = parent.nativeElement.clientWidth;
+                /** @type {?} */
+                var cw = child.nativeElement.clientWidth;
+                /** @type {?} */
+                var pp = _this.getSidePadding(parent.nativeElement);
+                return { parentWidth: pw - pp, childWidth: cw };
+            });
+            this.getSidePadding = (/**
+             * @param {?} node
+             * @return {?}
+             */
+            function (node) { return (
+            // returns an integer representing the sum of left and right paddings
+            (+window.getComputedStyle(node, null).getPropertyValue('padding-left').match(/\d+/)[0])
+                + (+window.getComputedStyle(node, null).getPropertyValue('padding-right').match(/\d+/)[0])); });
+        }
+        /**
+         * @return {?}
+         */
+        SmartBreadcrumbsComponent.prototype.ngAfterViewInit = /**
+         * @return {?}
+         */
+        function () {
+            var _a;
+            if (this.bcdiv && this.bcol) {
+                var _b = this.getWidths(this.bcdiv, this.bcol), parentWidth = _b.parentWidth, childWidth = _b.childWidth;
+                /** @type {?} */
+                var liArray = this.bcol.nativeElement.children;
+                if (parentWidth === childWidth) { // collapse condition
+                    // collapse condition
+                    /** @type {?} */
+                    var i = 1;
+                    while (parentWidth === childWidth && i < liArray.length - 1) { // Skip last element
+                        // Skip last element
+                        /** @type {?} */
+                        var tippyData = document.createElement('ol');
+                        tippyData.className = 'n7-smart-breadcrumbs__tippy-content';
+                        tippyData.appendChild(liArray[i].cloneNode(true)); // add <li> to tippy data (<ol>)
+                        liArray[i].children[0].innerText = '…'; // convert to ellipsis
+                        liArray[i].className = 'n7-breadcrumbs__item-ellipsis'; // set class to list item
+                        this.tippyBuilder(liArray[i], tippyData); // append tooltip to ellipsis
+                        i += 1;
+                        // update widths
+                        (_a = this.getWidths(this.bcdiv, this.bcol), parentWidth = _a.parentWidth, childWidth = _a.childWidth);
+                    }
+                }
+            }
+        };
+        /**
+         * @param {?} payload
+         * @return {?}
+         */
+        SmartBreadcrumbsComponent.prototype.onClick = /**
+         * @param {?} payload
+         * @return {?}
+         */
+        function (payload) {
+            if (!this.emit)
+                return;
+            this.emit('click', payload);
+        };
+        SmartBreadcrumbsComponent.decorators = [
+            { type: core.Component, args: [{
+                        selector: 'n7-smart-breadcrumbs',
+                        template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\n    <nav class=\"n7-breadcrumbs__nav\">\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\n                <n7-anchor-wrapper [classes]=\"item.classes\"\n                [data]=\"item.anchor\"\n                (clicked)=\"onClick($event)\">\n                    {{ item.label }}\n                </n7-anchor-wrapper>\n            </li>\n        </ol>\n    </nav>\n</div>"
+                    }] }
+        ];
+        SmartBreadcrumbsComponent.propDecorators = {
+            data: [{ type: core.Input }],
+            emit: [{ type: core.Input }],
+            bcol: [{ type: core.ViewChild, args: ['bcol', { read: core.ElementRef, static: false },] }],
+            bcdiv: [{ type: core.ViewChild, args: ['bcdiv', { read: core.ElementRef, static: false },] }]
+        };
+        return SmartBreadcrumbsComponent;
+    }());
+    if (false) {
+        /** @type {?} */
+        SmartBreadcrumbsComponent.prototype.data;
+        /** @type {?} */
+        SmartBreadcrumbsComponent.prototype.emit;
+        /** @type {?} */
+        SmartBreadcrumbsComponent.prototype.bcol;
+        /** @type {?} */
+        SmartBreadcrumbsComponent.prototype.bcdiv;
+        /**
+         * Builds tippy data for a node.
+         * @type {?}
+         */
+        SmartBreadcrumbsComponent.prototype.tippyBuilder;
+        /** @type {?} */
+        SmartBreadcrumbsComponent.prototype.getWidths;
+        /** @type {?} */
+        SmartBreadcrumbsComponent.prototype.getSidePadding;
+    }
 
     /**
      * @fileoverview added by tsickle
@@ -15378,9 +15373,14 @@
     exports.SubnavEH = SubnavEH;
     exports.ɵa = MainLayoutComponent;
     exports.ɵb = AbstractLayout;
-    exports.ɵba = MrStaticLayoutComponent;
-    exports.ɵbb = MrSearchFacetsLayoutComponent;
-    exports.ɵbc = MrSearchTestLayoutComponent;
+    exports.ɵba = DatepickerWrapperComponent;
+    exports.ɵbb = DvExampleLayoutComponent;
+    exports.ɵbc = MrHomeLayoutComponent;
+    exports.ɵbd = MrSearchLayoutComponent;
+    exports.ɵbe = MrGlossaryLayoutComponent;
+    exports.ɵbf = MrStaticLayoutComponent;
+    exports.ɵbg = MrSearchFacetsLayoutComponent;
+    exports.ɵbh = MrSearchTestLayoutComponent;
     exports.ɵc = ConfigurationService;
     exports.ɵd = LayoutsConfigurationService;
     exports.ɵe = MainStateService;
@@ -15396,15 +15396,15 @@
     exports.ɵo = AwSearchLayoutComponent;
     exports.ɵp = SearchService;
     exports.ɵq = AwGalleryLayoutComponent;
-    exports.ɵr = BubbleChartWrapperComponent;
-    exports.ɵs = ChartTippyComponent;
-    exports.ɵt = SmartBreadcrumbsComponent;
-    exports.ɵu = DataWidgetWrapperComponent;
-    exports.ɵv = DatepickerWrapperComponent;
-    exports.ɵw = DvExampleLayoutComponent;
-    exports.ɵx = MrHomeLayoutComponent;
-    exports.ɵy = MrSearchLayoutComponent;
-    exports.ɵz = MrGlossaryLayoutComponent;
+    exports.ɵr = ConfigurationService;
+    exports.ɵs = LayoutsConfigurationService;
+    exports.ɵt = MainStateService;
+    exports.ɵu = CommunicationService;
+    exports.ɵv = SearchService;
+    exports.ɵw = BubbleChartWrapperComponent;
+    exports.ɵx = ChartTippyComponent;
+    exports.ɵy = SmartBreadcrumbsComponent;
+    exports.ɵz = DataWidgetWrapperComponent;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
