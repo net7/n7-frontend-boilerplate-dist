@@ -14,7 +14,3 @@ export * from './search-layout/search-layout';
 export * from './search-layout/search-layout.ds';
 export * from './search-layout/search-layout.eh';
 export * from './search-layout/search-layout.config';
-export * from './gallery-layout/gallery-layout';
-export * from './gallery-layout/gallery-layout.ds';
-export * from './gallery-layout/gallery-layout.eh';
-export * from './gallery-layout/gallery-layout.config';

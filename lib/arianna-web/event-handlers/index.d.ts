@@ -1,3 +1,7 @@
+export * from './linked-objects.eh';
+export * from './autocomplete-wrapper.eh';
+export * from './bubble-chart.eh';
+export * from './chart-tippy.eh';
 export * from './hero.eh';
 export * from './home-facets-wrapper.eh';
 export * from './home-hero-patrimonio.eh';
@@ -8,9 +12,4 @@ export * from './scheda-breadcrumbs.eh';
 export * from './sidebar-header.eh';
 export * from './tree.eh';
 export * from './search-layout-tabs.eh';
-export * from './gallery-results.eh';
-export * from './linked-objects.eh';
-export * from './autocomplete-wrapper.eh';
-export * from './bubble-chart.eh';
 export * from './table.eh';
-export * from './chart-tippy.eh';
