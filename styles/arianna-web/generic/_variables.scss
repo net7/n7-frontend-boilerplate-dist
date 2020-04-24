@@ -310,6 +310,12 @@ $entity-nav-item-active-decoration-bg: $color-gray-05;
 $search-box-shadow: 0 0 15px 0 rgba(0,0,0,0.05);
 $search-nav-decoration-height: 5px;
 
+// ------------------------------------ //
+// #GALLERY
+// ------------------------------------ //
+$gallery-box-shadow: 0 0 15px 0 rgba(0,0,0,0.05);
+$gallery-nav-decoration-height: 5px;
+
 
 // ------------------------------------ //
 // #FACET
@@ -337,6 +343,19 @@ $bubble-chart-column-container-min-width: 200px;
 // #TREE
 // ------------------------------------ //
 $tree-indent: $space*1.6;
+
+
+// ------------------------------------ //
+// #IMAGE-VIEWER
+// ------------------------------------ //
+$image-viewer-height: 550px;
+// $image-viewer-thumb-height: 80px;
+// $image-viewer-thumb-width: 80px;
+// $image-viewer-control-height: 60px;
+// $image-viewer-control-width: 60px;
+// $image-viewer-background-color: $color-gray-05;
+// $image-viewer-thumb-active-border-color: $color-main;
+// $image-viewer-thumb-hover-border-color: $color-main;
 
 
 // ------------------------------------ //

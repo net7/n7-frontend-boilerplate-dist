@@ -1,0 +1,44 @@
+import { LayoutDataSource } from '@n7-frontend/core';
+import { Observable } from 'rxjs';
+export declare class AwGalleryLayoutDS extends LayoutDataSource {
+    private destroyed$;
+    private communication;
+    private configuration;
+    private mainState;
+    private search;
+    private searchModel;
+    private pageTitle;
+    private sidebarIsSticky;
+    currentPage: any;
+    pageSize: number;
+    isFirstLoading: boolean;
+    orderByLabel: string;
+    orderByOptions: any;
+    totalCount: number;
+    resultsTitle: string;
+    options: any;
+    private prettifyLabels;
+    private configKeys;
+    private fallback;
+    private resetButtonEnabled;
+    onInit({ configuration, mainState, options, communication, search }: {
+        configuration: any;
+        mainState: any;
+        options: any;
+        communication: any;
+        search: any;
+    }): void;
+    onDestroy(): void;
+    onGalleryResponse(): void;
+    onOrderByChange(payload: any): void;
+    onPaginationChange(payload: any): Observable<boolean>;
+    resetPagination(): void;
+    onResultsLimitChange(payload: any): void;
+    getGalleryModelId: () => string;
+    doGalleryRequest$(): Observable<any>;
+    private _updateSearchPage;
+    private _addFacetsLabels;
+    private _addFacetsOptions;
+    private _normalizeItems;
+    private _sidebarStickyControl;
+}
