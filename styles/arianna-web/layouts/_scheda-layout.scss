@@ -17,10 +17,6 @@
         position: relative;
         margin: 0 auto;
         max-width: $page-max-width;
-  
-        // display: grid;
-        // grid-template-columns: $aw-scheda-tree-width minmax($bubble-chart-column-container-min-width,1fr);
-        // grid-column-gap: 0;
     }
 
     &__tree {
@@ -70,14 +66,6 @@
 
     .n7-sidebar-header__icon-right {
         cursor: pointer;
-    }
-
-    /* First level */
-    .n7-tree {
-        > .n7-tree__item > .n7-tree__item-contents .n7-tree__item-text {
-            font-size: $font-size-m;
-            font-weight: $font-weight-bold;
-        }
     }
 
     /* Loading */
