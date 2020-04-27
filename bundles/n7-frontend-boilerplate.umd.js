@@ -469,7 +469,7 @@
         },
         getNode: {
             queryName: 'getNode',
-            queryBody: "{\n      getNode(__PARAMS__) {\n        ... on Item {\n          id\n          label\n          title\n          subTitle\n          image\n          text\n          document_type\n          fields {\n            ...\n            on KeyValueField {\n              key\n              value\n            }\n            ... on KeyValueFieldGroup {\n              label\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n          relatedEntities {\n              count\n              entity{\n                id\n                label\n                typeOfEntity\n                relation\n              }\n          }\n          relatedItems {\n              thumbnail\n              item {\n                label\n                id\n                fields {\n                  ...\n                  on KeyValueField {\n                    key\n                    value\n                  }\n                  ... on KeyValueFieldGroup {\n                    label\n                    fields {\n                      ...\n                      on KeyValueField {\n                        key\n                        value\n                      }\n                    }\n                  }\n                }\n                relatedTypesOfEntity {\n                  type\n                  count\n                }\n              }\n            }\n          breadcrumbs {\n            label\n            link\n          }\n        }\n        ... on Node {\n          id\n          label\n          img\n          document_type\n          fields {\n            ...\n            on KeyValueField {\n              key\n              value\n            }\n            ... on KeyValueFieldGroup {\n              label\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n        }\n      }\n    }",
+            queryBody: "{\n      getNode(__PARAMS__) {\n        ... on Item {\n          id\n          label\n          title\n          subTitle\n          image\n          images\n          text\n          document_type\n          fields {\n            ...\n            on KeyValueField {\n              key\n              value\n            }\n            ... on KeyValueFieldGroup {\n              label\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n          relatedEntities {\n              count\n              entity{\n                id\n                label\n                typeOfEntity\n                relation\n              }\n          }\n          relatedItems {\n              thumbnail\n              item {\n                label\n                id\n                fields {\n                  ...\n                  on KeyValueField {\n                    key\n                    value\n                  }\n                  ... on KeyValueFieldGroup {\n                    label\n                    fields {\n                      ...\n                      on KeyValueField {\n                        key\n                        value\n                      }\n                    }\n                  }\n                }\n                relatedTypesOfEntity {\n                  type\n                  count\n                }\n              }\n            }\n          breadcrumbs {\n            label\n            link\n          }\n        }\n        ... on Node {\n          id\n          label\n          img\n          document_type\n          fields {\n            ...\n            on KeyValueField {\n              key\n              value\n            }\n            ... on KeyValueFieldGroup {\n              label\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n        }\n      }\n    }",
         },
         autoComplete: {
             queryName: 'autoComplete',
@@ -7079,7 +7079,7 @@
         function (data) {
             var _this = this;
             /** @type {?} */
-            var tileSources = this.getTileSources(data.image);
+            var tileSources = this.getTileSources(data.images);
             return {
                 images: [],
                 viewerId: 'scheda-layout-viewer',
@@ -7117,11 +7117,20 @@
          * @return {?}
          */
         function (data) {
+            var _this = this;
             if (!this.instance)
                 return;
-            /** @type {?} */
-            var images = this.getTileSources(data.image);
-            this.instance.open(images);
+            // reset
+            this.instance.world.removeAll();
+            setTimeout((/**
+             * @return {?}
+             */
+            function () {
+                /** @type {?} */
+                var images = _this.getTileSources(data.images);
+                console.warn('images', images.length, images);
+                _this.instance.open(images);
+            }));
         };
         /**
          * @private
@@ -7263,12 +7272,10 @@
                          * @param {?} o
                          * @return {?}
                          */
-                        function (o) {
-                            return {
-                                text: o,
-                                selected: o === size,
-                            };
-                        })),
+                        function (o) { return ({
+                            text: o,
+                            selected: o === size,
+                        }); })),
                         payload: 'select-size'
                     },
                 };
@@ -7318,10 +7325,10 @@
                         lastPage = limit + 1;
                         firstPage = 1;
                     }
-                    for (var i = firstPage; i <= lastPage; i++) {
+                    for (var i = firstPage; i <= lastPage; i += 1) {
                         result.push({
                             text: String(i),
-                            payload: 'page-' + String(i),
+                            payload: "page-" + String(i),
                             classes: currentPage === i ? 'is-active' : ''
                         });
                     }
@@ -7332,8 +7339,8 @@
                         payload: 'page-1',
                         classes: currentPage === 1 ? 'is-active' : ''
                     });
-                    for (var i = 1; i < totalPages; i++) {
-                        result.push({ text: String(i + 1), payload: 'page-' + String(i + 1), classes: currentPage === i + 1 ? 'is-active' : '' });
+                    for (var i = 1; i < totalPages; i += 1) {
+                        result.push({ text: String(i + 1), payload: "page-" + String(i + 1), classes: currentPage === i + 1 ? 'is-active' : '' });
                     }
                 }
                 return result;
@@ -7351,6 +7358,7 @@
          * @return {?}
          */
         function (data) {
+            // eslint-disable-next-line no-param-reassign
             data = this.GALLERY_RESULTS_MOCK;
             var _a = this.options, pageSize = _a.pageSize, currentPage = _a.currentPage;
             this.GALLERY_RESULTS_MOCK.fill({
@@ -9854,7 +9862,7 @@
                 }
                 this.contentParts.push(content);
                 // image viewer
-                if (response.image) {
+                if (response.images) {
                     /** @type {?} */
                     var viewerDataSource = this.getWidgetDataSource('aw-scheda-image');
                     if (!viewerDataSource.hasInstance()) {
@@ -10340,7 +10348,7 @@
         AwSchedaLayoutComponent.decorators = [
             { type: core.Component, args: [{
                         selector: 'aw-scheda-layout',
-                        template: "<div class=\"aw-scheda\"\n     id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                               [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n            <div class=\"aw-scheda__tree-content-loading\"\n                 *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                        [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n            </div>\n            <div class=\"aw-scheda__tree-content\"\n                 [ngStyle]=\"{\n                    'max-height': lb.dataSource.treeMaxHeight,\n                    'overflow': 'auto'\n                }\">\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                         [emit]=\"lb.widgets['aw-tree'].emit\"\n                         *ngIf=\"!lb.dataSource.sidebarCollapsed\">\n                </n7-tree>\n            </div>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper-loading\"\n             *ngIf=\"lb.dataSource.contentIsLoading\">\n            <!--\n                <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'content-placeholder-title'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }]\n            }\"></n7-content-placeholder>\n            -->\n        </div>\n        <div class=\"aw-scheda__scheda-wrapper\"\n             *ngIf=\"!lb.dataSource.contentIsLoading\">\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                                  [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                                  [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\"\n                 class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n\n            <div *ngIf=\"!lb.dataSource.currentId\"\n                 class=\"aw-scheda__intro-text\"\n                 [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <n7-image-viewer *ngIf=\"lb.dataSource.hasImage\"\n                             [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\"\n                     *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\"\n                     *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section class=\"aw-scheda__bubble-chart\"\n                     *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\n                <div *ngIf=\"lb.dataSource.hasBubbles\"\n                     class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <aw-bubble-chart-wrapper>\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                    </aw-chart-tippy>\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </section>\n\n            <section *ngIf=\"lb.dataSource.hasSimilarItems && lb.dataSource.hasBubbles\"\n                     id=\"related-item-container\"\n                     class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.similarItemsSectionTitle}}\n                </div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview [data]=\"preview\"\n                                         [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n            </section>\n        </div>\n    </div>\n</div>\n"
+                        template: "<div class=\"aw-scheda\"\n     id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                               [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n            <div class=\"aw-scheda__tree-content-loading\"\n                 *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                        [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n            </div>\n            <div class=\"aw-scheda__tree-content\"\n                 [ngStyle]=\"{\n                    'max-height': lb.dataSource.treeMaxHeight,\n                    'overflow': 'auto'\n                }\">\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                         [emit]=\"lb.widgets['aw-tree'].emit\"\n                         *ngIf=\"!lb.dataSource.sidebarCollapsed\">\n                </n7-tree>\n            </div>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper-loading\"\n             [hidden]=\"!lb.dataSource.contentIsLoading\">\n            <!--\n                <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'content-placeholder-title'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }]\n            }\"></n7-content-placeholder>\n            -->\n        </div>\n        <div class=\"aw-scheda__scheda-wrapper\"\n             [hidden]=\"lb.dataSource.contentIsLoading\">\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                                  [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                                  [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\"\n                 class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n\n            <div *ngIf=\"!lb.dataSource.currentId\"\n                 class=\"aw-scheda__intro-text\"\n                 [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <n7-image-viewer [hidden]=\"!lb.dataSource.hasImage\"\n                             [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\"\n                     *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\"\n                     *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section class=\"aw-scheda__bubble-chart\"\n                     *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\n                <div *ngIf=\"lb.dataSource.hasBubbles\"\n                     class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <aw-bubble-chart-wrapper>\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                    </aw-chart-tippy>\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </section>\n\n            <section *ngIf=\"lb.dataSource.hasSimilarItems && lb.dataSource.hasBubbles\"\n                     id=\"related-item-container\"\n                     class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.similarItemsSectionTitle}}\n                </div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview [data]=\"preview\"\n                                         [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n            </section>\n        </div>\n    </div>\n</div>\n"
                     }] }
         ];
         /** @nocollapse */
@@ -11781,7 +11789,7 @@
              * @return {?}
              */
             function (_a) {
-                var totalCount = _a.totalCount, results = _a.results, facets = _a.facets;
+                var totalCount = _a.totalCount, facets = _a.facets;
                 _this.totalCount = totalCount;
                 /** @type {?} */
                 var resultsTitleIndex = 0;
@@ -11953,7 +11961,7 @@
                 /** @type {?} */
                 var windowOffsetTop = window.pageYOffset;
                 /** @type {?} */
-                var wrapperOffsetTop = document.getElementsByClassName('sticky-parent')[0]['offsetTop'];
+                var wrapperOffsetTop = ((/** @type {?} */ (document.getElementsByClassName('sticky-parent')[0]))).offsetTop;
                 _this.sidebarIsSticky = wrapperOffsetTop <= windowOffsetTop;
             }));
         };
@@ -12122,12 +12130,16 @@
                         _this.facetsChange$.next();
                         break;
                     case 'aw-gallery-results.click':
-                        /** @type {?} */
-                        var paths = _this.dataSource.configuration.get('paths');
-                        _this.emitGlobal('navigate', {
-                            handler: 'router',
-                            path: [payload.type == undefined ? paths.schedaBasePath : paths.entitaBasePath, payload.id]
-                        });
+                        {
+                            /** @type {?} */
+                            var paths = _this.dataSource.configuration.get('paths');
+                            _this.emitGlobal('navigate', {
+                                handler: 'router',
+                                path: [payload.type === undefined
+                                        ? paths.schedaBasePath
+                                        : paths.entitaBasePath, payload.id]
+                            });
+                        }
                         break;
                     default:
                         break;
@@ -12225,9 +12237,11 @@
      */
     var AwGalleryLayoutComponent = /** @class */ (function (_super) {
         __extends(AwGalleryLayoutComponent, _super);
-        function AwGalleryLayoutComponent(configuration, layoutsConfiguration, mainState, communication, search, route) {
+        function AwGalleryLayoutComponent(router, configuration, titleService, layoutsConfiguration, mainState, communication, search, route) {
             var _this = _super.call(this, AwGalleryLayoutConfig) || this;
+            _this.router = router;
             _this.configuration = configuration;
+            _this.titleService = titleService;
             _this.layoutsConfiguration = layoutsConfiguration;
             _this.mainState = mainState;
             _this.communication = communication;
@@ -12247,10 +12261,12 @@
             return {
                 configuration: this.configuration,
                 mainState: this.mainState,
-                communication: this.communication,
-                search: this.search,
+                router: this.router,
                 route: this.route,
+                titleService: this.titleService,
+                communication: this.communication,
                 options: this.config.options || {},
+                search: this.search,
             };
         };
         /**
@@ -12279,7 +12295,9 @@
         ];
         /** @nocollapse */
         AwGalleryLayoutComponent.ctorParameters = function () { return [
+            { type: router.Router },
             { type: ConfigurationService },
+            { type: platformBrowser.Title },
             { type: LayoutsConfigurationService },
             { type: MainStateService },
             { type: CommunicationService },
@@ -12293,7 +12311,17 @@
          * @type {?}
          * @private
          */
+        AwGalleryLayoutComponent.prototype.router;
+        /**
+         * @type {?}
+         * @private
+         */
         AwGalleryLayoutComponent.prototype.configuration;
+        /**
+         * @type {?}
+         * @private
+         */
+        AwGalleryLayoutComponent.prototype.titleService;
         /**
          * @type {?}
          * @private
@@ -15373,14 +15401,9 @@
     exports.SubnavEH = SubnavEH;
     exports.ɵa = MainLayoutComponent;
     exports.ɵb = AbstractLayout;
-    exports.ɵba = DatepickerWrapperComponent;
-    exports.ɵbb = DvExampleLayoutComponent;
-    exports.ɵbc = MrHomeLayoutComponent;
-    exports.ɵbd = MrSearchLayoutComponent;
-    exports.ɵbe = MrGlossaryLayoutComponent;
-    exports.ɵbf = MrStaticLayoutComponent;
-    exports.ɵbg = MrSearchFacetsLayoutComponent;
-    exports.ɵbh = MrSearchTestLayoutComponent;
+    exports.ɵba = MrStaticLayoutComponent;
+    exports.ɵbb = MrSearchFacetsLayoutComponent;
+    exports.ɵbc = MrSearchTestLayoutComponent;
     exports.ɵc = ConfigurationService;
     exports.ɵd = LayoutsConfigurationService;
     exports.ɵe = MainStateService;
@@ -15396,15 +15419,15 @@
     exports.ɵo = AwSearchLayoutComponent;
     exports.ɵp = SearchService;
     exports.ɵq = AwGalleryLayoutComponent;
-    exports.ɵr = ConfigurationService;
-    exports.ɵs = LayoutsConfigurationService;
-    exports.ɵt = MainStateService;
-    exports.ɵu = CommunicationService;
-    exports.ɵv = SearchService;
-    exports.ɵw = BubbleChartWrapperComponent;
-    exports.ɵx = ChartTippyComponent;
-    exports.ɵy = SmartBreadcrumbsComponent;
-    exports.ɵz = DataWidgetWrapperComponent;
+    exports.ɵr = BubbleChartWrapperComponent;
+    exports.ɵs = ChartTippyComponent;
+    exports.ɵt = SmartBreadcrumbsComponent;
+    exports.ɵu = DataWidgetWrapperComponent;
+    exports.ɵv = DatepickerWrapperComponent;
+    exports.ɵw = DvExampleLayoutComponent;
+    exports.ɵx = MrHomeLayoutComponent;
+    exports.ɵy = MrSearchLayoutComponent;
+    exports.ɵz = MrGlossaryLayoutComponent;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 

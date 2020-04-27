@@ -492,6 +492,7 @@ const ApolloProviderConfig = {
           title
           subTitle
           image
+          images
           text
           document_type
           fields {
@@ -6515,7 +6516,7 @@ class AwSchedaImageDS extends DataSource {
      */
     transform(data) {
         /** @type {?} */
-        const tileSources = this.getTileSources(data.image);
+        const tileSources = this.getTileSources(data.images);
         return {
             images: [],
             viewerId: 'scheda-layout-viewer',
@@ -6548,9 +6549,17 @@ class AwSchedaImageDS extends DataSource {
     updateImages(data) {
         if (!this.instance)
             return;
-        /** @type {?} */
-        const images = this.getTileSources(data.image);
-        this.instance.open(images);
+        // reset
+        this.instance.world.removeAll();
+        setTimeout((/**
+         * @return {?}
+         */
+        () => {
+            /** @type {?} */
+            const images = this.getTileSources(data.images);
+            console.warn('images', images.length, images);
+            this.instance.open(images);
+        }));
     }
     /**
      * @private
@@ -6664,12 +6673,10 @@ class AwGalleryResultsDS extends DataSource {
                      * @param {?} o
                      * @return {?}
                      */
-                    o => {
-                        return {
-                            text: o,
-                            selected: o === size,
-                        };
-                    })),
+                    (o) => ({
+                        text: o,
+                        selected: o === size,
+                    }))),
                     payload: 'select-size'
                 },
             };
@@ -6719,10 +6726,10 @@ class AwGalleryResultsDS extends DataSource {
                     lastPage = limit + 1;
                     firstPage = 1;
                 }
-                for (let i = firstPage; i <= lastPage; i++) {
+                for (let i = firstPage; i <= lastPage; i += 1) {
                     result.push({
                         text: String(i),
-                        payload: 'page-' + String(i),
+                        payload: `page-${String(i)}`,
                         classes: currentPage === i ? 'is-active' : ''
                     });
                 }
@@ -6733,8 +6740,8 @@ class AwGalleryResultsDS extends DataSource {
                     payload: 'page-1',
                     classes: currentPage === 1 ? 'is-active' : ''
                 });
-                for (let i = 1; i < totalPages; i++) {
-                    result.push({ text: String(i + 1), payload: 'page-' + String(i + 1), classes: currentPage === i + 1 ? 'is-active' : '' });
+                for (let i = 1; i < totalPages; i += 1) {
+                    result.push({ text: String(i + 1), payload: `page-${String(i + 1)}`, classes: currentPage === i + 1 ? 'is-active' : '' });
                 }
             }
             return result;
@@ -6746,6 +6753,7 @@ class AwGalleryResultsDS extends DataSource {
      * @return {?}
      */
     transform(data) {
+        // eslint-disable-next-line no-param-reassign
         data = this.GALLERY_RESULTS_MOCK;
         const { pageSize, currentPage } = this.options;
         this.GALLERY_RESULTS_MOCK.fill({
@@ -6777,7 +6785,7 @@ class AwGalleryResultsDS extends DataSource {
      */
     chunks(a, size) {
         /** @type {?} */
-        var results = [];
+        const results = [];
         while (a.length) {
             results.push(a.splice(0, size));
         }
@@ -8955,7 +8963,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
             }
             this.contentParts.push(content);
             // image viewer
-            if (response.image) {
+            if (response.images) {
                 /** @type {?} */
                 const viewerDataSource = this.getWidgetDataSource('aw-scheda-image');
                 if (!viewerDataSource.hasInstance()) {
@@ -9402,7 +9410,7 @@ class AwSchedaLayoutComponent extends AbstractLayout {
 AwSchedaLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-scheda-layout',
-                template: "<div class=\"aw-scheda\"\n     id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                               [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n            <div class=\"aw-scheda__tree-content-loading\"\n                 *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                        [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n            </div>\n            <div class=\"aw-scheda__tree-content\"\n                 [ngStyle]=\"{\n                    'max-height': lb.dataSource.treeMaxHeight,\n                    'overflow': 'auto'\n                }\">\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                         [emit]=\"lb.widgets['aw-tree'].emit\"\n                         *ngIf=\"!lb.dataSource.sidebarCollapsed\">\n                </n7-tree>\n            </div>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper-loading\"\n             *ngIf=\"lb.dataSource.contentIsLoading\">\n            <!--\n                <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'content-placeholder-title'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }]\n            }\"></n7-content-placeholder>\n            -->\n        </div>\n        <div class=\"aw-scheda__scheda-wrapper\"\n             *ngIf=\"!lb.dataSource.contentIsLoading\">\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                                  [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                                  [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\"\n                 class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n\n            <div *ngIf=\"!lb.dataSource.currentId\"\n                 class=\"aw-scheda__intro-text\"\n                 [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <n7-image-viewer *ngIf=\"lb.dataSource.hasImage\"\n                             [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\"\n                     *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\"\n                     *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section class=\"aw-scheda__bubble-chart\"\n                     *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\n                <div *ngIf=\"lb.dataSource.hasBubbles\"\n                     class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <aw-bubble-chart-wrapper>\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                    </aw-chart-tippy>\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </section>\n\n            <section *ngIf=\"lb.dataSource.hasSimilarItems && lb.dataSource.hasBubbles\"\n                     id=\"related-item-container\"\n                     class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.similarItemsSectionTitle}}\n                </div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview [data]=\"preview\"\n                                         [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n            </section>\n        </div>\n    </div>\n</div>\n"
+                template: "<div class=\"aw-scheda\"\n     id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                               [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n            <div class=\"aw-scheda__tree-content-loading\"\n                 *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                        [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n            </div>\n            <div class=\"aw-scheda__tree-content\"\n                 [ngStyle]=\"{\n                    'max-height': lb.dataSource.treeMaxHeight,\n                    'overflow': 'auto'\n                }\">\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                         [emit]=\"lb.widgets['aw-tree'].emit\"\n                         *ngIf=\"!lb.dataSource.sidebarCollapsed\">\n                </n7-tree>\n            </div>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper-loading\"\n             [hidden]=\"!lb.dataSource.contentIsLoading\">\n            <!--\n                <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'content-placeholder-title'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }]\n            }\"></n7-content-placeholder>\n            -->\n        </div>\n        <div class=\"aw-scheda__scheda-wrapper\"\n             [hidden]=\"lb.dataSource.contentIsLoading\">\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                                  [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                                  [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\"\n                 class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n\n            <div *ngIf=\"!lb.dataSource.currentId\"\n                 class=\"aw-scheda__intro-text\"\n                 [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <n7-image-viewer [hidden]=\"!lb.dataSource.hasImage\"\n                             [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\"\n                     *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\"\n                     *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section class=\"aw-scheda__bubble-chart\"\n                     *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\n                <div *ngIf=\"lb.dataSource.hasBubbles\"\n                     class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <aw-bubble-chart-wrapper>\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                    </aw-chart-tippy>\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </section>\n\n            <section *ngIf=\"lb.dataSource.hasSimilarItems && lb.dataSource.hasBubbles\"\n                     id=\"related-item-container\"\n                     class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.similarItemsSectionTitle}}\n                </div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview [data]=\"preview\"\n                                         [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n            </section>\n        </div>\n    </div>\n</div>\n"
             }] }
 ];
 /** @nocollapse */
@@ -10688,13 +10696,13 @@ class AwGalleryLayoutDS extends LayoutDataSource$1 {
              * @param {?} error
              * @return {?}
              */
-            error => console.error(error)),
+            (error) => console.error(error)),
             params: requestPayload
         }).pipe(tap((/**
          * @param {?} __0
          * @return {?}
          */
-        ({ totalCount, results, facets }) => {
+        ({ totalCount, facets }) => {
             this.totalCount = totalCount;
             /** @type {?} */
             let resultsTitleIndex = 0;
@@ -10761,17 +10769,17 @@ class AwGalleryLayoutDS extends LayoutDataSource$1 {
          * @param {?} f
          * @return {?}
          */
-        f => Array.isArray(f.data)))
+        (f) => Array.isArray(f.data)))
             .forEach((/**
          * @param {?} f
          * @return {?}
          */
-        f => {
+        (f) => {
             f.data.forEach((/**
              * @param {?} dataItem
              * @return {?}
              */
-            dataItem => {
+            (dataItem) => {
                 /** @type {?} */
                 const key = dataItem.label;
                 dataItem.label = helpers.prettifySnakeCase(key, this.prettifyLabels[key]);
@@ -10789,17 +10797,17 @@ class AwGalleryLayoutDS extends LayoutDataSource$1 {
          * @param {?} f
          * @return {?}
          */
-        f => f.id === 'query-links'))
+        (f) => f.id === 'query-links'))
             .forEach((/**
          * @param {?} f
          * @return {?}
          */
-        f => {
+        (f) => {
             f.data.forEach((/**
              * @param {?} dataItem
              * @return {?}
              */
-            dataItem => {
+            (dataItem) => {
                 /** @type {?} */
                 const key = dataItem.value.replace(' ', '-');
                 /** @type {?} */
@@ -10823,7 +10831,7 @@ class AwGalleryLayoutDS extends LayoutDataSource$1 {
          * @param {?} singleItem
          * @return {?}
          */
-        singleItem => ({ item: Object.assign({}, singleItem) })));
+        (singleItem) => ({ item: Object.assign({}, singleItem) })));
     }
     /**
      * @private
@@ -10839,7 +10847,7 @@ class AwGalleryLayoutDS extends LayoutDataSource$1 {
             /** @type {?} */
             const windowOffsetTop = window.pageYOffset;
             /** @type {?} */
-            const wrapperOffsetTop = document.getElementsByClassName('sticky-parent')[0]['offsetTop'];
+            const wrapperOffsetTop = ((/** @type {?} */ (document.getElementsByClassName('sticky-parent')[0]))).offsetTop;
             this.sidebarIsSticky = wrapperOffsetTop <= windowOffsetTop;
         }));
     }
@@ -10988,7 +10996,7 @@ class AwGalleryLayoutEH extends EventHandler {
                      * @param {?} changed
                      * @return {?}
                      */
-                    changed => {
+                    (changed) => {
                         if (changed) {
                             this.facetsChange$.next();
                         }
@@ -10999,12 +11007,16 @@ class AwGalleryLayoutEH extends EventHandler {
                     this.facetsChange$.next();
                     break;
                 case 'aw-gallery-results.click':
-                    /** @type {?} */
-                    const paths = this.dataSource.configuration.get('paths');
-                    this.emitGlobal('navigate', {
-                        handler: 'router',
-                        path: [payload.type == undefined ? paths.schedaBasePath : paths.entitaBasePath, payload.id]
-                    });
+                    {
+                        /** @type {?} */
+                        const paths = this.dataSource.configuration.get('paths');
+                        this.emitGlobal('navigate', {
+                            handler: 'router',
+                            path: [payload.type === undefined
+                                    ? paths.schedaBasePath
+                                    : paths.entitaBasePath, payload.id]
+                        });
+                    }
                     break;
                 default:
                     break;
@@ -11038,7 +11050,7 @@ class AwGalleryLayoutEH extends EventHandler {
          * @param {?} params
          * @return {?}
          */
-        params => {
+        (params) => {
             this.emitOuter('queryparamschange', params);
             this.facetsChange$.next();
         }));
@@ -11091,16 +11103,20 @@ const AwGalleryLayoutConfig = {
  */
 class AwGalleryLayoutComponent extends AbstractLayout {
     /**
+     * @param {?} router
      * @param {?} configuration
+     * @param {?} titleService
      * @param {?} layoutsConfiguration
      * @param {?} mainState
      * @param {?} communication
      * @param {?} search
      * @param {?} route
      */
-    constructor(configuration, layoutsConfiguration, mainState, communication, search, route) {
+    constructor(router, configuration, titleService, layoutsConfiguration, mainState, communication, search, route) {
         super(AwGalleryLayoutConfig);
+        this.router = router;
         this.configuration = configuration;
+        this.titleService = titleService;
         this.layoutsConfiguration = layoutsConfiguration;
         this.mainState = mainState;
         this.communication = communication;
@@ -11115,10 +11131,12 @@ class AwGalleryLayoutComponent extends AbstractLayout {
         return {
             configuration: this.configuration,
             mainState: this.mainState,
-            communication: this.communication,
-            search: this.search,
+            router: this.router,
             route: this.route,
+            titleService: this.titleService,
+            communication: this.communication,
             options: this.config.options || {},
+            search: this.search,
         };
     }
     /**
@@ -11142,7 +11160,9 @@ AwGalleryLayoutComponent.decorators = [
 ];
 /** @nocollapse */
 AwGalleryLayoutComponent.ctorParameters = () => [
+    { type: Router },
     { type: ConfigurationService },
+    { type: Title },
     { type: LayoutsConfigurationService },
     { type: MainStateService },
     { type: CommunicationService },
@@ -11154,7 +11174,17 @@ if (false) {
      * @type {?}
      * @private
      */
+    AwGalleryLayoutComponent.prototype.router;
+    /**
+     * @type {?}
+     * @private
+     */
     AwGalleryLayoutComponent.prototype.configuration;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwGalleryLayoutComponent.prototype.titleService;
     /**
      * @type {?}
      * @private
@@ -13652,5 +13682,5 @@ N7BoilerplateLibModule.decorators = [
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrInnerTitleDS, MrItemPreviewsDS, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, DatepickerWrapperComponent as ɵba, DvExampleLayoutComponent as ɵbb, MrHomeLayoutComponent as ɵbc, MrSearchLayoutComponent as ɵbd, MrGlossaryLayoutComponent as ɵbe, MrStaticLayoutComponent as ɵbf, MrSearchFacetsLayoutComponent as ɵbg, MrSearchTestLayoutComponent as ɵbh, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, AwGalleryLayoutComponent as ɵq, ConfigurationService as ɵr, LayoutsConfigurationService as ɵs, MainStateService as ɵt, CommunicationService as ɵu, SearchService as ɵv, BubbleChartWrapperComponent as ɵw, ChartTippyComponent as ɵx, SmartBreadcrumbsComponent as ɵy, DataWidgetWrapperComponent as ɵz };
+export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrInnerTitleDS, MrItemPreviewsDS, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrStaticLayoutComponent as ɵba, MrSearchFacetsLayoutComponent as ɵbb, MrSearchTestLayoutComponent as ɵbc, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, AwGalleryLayoutComponent as ɵq, BubbleChartWrapperComponent as ɵr, ChartTippyComponent as ɵs, SmartBreadcrumbsComponent as ɵt, DataWidgetWrapperComponent as ɵu, DatepickerWrapperComponent as ɵv, DvExampleLayoutComponent as ɵw, MrHomeLayoutComponent as ɵx, MrSearchLayoutComponent as ɵy, MrGlossaryLayoutComponent as ɵz };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map
