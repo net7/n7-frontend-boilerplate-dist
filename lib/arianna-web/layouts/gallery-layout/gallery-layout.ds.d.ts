@@ -1,4 +1,4 @@
-import { LayoutDataSource } from '@n7-frontend/core';
+import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
 import { Observable } from 'rxjs';
 export declare class AwGalleryLayoutDS extends LayoutDataSource {
     private destroyed$;
@@ -7,21 +7,24 @@ export declare class AwGalleryLayoutDS extends LayoutDataSource {
     private mainState;
     private search;
     private searchModel;
-    private pageTitle;
-    private sidebarIsSticky;
-    currentPage: any;
-    pageSize: number;
-    isFirstLoading: boolean;
-    orderByLabel: string;
-    orderByOptions: any;
-    totalCount: number;
-    resultsTitle: string;
-    options: any;
     private prettifyLabels;
     private configKeys;
     private fallback;
     private resetButtonEnabled;
-    onInit({ configuration, mainState, options, communication, search }: {
+    pageTitle: string;
+    resultsTitle: string;
+    totalCount: number;
+    currentPage: any;
+    pageSize: number;
+    sidebarIsSticky: boolean;
+    isFirstLoading: boolean;
+    resultsLoading: boolean;
+    orderBy: string;
+    orderDirection: string;
+    options: any;
+    orderByLabel: string;
+    orderByOptions: any;
+    onInit({ configuration, mainState, options, communication, search, }: {
         configuration: any;
         mainState: any;
         options: any;
@@ -29,16 +32,21 @@ export declare class AwGalleryLayoutDS extends LayoutDataSource {
         search: any;
     }): void;
     onDestroy(): void;
-    onGalleryResponse(): void;
+    onSearchResponse(): void;
     onOrderByChange(payload: any): void;
+    onPageSizeChange(size: any): Observable<boolean>;
     onPaginationChange(payload: any): Observable<boolean>;
+    onPaginationGoToChange(payload: any): Observable<boolean>;
+    drawPagination: () => void;
     resetPagination(): void;
     onResultsLimitChange(payload: any): void;
-    getGalleryModelId: () => string;
-    doGalleryRequest$(): Observable<any>;
+    setLimit(payload: any): void;
+    getSearchModelId: () => string;
+    doSearchRequest$(): Observable<any>;
     private _updateSearchPage;
     private _addFacetsLabels;
     private _addFacetsOptions;
     private _normalizeItems;
     private _sidebarStickyControl;
+    private _getPaginationParams;
 }

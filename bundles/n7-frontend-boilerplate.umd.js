@@ -5307,7 +5307,7 @@
                     var toeData = lodash.get(el, paths.metadata.toe.data, itemData.relatedTypesOfEntity);
                     /** @type {?} */
                     var breadcrumbs = lodash.get(el, paths.metadata.breadcrumbs.data, itemData.breadcrumbs);
-                    if (['entita', 'search'].includes(context)) {
+                    if (['entita', 'search', 'gallery'].includes(context)) {
                         if (itemData.typeOfEntity && itemData.typeOfEntity !== '') {
                             infoDataItems.push({ key: 'Tipo di entità', value: keys[itemData.typeOfEntity]['singular-label'] });
                         }
@@ -5315,6 +5315,10 @@
                     /** @type {?} */
                     var classes = ['entita', 'search', 'oggetti-collegati'].includes(context) ? 'is-fullwidth' : '';
                     classes += itemData.typeOfEntity ? " is-" + config.get('config-keys')[itemData.typeOfEntity]['class-name'] : ' is-oggetto-culturale';
+                    // gallery classes
+                    if (context === 'gallery') {
+                        classes += ' is-vertical has-image';
+                    }
                     // consider the lenght of <em> tags to exclude from count
                     /** @type {?} */
                     var highlights = lodash.get(el, paths.title, itemData.label).match(/<em>/g) ? lodash.get(el, paths.title, itemData.label).match(/<em>/g).length * 9 : 0;
@@ -7250,7 +7254,6 @@
         __extends(AwGalleryResultsDS, _super);
         function AwGalleryResultsDS() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.GALLERY_RESULTS_MOCK = new Array(100);
             _this.addPagination = (/**
              * @param {?} page
              * @param {?} totalPages
@@ -7325,7 +7328,8 @@
                         lastPage = limit + 1;
                         firstPage = 1;
                     }
-                    for (var i = firstPage; i <= lastPage; i += 1) {
+                    // eslint-disable-next-line no-plusplus
+                    for (var i = firstPage; i <= lastPage; i++) {
                         result.push({
                             text: String(i),
                             payload: "page-" + String(i),
@@ -7339,7 +7343,8 @@
                         payload: 'page-1',
                         classes: currentPage === 1 ? 'is-active' : ''
                     });
-                    for (var i = 1; i < totalPages; i += 1) {
+                    // eslint-disable-next-line no-plusplus
+                    for (var i = 1; i < totalPages; i++) {
                         result.push({ text: String(i + 1), payload: "page-" + String(i + 1), classes: currentPage === i + 1 ? 'is-active' : '' });
                     }
                 }
@@ -7358,28 +7363,15 @@
          * @return {?}
          */
         function (data) {
-            // eslint-disable-next-line no-param-reassign
-            data = this.GALLERY_RESULTS_MOCK;
+            if (!data)
+                return null;
             var _a = this.options, pageSize = _a.pageSize, currentPage = _a.currentPage;
-            this.GALLERY_RESULTS_MOCK.fill({
-                image: 'https://i.imgur.com/2xY0DWR.png',
-                title: 'Costa di Sorrento',
-                classes: 'is-vertical',
-                metadata: [
-                    {
-                        items: [
-                            { label: 'Artista', value: 'John Davies' },
-                            { value: 'Fotografia' }
-                        ]
-                    }
-                ]
-            });
             // if the data doesn't fit on one page, render the pagination component
             if (data.length > pageSize) {
                 this.addPagination(currentPage, Math.ceil(data.length / pageSize), pageSize);
             }
             return {
-                res: this.GALLERY_RESULTS_MOCK.slice(0, pageSize),
+                res: data.slice(0, pageSize),
                 pagination: this.pagination
             };
         };
@@ -7404,11 +7396,6 @@
         return AwGalleryResultsDS;
     }(core$1.DataSource));
     if (false) {
-        /**
-         * @type {?}
-         * @private
-         */
-        AwGalleryResultsDS.prototype.GALLERY_RESULTS_MOCK;
         /**
          * @type {?}
          * @private
@@ -8045,23 +8032,20 @@
                         _this.emitOuter('change', +payload.value);
                         break;
                     case 'aw-gallery-results.click':
-                        if (typeof payload == 'string') { // click on pagination
+                        if (typeof payload === 'string') { // click on pagination
                             if (payload.startsWith('page')) {
                                 // pagination routing is handled by the parent layout
                                 _this.emitOuter('pagination', payload);
                             }
                             else if (payload.startsWith('goto')) {
                                 /** @type {?} */
-                                var targetPage = +payload.replace('goto-', '')
-                                // kill impossible page navigations
-                                ;
+                                var targetPage = +payload.replace('goto-', '');
                                 // kill impossible page navigations
                                 if (targetPage > _this.dataSource.totalPages)
                                     return;
-                                else if (targetPage < 1 || targetPage === _this.dataSource.currentPage)
+                                if (targetPage < 1 || targetPage === _this.dataSource.currentPage)
                                     return;
-                                else
-                                    _this.emitOuter('goto', payload);
+                                _this.emitOuter('goto', payload);
                             }
                         }
                         else { // click on a linked object
@@ -8073,11 +8057,8 @@
                         break;
                 }
             }));
-            /*
-                this.outerEvents$.subscribe(event => {
-                    
-                });
-            */
+            // this.outerEvents$.subscribe(({ type, payload }) => {
+            // });
         };
         return AwGalleryResultsEH;
     }(core$1.EventHandler));
@@ -11499,22 +11480,18 @@
         ],
         fields: [
             {
-                header: {
-                    label: 'Filtri di ricerca',
-                    classes: 'search-filters-header'
-                },
                 inputs: [
                     {
                         type: 'text',
                         facetId: 'query',
-                        placeholder: 'Cerca',
+                        placeholder: 'Cerca nei titoli delle schede',
                         // icon: 'n7-icon-search',
                         filterConfig: {
                             delay: 500,
                             minChars: 3,
                             searchIn: [
                                 {
-                                    key: 'label',
+                                    key: 'label.ngrams',
                                     operator: 'LIKE'
                                 }
                             ]
@@ -11526,7 +11503,7 @@
                         filterConfig: {
                             searchIn: [
                                 {
-                                    key: 'query-all',
+                                    key: 'label.ngrams^5,text^4,fields.*^3',
                                     operator: '='
                                 }
                             ]
@@ -11595,11 +11572,11 @@
         ],
         results: {
             order: {
-                type: 'text',
+                type: 'score',
                 // score | text | date
-                key: 'label',
+                key: '_score',
                 // docPath, elastic key, ecc
-                direction: 'ASC' // ASC | DESC
+                direction: 'DESC' // ASC | DESC
             },
             fields: [
                 {
@@ -11623,29 +11600,58 @@
         function AwGalleryLayoutDS() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.destroyed$ = new rxjs.Subject();
-            _this.pageTitle = 'Galleria';
-            _this.sidebarIsSticky = true;
+            _this.resetButtonEnabled = true;
             _this.currentPage = 1; // pagination value (url param)
             // pagination value (url param)
-            _this.pageSize = 12; // linked objects page size
+            _this.pageSize = 10; // linked objects page size
             // linked objects page size
-            _this.isFirstLoading = true; // initial URL check
-            // initial URL check
+            _this.sidebarIsSticky = false;
+            _this.isFirstLoading = true;
+            _this.resultsLoading = false;
+            _this.orderBy = '_score';
+            _this.orderDirection = 'DESC';
             _this.orderByLabel = 'Ordina per';
             _this.orderByOptions = [
                 {
-                    value: 'label_ASC',
-                    label: 'Ordine alfabetico (A→Z)'
+                    value: '_score_DESC',
+                    label: 'Ordine per pertinenza',
+                    type: 'score',
+                    selected: true
                 },
                 {
-                    value: 'label_DESC',
-                    label: 'Ordine alfabetico (Z→A)'
+                    value: 'label_sort_ASC',
+                    label: 'Ordine alfabetico (A→Z)',
+                    type: 'text',
+                    selected: false
+                },
+                {
+                    value: 'label_sort_DESC',
+                    label: 'Ordine alfabetico (Z→A)',
+                    type: 'text',
+                    selected: false
                 }
             ];
-            _this.totalCount = 12;
-            _this.resultsTitle = 'Risultati';
-            _this.resetButtonEnabled = true;
-            _this.getGalleryModelId = (/**
+            _this.drawPagination = (/**
+             * @return {?}
+             */
+            function () {
+                var _a = _this._getPaginationParams(), href = _a.href, queryParams = _a.queryParams;
+                _this.one('n7-smart-pagination').updateOptions({
+                    mode: 'href',
+                    href: href,
+                    queryParams: queryParams,
+                });
+                _this.one('n7-smart-pagination').update({
+                    totalPages: Math.ceil(_this.totalCount / _this.pageSize),
+                    currentPage: _this.currentPage,
+                    pageLimit: 5,
+                    sizes: {
+                        list: [10, 25, 50],
+                        active: _this.pageSize,
+                    },
+                });
+            });
+            _this.getSearchModelId = (/**
              * @return {?}
              */
             function () { return SEARCH_MODEL_ID$1; });
@@ -11668,7 +11674,8 @@
             this.options = options;
             this.prettifyLabels = this.configuration.get('labels');
             this.configKeys = this.configuration.get('config-keys');
-            this.fallback = this.configuration.get('search-layout').fallback;
+            this.fallback = this.configuration.get('gallery-layout').fallback;
+            this.pageTitle = this.configuration.get('gallery-layout').title;
             // remove first
             // stateless search
             if (this.search.model(SEARCH_MODEL_ID$1)) {
@@ -11681,11 +11688,8 @@
                 this.searchModel.updateFiltersFromQueryParams(SearchService.queryParams);
                 SearchService.queryParams = null;
             }
-            this.one('aw-gallery-results').updateOptions({
-                currentPage: this.currentPage,
-                pageSize: this.pageSize,
-            });
-            this.one('aw-gallery-results').update(null);
+            // sidebar sticky control
+            this._sidebarStickyControl();
             this.mainState.updateCustom('currentNav', 'galleria');
             this.mainState.update('headTitle', 'Arianna Web > Galleria');
         };
@@ -11702,7 +11706,7 @@
         /**
          * @return {?}
          */
-        AwGalleryLayoutDS.prototype.onGalleryResponse = /**
+        AwGalleryLayoutDS.prototype.onSearchResponse = /**
          * @return {?}
          */
         function () {
@@ -11722,9 +11726,43 @@
          * @return {?}
          */
         function (payload) {
-            var _a = __read(payload.split('_'), 2), orderBy = _a[0], direction = _a[1];
+            /** @type {?} */
+            var orderBy = payload.substring(0, payload.lastIndexOf('_'));
+            /** @type {?} */
+            var direction = payload.substring(payload.lastIndexOf('_') + 1);
+            /** @type {?} */
+            var type = '';
+            // set selected
+            this.orderByOptions.forEach((/**
+             * @param {?} option
+             * @return {?}
+             */
+            function (option) {
+                if (option.value === payload) {
+                    option.selected = true;
+                    type = option.type;
+                }
+                else {
+                    option.selected = false;
+                }
+            }));
+            this.orderBy = orderBy;
+            this.orderDirection = direction;
             this.searchModel.setSearchConfigOrderBy(orderBy);
             this.searchModel.setSearchConfigDirection(direction);
+            this.searchModel.setSearchConfigType(type);
+        };
+        /**
+         * @param {?} size
+         * @return {?}
+         */
+        AwGalleryLayoutDS.prototype.onPageSizeChange = /**
+         * @param {?} size
+         * @return {?}
+         */
+        function (size) {
+            this.pageSize = size;
+            return this._updateSearchPage(this.currentPage);
         };
         /**
          * @param {?} payload
@@ -11736,7 +11774,20 @@
          */
         function (payload) {
             /** @type {?} */
-            var page = payload.replace('page-', '').replace('goto-', '');
+            var page = payload.replace('page-', '');
+            return this._updateSearchPage(page);
+        };
+        /**
+         * @param {?} payload
+         * @return {?}
+         */
+        AwGalleryLayoutDS.prototype.onPaginationGoToChange = /**
+         * @param {?} payload
+         * @return {?}
+         */
+        function (payload) {
+            /** @type {?} */
+            var page = payload.replace('goto-', '');
             return this._updateSearchPage(page);
         };
         /**
@@ -11757,16 +11808,28 @@
          * @return {?}
          */
         function (payload) {
-            this.pageSize = payload;
-            this.searchModel.setPageConfigLimit(payload);
+            this.setLimit(payload);
             // reset page & offset
             this.currentPage = 1;
             this.searchModel.setPageConfigOffset(0);
         };
         /**
+         * @param {?} payload
          * @return {?}
          */
-        AwGalleryLayoutDS.prototype.doGalleryRequest$ = /**
+        AwGalleryLayoutDS.prototype.setLimit = /**
+         * @param {?} payload
+         * @return {?}
+         */
+        function (payload) {
+            this.pageSize = payload;
+            this.searchModel.setPageConfigLimit(payload);
+            this.searchModel.setPageConfigOffset((this.currentPage - 1) * this.pageSize);
+        };
+        /**
+         * @return {?}
+         */
+        AwGalleryLayoutDS.prototype.doSearchRequest$ = /**
          * @return {?}
          */
         function () {
@@ -11775,7 +11838,7 @@
             var requestParams = this.searchModel.getRequestParams();
             /** @type {?} */
             var requestPayload = {
-                searchParameters: __assign({ totalCount: 100 }, requestParams)
+                searchParameters: __assign({ totalCount: 100, gallery: true }, requestParams),
             };
             return this.communication.request$('search', {
                 onError: (/**
@@ -11783,13 +11846,13 @@
                  * @return {?}
                  */
                 function (error) { return console.error(error); }),
-                params: requestPayload
+                params: requestPayload,
             }).pipe(operators.tap((/**
              * @param {?} __0
              * @return {?}
              */
             function (_a) {
-                var totalCount = _a.totalCount, facets = _a.facets;
+                var totalCount = _a.totalCount, results = _a.results, facets = _a.facets;
                 _this.totalCount = totalCount;
                 /** @type {?} */
                 var resultsTitleIndex = 0;
@@ -11800,7 +11863,7 @@
                 else if (_this.totalCount === 1) {
                     resultsTitleIndex = 1;
                 }
-                _this.resultsTitle = _this.configuration.get('search-layout').results[resultsTitleIndex];
+                _this.resultsTitle = _this.configuration.get('gallery-layout').results[resultsTitleIndex];
                 // facets labels
                 _this._addFacetsLabels(facets);
                 // facets options
@@ -11808,21 +11871,18 @@
                 _this.searchModel.updateFacets(facets);
                 _this.searchModel.updateTotalCount(totalCount);
                 _this.one('aw-linked-objects').updateOptions({
-                    context: 'search',
+                    context: 'gallery',
                     config: _this.configuration,
                     page: _this.currentPage,
                     pagination: true,
+                    paginationParams: _this._getPaginationParams(),
                     dynamicPagination: {
-                        total: totalCount
+                        total: totalCount,
                     },
-                    size: _this.pageSize
+                    size: _this.pageSize,
                 });
-                // this.one('aw-linked-objects').update({ items: this._normalizeItems(results.items) });
-                _this.one('aw-gallery-results').updateOptions({
-                    currentPage: _this.currentPage,
-                    pageSize: _this.pageSize,
-                });
-                _this.one('aw-gallery-results').update(null);
+                _this.drawPagination();
+                _this.one('aw-linked-objects').update({ items: _this._normalizeItems(results.items) });
             })));
         };
         /**
@@ -11913,13 +11973,11 @@
                  */
                 function (dataItem) {
                     /** @type {?} */
-                    var key = dataItem.value.replace(' ', '-');
-                    /** @type {?} */
-                    var config = _this.configKeys[key];
+                    var config = _this.configKeys[dataItem.value];
                     if (config) {
                         dataItem.options = {
                             icon: config.icon,
-                            classes: "color-" + key
+                            classes: "color-" + config['class-name'],
                         };
                     }
                 }));
@@ -11952,6 +12010,10 @@
          */
         function () {
             var _this = this;
+            // no sticky for Internet Explorer
+            if (helpers.browserIsIE()) {
+                return;
+            }
             /** @type {?} */
             var source$ = rxjs.fromEvent(window, 'scroll');
             source$.pipe(operators.takeUntil(this.destroyed$)).subscribe((/**
@@ -11961,12 +12023,42 @@
                 /** @type {?} */
                 var windowOffsetTop = window.pageYOffset;
                 /** @type {?} */
-                var wrapperOffsetTop = ((/** @type {?} */ (document.getElementsByClassName('sticky-parent')[0]))).offsetTop;
+                var stickyParent = (/** @type {?} */ (document.getElementsByClassName('sticky-parent')[0]));
+                /** @type {?} */
+                var wrapperOffsetTop = stickyParent ? stickyParent.offsetTop : 0;
                 _this.sidebarIsSticky = wrapperOffsetTop <= windowOffsetTop;
             }));
         };
+        /**
+         * @private
+         * @return {?}
+         */
+        AwGalleryLayoutDS.prototype._getPaginationParams = /**
+         * @private
+         * @return {?}
+         */
+        function () {
+            /** @type {?} */
+            var requestParams = this.searchModel.getRequestParams();
+            /** @type {?} */
+            var queryParams = this.searchModel.filtersAsQueryParams(requestParams.filters);
+            Object.keys(queryParams).forEach((/**
+             * @param {?} key
+             * @return {?}
+             */
+            function (key) { queryParams[key] = queryParams[key] || null; }));
+            // aditional params
+            queryParams.orderby = this.orderBy;
+            queryParams.orderdirection = this.orderDirection;
+            queryParams.page = this.currentPage;
+            queryParams.limit = this.pageSize;
+            return {
+                queryParams: queryParams,
+                href: this.configuration.get('paths').galleryBasePath,
+            };
+        };
         return AwGalleryLayoutDS;
-    }(core$1.LayoutDataSource));
+    }(layoutDataSource.LayoutDataSource));
     if (false) {
         /**
          * @type {?}
@@ -12002,32 +12094,6 @@
          * @type {?}
          * @private
          */
-        AwGalleryLayoutDS.prototype.pageTitle;
-        /**
-         * @type {?}
-         * @private
-         */
-        AwGalleryLayoutDS.prototype.sidebarIsSticky;
-        /** @type {?} */
-        AwGalleryLayoutDS.prototype.currentPage;
-        /** @type {?} */
-        AwGalleryLayoutDS.prototype.pageSize;
-        /** @type {?} */
-        AwGalleryLayoutDS.prototype.isFirstLoading;
-        /** @type {?} */
-        AwGalleryLayoutDS.prototype.orderByLabel;
-        /** @type {?} */
-        AwGalleryLayoutDS.prototype.orderByOptions;
-        /** @type {?} */
-        AwGalleryLayoutDS.prototype.totalCount;
-        /** @type {?} */
-        AwGalleryLayoutDS.prototype.resultsTitle;
-        /** @type {?} */
-        AwGalleryLayoutDS.prototype.options;
-        /**
-         * @type {?}
-         * @private
-         */
         AwGalleryLayoutDS.prototype.prettifyLabels;
         /**
          * @type {?}
@@ -12045,7 +12111,35 @@
          */
         AwGalleryLayoutDS.prototype.resetButtonEnabled;
         /** @type {?} */
-        AwGalleryLayoutDS.prototype.getGalleryModelId;
+        AwGalleryLayoutDS.prototype.pageTitle;
+        /** @type {?} */
+        AwGalleryLayoutDS.prototype.resultsTitle;
+        /** @type {?} */
+        AwGalleryLayoutDS.prototype.totalCount;
+        /** @type {?} */
+        AwGalleryLayoutDS.prototype.currentPage;
+        /** @type {?} */
+        AwGalleryLayoutDS.prototype.pageSize;
+        /** @type {?} */
+        AwGalleryLayoutDS.prototype.sidebarIsSticky;
+        /** @type {?} */
+        AwGalleryLayoutDS.prototype.isFirstLoading;
+        /** @type {?} */
+        AwGalleryLayoutDS.prototype.resultsLoading;
+        /** @type {?} */
+        AwGalleryLayoutDS.prototype.orderBy;
+        /** @type {?} */
+        AwGalleryLayoutDS.prototype.orderDirection;
+        /** @type {?} */
+        AwGalleryLayoutDS.prototype.options;
+        /** @type {?} */
+        AwGalleryLayoutDS.prototype.orderByLabel;
+        /** @type {?} */
+        AwGalleryLayoutDS.prototype.orderByOptions;
+        /** @type {?} */
+        AwGalleryLayoutDS.prototype.drawPagination;
+        /** @type {?} */
+        AwGalleryLayoutDS.prototype.getSearchModelId;
     }
 
     /**
@@ -12058,6 +12152,7 @@
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.destroyed$ = new rxjs.Subject();
             _this.facetsChange$ = new rxjs.Subject();
+            _this.aditionalParamsChange$ = new rxjs.Subject();
             return _this;
         }
         /**
@@ -12080,6 +12175,7 @@
                         _this.configuration = payload.configuration;
                         _this.dataSource.onInit(payload);
                         _this._listenToFacetsChange();
+                        _this._listenToAditionalParamsChange();
                         _this._listenToRouterChanges();
                         break;
                     case 'aw-gallery-layout.destroy':
@@ -12088,18 +12184,15 @@
                         break;
                     case 'aw-gallery-layout.orderbychange':
                         _this.dataSource.onOrderByChange(payload);
-                        _this.facetsChange$.next();
+                        _this.aditionalParamsChange$.next();
                         break;
-                    case 'aw-gallery-layout.galleryreset':
+                    case 'aw-gallery-layout.searchreset':
                         _this.dataSource.resetButtonEnabled = false;
-                        _this.dataSource.galleryModel.clear();
-                        _this.emitGlobal('navigate', {
-                            handler: 'router',
-                            path: [_this.configuration.get('paths').galleryBasePath]
-                        });
+                        _this.dataSource.searchModel.clear();
+                        _this.aditionalParamsChange$.next();
                         break;
                     default:
-                        console.warn('(gallery) unhandled inner event of type', type);
+                        console.warn('(search) unhandled inner event of type', type);
                         break;
                 }
             }));
@@ -12113,33 +12206,9 @@
                     case 'facets-wrapper.facetschange':
                         _this.dataSource.resetPagination();
                         break;
-                    case 'aw-gallery-results.pagination':
-                    case 'aw-gallery-results.goto':
-                        _this.dataSource.onPaginationChange(payload).subscribe((/**
-                         * @param {?} changed
-                         * @return {?}
-                         */
-                        function (changed) {
-                            if (changed) {
-                                _this.facetsChange$.next();
-                            }
-                        }));
-                        break;
-                    case 'aw-gallery-results.change':
-                        _this.dataSource.onResultsLimitChange(payload);
-                        _this.facetsChange$.next();
-                        break;
-                    case 'aw-gallery-results.click':
-                        {
-                            /** @type {?} */
-                            var paths = _this.dataSource.configuration.get('paths');
-                            _this.emitGlobal('navigate', {
-                                handler: 'router',
-                                path: [payload.type === undefined
-                                        ? paths.schedaBasePath
-                                        : paths.entitaBasePath, payload.id]
-                            });
-                        }
+                    case 'n7-smart-pagination.change':
+                        _this.dataSource.onResultsLimitChange(payload.value);
+                        _this.aditionalParamsChange$.next();
                         break;
                     default:
                         break;
@@ -12160,13 +12229,52 @@
              * @return {?}
              */
             function () {
-                _this.dataSource.doGalleryRequest$().subscribe((/**
+                _this.dataSource.resultsLoading = true;
+                _this.dataSource.doSearchRequest$().subscribe((/**
                  * @return {?}
                  */
                 function () {
-                    _this.dataSource.onGalleryResponse();
-                    _this.emitGlobal('galleryresponse', _this.dataSource.getGalleryModelId());
+                    _this.dataSource.resultsLoading = false;
+                    _this.dataSource.onSearchResponse();
+                    _this.emitGlobal('searchresponse', _this.dataSource.getSearchModelId());
                 }));
+            }));
+        };
+        /**
+         * @private
+         * @return {?}
+         */
+        AwGalleryLayoutEH.prototype._listenToAditionalParamsChange = /**
+         * @private
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.aditionalParamsChange$.subscribe((/**
+             * @return {?}
+             */
+            function () {
+                var searchModel = _this.dataSource.searchModel;
+                /** @type {?} */
+                var requestParams = searchModel.getRequestParams();
+                /** @type {?} */
+                var queryParams = searchModel.filtersAsQueryParams(requestParams.filters);
+                Object.keys(queryParams).forEach((/**
+                 * @param {?} key
+                 * @return {?}
+                 */
+                function (key) { queryParams[key] = queryParams[key] || null; }));
+                // aditional params
+                queryParams.orderby = _this.dataSource.orderBy;
+                queryParams.orderdirection = _this.dataSource.orderDirection;
+                queryParams.page = _this.dataSource.currentPage;
+                queryParams.limit = _this.dataSource.pageSize;
+                // router signal
+                _this.emitGlobal('navigate', {
+                    handler: 'router',
+                    path: [],
+                    queryParams: queryParams,
+                });
             }));
         };
         /**
@@ -12185,6 +12293,16 @@
              */
             function (params) {
                 _this.emitOuter('queryparamschange', params);
+                // aditional params control
+                if (params.orderby && params.orderdirection) {
+                    _this.dataSource.onOrderByChange(params.orderby + "_" + params.orderdirection);
+                }
+                if (params.page) {
+                    _this.dataSource.onPaginationChange("page-" + params.page);
+                }
+                if (params.limit) {
+                    _this.dataSource.setLimit(+params.limit);
+                }
                 _this.facetsChange$.next();
             }));
         };
@@ -12210,6 +12328,11 @@
          * @type {?}
          * @private
          */
+        AwGalleryLayoutEH.prototype.aditionalParamsChange$;
+        /**
+         * @type {?}
+         * @private
+         */
         AwGalleryLayoutEH.prototype.configuration;
     }
 
@@ -12220,15 +12343,27 @@
     /** @type {?} */
     var AwGalleryLayoutConfig = {
         layoutId: 'aw-gallery-layout',
+        /**
+         * Array of components you want to use
+         * in this layout
+         */
         widgets: [
             { id: 'facets-wrapper', dataSource: FacetsWrapperDS, eventHandler: FacetsWrapperEH },
-            { id: 'aw-gallery-results', hasStaticData: true },
+            { id: 'aw-linked-objects' },
+            { id: 'aw-search-layout-tabs', hasStaticData: true },
+            {
+                id: 'n7-smart-pagination',
+                dataSource: SmartPaginationDS,
+                eventHandler: SmartPaginationEH,
+            },
         ],
         layoutDS: AwGalleryLayoutDS,
         layoutEH: AwGalleryLayoutEH,
         widgetsDataSources: DS$1,
         widgetsEventHandlers: EH$1,
-        layoutOptions: {}
+        options: {
+        // TODO
+        },
     };
 
     /**
@@ -12237,11 +12372,9 @@
      */
     var AwGalleryLayoutComponent = /** @class */ (function (_super) {
         __extends(AwGalleryLayoutComponent, _super);
-        function AwGalleryLayoutComponent(router, configuration, titleService, layoutsConfiguration, mainState, communication, search, route) {
+        function AwGalleryLayoutComponent(configuration, layoutsConfiguration, mainState, communication, search, route) {
             var _this = _super.call(this, AwGalleryLayoutConfig) || this;
-            _this.router = router;
             _this.configuration = configuration;
-            _this.titleService = titleService;
             _this.layoutsConfiguration = layoutsConfiguration;
             _this.mainState = mainState;
             _this.communication = communication;
@@ -12261,12 +12394,10 @@
             return {
                 configuration: this.configuration,
                 mainState: this.mainState,
-                router: this.router,
-                route: this.route,
-                titleService: this.titleService,
                 communication: this.communication,
-                options: this.config.options || {},
                 search: this.search,
+                route: this.route,
+                options: this.config.options || {},
             };
         };
         /**
@@ -12290,14 +12421,12 @@
         AwGalleryLayoutComponent.decorators = [
             { type: core.Component, args: [{
                         selector: 'aw-gallery-layout',
-                        template: "<div class=\"aw-gallery\" *ngIf=\"lb.dataSource\">\n\n  <div class=\"aw-gallery__header\">\n    <div class=\"aw-gallery__header-left\">\n      <h1 class=\"aw-gallery__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n    </div>\n  </div>\n\n  <div class=\"aw-gallery__content-wrapper sticky-parent\">\n    \n    <!-- Left sidebar: facets -->\n    <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-gallery__sidebar-loading sticky-target\">\n        <div class=\"aw-gallery__facets-loading\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'gallery-placeholder-facet-input'\n                }, {\n                    classes: 'gallery-placeholder-facet-check'\n                }, {\n                    classes: 'gallery-placeholder-facet-item'\n                }, {\n                    classes: 'gallery-placeholder-facet-item'\n                }, {\n                    classes: 'gallery-placeholder-facet-item'\n                }, {\n                    classes: 'gallery-placeholder-facet-item'\n                }, {\n                    classes: 'gallery-placeholder-facet-item'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n    </div>\n    <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-gallery__sidebar sticky-target\" [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n        <div class=\"aw-gallery__facets\">\n            <!-- <n7-facet-header [data]=\"{\n                iconLeft: 'n7-icon-search1',\n                text: 'Filtri di ricerca',\n                iconRight: 'n7-icon-angle-down',\n                classes: 'is-expanded',\n                payload: 'header'\n                }\"></n7-facet-header> -->\n            <n7-facets-wrapper \n                [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                [emit]=\"lb.widgets['facets-wrapper'].emit\">\n              </n7-facets-wrapper>\n        </div>\n    </div>\n\n    <div class=\"aw-gallery__content\">\n      <div class=\"aw-gallery__results-header\">\n        <div class=\"aw-gallery__results-header-left\">\n          <h3 class=\"aw-gallery__total\">\n            <span class=\"aw-gallery__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n            <span class=\"aw-gallery__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n          </h3>\n        </div>\n        <div class=\"aw-gallery__results-header-right\">\n          <label class=\"aw-gallery__results-select-orderby-label\"\n            for=\"aw-gallery__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n          <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n            id=\"aw-gallery__results-select-orderby\">\n            <option *ngFor=\"let option of lb.dataSource.orderByOptions\" [value]=\"option.value\">\n              {{ option.label }}</option>\n          </select>\n        </div>\n      </div>\n      \n      <!-- Gallery details -->\n      <div class=\"aw-gallery__results-wrapper\">\n\n        <!-- Gallery results loader -->\n        <div *ngIf=\"!(lb.widgets['aw-gallery-results'].ds.out$ | async)\"\n             class=\"aw-gallery__results-wrapper-loader n7-grid-3\">\n             <n7-content-placeholder *ngFor=\"let i of [1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                blocks: [\n                    { classes: 'gallery-placeholder-image' },\n                    { classes: 'gallery-placeholder-title' },\n                    { classes: 'gallery-placeholder-subtitle' }\n                ]\n                }\">\n            </n7-content-placeholder>\n            <n7-content-placeholder *ngFor=\"let i of [1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                blocks: [\n                    { classes: 'gallery-placeholder-image' },\n                    { classes: 'gallery-placeholder-title' },\n                    { classes: 'gallery-placeholder-subtitle' }\n                ]\n                }\">\n            </n7-content-placeholder>\n            <n7-content-placeholder *ngFor=\"let i of [1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                blocks: [\n                    { classes: 'gallery-placeholder-image' },\n                    { classes: 'gallery-placeholder-title' },\n                    { classes: 'gallery-placeholder-subtitle' }\n                ]\n                }\">\n            </n7-content-placeholder>\n            <n7-content-placeholder *ngFor=\"let i of [1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                blocks: [\n                    { classes: 'gallery-placeholder-image' },\n                    { classes: 'gallery-placeholder-title' },\n                    { classes: 'gallery-placeholder-subtitle' }\n                ]\n                }\">\n            </n7-content-placeholder>\n            <n7-content-placeholder *ngFor=\"let i of [1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                blocks: [\n                    { classes: 'gallery-placeholder-image' },\n                    { classes: 'gallery-placeholder-title' },\n                    { classes: 'gallery-placeholder-subtitle' }\n                ]\n                }\">\n            </n7-content-placeholder>\n            <n7-content-placeholder *ngFor=\"let i of [1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                blocks: [\n                    { classes: 'gallery-placeholder-image' },\n                    { classes: 'gallery-placeholder-title' },\n                    { classes: 'gallery-placeholder-subtitle' }\n                ]\n                }\">\n            </n7-content-placeholder>\n        </div>\n\n        <!-- Gallery results and pagination -->\n        <div class=\"aw-gallery__results\">\n            <div class=\"aw-gallery__results-list n7-grid-3\">\n                <n7-item-preview \n                *ngFor=\"let item of (lb.widgets['aw-gallery-results'].ds.out$ | async)?.res\"\n                class=\"gallery-result is-vertical\"\n                [data]=\"item\">\n                </n7-item-preview>\n            </div>\n\n            <n7-pagination [data]=\"(lb.widgets['aw-gallery-results'].ds.out$ | async)?.pagination\"\n            [emit]=\"lb.widgets['aw-gallery-results'].emit\">\n            </n7-pagination>\n\n            <!-- <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n            <div class=\"aw-gallery__fallback\">\n                <p class=\"aw-gallery__fallback-string\">\n                {{ lb.dataSource.fallback }}\n                </p>\n                <button [disabled]=\"!lb.dataSource.resetButtonEnabled\" class=\"n7-btn aw-gallery__fallback-button\"\n                (click)=\"lb.eventHandler.emitInner('galleryreset', {})\">\n                Resetta la ricerca\n                </button>\n            </div>\n            </ng-container>\n            <n7-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n            [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.pagination\"\n            [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n            </n7-pagination> -->\n        </div>\n      </div>\n    </div>\n  </div>\n</div>"
+                        template: "<div class=\"aw-search aw-gallery n7-side-auto-padding\" id=\"gallery-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar sticky-target\"\n            [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                        for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                        id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\" [value]=\"option.value\"\n                            [selected]=\"option.selected\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper\">\n                <div class=\"n7-grid-3\">\n                    <div *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\" class=\"n7-btn aw-search__fallback-button\"\n                            (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>"
                     }] }
         ];
         /** @nocollapse */
         AwGalleryLayoutComponent.ctorParameters = function () { return [
-            { type: router.Router },
             { type: ConfigurationService },
-            { type: platformBrowser.Title },
             { type: LayoutsConfigurationService },
             { type: MainStateService },
             { type: CommunicationService },
@@ -12311,17 +12440,7 @@
          * @type {?}
          * @private
          */
-        AwGalleryLayoutComponent.prototype.router;
-        /**
-         * @type {?}
-         * @private
-         */
         AwGalleryLayoutComponent.prototype.configuration;
-        /**
-         * @type {?}
-         * @private
-         */
-        AwGalleryLayoutComponent.prototype.titleService;
         /**
          * @type {?}
          * @private
@@ -15401,9 +15520,14 @@
     exports.SubnavEH = SubnavEH;
     exports.ɵa = MainLayoutComponent;
     exports.ɵb = AbstractLayout;
-    exports.ɵba = MrStaticLayoutComponent;
-    exports.ɵbb = MrSearchFacetsLayoutComponent;
-    exports.ɵbc = MrSearchTestLayoutComponent;
+    exports.ɵba = DatepickerWrapperComponent;
+    exports.ɵbb = DvExampleLayoutComponent;
+    exports.ɵbc = MrHomeLayoutComponent;
+    exports.ɵbd = MrSearchLayoutComponent;
+    exports.ɵbe = MrGlossaryLayoutComponent;
+    exports.ɵbf = MrStaticLayoutComponent;
+    exports.ɵbg = MrSearchFacetsLayoutComponent;
+    exports.ɵbh = MrSearchTestLayoutComponent;
     exports.ɵc = ConfigurationService;
     exports.ɵd = LayoutsConfigurationService;
     exports.ɵe = MainStateService;
@@ -15419,15 +15543,15 @@
     exports.ɵo = AwSearchLayoutComponent;
     exports.ɵp = SearchService;
     exports.ɵq = AwGalleryLayoutComponent;
-    exports.ɵr = BubbleChartWrapperComponent;
-    exports.ɵs = ChartTippyComponent;
-    exports.ɵt = SmartBreadcrumbsComponent;
-    exports.ɵu = DataWidgetWrapperComponent;
-    exports.ɵv = DatepickerWrapperComponent;
-    exports.ɵw = DvExampleLayoutComponent;
-    exports.ɵx = MrHomeLayoutComponent;
-    exports.ɵy = MrSearchLayoutComponent;
-    exports.ɵz = MrGlossaryLayoutComponent;
+    exports.ɵr = ConfigurationService;
+    exports.ɵs = LayoutsConfigurationService;
+    exports.ɵt = MainStateService;
+    exports.ɵu = CommunicationService;
+    exports.ɵv = SearchService;
+    exports.ɵw = BubbleChartWrapperComponent;
+    exports.ɵx = ChartTippyComponent;
+    exports.ɵy = SmartBreadcrumbsComponent;
+    exports.ɵz = DataWidgetWrapperComponent;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 

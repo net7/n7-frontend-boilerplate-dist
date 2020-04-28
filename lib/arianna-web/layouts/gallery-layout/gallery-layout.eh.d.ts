@@ -3,8 +3,10 @@ export declare class AwGalleryLayoutEH extends EventHandler {
     private destroyed$;
     private route;
     private facetsChange$;
+    private aditionalParamsChange$;
     private configuration;
     listen(): void;
     private _listenToFacetsChange;
+    private _listenToAditionalParamsChange;
     private _listenToRouterChanges;
 }

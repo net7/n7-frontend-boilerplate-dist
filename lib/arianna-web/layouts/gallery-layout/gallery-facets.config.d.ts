@@ -41,10 +41,6 @@ declare const _default: {
         order?: undefined;
     })[];
     fields: ({
-        header: {
-            label: string;
-            classes: string;
-        };
         inputs: ({
             type: string;
             facetId: string;
@@ -70,6 +66,7 @@ declare const _default: {
             };
             placeholder?: undefined;
         })[];
+        header?: undefined;
     } | {
         header: {
             label: string;
