@@ -12372,9 +12372,11 @@
      */
     var AwGalleryLayoutComponent = /** @class */ (function (_super) {
         __extends(AwGalleryLayoutComponent, _super);
-        function AwGalleryLayoutComponent(configuration, layoutsConfiguration, mainState, communication, search, route) {
+        function AwGalleryLayoutComponent(router, configuration, titleService, layoutsConfiguration, mainState, communication, search, route) {
             var _this = _super.call(this, AwGalleryLayoutConfig) || this;
+            _this.router = router;
             _this.configuration = configuration;
+            _this.titleService = titleService;
             _this.layoutsConfiguration = layoutsConfiguration;
             _this.mainState = mainState;
             _this.communication = communication;
@@ -12394,10 +12396,12 @@
             return {
                 configuration: this.configuration,
                 mainState: this.mainState,
-                communication: this.communication,
-                search: this.search,
+                router: this.router,
                 route: this.route,
+                titleService: this.titleService,
+                communication: this.communication,
                 options: this.config.options || {},
+                search: this.search,
             };
         };
         /**
@@ -12426,7 +12430,9 @@
         ];
         /** @nocollapse */
         AwGalleryLayoutComponent.ctorParameters = function () { return [
+            { type: router.Router },
             { type: ConfigurationService },
+            { type: platformBrowser.Title },
             { type: LayoutsConfigurationService },
             { type: MainStateService },
             { type: CommunicationService },
@@ -12440,7 +12446,17 @@
          * @type {?}
          * @private
          */
+        AwGalleryLayoutComponent.prototype.router;
+        /**
+         * @type {?}
+         * @private
+         */
         AwGalleryLayoutComponent.prototype.configuration;
+        /**
+         * @type {?}
+         * @private
+         */
+        AwGalleryLayoutComponent.prototype.titleService;
         /**
          * @type {?}
          * @private
@@ -15520,14 +15536,9 @@
     exports.SubnavEH = SubnavEH;
     exports.ɵa = MainLayoutComponent;
     exports.ɵb = AbstractLayout;
-    exports.ɵba = DatepickerWrapperComponent;
-    exports.ɵbb = DvExampleLayoutComponent;
-    exports.ɵbc = MrHomeLayoutComponent;
-    exports.ɵbd = MrSearchLayoutComponent;
-    exports.ɵbe = MrGlossaryLayoutComponent;
-    exports.ɵbf = MrStaticLayoutComponent;
-    exports.ɵbg = MrSearchFacetsLayoutComponent;
-    exports.ɵbh = MrSearchTestLayoutComponent;
+    exports.ɵba = MrStaticLayoutComponent;
+    exports.ɵbb = MrSearchFacetsLayoutComponent;
+    exports.ɵbc = MrSearchTestLayoutComponent;
     exports.ɵc = ConfigurationService;
     exports.ɵd = LayoutsConfigurationService;
     exports.ɵe = MainStateService;
@@ -15543,15 +15554,15 @@
     exports.ɵo = AwSearchLayoutComponent;
     exports.ɵp = SearchService;
     exports.ɵq = AwGalleryLayoutComponent;
-    exports.ɵr = ConfigurationService;
-    exports.ɵs = LayoutsConfigurationService;
-    exports.ɵt = MainStateService;
-    exports.ɵu = CommunicationService;
-    exports.ɵv = SearchService;
-    exports.ɵw = BubbleChartWrapperComponent;
-    exports.ɵx = ChartTippyComponent;
-    exports.ɵy = SmartBreadcrumbsComponent;
-    exports.ɵz = DataWidgetWrapperComponent;
+    exports.ɵr = BubbleChartWrapperComponent;
+    exports.ɵs = ChartTippyComponent;
+    exports.ɵt = SmartBreadcrumbsComponent;
+    exports.ɵu = DataWidgetWrapperComponent;
+    exports.ɵv = DatepickerWrapperComponent;
+    exports.ɵw = DvExampleLayoutComponent;
+    exports.ɵx = MrHomeLayoutComponent;
+    exports.ɵy = MrSearchLayoutComponent;
+    exports.ɵz = MrGlossaryLayoutComponent;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
