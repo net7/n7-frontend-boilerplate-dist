@@ -3,7 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK } from '@n7-frontend/components';
 import { ReplaySubject, empty, of, Subject, forkJoin, fromEvent, merge } from 'rxjs';
-import { map, catchError, tap, takeUntil, filter, debounceTime } from 'rxjs/operators';
+import { map, catchError, tap, takeUntil, filter, debounceTime, first, withLatestFrom } from 'rxjs/operators';
 import { __extends, __assign, __values, __read } from 'tslib';
 import { NavigationStart, Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Title } from '@angular/platform-browser';
@@ -6746,13 +6746,12 @@ var AwSidebarHeaderDS = /** @class */ (function (_super) {
         var sidebarData = this.output;
         if (sidebarData.classes === 'is-expanded') {
             sidebarData.classes = 'is-collapsed';
-            sidebarData.iconRight = 'n7-icon-tree-icon';
+            sidebarData.iconRight = 'n7-icon-angle-right';
         }
         else {
             sidebarData.classes = 'is-expanded';
             sidebarData.iconRight = 'n7-icon-angle-left';
         }
-        this.update(sidebarData);
     };
     return AwSidebarHeaderDS;
 }(DataSource));
@@ -7676,6 +7675,51 @@ var AwTreeEH = /** @class */ (function (_super) {
     __extends(AwTreeEH, _super);
     function AwTreeEH() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.targetOffset = new ReplaySubject();
+        _this.targetIsOpen = false;
+        _this.scrollOpenedIntoView = (/**
+         * @return {?}
+         */
+        function () {
+            _this.dataSource.out$
+                .pipe(filter((/**
+             * @param {?} data
+             * @return {?}
+             */
+            function (data) { return !!data; })), first(), withLatestFrom(_this.targetOffset)).subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var _b = __read(_a, 2), offset = _b[1];
+                setTimeout((/**
+                 * @return {?}
+                 */
+                function () {
+                    /** @type {?} */
+                    var wrapperEl = (/** @type {?} */ (document.querySelector('.aw-scheda__tree-content')));
+                    /** @type {?} */
+                    var expandedNode = document.getElementsByClassName('n7-tree__item is-expanded');
+                    /** @type {?} */
+                    var lastExpandedNode = expandedNode.length
+                        ? expandedNode[expandedNode.length - 1]
+                        : null;
+                    if (lastExpandedNode) {
+                        /** @type {?} */
+                        var scrollTreeEl = (/** @type {?} */ (document.querySelector('.n7-tree')));
+                        /** @type {?} */
+                        var wrapperElRect = wrapperEl.getBoundingClientRect();
+                        /** @type {?} */
+                        var offsetToAdjust = offset - wrapperElRect.top;
+                        scrollTreeEl.style.marginBottom = '1000px';
+                        lastExpandedNode.scrollIntoView();
+                        wrapperEl.scrollTop -= offsetToAdjust;
+                        window.scrollTo(0, 0);
+                        scrollTreeEl.style.marginBottom = '0px';
+                    }
+                }), 200);
+            }));
+        });
         _this.scrollLeafIntoView = (/**
          * @return {?}
          */
@@ -7725,7 +7769,15 @@ var AwTreeEH = /** @class */ (function (_super) {
             switch (type) {
                 case 'aw-tree.click':
                     if (payload.source === 'toggle') {
-                        _this.dataSource.build(payload.id);
+                        setTimeout((/**
+                         * @return {?}
+                         */
+                        function () {
+                            _this.dataSource.build(payload.id);
+                            if (_this.targetIsOpen) {
+                                _this.scrollOpenedIntoView();
+                            }
+                        }));
                     }
                     break;
                 default:
@@ -7766,12 +7818,26 @@ var AwTreeEH = /** @class */ (function (_super) {
                     }
                     break;
                 case 'aw-scheda-layout.viewleaf':
-                    _this.dataSource.out$.subscribe((/**
+                    _this.dataSource.out$
+                        .pipe(filter((/**
+                     * @param {?} data
+                     * @return {?}
+                     */
+                    function (data) { return !!data; })), first()).subscribe((/**
                      * @return {?}
                      */
                     function () {
                         _this.scrollLeafIntoView();
                     }));
+                    break;
+                case 'aw-scheda-layout.treeposition':
+                    {
+                        var target = payload.target;
+                        /** @type {?} */
+                        var targetRect = target.getBoundingClientRect();
+                        _this.targetIsOpen = target.className.indexOf('n7-icon-angle-right') !== -1;
+                        _this.targetOffset.next(targetRect.top);
+                    }
                     break;
                 default:
                     break;
@@ -7781,6 +7847,21 @@ var AwTreeEH = /** @class */ (function (_super) {
     return AwTreeEH;
 }(EventHandler));
 if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    AwTreeEH.prototype.targetOffset;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwTreeEH.prototype.targetIsOpen;
+    /**
+     * @type {?}
+     * @private
+     */
+    AwTreeEH.prototype.scrollOpenedIntoView;
     /**
      * @type {?}
      * @private
@@ -10139,7 +10220,7 @@ var AwSchedaLayoutComponent = /** @class */ (function (_super) {
     AwSchedaLayoutComponent.decorators = [
         { type: Component, args: [{
                     selector: 'aw-scheda-layout',
-                    template: "<div class=\"aw-scheda\"\n     id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                               [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n            <div class=\"aw-scheda__tree-content-loading\"\n                 *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                        [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n            </div>\n            <div class=\"aw-scheda__tree-content\"\n                 [ngStyle]=\"{\n                    'max-height': lb.dataSource.treeMaxHeight,\n                    'overflow': 'auto'\n                }\">\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                         [emit]=\"lb.widgets['aw-tree'].emit\"\n                         *ngIf=\"!lb.dataSource.sidebarCollapsed\">\n                </n7-tree>\n            </div>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper-loading\"\n             [hidden]=\"!lb.dataSource.contentIsLoading\">\n            <!--\n                <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'content-placeholder-title'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }]\n            }\"></n7-content-placeholder>\n            -->\n        </div>\n        <div class=\"aw-scheda__scheda-wrapper\"\n             [hidden]=\"lb.dataSource.contentIsLoading\">\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                                  [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                                  [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\"\n                 class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n\n            <div *ngIf=\"!lb.dataSource.currentId\"\n                 class=\"aw-scheda__intro-text\"\n                 [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <n7-image-viewer [hidden]=\"!lb.dataSource.hasImage\"\n                             [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\"\n                     *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\"\n                     *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section class=\"aw-scheda__bubble-chart\"\n                     *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\n                <div *ngIf=\"lb.dataSource.hasBubbles\"\n                     class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <aw-bubble-chart-wrapper>\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                    </aw-chart-tippy>\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </section>\n\n            <section *ngIf=\"lb.dataSource.hasSimilarItems && lb.dataSource.hasBubbles\"\n                     id=\"related-item-container\"\n                     class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.similarItemsSectionTitle}}\n                </div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview [data]=\"preview\"\n                                         [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n            </section>\n        </div>\n    </div>\n</div>\n"
+                    template: "<div class=\"aw-scheda\"\n     id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                               [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n            <div class=\"aw-scheda__tree-content-loading\"\n                 *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                        [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n            </div>\n            <div class=\"aw-scheda__tree-content\"\n                 (click)=\"lb.eventHandler.emitOuter('treeposition', $event)\"\n                 [ngStyle]=\"{\n                    'max-height': lb.dataSource.treeMaxHeight,\n                    'overflow': 'auto'\n                }\">\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                         [emit]=\"lb.widgets['aw-tree'].emit\"\n                         *ngIf=\"!lb.dataSource.sidebarCollapsed\">\n                </n7-tree>\n            </div>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper-loading\"\n             [hidden]=\"!lb.dataSource.contentIsLoading\">\n            <!--\n                <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'content-placeholder-title'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }]\n            }\"></n7-content-placeholder>\n            -->\n        </div>\n        <div class=\"aw-scheda__scheda-wrapper\"\n             [hidden]=\"lb.dataSource.contentIsLoading\">\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                                  [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                                  [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\"\n                 class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n\n            <div *ngIf=\"!lb.dataSource.currentId\"\n                 class=\"aw-scheda__intro-text\"\n                 [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <n7-image-viewer [hidden]=\"!lb.dataSource.hasImage\"\n                             [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\"\n                     *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\"\n                     *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section class=\"aw-scheda__bubble-chart\"\n                     *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\n                <div *ngIf=\"lb.dataSource.hasBubbles\"\n                     class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <aw-bubble-chart-wrapper>\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                    </aw-chart-tippy>\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </section>\n\n            <section *ngIf=\"lb.dataSource.hasSimilarItems && lb.dataSource.hasBubbles\"\n                     id=\"related-item-container\"\n                     class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.similarItemsSectionTitle}}\n                </div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview [data]=\"preview\"\n                                         [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n            </section>\n        </div>\n    </div>\n</div>\n"
                 }] }
     ];
     /** @nocollapse */
@@ -11396,7 +11477,7 @@ var facetsConfig$1 = {
             }
         ]
     },
-    page: { offset: 0, limit: 10 }
+    page: { offset: 0, limit: 12 }
 };
 
 /**
@@ -11413,7 +11494,7 @@ var AwGalleryLayoutDS = /** @class */ (function (_super) {
         _this.resetButtonEnabled = true;
         _this.currentPage = 1; // pagination value (url param)
         // pagination value (url param)
-        _this.pageSize = 10; // linked objects page size
+        _this.pageSize = 12; // linked objects page size
         // linked objects page size
         _this.sidebarIsSticky = false;
         _this.isFirstLoading = true;
@@ -11456,7 +11537,7 @@ var AwGalleryLayoutDS = /** @class */ (function (_super) {
                 currentPage: _this.currentPage,
                 pageLimit: 5,
                 sizes: {
-                    list: [10, 25, 50],
+                    list: [12, 24, 48],
                     active: _this.pageSize,
                 },
             });
