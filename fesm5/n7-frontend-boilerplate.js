@@ -1,4 +1,4 @@
-import { Injectable, ɵɵdefineInjectable, Inject, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef } from '@angular/core';
+import { Injectable, ɵɵdefineInjectable, Inject, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef, ApplicationInitStatus } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK } from '@n7-frontend/components';
@@ -16,6 +16,7 @@ import { DataSource as DataSource$1 } from '@n7-frontend/core/dist/data-source';
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/configuration.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var ConfigurationService = /** @class */ (function () {
@@ -56,6 +57,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/layouts-configuration.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var LayoutsConfigurationService = /** @class */ (function () {
@@ -115,6 +117,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/main-state.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MainStateService = /** @class */ (function () {
@@ -253,79 +256,31 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-var ApolloProviderConfig = {
-    getLastPosts: {
-        queryName: 'getLastPosts',
-        queryBody: "\n      {\n        getLastPosts(__PARAMS__) {\n          id\n          title\n        }\n      }\n    ",
-    },
-    getTree: {
-        queryName: 'getTreeOfItems',
-        queryBody: "\n    {\n      getTreeOfItems{\n        label\n        id\n        img\n        document_type\n        document_classification\n        branches {\n          label\n          id\n          img\n          document_type\n          document_classification\n          branches {\n            label\n            id\n            img\n            document_type\n            document_classification\n            branches {\n              label\n              id\n              img\n              document_type\n              document_classification\n              branches {\n                label\n                id\n                img\n                document_type\n                document_classification\n                branches {\n                  label\n                  id\n                  img\n                  document_type\n                  document_classification\n                  branches {\n                    label\n                    id\n                    img\n                    document_type\n                    document_classification\n                    branches {\n                      label\n                      id\n                      img\n                      document_type\n                      document_classification\n                      branches {\n                        label\n                        id\n                        img\n                        document_type\n                        document_classification\n                      }\n                    }\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n    ",
-    },
-    globalFilter: {
-        queryName: 'globalFilter',
-        queryBody: "{\n      globalFilter(__PARAMS__){\n        entitiesData {\n          entity {\n              id\n              label\n              typeOfEntity\n          } count\n        }\n        typeOfEntityData {\n          type\n          count\n        }\n        itemsPagination {\n          totalCount\n          items {\n            thumbnail\n            item {\n              id\n              label\n              fields\n              {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n              breadcrumbs {\n                label\n                link\n              }\n              relatedTypesOfEntity {\n                type\n                count\n              }\n            }\n          }\n        }\n      }\n      }",
-    },
-    getEntityDetails: {
-        queryName: 'getEntity',
-        queryBody: "{\n      getEntity(__PARAMS__){\n        overviewTab\n        label\n        id\n        typeOfEntity\n        fields {\n          ...\n          on KeyValueField {\n            key\n            value\n          }\n          ... on\n          KeyValueFieldGroup {\n            label\n            fields\n            {\n              ...\n              on KeyValueField {\n                key\n                value\n              }\n            }\n          }\n        }\n        extraTab\n        wikiTab {\n          text\n          url\n        }\n        relatedItems {\n          thumbnail\n          relation\n          item {\n            label\n            id\n            fields\n            {\n              ...\n              on KeyValueField {\n                key\n                value\n              }\n            }\n            breadcrumbs {\n              label\n              link\n            }\n          }\n          relatedTypesOfEntity {\n            type\n            count\n          }\n        }\n        relatedEntities {\n          entity {\n              id\n              label\n              typeOfEntity\n          }\n          count\n        }\n      }\n    }\n    ",
-    },
-    getItem: {
-        queryName: 'getItem',
-        queryBody: "{\n      getItem(__PARAMS__) {\n        id\n        label\n        icon\n        title\n        subTitle\n        image\n        text\n        fields {\n          ...\n          on KeyValueField {\n            key\n            value\n          }\n          ... on KeyValueFieldGroup {\n            label\n            fields {\n              ...\n              on KeyValueField {\n                key\n                value\n              }\n            }\n          }\n        }\n        relatedEntities {\n          count\n          entity{\n            id\n            label\n            typeOfEntity\n          }\n        }\n        relatedItems {\n          thumbnail\n          item {\n            label\n            id\n            relatedTypesOfEntity {\n              type\n              count\n            }\n          }\n        }\n        breadcrumbs {\n          label\n          link\n        }\n      }\n    }",
-    },
-    getNode: {
-        queryName: 'getNode',
-        queryBody: "{\n      getNode(__PARAMS__) {\n        ... on Item {\n          id\n          label\n          title\n          subTitle\n          image\n          images\n          text\n          document_type\n          fields {\n            ...\n            on KeyValueField {\n              key\n              value\n            }\n            ... on KeyValueFieldGroup {\n              label\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n          relatedEntities {\n              count\n              entity{\n                id\n                label\n                typeOfEntity\n                relation\n              }\n          }\n          relatedItems {\n              thumbnail\n              item {\n                label\n                id\n                fields {\n                  ...\n                  on KeyValueField {\n                    key\n                    value\n                  }\n                  ... on KeyValueFieldGroup {\n                    label\n                    fields {\n                      ...\n                      on KeyValueField {\n                        key\n                        value\n                      }\n                    }\n                  }\n                }\n                relatedTypesOfEntity {\n                  type\n                  count\n                }\n              }\n            }\n          breadcrumbs {\n            label\n            link\n          }\n        }\n        ... on Node {\n          id\n          label\n          img\n          document_type\n          fields {\n            ...\n            on KeyValueField {\n              key\n              value\n            }\n            ... on KeyValueFieldGroup {\n              label\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n        }\n      }\n    }",
-    },
-    autoComplete: {
-        queryName: 'autoComplete',
-        queryBody: "{\n      autoComplete(__PARAMS__){\n        totalCount\n        results {\n          ... on EntityCountData {\n            count\n            entity {\n              id\n              label\n              typeOfEntity\n              fields {\n                ... on KeyValueField {\n                  key\n                  value\n                }\n                ... on KeyValueFieldGroup {\n                  label\n                  fields {\n                    ... on KeyValueField {\n                      key\n                      value\n                    }\n                  }\n                }\n              }\n            }\n          }\n          ... on ItemListing {\n            item {\n              id\n              label\n              document_type\n              fields {\n                ... on KeyValueField {\n                  key\n                  value\n                }\n                ... on KeyValueFieldGroup {\n                  label\n                  fields {\n                    ... on KeyValueField {\n                      key\n                      value\n                    }\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    }",
-    },
-    search: {
-        queryName: 'search',
-        queryBody: "{\n      search(__PARAMS__){\n        totalCount\n        facets {\n          id\n          type\n          operator\n          limit\n          order\n          data {\n            label\n            value\n            counter\n            searchData {\n              key\n              value\n            }\n          }\n        }\n        results {\n          order{\n            type\n            key\n            direction\n          }\n          fields\n          {\n            id\n            highlight\n            limit\n          }\n          items {\n            ... on Entity {\n              id\n              label\n              typeOfEntity\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n                ... on KeyValueFieldGroup {\n                  label\n                  fields {\n                    ...\n                    on KeyValueField {\n                      key\n                      value\n                    }\n                  }\n                }\n              }\n              relatedEntities {\n                  count\n                  entity{\n                    id\n                    label\n                    typeOfEntity\n                  }\n              }\n              relatedItems {\n                  thumbnail\n                  item {\n                    label\n                    id\n                    fields {\n                      ...\n                      on KeyValueField {\n                        key\n                        value\n                      }\n                      ... on KeyValueFieldGroup {\n                        label\n                        fields {\n                          ...\n                          on KeyValueField {\n                            key\n                            value\n                          }\n                        }\n                      }\n                    }\n                }\n                relatedTypesOfEntity {\n                  type\n                  count\n                }\n              }\n            }\n            ... on Item {\n              id\n              label\n              icon\n              title\n              subTitle\n              image\n              text\n              relatedTypesOfEntity {\n                type\n                count\n              }\n              breadcrumbs {\n                label\n                link\n              }\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n                ... on KeyValueFieldGroup {\n                  label\n                  fields {\n                    ...\n                    on KeyValueField {\n                      key\n                      value\n                    }\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    }",
-    },
-    getMissingBubble: {
-        queryName: 'getEntity',
-        queryBody: "{\n      getEntity(__PARAMS__){\n        label\n        id\n        typeOfEntity\n      }\n    }",
-    },
-};
-
-/**
- * @fileoverview added by tsickle
+ * Generated from: lib/common/services/communication-providers/apollo.provider.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var ApolloProvider = /** @class */ (function () {
-    function ApolloProvider(config, http) {
-        this.config = config;
+    function ApolloProvider(http) {
         this.http = http;
-        try {
-            this.providerConfig = this.config.get('communication').providers.apollo;
-        }
-        catch (err) {
-            throw Error('No config found for apollo provider!');
-        }
     }
     /**
+     * @param {?} providerConfig
      * @param {?} requestId
      * @param {?} options
      * @return {?}
      */
     ApolloProvider.prototype.request$ = /**
+     * @param {?} providerConfig
      * @param {?} requestId
      * @param {?} options
      * @return {?}
      */
-    function (requestId, options) {
+    function (providerConfig, requestId, options) {
         var params = options.params, method = options.method, httpOptions = options.httpOptions;
         /** @type {?} */
-        var query = ApolloProviderConfig[requestId];
-        if (this.providerConfig.config && this.providerConfig.config[requestId]) {
-            query = this.providerConfig.config[requestId];
+        var query;
+        if (providerConfig.config && providerConfig.config[requestId]) {
+            query = providerConfig.config[requestId];
         }
         query = query || {};
         var queryName = query.queryName;
@@ -345,10 +300,10 @@ var ApolloProvider = /** @class */ (function () {
         /** @type {?} */
         var source$;
         if (method && method === 'GET') {
-            source$ = this.http.get(this.providerConfig.baseUrl);
+            source$ = this.http.get(providerConfig.baseUrl);
         }
         else {
-            source$ = this.http.post(this.providerConfig.baseUrl, { query: queryBody }, httpOptions);
+            source$ = this.http.post(providerConfig.baseUrl, { query: queryBody }, httpOptions);
         }
         return source$.pipe(map((/**
          * @param {?} response
@@ -421,23 +376,12 @@ var ApolloProvider = /** @class */ (function () {
     ];
     /** @nocollapse */
     ApolloProvider.ctorParameters = function () { return [
-        { type: ConfigurationService },
         { type: HttpClient }
     ]; };
-    /** @nocollapse */ ApolloProvider.ngInjectableDef = ɵɵdefineInjectable({ factory: function ApolloProvider_Factory() { return new ApolloProvider(ɵɵinject(ConfigurationService), ɵɵinject(HttpClient)); }, token: ApolloProvider, providedIn: "root" });
+    /** @nocollapse */ ApolloProvider.ngInjectableDef = ɵɵdefineInjectable({ factory: function ApolloProvider_Factory() { return new ApolloProvider(ɵɵinject(HttpClient)); }, token: ApolloProvider, providedIn: "root" });
     return ApolloProvider;
 }());
 if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    ApolloProvider.prototype.providerConfig;
-    /**
-     * @type {?}
-     * @private
-     */
-    ApolloProvider.prototype.config;
     /**
      * @type {?}
      * @private
@@ -447,60 +391,47 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-var RestProviderConfig = {
-    getLastPosts: 'posts',
-};
-
-/**
- * @fileoverview added by tsickle
+ * Generated from: lib/common/services/communication-providers/rest.provider.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var RestProvider = /** @class */ (function () {
-    function RestProvider(config, http) {
-        this.config = config;
+    function RestProvider(http) {
         this.http = http;
-        try {
-            this.providerConfig = this.config.get('communication').providers.rest;
-        }
-        catch (err) {
-            throw Error('No config found for rest provider!');
-        }
     }
     /**
+     * @param {?} providerConfig
      * @param {?} requestId
      * @param {?=} options
      * @return {?}
      */
     RestProvider.prototype.request$ = /**
+     * @param {?} providerConfig
      * @param {?} requestId
      * @param {?=} options
      * @return {?}
      */
-    function (requestId, options) {
+    function (providerConfig, requestId, options) {
         if (options === void 0) { options = {}; }
         var params = options.params, httpOptions = options.httpOptions, _a = options.urlParams, urlParams = _a === void 0 ? '' : _a;
         var method = options.method;
         /** @type {?} */
-        var point = RestProviderConfig[requestId];
+        var point;
         // default method
         if (!method) {
-            method = this.providerConfig.defaultMethod || 'GET';
+            method = providerConfig.defaultMethod || 'GET';
         }
-        if (this.providerConfig.config && this.providerConfig.config[requestId]) {
-            point = this.providerConfig.config[requestId];
+        if (providerConfig.config && providerConfig.config[requestId]) {
+            point = providerConfig.config[requestId];
         }
         // config point control
         if (!point) {
             throw Error("No config found for requestId \"" + requestId + "\"");
         }
         if (method === 'POST' || method === 'PUT') {
-            return this.http[method.toLowerCase()](this.providerConfig.baseUrl + point, params, httpOptions);
+            return this.http[method.toLowerCase()](providerConfig.baseUrl + point, params, httpOptions);
         }
         if (method === 'GET' || method === 'DELETE') {
-            return this.http[method.toLowerCase()](this.providerConfig.baseUrl + point + urlParams, httpOptions);
+            return this.http[method.toLowerCase()](providerConfig.baseUrl + point + urlParams, httpOptions);
         }
         throw Error("Rest method " + method + " not supported");
     };
@@ -511,23 +442,12 @@ var RestProvider = /** @class */ (function () {
     ];
     /** @nocollapse */
     RestProvider.ctorParameters = function () { return [
-        { type: ConfigurationService },
         { type: HttpClient }
     ]; };
-    /** @nocollapse */ RestProvider.ngInjectableDef = ɵɵdefineInjectable({ factory: function RestProvider_Factory() { return new RestProvider(ɵɵinject(ConfigurationService), ɵɵinject(HttpClient)); }, token: RestProvider, providedIn: "root" });
+    /** @nocollapse */ RestProvider.ngInjectableDef = ɵɵdefineInjectable({ factory: function RestProvider_Factory() { return new RestProvider(ɵɵinject(HttpClient)); }, token: RestProvider, providedIn: "root" });
     return RestProvider;
 }());
 if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    RestProvider.prototype.providerConfig;
-    /**
-     * @type {?}
-     * @private
-     */
-    RestProvider.prototype.config;
     /**
      * @type {?}
      * @private
@@ -537,6 +457,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/communication.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var CommunicationService = /** @class */ (function () {
@@ -569,10 +490,19 @@ var CommunicationService = /** @class */ (function () {
         if (options === void 0) { options = {}; }
         /** @type {?} */
         var activeProvider = provider || this.defaultProvider;
-        if (!this[activeProvider])
-            throw Error("There is no " + activeProvider + " provider");
+        /** @type {?} */
+        var activeProviderConfig = this.communicationConfig.providers[activeProvider];
+        if (!activeProviderConfig) {
+            throw Error("There is no config for \"" + activeProvider + "\" provider");
+        }
+        // provider.type control for retrocompatibility
+        /** @type {?} */
+        var activeProviderType = activeProviderConfig.type || activeProvider;
+        if (!this[activeProviderType]) {
+            throw Error("There is no \"" + activeProviderType + "\" provider type");
+        }
         var onError = options.onError;
-        return this[activeProvider].request$(requestId, options)
+        return this[activeProviderType].request$(activeProviderConfig, requestId, options)
             .pipe(catchError((/**
          * @param {?} error
          * @return {?}
@@ -642,6 +572,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/abstract-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -721,6 +652,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/main-layout/main-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MainLayoutDS = /** @class */ (function (_super) {
@@ -885,6 +817,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/json-config.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var JsonConfigService = /** @class */ (function () {
@@ -1001,6 +934,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -1183,6 +1117,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input-checkbox.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FacetInputCheckbox = /** @class */ (function (_super) {
@@ -1253,6 +1188,7 @@ var FacetInputCheckbox = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/helpers.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -1327,6 +1263,7 @@ var helpers = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input-text.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FacetInputText = /** @class */ (function (_super) {
@@ -1379,6 +1316,7 @@ var FacetInputText = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input-link.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -1579,6 +1517,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input-select.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FacetInputSelect = /** @class */ (function (_super) {
@@ -1647,11 +1586,13 @@ var FacetInputSelect = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/search.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -2682,11 +2623,13 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/main-layout/main-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MainLayoutEH = /** @class */ (function (_super) {
@@ -2828,6 +2771,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/header.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var HeaderDS = /** @class */ (function (_super) {
@@ -2875,6 +2819,7 @@ var HeaderDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/subnav.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var SubnavDS = /** @class */ (function (_super) {
@@ -2940,6 +2885,7 @@ var SubnavDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/breadcrumbs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var BreadcrumbsDS = /** @class */ (function (_super) {
@@ -2965,6 +2911,7 @@ var BreadcrumbsDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/facets.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FacetsDS = /** @class */ (function (_super) {
@@ -2997,6 +2944,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/facets-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -3341,6 +3289,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/footer.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FooterDS = /** @class */ (function (_super) {
@@ -3369,6 +3318,7 @@ var FooterDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/smart-pagination.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var SmartPaginationDS = /** @class */ (function (_super) {
@@ -3554,10 +3504,12 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     HeaderDS: HeaderDS,
     SubnavDS: SubnavDS,
     BreadcrumbsDS: BreadcrumbsDS,
@@ -3569,6 +3521,7 @@ var DS = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/header.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var HeaderEH = /** @class */ (function (_super) {
@@ -3604,6 +3557,7 @@ var HeaderEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/subnav.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var SubnavEH = /** @class */ (function (_super) {
@@ -3644,6 +3598,7 @@ var SubnavEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/breadcrumbs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var BreadcrumbsEH = /** @class */ (function (_super) {
@@ -3684,6 +3639,7 @@ var BreadcrumbsEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/facets-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FacetsWrapperEH = /** @class */ (function (_super) {
@@ -3841,6 +3797,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/footer.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FooterEH = /** @class */ (function (_super) {
@@ -3862,6 +3819,7 @@ var FooterEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/smart-pagination.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var SmartPaginationEH = /** @class */ (function (_super) {
@@ -3901,10 +3859,12 @@ var SmartPaginationEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     HeaderEH: HeaderEH,
     SubnavEH: SubnavEH,
     BreadcrumbsEH: BreadcrumbsEH,
@@ -3915,6 +3875,7 @@ var EH = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/main-layout/main-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -3940,6 +3901,7 @@ var MainLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/main-layout/main-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MainLayoutComponent = /** @class */ (function (_super) {
@@ -4042,6 +4004,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/page404-layout/page404-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var Page404LayoutDS = /** @class */ (function (_super) {
@@ -4070,6 +4033,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/page404-layout/page404-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var Page404LayoutEH = /** @class */ (function (_super) {
@@ -4130,6 +4094,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/page404-layout/page404-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -4147,6 +4112,7 @@ var Page404LayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/page404-layout/page404-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var Page404LayoutComponent = /** @class */ (function (_super) {
@@ -4200,6 +4166,7 @@ var Page404LayoutComponent = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/components/facets-wrapper/facets-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FacetsWrapperComponent = /** @class */ (function () {
@@ -4258,6 +4225,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/components/smart-pagination/smart-pagination.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var SmartPaginationComponent = /** @class */ (function () {
@@ -4302,6 +4270,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/n7-boilerplate-common.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -4351,6 +4320,7 @@ var N7BoilerplateCommonModule = /** @class */ (function () {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwEntitaLayoutDS = /** @class */ (function (_super) {
@@ -4767,6 +4737,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwEntitaLayoutEH = /** @class */ (function (_super) {
@@ -4988,6 +4959,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/linked-objects.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwLinkedObjectsDS = /** @class */ (function (_super) {
@@ -5315,6 +5287,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/autocomplete-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwAutocompleteWrapperDS = /** @class */ (function (_super) {
@@ -5401,6 +5374,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/bubble-chart.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwBubbleChartDS = /** @class */ (function (_super) {
@@ -5565,6 +5539,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/chart-tippy.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwChartTippyDS = /** @class */ (function (_super) {
@@ -5617,6 +5592,7 @@ var AwChartTippyDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/hero.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHeroDS = /** @class */ (function (_super) {
@@ -5663,6 +5639,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/table.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwTableDS = /** @class */ (function (_super) {
@@ -5686,6 +5663,7 @@ var AwTableDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/home-hero-patrimonio.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeHeroPatrimonioDS = /** @class */ (function (_super) {
@@ -5711,6 +5689,7 @@ var AwHomeHeroPatrimonioDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/home-facets-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeFacetsWrapperDS = /** @class */ (function (_super) {
@@ -5980,6 +5959,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/home-item-tags-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeItemTagsWrapperDS = /** @class */ (function (_super) {
@@ -6005,6 +5985,7 @@ var AwHomeItemTagsWrapperDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/home-autocomplete.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeAutocompleteDS = /** @class */ (function (_super) {
@@ -6126,6 +6107,7 @@ var AwHomeAutocompleteDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/entita-nav.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwEntitaNavDS = /** @class */ (function (_super) {
@@ -6203,6 +6185,7 @@ var AwEntitaNavDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/entita-metadata-viewer.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwEntitaMetadataViewerDS = /** @class */ (function (_super) {
@@ -6361,6 +6344,7 @@ var AwEntitaMetadataViewerDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/tree.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwTreeDS = /** @class */ (function (_super) {
@@ -6709,6 +6693,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/sidebar-header.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSidebarHeaderDS = /** @class */ (function (_super) {
@@ -6758,6 +6743,7 @@ var AwSidebarHeaderDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/scheda-breadcrumbs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSchedaBreadcrumbsDS = /** @class */ (function (_super) {
@@ -6800,6 +6786,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/scheda-metadata.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSchedaMetadataDS = /** @class */ (function (_super) {
@@ -6872,6 +6859,7 @@ var AwSchedaMetadataDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/scheda-image.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSchedaImageDS = /** @class */ (function (_super) {
@@ -6975,6 +6963,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/scheda-inner-title.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSchedaInnerTitleDS = /** @class */ (function (_super) {
@@ -7000,6 +6989,7 @@ var AwSchedaInnerTitleDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/search-layout-tabs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSearchLayoutTabsDS = /** @class */ (function (_super) {
@@ -7057,6 +7047,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/gallery-results.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwGalleryResultsDS = /** @class */ (function (_super) {
@@ -7218,10 +7209,12 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     AwLinkedObjectsDS: AwLinkedObjectsDS,
     AwAutocompleteWrapperDS: AwAutocompleteWrapperDS,
     AwBubbleChartDS: AwBubbleChartDS,
@@ -7246,6 +7239,7 @@ var DS$1 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/hero.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHeroEH = /** @class */ (function (_super) {
@@ -7291,6 +7285,7 @@ var AwHeroEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/home-facets-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeFacetsWrapperEH = /** @class */ (function (_super) {
@@ -7467,6 +7462,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/home-hero-patrimonio.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeHeroPatrimonioEH = /** @class */ (function (_super) {
@@ -7488,6 +7484,7 @@ var AwHomeHeroPatrimonioEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/home-item-tags-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeItemTagsWrapperEH = /** @class */ (function (_super) {
@@ -7525,6 +7522,7 @@ var AwHomeItemTagsWrapperEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/home-autocomplete.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeAutocompleteEH = /** @class */ (function (_super) {
@@ -7560,6 +7558,7 @@ var AwHomeAutocompleteEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/entita-nav.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwEntitaNavEH = /** @class */ (function (_super) {
@@ -7602,6 +7601,7 @@ var AwEntitaNavEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/scheda-breadcrumbs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSchedaSidebarEH = /** @class */ (function (_super) {
@@ -7634,6 +7634,7 @@ var AwSchedaSidebarEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/sidebar-header.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSidebarHeaderEH = /** @class */ (function (_super) {
@@ -7669,6 +7670,7 @@ var AwSidebarHeaderEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/tree.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwTreeEH = /** @class */ (function (_super) {
@@ -7876,6 +7878,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/search-layout-tabs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSearchLayoutTabsEH = /** @class */ (function (_super) {
@@ -7897,6 +7900,7 @@ var AwSearchLayoutTabsEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/gallery-results.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwGalleryResultsEH = /** @class */ (function (_super) {
@@ -7956,6 +7960,7 @@ var AwGalleryResultsEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/linked-objects.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwLinkedObjectsEH = /** @class */ (function (_super) {
@@ -8048,6 +8053,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/autocomplete-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwAutocompleteWrapperEH = /** @class */ (function (_super) {
@@ -8086,6 +8092,7 @@ var AwAutocompleteWrapperEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/bubble-chart.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwBubbleChartEH = /** @class */ (function (_super) {
@@ -8239,6 +8246,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/table.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwTableEH = /** @class */ (function (_super) {
@@ -8268,6 +8276,7 @@ var AwTableEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/chart-tippy.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwChartTippyEH = /** @class */ (function (_super) {
@@ -8384,10 +8393,12 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     AwHeroEH: AwHeroEH,
     AwHomeFacetsWrapperEH: AwHomeFacetsWrapperEH,
     AwHomeHeroPatrimonioEH: AwHomeHeroPatrimonioEH,
@@ -8408,6 +8419,7 @@ var EH$1 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -8436,6 +8448,7 @@ var AwEntitaLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwEntitaLayoutComponent = /** @class */ (function (_super) {
@@ -8569,6 +8582,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeLayoutDS = /** @class */ (function (_super) {
@@ -9104,6 +9118,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/home-layout/home-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeLayoutEH = /** @class */ (function (_super) {
@@ -9456,6 +9471,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/home-layout/home-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -9491,6 +9507,7 @@ var AwHomeLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwHomeLayoutComponent = /** @class */ (function (_super) {
@@ -9580,6 +9597,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSchedaLayoutDS = /** @class */ (function (_super) {
@@ -9943,6 +9961,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSchedaLayoutEH = /** @class */ (function (_super) {
@@ -10123,6 +10142,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -10154,6 +10174,7 @@ var AwPatrimonioLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSchedaLayoutComponent = /** @class */ (function (_super) {
@@ -10275,6 +10296,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-facets.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var facetsConfig = {
@@ -10442,6 +10464,7 @@ var facetsConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -10995,6 +11018,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSearchLayoutEH = /** @class */ (function (_super) {
@@ -11189,6 +11213,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -11219,6 +11244,7 @@ var AwSearchLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwSearchLayoutComponent = /** @class */ (function (_super) {
@@ -11332,6 +11358,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-facets.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var facetsConfig$1 = {
@@ -11482,6 +11509,7 @@ var facetsConfig$1 = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -12035,6 +12063,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwGalleryLayoutEH = /** @class */ (function (_super) {
@@ -12229,6 +12258,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -12259,6 +12289,7 @@ var AwGalleryLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var AwGalleryLayoutComponent = /** @class */ (function (_super) {
@@ -12377,6 +12408,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/components/chart-tippy/chart-tippy.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var ChartTippyComponent = /** @class */ (function () {
@@ -12419,6 +12451,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/components/bubble-chart-wrapper/bubble-chart-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var BubbleChartWrapperComponent = /** @class */ (function () {
@@ -12461,6 +12494,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/components/smart-breadcrumbs/smart-breadcrumbs.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -12639,6 +12673,51 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/config/apollo.config.ts
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var apolloConfig = {
+    getLastPosts: {
+        queryName: 'getLastPosts',
+        queryBody: "\n        {\n          getLastPosts(__PARAMS__) {\n            id\n            title\n          }\n        }\n      ",
+    },
+    getTree: {
+        queryName: 'getTreeOfItems',
+        queryBody: "\n      {\n        getTreeOfItems{\n          label\n          id\n          img\n          document_type\n          document_classification\n          branches {\n            label\n            id\n            img\n            document_type\n            document_classification\n            branches {\n              label\n              id\n              img\n              document_type\n              document_classification\n              branches {\n                label\n                id\n                img\n                document_type\n                document_classification\n                branches {\n                  label\n                  id\n                  img\n                  document_type\n                  document_classification\n                  branches {\n                    label\n                    id\n                    img\n                    document_type\n                    document_classification\n                    branches {\n                      label\n                      id\n                      img\n                      document_type\n                      document_classification\n                      branches {\n                        label\n                        id\n                        img\n                        document_type\n                        document_classification\n                        branches {\n                          label\n                          id\n                          img\n                          document_type\n                          document_classification\n                        }\n                      }\n                    }\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n      ",
+    },
+    globalFilter: {
+        queryName: 'globalFilter',
+        queryBody: "{\n        globalFilter(__PARAMS__){\n          entitiesData {\n            entity {\n                id\n                label\n                typeOfEntity\n            } count\n          }\n          typeOfEntityData {\n            type\n            count\n          }\n          itemsPagination {\n            totalCount\n            items {\n              thumbnail\n              item {\n                id\n                label\n                fields\n                {\n                  ...\n                  on KeyValueField {\n                    key\n                    value\n                  }\n                }\n                breadcrumbs {\n                  label\n                  link\n                }\n                relatedTypesOfEntity {\n                  type\n                  count\n                }\n              }\n            }\n          }\n        }\n        }",
+    },
+    getEntityDetails: {
+        queryName: 'getEntity',
+        queryBody: "{\n        getEntity(__PARAMS__){\n          overviewTab\n          label\n          id\n          typeOfEntity\n          fields {\n            ...\n            on KeyValueField {\n              key\n              value\n            }\n            ... on\n            KeyValueFieldGroup {\n              label\n              fields\n              {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n          extraTab\n          wikiTab {\n            text\n            url\n          }\n          relatedItems {\n            thumbnail\n            relation\n            item {\n              label\n              id\n              fields\n              {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n              breadcrumbs {\n                label\n                link\n              }\n            }\n            relatedTypesOfEntity {\n              type\n              count\n            }\n          }\n          relatedEntities {\n            entity {\n                id\n                label\n                typeOfEntity\n            }\n            count\n          }\n        }\n      }\n      ",
+    },
+    getItem: {
+        queryName: 'getItem',
+        queryBody: "{\n        getItem(__PARAMS__) {\n          id\n          label\n          icon\n          title\n          subTitle\n          image\n          text\n          fields {\n            ...\n            on KeyValueField {\n              key\n              value\n            }\n            ... on KeyValueFieldGroup {\n              label\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n          relatedEntities {\n            count\n            entity{\n              id\n              label\n              typeOfEntity\n            }\n          }\n          relatedItems {\n            thumbnail\n            item {\n              label\n              id\n              relatedTypesOfEntity {\n                type\n                count\n              }\n            }\n          }\n          breadcrumbs {\n            label\n            link\n          }\n        }\n      }",
+    },
+    getNode: {
+        queryName: 'getNode',
+        queryBody: "{\n        getNode(__PARAMS__) {\n          ... on Item {\n            id\n            label\n            title\n            subTitle\n            image\n            images\n            text\n            document_type\n            fields {\n              ...\n              on KeyValueField {\n                key\n                value\n              }\n              ... on KeyValueFieldGroup {\n                label\n                fields {\n                  ...\n                  on KeyValueField {\n                    key\n                    value\n                  }\n                }\n              }\n            }\n            relatedEntities {\n                count\n                entity{\n                  id\n                  label\n                  typeOfEntity\n                  relation\n                }\n            }\n            relatedItems {\n                thumbnail\n                item {\n                  label\n                  id\n                  fields {\n                    ...\n                    on KeyValueField {\n                      key\n                      value\n                    }\n                    ... on KeyValueFieldGroup {\n                      label\n                      fields {\n                        ...\n                        on KeyValueField {\n                          key\n                          value\n                        }\n                      }\n                    }\n                  }\n                  relatedTypesOfEntity {\n                    type\n                    count\n                  }\n                }\n              }\n            breadcrumbs {\n              label\n              link\n            }\n          }\n          ... on Node {\n            id\n            label\n            img\n            document_type\n            fields {\n              ...\n              on KeyValueField {\n                key\n                value\n              }\n              ... on KeyValueFieldGroup {\n                label\n                fields {\n                  ...\n                  on KeyValueField {\n                    key\n                    value\n                  }\n                }\n              }\n            }\n          }\n        }\n      }",
+    },
+    autoComplete: {
+        queryName: 'autoComplete',
+        queryBody: "{\n        autoComplete(__PARAMS__){\n          totalCount\n          results {\n            ... on EntityCountData {\n              count\n              entity {\n                id\n                label\n                typeOfEntity\n                fields {\n                  ... on KeyValueField {\n                    key\n                    value\n                  }\n                  ... on KeyValueFieldGroup {\n                    label\n                    fields {\n                      ... on KeyValueField {\n                        key\n                        value\n                      }\n                    }\n                  }\n                }\n              }\n            }\n            ... on ItemListing {\n              item {\n                id\n                label\n                document_type\n                fields {\n                  ... on KeyValueField {\n                    key\n                    value\n                  }\n                  ... on KeyValueFieldGroup {\n                    label\n                    fields {\n                      ... on KeyValueField {\n                        key\n                        value\n                      }\n                    }\n                  }\n                }\n              }\n            }\n          }\n        }\n      }",
+    },
+    search: {
+        queryName: 'search',
+        queryBody: "{\n        search(__PARAMS__){\n          totalCount\n          facets {\n            id\n            type\n            operator\n            limit\n            order\n            data {\n              label\n              value\n              counter\n              searchData {\n                key\n                value\n              }\n            }\n          }\n          results {\n            order{\n              type\n              key\n              direction\n            }\n            fields\n            {\n              id\n              highlight\n              limit\n            }\n            items {\n              ... on Entity {\n                id\n                label\n                typeOfEntity\n                fields {\n                  ...\n                  on KeyValueField {\n                    key\n                    value\n                  }\n                  ... on KeyValueFieldGroup {\n                    label\n                    fields {\n                      ...\n                      on KeyValueField {\n                        key\n                        value\n                      }\n                    }\n                  }\n                }\n                relatedEntities {\n                    count\n                    entity{\n                      id\n                      label\n                      typeOfEntity\n                    }\n                }\n                relatedItems {\n                    thumbnail\n                    item {\n                      label\n                      id\n                      fields {\n                        ...\n                        on KeyValueField {\n                          key\n                          value\n                        }\n                        ... on KeyValueFieldGroup {\n                          label\n                          fields {\n                            ...\n                            on KeyValueField {\n                              key\n                              value\n                            }\n                          }\n                        }\n                      }\n                  }\n                  relatedTypesOfEntity {\n                    type\n                    count\n                  }\n                }\n              }\n              ... on Item {\n                id\n                label\n                icon\n                title\n                subTitle\n                image\n                text\n                relatedTypesOfEntity {\n                  type\n                  count\n                }\n                breadcrumbs {\n                  label\n                  link\n                }\n                fields {\n                  ...\n                  on KeyValueField {\n                    key\n                    value\n                  }\n                  ... on KeyValueFieldGroup {\n                    label\n                    fields {\n                      ...\n                      on KeyValueField {\n                        key\n                        value\n                      }\n                    }\n                  }\n                }\n              }\n            }\n          }\n        }\n      }",
+    },
+    getMissingBubble: {
+        queryName: 'getEntity',
+        queryBody: "{\n        getEntity(__PARAMS__){\n          label\n          id\n          typeOfEntity\n        }\n      }",
+    },
+};
+
+/**
+ * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/n7-boilerplate-arianna-web.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -12653,7 +12732,19 @@ var COMPONENTS$1 = [
     SmartBreadcrumbsComponent,
 ];
 var N7BoilerplateAriannaWebModule = /** @class */ (function () {
-    function N7BoilerplateAriannaWebModule() {
+    function N7BoilerplateAriannaWebModule(initStatus, config) {
+        // add apollo config on app init
+        // note: this is just for arianna* sites!
+        initStatus.donePromise.then((/**
+         * @return {?}
+         */
+        function () {
+            /** @type {?} */
+            var communication = config.get('communication');
+            var defaultProvider = communication.defaultProvider;
+            communication.providers[defaultProvider].config = apolloConfig;
+            config.set('communication', communication);
+        }));
     }
     N7BoilerplateAriannaWebModule.decorators = [
         { type: NgModule, args: [{
@@ -12664,16 +12755,21 @@ var N7BoilerplateAriannaWebModule = /** @class */ (function () {
                         DvComponentsLibModule,
                         N7BoilerplateCommonModule,
                     ],
-                    providers: [],
                     entryComponents: COMPONENTS$1,
                     exports: COMPONENTS$1,
                 },] }
     ];
+    /** @nocollapse */
+    N7BoilerplateAriannaWebModule.ctorParameters = function () { return [
+        { type: ApplicationInitStatus },
+        { type: ConfigurationService }
+    ]; };
     return N7BoilerplateAriannaWebModule;
 }());
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/components/data-widget-wrapper/data-widget-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -12705,6 +12801,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/components/datepicker-wrapper/datepicker-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -12799,6 +12896,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/example-layout/example-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvExampleLayoutDS = /** @class */ (function (_super) {
@@ -12872,6 +12970,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/example-layout/example-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvExampleLayoutEH = /** @class */ (function (_super) {
@@ -12901,6 +13000,7 @@ var DvExampleLayoutEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/data-widget-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvDataWidgetDS = /** @class */ (function (_super) {
@@ -12929,6 +13029,7 @@ var DvDataWidgetDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/datepicker-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvDatepickerWrapperDS = /** @class */ (function (_super) {
@@ -13046,6 +13147,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/graph.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvGraphDS = /** @class */ (function (_super) {
@@ -13147,6 +13249,7 @@ var DvGraphDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/inner-title.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvInnerTitleDS = /** @class */ (function (_super) {
@@ -13181,6 +13284,7 @@ var DvInnerTitleDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/widget.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvWidgetDS = /** @class */ (function (_super) {
@@ -13204,10 +13308,12 @@ var DvWidgetDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS$2 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     DvDataWidgetDS: DvDataWidgetDS,
     DvDatepickerWrapperDS: DvDatepickerWrapperDS,
     DvGraphDS: DvGraphDS,
@@ -13217,6 +13323,7 @@ var DS$2 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/event-handlers/datepicker-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvDatepickerWrapperEH = /** @class */ (function (_super) {
@@ -13264,15 +13371,18 @@ var DvDatepickerWrapperEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH$2 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     DvDatepickerWrapperEH: DvDatepickerWrapperEH
 });
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/example-layout/example-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -13299,6 +13409,7 @@ var DvExampleLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/example-layout/example-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var DvExampleLayoutComponent = /** @class */ (function (_super) {
@@ -13346,6 +13457,7 @@ var DvExampleLayoutComponent = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/n7-boilerplate-data-viz.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -13374,6 +13486,7 @@ var N7BoilerplateDataVizModule = /** @class */ (function () {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/home-layout/home-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MrHomeLayoutDS = /** @class */ (function (_super) {
@@ -13425,6 +13538,7 @@ var MrHomeLayoutDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/home-layout/home-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MrHomeLayoutEH = /** @class */ (function (_super) {
@@ -13460,6 +13574,7 @@ var MrHomeLayoutEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/item-previews.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MrItemPreviewsDS = /** @class */ (function (_super) {
@@ -13601,6 +13716,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/inner-title.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MrInnerTitleDS = /** @class */ (function (_super) {
@@ -13651,6 +13767,7 @@ var MrInnerTitleDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/hero.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MrHeroDS = /** @class */ (function (_super) {
@@ -13680,6 +13797,7 @@ var MrHeroDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/filters.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MrFiltersDS = /** @class */ (function (_super) {
@@ -13709,10 +13827,12 @@ var MrFiltersDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS$3 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     MrItemPreviewsDS: MrItemPreviewsDS,
     MrInnerTitleDS: MrInnerTitleDS,
     MrHeroDS: MrHeroDS,
@@ -13721,6 +13841,7 @@ var DS$3 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/event-handlers/dummy.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MrDummyEH = /** @class */ (function (_super) {
@@ -13742,6 +13863,7 @@ var MrDummyEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/event-handlers/filters.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MrFiltersEH = /** @class */ (function (_super) {
@@ -13763,16 +13885,19 @@ var MrFiltersEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH$3 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     MrDummyEH: MrDummyEH,
     MrFiltersEH: MrFiltersEH
 });
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/home-layout/home-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -13800,6 +13925,7 @@ var MrHomeLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/home-layout/home-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MrHomeLayoutComponent = /** @class */ (function (_super) {
@@ -13853,6 +13979,7 @@ var MrHomeLayoutComponent = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-layout/search-facets.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var facetsConfig$2 = {
@@ -14018,6 +14145,7 @@ var facetsConfig$2 = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-layout/search-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 // import helpers from '../../../common/helpers';
@@ -14067,6 +14195,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-layout/search-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MrSearchLayoutEH = /** @class */ (function (_super) {
@@ -14107,6 +14236,7 @@ var MrSearchLayoutEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-layout/search-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -14130,6 +14260,7 @@ var MrSearchLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-layout/search-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 // import { CommunicationService } from '../../../common/services/communication.service';
@@ -14199,6 +14330,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/glossary-layout/glossary-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MrGlossaryLayoutDS = /** @class */ (function (_super) {
@@ -14224,6 +14356,7 @@ var MrGlossaryLayoutDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/glossary-layout/glossary-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MrGlossaryLayoutEH = /** @class */ (function (_super) {
@@ -14264,6 +14397,7 @@ var MrGlossaryLayoutEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/glossary-layout/glossary-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -14284,6 +14418,7 @@ var MrGlossaryLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/glossary-layout/glossary-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MrGlossaryLayoutComponent = /** @class */ (function (_super) {
@@ -14337,6 +14472,7 @@ var MrGlossaryLayoutComponent = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/static-layout/static-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MrStaticLayoutDS = /** @class */ (function (_super) {
@@ -14362,6 +14498,7 @@ var MrStaticLayoutDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/static-layout/static-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MrStaticLayoutEH = /** @class */ (function (_super) {
@@ -14402,6 +14539,7 @@ var MrStaticLayoutEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/static-layout/static-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -14422,6 +14560,7 @@ var MrStaticLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/static-layout/static-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MrStaticLayoutComponent = /** @class */ (function (_super) {
@@ -14475,6 +14614,7 @@ var MrStaticLayoutComponent = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-facets-layout/search-facets-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var SearchFacetsLayoutDS = /** @class */ (function (_super) {
@@ -14539,6 +14679,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-facets-layout/search-facets-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -14629,6 +14770,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-facets-layout/search-facets-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -14644,6 +14786,7 @@ var SearchFacetsLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/facets/facet-text.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FacetTextDS = /** @class */ (function (_super) {
@@ -14708,6 +14851,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/facets/facet-checkbox.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FacetCheckboxDS = /** @class */ (function (_super) {
@@ -14779,6 +14923,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/facets/facet-select.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FacetSelectDS = /** @class */ (function (_super) {
@@ -14850,6 +14995,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/facets/facet-link.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -14923,6 +15069,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/event-handlers/facets/facet-generic.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var FacetGenericEH = /** @class */ (function (_super) {
@@ -14958,6 +15105,7 @@ var FacetGenericEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-facets-layout/search-facets-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -15051,6 +15199,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-test-layout/search-test-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var SearchTestLayoutDS = /** @class */ (function (_super) {
@@ -15072,6 +15221,7 @@ var SearchTestLayoutDS = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-test-layout/search-test-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var SearchTestLayoutEH = /** @class */ (function (_super) {
@@ -15113,6 +15263,7 @@ var SearchTestLayoutEH = /** @class */ (function (_super) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-test-layout/search-test-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -15130,6 +15281,7 @@ var SearchTestLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-test-layout/search-test-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var MrSearchTestLayoutComponent = /** @class */ (function (_super) {
@@ -15230,6 +15382,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/n7-boilerplate-muruca.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -15261,6 +15414,7 @@ var N7BoilerplateMurucaModule = /** @class */ (function () {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/n7-boilerplate-lib.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var N7BoilerplateLibModule = /** @class */ (function () {
@@ -15289,48 +15443,57 @@ var N7BoilerplateLibModule = /** @class */ (function () {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: public-api.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: n7-frontend-boilerplate.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrInnerTitleDS, MrItemPreviewsDS, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrStaticLayoutComponent as ɵba, MrSearchFacetsLayoutComponent as ɵbb, MrSearchTestLayoutComponent as ɵbc, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, AwGalleryLayoutComponent as ɵq, BubbleChartWrapperComponent as ɵr, ChartTippyComponent as ɵs, SmartBreadcrumbsComponent as ɵt, DataWidgetWrapperComponent as ɵu, DatepickerWrapperComponent as ɵv, DvExampleLayoutComponent as ɵw, MrHomeLayoutComponent as ɵx, MrSearchLayoutComponent as ɵy, MrGlossaryLayoutComponent as ɵz };
+export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrInnerTitleDS, MrItemPreviewsDS, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrStaticLayoutComponent as ɵba, MrSearchFacetsLayoutComponent as ɵbb, MrSearchTestLayoutComponent as ɵbc, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, AwGalleryLayoutComponent as ɵq, BubbleChartWrapperComponent as ɵr, ChartTippyComponent as ɵs, SmartBreadcrumbsComponent as ɵt, DataWidgetWrapperComponent as ɵu, DatepickerWrapperComponent as ɵv, DvExampleLayoutComponent as ɵw, MrHomeLayoutComponent as ɵx, MrSearchLayoutComponent as ɵy, MrGlossaryLayoutComponent as ɵz };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

@@ -1,4 +1,4 @@
-import { Injectable, ɵɵdefineInjectable, Inject, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef } from '@angular/core';
+import { Injectable, ɵɵdefineInjectable, Inject, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef, ApplicationInitStatus } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK } from '@n7-frontend/components';
@@ -15,6 +15,7 @@ import { DataSource as DataSource$1 } from '@n7-frontend/core/dist/data-source';
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/configuration.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class ConfigurationService {
@@ -53,6 +54,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/layouts-configuration.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class LayoutsConfigurationService {
@@ -113,6 +115,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/main-state.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainStateService {
@@ -231,583 +234,28 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-const ApolloProviderConfig = {
-    getLastPosts: {
-        queryName: 'getLastPosts',
-        queryBody: `
-      {
-        getLastPosts(__PARAMS__) {
-          id
-          title
-        }
-      }
-    `,
-    },
-    getTree: {
-        queryName: 'getTreeOfItems',
-        queryBody: `
-    {
-      getTreeOfItems{
-        label
-        id
-        img
-        document_type
-        document_classification
-        branches {
-          label
-          id
-          img
-          document_type
-          document_classification
-          branches {
-            label
-            id
-            img
-            document_type
-            document_classification
-            branches {
-              label
-              id
-              img
-              document_type
-              document_classification
-              branches {
-                label
-                id
-                img
-                document_type
-                document_classification
-                branches {
-                  label
-                  id
-                  img
-                  document_type
-                  document_classification
-                  branches {
-                    label
-                    id
-                    img
-                    document_type
-                    document_classification
-                    branches {
-                      label
-                      id
-                      img
-                      document_type
-                      document_classification
-                      branches {
-                        label
-                        id
-                        img
-                        document_type
-                        document_classification
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    `,
-    },
-    globalFilter: {
-        queryName: 'globalFilter',
-        queryBody: `{
-      globalFilter(__PARAMS__){
-        entitiesData {
-          entity {
-              id
-              label
-              typeOfEntity
-          } count
-        }
-        typeOfEntityData {
-          type
-          count
-        }
-        itemsPagination {
-          totalCount
-          items {
-            thumbnail
-            item {
-              id
-              label
-              fields
-              {
-                ...
-                on KeyValueField {
-                  key
-                  value
-                }
-              }
-              breadcrumbs {
-                label
-                link
-              }
-              relatedTypesOfEntity {
-                type
-                count
-              }
-            }
-          }
-        }
-      }
-      }`,
-    },
-    getEntityDetails: {
-        queryName: 'getEntity',
-        queryBody: `{
-      getEntity(__PARAMS__){
-        overviewTab
-        label
-        id
-        typeOfEntity
-        fields {
-          ...
-          on KeyValueField {
-            key
-            value
-          }
-          ... on
-          KeyValueFieldGroup {
-            label
-            fields
-            {
-              ...
-              on KeyValueField {
-                key
-                value
-              }
-            }
-          }
-        }
-        extraTab
-        wikiTab {
-          text
-          url
-        }
-        relatedItems {
-          thumbnail
-          relation
-          item {
-            label
-            id
-            fields
-            {
-              ...
-              on KeyValueField {
-                key
-                value
-              }
-            }
-            breadcrumbs {
-              label
-              link
-            }
-          }
-          relatedTypesOfEntity {
-            type
-            count
-          }
-        }
-        relatedEntities {
-          entity {
-              id
-              label
-              typeOfEntity
-          }
-          count
-        }
-      }
-    }
-    `,
-    },
-    getItem: {
-        queryName: 'getItem',
-        queryBody: `{
-      getItem(__PARAMS__) {
-        id
-        label
-        icon
-        title
-        subTitle
-        image
-        text
-        fields {
-          ...
-          on KeyValueField {
-            key
-            value
-          }
-          ... on KeyValueFieldGroup {
-            label
-            fields {
-              ...
-              on KeyValueField {
-                key
-                value
-              }
-            }
-          }
-        }
-        relatedEntities {
-          count
-          entity{
-            id
-            label
-            typeOfEntity
-          }
-        }
-        relatedItems {
-          thumbnail
-          item {
-            label
-            id
-            relatedTypesOfEntity {
-              type
-              count
-            }
-          }
-        }
-        breadcrumbs {
-          label
-          link
-        }
-      }
-    }`,
-    },
-    getNode: {
-        queryName: 'getNode',
-        queryBody: `{
-      getNode(__PARAMS__) {
-        ... on Item {
-          id
-          label
-          title
-          subTitle
-          image
-          images
-          text
-          document_type
-          fields {
-            ...
-            on KeyValueField {
-              key
-              value
-            }
-            ... on KeyValueFieldGroup {
-              label
-              fields {
-                ...
-                on KeyValueField {
-                  key
-                  value
-                }
-              }
-            }
-          }
-          relatedEntities {
-              count
-              entity{
-                id
-                label
-                typeOfEntity
-                relation
-              }
-          }
-          relatedItems {
-              thumbnail
-              item {
-                label
-                id
-                fields {
-                  ...
-                  on KeyValueField {
-                    key
-                    value
-                  }
-                  ... on KeyValueFieldGroup {
-                    label
-                    fields {
-                      ...
-                      on KeyValueField {
-                        key
-                        value
-                      }
-                    }
-                  }
-                }
-                relatedTypesOfEntity {
-                  type
-                  count
-                }
-              }
-            }
-          breadcrumbs {
-            label
-            link
-          }
-        }
-        ... on Node {
-          id
-          label
-          img
-          document_type
-          fields {
-            ...
-            on KeyValueField {
-              key
-              value
-            }
-            ... on KeyValueFieldGroup {
-              label
-              fields {
-                ...
-                on KeyValueField {
-                  key
-                  value
-                }
-              }
-            }
-          }
-        }
-      }
-    }`,
-    },
-    autoComplete: {
-        queryName: 'autoComplete',
-        queryBody: `{
-      autoComplete(__PARAMS__){
-        totalCount
-        results {
-          ... on EntityCountData {
-            count
-            entity {
-              id
-              label
-              typeOfEntity
-              fields {
-                ... on KeyValueField {
-                  key
-                  value
-                }
-                ... on KeyValueFieldGroup {
-                  label
-                  fields {
-                    ... on KeyValueField {
-                      key
-                      value
-                    }
-                  }
-                }
-              }
-            }
-          }
-          ... on ItemListing {
-            item {
-              id
-              label
-              document_type
-              fields {
-                ... on KeyValueField {
-                  key
-                  value
-                }
-                ... on KeyValueFieldGroup {
-                  label
-                  fields {
-                    ... on KeyValueField {
-                      key
-                      value
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }`,
-    },
-    search: {
-        queryName: 'search',
-        queryBody: `{
-      search(__PARAMS__){
-        totalCount
-        facets {
-          id
-          type
-          operator
-          limit
-          order
-          data {
-            label
-            value
-            counter
-            searchData {
-              key
-              value
-            }
-          }
-        }
-        results {
-          order{
-            type
-            key
-            direction
-          }
-          fields
-          {
-            id
-            highlight
-            limit
-          }
-          items {
-            ... on Entity {
-              id
-              label
-              typeOfEntity
-              fields {
-                ...
-                on KeyValueField {
-                  key
-                  value
-                }
-                ... on KeyValueFieldGroup {
-                  label
-                  fields {
-                    ...
-                    on KeyValueField {
-                      key
-                      value
-                    }
-                  }
-                }
-              }
-              relatedEntities {
-                  count
-                  entity{
-                    id
-                    label
-                    typeOfEntity
-                  }
-              }
-              relatedItems {
-                  thumbnail
-                  item {
-                    label
-                    id
-                    fields {
-                      ...
-                      on KeyValueField {
-                        key
-                        value
-                      }
-                      ... on KeyValueFieldGroup {
-                        label
-                        fields {
-                          ...
-                          on KeyValueField {
-                            key
-                            value
-                          }
-                        }
-                      }
-                    }
-                }
-                relatedTypesOfEntity {
-                  type
-                  count
-                }
-              }
-            }
-            ... on Item {
-              id
-              label
-              icon
-              title
-              subTitle
-              image
-              text
-              relatedTypesOfEntity {
-                type
-                count
-              }
-              breadcrumbs {
-                label
-                link
-              }
-              fields {
-                ...
-                on KeyValueField {
-                  key
-                  value
-                }
-                ... on KeyValueFieldGroup {
-                  label
-                  fields {
-                    ...
-                    on KeyValueField {
-                      key
-                      value
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }`,
-    },
-    getMissingBubble: {
-        queryName: 'getEntity',
-        queryBody: `{
-      getEntity(__PARAMS__){
-        label
-        id
-        typeOfEntity
-      }
-    }`,
-    },
-};
-
-/**
- * @fileoverview added by tsickle
+ * Generated from: lib/common/services/communication-providers/apollo.provider.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class ApolloProvider {
     /**
-     * @param {?} config
      * @param {?} http
      */
-    constructor(config, http) {
-        this.config = config;
+    constructor(http) {
         this.http = http;
-        try {
-            this.providerConfig = this.config.get('communication').providers.apollo;
-        }
-        catch (err) {
-            throw Error('No config found for apollo provider!');
-        }
     }
     /**
+     * @param {?} providerConfig
      * @param {?} requestId
      * @param {?} options
      * @return {?}
      */
-    request$(requestId, options) {
+    request$(providerConfig, requestId, options) {
         const { params, method, httpOptions } = options;
         /** @type {?} */
-        let query = ApolloProviderConfig[requestId];
-        if (this.providerConfig.config && this.providerConfig.config[requestId]) {
-            query = this.providerConfig.config[requestId];
+        let query;
+        if (providerConfig.config && providerConfig.config[requestId]) {
+            query = providerConfig.config[requestId];
         }
         query = query || {};
         const { queryName } = query;
@@ -827,10 +275,10 @@ class ApolloProvider {
         /** @type {?} */
         let source$;
         if (method && method === 'GET') {
-            source$ = this.http.get(this.providerConfig.baseUrl);
+            source$ = this.http.get(providerConfig.baseUrl);
         }
         else {
-            source$ = this.http.post(this.providerConfig.baseUrl, { query: queryBody }, httpOptions);
+            source$ = this.http.post(providerConfig.baseUrl, { query: queryBody }, httpOptions);
         }
         return source$.pipe(map((/**
          * @param {?} response
@@ -898,21 +346,10 @@ ApolloProvider.decorators = [
 ];
 /** @nocollapse */
 ApolloProvider.ctorParameters = () => [
-    { type: ConfigurationService },
     { type: HttpClient }
 ];
-/** @nocollapse */ ApolloProvider.ngInjectableDef = ɵɵdefineInjectable({ factory: function ApolloProvider_Factory() { return new ApolloProvider(ɵɵinject(ConfigurationService), ɵɵinject(HttpClient)); }, token: ApolloProvider, providedIn: "root" });
+/** @nocollapse */ ApolloProvider.ngInjectableDef = ɵɵdefineInjectable({ factory: function ApolloProvider_Factory() { return new ApolloProvider(ɵɵinject(HttpClient)); }, token: ApolloProvider, providedIn: "root" });
 if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    ApolloProvider.prototype.providerConfig;
-    /**
-     * @type {?}
-     * @private
-     */
-    ApolloProvider.prototype.config;
     /**
      * @type {?}
      * @private
@@ -922,58 +359,43 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-const RestProviderConfig = {
-    getLastPosts: 'posts',
-};
-
-/**
- * @fileoverview added by tsickle
+ * Generated from: lib/common/services/communication-providers/rest.provider.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class RestProvider {
     /**
-     * @param {?} config
      * @param {?} http
      */
-    constructor(config, http) {
-        this.config = config;
+    constructor(http) {
         this.http = http;
-        try {
-            this.providerConfig = this.config.get('communication').providers.rest;
-        }
-        catch (err) {
-            throw Error('No config found for rest provider!');
-        }
     }
     /**
+     * @param {?} providerConfig
      * @param {?} requestId
      * @param {?=} options
      * @return {?}
      */
-    request$(requestId, options = {}) {
+    request$(providerConfig, requestId, options = {}) {
         const { params, httpOptions, urlParams = '', } = options;
         let { method } = options;
         /** @type {?} */
-        let point = RestProviderConfig[requestId];
+        let point;
         // default method
         if (!method) {
-            method = this.providerConfig.defaultMethod || 'GET';
+            method = providerConfig.defaultMethod || 'GET';
         }
-        if (this.providerConfig.config && this.providerConfig.config[requestId]) {
-            point = this.providerConfig.config[requestId];
+        if (providerConfig.config && providerConfig.config[requestId]) {
+            point = providerConfig.config[requestId];
         }
         // config point control
         if (!point) {
             throw Error(`No config found for requestId "${requestId}"`);
         }
         if (method === 'POST' || method === 'PUT') {
-            return this.http[method.toLowerCase()](this.providerConfig.baseUrl + point, params, httpOptions);
+            return this.http[method.toLowerCase()](providerConfig.baseUrl + point, params, httpOptions);
         }
         if (method === 'GET' || method === 'DELETE') {
-            return this.http[method.toLowerCase()](this.providerConfig.baseUrl + point + urlParams, httpOptions);
+            return this.http[method.toLowerCase()](providerConfig.baseUrl + point + urlParams, httpOptions);
         }
         throw Error(`Rest method ${method} not supported`);
     }
@@ -985,21 +407,10 @@ RestProvider.decorators = [
 ];
 /** @nocollapse */
 RestProvider.ctorParameters = () => [
-    { type: ConfigurationService },
     { type: HttpClient }
 ];
-/** @nocollapse */ RestProvider.ngInjectableDef = ɵɵdefineInjectable({ factory: function RestProvider_Factory() { return new RestProvider(ɵɵinject(ConfigurationService), ɵɵinject(HttpClient)); }, token: RestProvider, providedIn: "root" });
+/** @nocollapse */ RestProvider.ngInjectableDef = ɵɵdefineInjectable({ factory: function RestProvider_Factory() { return new RestProvider(ɵɵinject(HttpClient)); }, token: RestProvider, providedIn: "root" });
 if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    RestProvider.prototype.providerConfig;
-    /**
-     * @type {?}
-     * @private
-     */
-    RestProvider.prototype.config;
     /**
      * @type {?}
      * @private
@@ -1009,6 +420,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/communication.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class CommunicationService {
@@ -1038,10 +450,19 @@ class CommunicationService {
     request$(requestId, options = {}, provider) {
         /** @type {?} */
         const activeProvider = provider || this.defaultProvider;
-        if (!this[activeProvider])
-            throw Error(`There is no ${activeProvider} provider`);
+        /** @type {?} */
+        const activeProviderConfig = this.communicationConfig.providers[activeProvider];
+        if (!activeProviderConfig) {
+            throw Error(`There is no config for "${activeProvider}" provider`);
+        }
+        // provider.type control for retrocompatibility
+        /** @type {?} */
+        const activeProviderType = activeProviderConfig.type || activeProvider;
+        if (!this[activeProviderType]) {
+            throw Error(`There is no "${activeProviderType}" provider type`);
+        }
         const { onError } = options;
-        return this[activeProvider].request$(requestId, options)
+        return this[activeProviderType].request$(activeProviderConfig, requestId, options)
             .pipe(catchError((/**
          * @param {?} error
          * @return {?}
@@ -1105,6 +526,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/abstract-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -1174,6 +596,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/main-layout/main-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainLayoutDS extends LayoutDataSource {
@@ -1310,6 +733,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/json-config.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class JsonConfigService {
@@ -1416,6 +840,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -1592,6 +1017,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input-checkbox.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetInputCheckbox extends FacetInput {
@@ -1645,6 +1071,7 @@ class FacetInputCheckbox extends FacetInput {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/helpers.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -1718,6 +1145,7 @@ var helpers = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input-text.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetInputText extends FacetInput {
@@ -1757,6 +1185,7 @@ class FacetInputText extends FacetInput {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input-link.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -1923,6 +1352,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/facet-inputs/facet-input-select.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetInputSelect extends FacetInput {
@@ -1975,11 +1405,13 @@ class FacetInputSelect extends FacetInput {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/models/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/search.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -2815,11 +2247,13 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/services/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/main-layout/main-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainLayoutEH extends EventHandler {
@@ -2942,6 +2376,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/header.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class HeaderDS extends DataSource {
@@ -2975,6 +2410,7 @@ class HeaderDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/subnav.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SubnavDS extends DataSource {
@@ -3023,6 +2459,7 @@ class SubnavDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/breadcrumbs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class BreadcrumbsDS extends DataSource {
@@ -3038,6 +2475,7 @@ class BreadcrumbsDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/facets.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetsDS extends DataSource {
@@ -3059,6 +2497,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/facets-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -3364,6 +2803,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/footer.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FooterDS extends DataSource {
@@ -3382,6 +2822,7 @@ class FooterDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/smart-pagination.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SmartPaginationDS extends DataSource {
@@ -3551,10 +2992,12 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     HeaderDS: HeaderDS,
     SubnavDS: SubnavDS,
     BreadcrumbsDS: BreadcrumbsDS,
@@ -3566,6 +3009,7 @@ var DS = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/header.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class HeaderEH extends EventHandler {
@@ -3591,6 +3035,7 @@ class HeaderEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/subnav.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SubnavEH extends EventHandler {
@@ -3621,6 +3066,7 @@ class SubnavEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/breadcrumbs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class BreadcrumbsEH extends EventHandler {
@@ -3651,6 +3097,7 @@ class BreadcrumbsEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/facets-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetsWrapperEH extends EventHandler {
@@ -3798,6 +3245,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/footer.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FooterEH extends EventHandler {
@@ -3811,6 +3259,7 @@ class FooterEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/smart-pagination.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SmartPaginationEH extends EventHandler {
@@ -3840,10 +3289,12 @@ class SmartPaginationEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     HeaderEH: HeaderEH,
     SubnavEH: SubnavEH,
     BreadcrumbsEH: BreadcrumbsEH,
@@ -3854,6 +3305,7 @@ var EH = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/main-layout/main-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -3879,6 +3331,7 @@ const MainLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/main-layout/main-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainLayoutComponent extends AbstractLayout {
@@ -3976,6 +3429,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/page404-layout/page404-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class Page404LayoutDS extends LayoutDataSource {
@@ -3994,6 +3448,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/page404-layout/page404-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class Page404LayoutEH extends EventHandler {
@@ -4046,6 +3501,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/page404-layout/page404-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -4063,6 +3519,7 @@ const Page404LayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/page404-layout/page404-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class Page404LayoutComponent extends AbstractLayout {
@@ -4107,6 +3564,7 @@ Page404LayoutComponent.ctorParameters = () => [
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/components/facets-wrapper/facets-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetsWrapperComponent {
@@ -4152,6 +3610,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/components/smart-pagination/smart-pagination.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SmartPaginationComponent {
@@ -4190,6 +3649,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/n7-boilerplate-common.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -4232,6 +3692,7 @@ N7BoilerplateCommonModule.decorators = [
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaLayoutDS extends LayoutDataSource {
@@ -4610,6 +4071,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaLayoutEH extends EventHandler {
@@ -4809,6 +4271,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/linked-objects.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwLinkedObjectsDS extends DataSource {
@@ -5126,6 +4589,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/autocomplete-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwAutocompleteWrapperDS extends DataSource$1 {
@@ -5203,6 +4667,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/bubble-chart.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwBubbleChartDS extends DataSource {
@@ -5356,6 +4821,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/chart-tippy.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwChartTippyDS extends DataSource {
@@ -5398,6 +4864,7 @@ class AwChartTippyDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/hero.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHeroDS extends DataSource {
@@ -5436,6 +4903,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/table.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwTableDS extends DataSource {
@@ -5450,6 +4918,7 @@ class AwTableDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/home-hero-patrimonio.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeHeroPatrimonioDS extends DataSource {
@@ -5465,6 +4934,7 @@ class AwHomeHeroPatrimonioDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/home-facets-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeFacetsWrapperDS extends DataSource {
@@ -5723,6 +5193,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/home-item-tags-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeItemTagsWrapperDS extends DataSource {
@@ -5738,6 +5209,7 @@ class AwHomeItemTagsWrapperDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/home-autocomplete.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeAutocompleteDS extends DataSource {
@@ -5847,6 +5319,7 @@ class AwHomeAutocompleteDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/entita-nav.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaNavDS extends DataSource {
@@ -5914,6 +5387,7 @@ class AwEntitaNavDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/entita-metadata-viewer.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaMetadataViewerDS extends DataSource {
@@ -6057,6 +5531,7 @@ class AwEntitaMetadataViewerDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/tree.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwTreeDS extends DataSource$1 {
@@ -6375,6 +5850,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/sidebar-header.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSidebarHeaderDS extends DataSource {
@@ -6411,6 +5887,7 @@ class AwSidebarHeaderDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/scheda-breadcrumbs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaBreadcrumbsDS extends DataSource {
@@ -6447,6 +5924,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/scheda-metadata.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaMetadataDS extends DataSource {
@@ -6509,6 +5987,7 @@ class AwSchedaMetadataDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/scheda-image.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaImageDS extends DataSource {
@@ -6588,6 +6067,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/scheda-inner-title.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaInnerTitleDS extends DataSource {
@@ -6603,6 +6083,7 @@ class AwSchedaInnerTitleDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/search-layout-tabs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutTabsDS extends DataSource {
@@ -6649,6 +6130,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/gallery-results.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwGalleryResultsDS extends DataSource {
@@ -6797,10 +6279,12 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     AwLinkedObjectsDS: AwLinkedObjectsDS,
     AwAutocompleteWrapperDS: AwAutocompleteWrapperDS,
     AwBubbleChartDS: AwBubbleChartDS,
@@ -6825,6 +6309,7 @@ var DS$1 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/hero.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHeroEH extends EventHandler {
@@ -6860,6 +6345,7 @@ class AwHeroEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/home-facets-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeFacetsWrapperEH extends EventHandler {
@@ -7027,6 +6513,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/home-hero-patrimonio.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeHeroPatrimonioEH extends EventHandler {
@@ -7040,6 +6527,7 @@ class AwHomeHeroPatrimonioEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/home-item-tags-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeItemTagsWrapperEH extends EventHandler {
@@ -7068,6 +6556,7 @@ class AwHomeItemTagsWrapperEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/home-autocomplete.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeAutocompleteEH extends EventHandler {
@@ -7093,6 +6582,7 @@ class AwHomeAutocompleteEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/entita-nav.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaNavEH extends EventHandler {
@@ -7125,6 +6615,7 @@ class AwEntitaNavEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/scheda-breadcrumbs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaSidebarEH extends EventHandler {
@@ -7147,6 +6638,7 @@ class AwSchedaSidebarEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/sidebar-header.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSidebarHeaderEH extends EventHandler {
@@ -7172,6 +6664,7 @@ class AwSidebarHeaderEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/tree.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwTreeEH extends EventHandler {
@@ -7369,6 +6862,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/search-layout-tabs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutTabsEH extends EventHandler {
@@ -7382,6 +6876,7 @@ class AwSearchLayoutTabsEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/gallery-results.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwGalleryResultsEH extends EventHandler {
@@ -7431,6 +6926,7 @@ class AwGalleryResultsEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/linked-objects.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwLinkedObjectsEH extends EventHandler {
@@ -7514,6 +7010,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/autocomplete-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwAutocompleteWrapperEH extends EventHandler {
@@ -7542,6 +7039,7 @@ class AwAutocompleteWrapperEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/bubble-chart.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwBubbleChartEH extends EventHandler {
@@ -7686,6 +7184,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/table.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwTableEH extends EventHandler {
@@ -7707,6 +7206,7 @@ class AwTableEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/chart-tippy.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwChartTippyEH extends EventHandler {
@@ -7812,10 +7312,12 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     AwHeroEH: AwHeroEH,
     AwHomeFacetsWrapperEH: AwHomeFacetsWrapperEH,
     AwHomeHeroPatrimonioEH: AwHomeHeroPatrimonioEH,
@@ -7836,6 +7338,7 @@ var EH$1 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -7864,6 +7367,7 @@ const AwEntitaLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaLayoutComponent extends AbstractLayout {
@@ -7984,6 +7488,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeLayoutDS extends LayoutDataSource {
@@ -8450,6 +7955,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/home-layout/home-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeLayoutEH extends EventHandler {
@@ -8783,6 +8289,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/home-layout/home-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -8818,6 +8325,7 @@ const AwHomeLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeLayoutComponent extends AbstractLayout {
@@ -8901,6 +8409,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaLayoutDS extends LayoutDataSource {
@@ -9224,6 +8733,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaLayoutEH extends EventHandler {
@@ -9384,6 +8894,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -9415,6 +8926,7 @@ const AwPatrimonioLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaLayoutComponent extends AbstractLayout {
@@ -9524,6 +9036,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-facets.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var facetsConfig = {
@@ -9691,6 +9204,7 @@ var facetsConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -10167,6 +9681,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutEH extends EventHandler {
@@ -10337,6 +9852,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -10367,6 +9883,7 @@ const AwSearchLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutComponent extends AbstractLayout {
@@ -10467,6 +9984,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-facets.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var facetsConfig$1 = {
@@ -10617,6 +10135,7 @@ var facetsConfig$1 = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -11093,6 +10612,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwGalleryLayoutEH extends EventHandler {
@@ -11263,6 +10783,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -11293,6 +10814,7 @@ const AwGalleryLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwGalleryLayoutComponent extends AbstractLayout {
@@ -11408,6 +10930,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/components/chart-tippy/chart-tippy.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class ChartTippyComponent {
@@ -11442,6 +10965,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/components/bubble-chart-wrapper/bubble-chart-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class BubbleChartWrapperComponent {
@@ -11476,6 +11000,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/components/smart-breadcrumbs/smart-breadcrumbs.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -11644,6 +11169,556 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/config/apollo.config.ts
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var apolloConfig = {
+    getLastPosts: {
+        queryName: 'getLastPosts',
+        queryBody: `
+        {
+          getLastPosts(__PARAMS__) {
+            id
+            title
+          }
+        }
+      `,
+    },
+    getTree: {
+        queryName: 'getTreeOfItems',
+        queryBody: `
+      {
+        getTreeOfItems{
+          label
+          id
+          img
+          document_type
+          document_classification
+          branches {
+            label
+            id
+            img
+            document_type
+            document_classification
+            branches {
+              label
+              id
+              img
+              document_type
+              document_classification
+              branches {
+                label
+                id
+                img
+                document_type
+                document_classification
+                branches {
+                  label
+                  id
+                  img
+                  document_type
+                  document_classification
+                  branches {
+                    label
+                    id
+                    img
+                    document_type
+                    document_classification
+                    branches {
+                      label
+                      id
+                      img
+                      document_type
+                      document_classification
+                      branches {
+                        label
+                        id
+                        img
+                        document_type
+                        document_classification
+                        branches {
+                          label
+                          id
+                          img
+                          document_type
+                          document_classification
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      `,
+    },
+    globalFilter: {
+        queryName: 'globalFilter',
+        queryBody: `{
+        globalFilter(__PARAMS__){
+          entitiesData {
+            entity {
+                id
+                label
+                typeOfEntity
+            } count
+          }
+          typeOfEntityData {
+            type
+            count
+          }
+          itemsPagination {
+            totalCount
+            items {
+              thumbnail
+              item {
+                id
+                label
+                fields
+                {
+                  ...
+                  on KeyValueField {
+                    key
+                    value
+                  }
+                }
+                breadcrumbs {
+                  label
+                  link
+                }
+                relatedTypesOfEntity {
+                  type
+                  count
+                }
+              }
+            }
+          }
+        }
+        }`,
+    },
+    getEntityDetails: {
+        queryName: 'getEntity',
+        queryBody: `{
+        getEntity(__PARAMS__){
+          overviewTab
+          label
+          id
+          typeOfEntity
+          fields {
+            ...
+            on KeyValueField {
+              key
+              value
+            }
+            ... on
+            KeyValueFieldGroup {
+              label
+              fields
+              {
+                ...
+                on KeyValueField {
+                  key
+                  value
+                }
+              }
+            }
+          }
+          extraTab
+          wikiTab {
+            text
+            url
+          }
+          relatedItems {
+            thumbnail
+            relation
+            item {
+              label
+              id
+              fields
+              {
+                ...
+                on KeyValueField {
+                  key
+                  value
+                }
+              }
+              breadcrumbs {
+                label
+                link
+              }
+            }
+            relatedTypesOfEntity {
+              type
+              count
+            }
+          }
+          relatedEntities {
+            entity {
+                id
+                label
+                typeOfEntity
+            }
+            count
+          }
+        }
+      }
+      `,
+    },
+    getItem: {
+        queryName: 'getItem',
+        queryBody: `{
+        getItem(__PARAMS__) {
+          id
+          label
+          icon
+          title
+          subTitle
+          image
+          text
+          fields {
+            ...
+            on KeyValueField {
+              key
+              value
+            }
+            ... on KeyValueFieldGroup {
+              label
+              fields {
+                ...
+                on KeyValueField {
+                  key
+                  value
+                }
+              }
+            }
+          }
+          relatedEntities {
+            count
+            entity{
+              id
+              label
+              typeOfEntity
+            }
+          }
+          relatedItems {
+            thumbnail
+            item {
+              label
+              id
+              relatedTypesOfEntity {
+                type
+                count
+              }
+            }
+          }
+          breadcrumbs {
+            label
+            link
+          }
+        }
+      }`,
+    },
+    getNode: {
+        queryName: 'getNode',
+        queryBody: `{
+        getNode(__PARAMS__) {
+          ... on Item {
+            id
+            label
+            title
+            subTitle
+            image
+            images
+            text
+            document_type
+            fields {
+              ...
+              on KeyValueField {
+                key
+                value
+              }
+              ... on KeyValueFieldGroup {
+                label
+                fields {
+                  ...
+                  on KeyValueField {
+                    key
+                    value
+                  }
+                }
+              }
+            }
+            relatedEntities {
+                count
+                entity{
+                  id
+                  label
+                  typeOfEntity
+                  relation
+                }
+            }
+            relatedItems {
+                thumbnail
+                item {
+                  label
+                  id
+                  fields {
+                    ...
+                    on KeyValueField {
+                      key
+                      value
+                    }
+                    ... on KeyValueFieldGroup {
+                      label
+                      fields {
+                        ...
+                        on KeyValueField {
+                          key
+                          value
+                        }
+                      }
+                    }
+                  }
+                  relatedTypesOfEntity {
+                    type
+                    count
+                  }
+                }
+              }
+            breadcrumbs {
+              label
+              link
+            }
+          }
+          ... on Node {
+            id
+            label
+            img
+            document_type
+            fields {
+              ...
+              on KeyValueField {
+                key
+                value
+              }
+              ... on KeyValueFieldGroup {
+                label
+                fields {
+                  ...
+                  on KeyValueField {
+                    key
+                    value
+                  }
+                }
+              }
+            }
+          }
+        }
+      }`,
+    },
+    autoComplete: {
+        queryName: 'autoComplete',
+        queryBody: `{
+        autoComplete(__PARAMS__){
+          totalCount
+          results {
+            ... on EntityCountData {
+              count
+              entity {
+                id
+                label
+                typeOfEntity
+                fields {
+                  ... on KeyValueField {
+                    key
+                    value
+                  }
+                  ... on KeyValueFieldGroup {
+                    label
+                    fields {
+                      ... on KeyValueField {
+                        key
+                        value
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            ... on ItemListing {
+              item {
+                id
+                label
+                document_type
+                fields {
+                  ... on KeyValueField {
+                    key
+                    value
+                  }
+                  ... on KeyValueFieldGroup {
+                    label
+                    fields {
+                      ... on KeyValueField {
+                        key
+                        value
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }`,
+    },
+    search: {
+        queryName: 'search',
+        queryBody: `{
+        search(__PARAMS__){
+          totalCount
+          facets {
+            id
+            type
+            operator
+            limit
+            order
+            data {
+              label
+              value
+              counter
+              searchData {
+                key
+                value
+              }
+            }
+          }
+          results {
+            order{
+              type
+              key
+              direction
+            }
+            fields
+            {
+              id
+              highlight
+              limit
+            }
+            items {
+              ... on Entity {
+                id
+                label
+                typeOfEntity
+                fields {
+                  ...
+                  on KeyValueField {
+                    key
+                    value
+                  }
+                  ... on KeyValueFieldGroup {
+                    label
+                    fields {
+                      ...
+                      on KeyValueField {
+                        key
+                        value
+                      }
+                    }
+                  }
+                }
+                relatedEntities {
+                    count
+                    entity{
+                      id
+                      label
+                      typeOfEntity
+                    }
+                }
+                relatedItems {
+                    thumbnail
+                    item {
+                      label
+                      id
+                      fields {
+                        ...
+                        on KeyValueField {
+                          key
+                          value
+                        }
+                        ... on KeyValueFieldGroup {
+                          label
+                          fields {
+                            ...
+                            on KeyValueField {
+                              key
+                              value
+                            }
+                          }
+                        }
+                      }
+                  }
+                  relatedTypesOfEntity {
+                    type
+                    count
+                  }
+                }
+              }
+              ... on Item {
+                id
+                label
+                icon
+                title
+                subTitle
+                image
+                text
+                relatedTypesOfEntity {
+                  type
+                  count
+                }
+                breadcrumbs {
+                  label
+                  link
+                }
+                fields {
+                  ...
+                  on KeyValueField {
+                    key
+                    value
+                  }
+                  ... on KeyValueFieldGroup {
+                    label
+                    fields {
+                      ...
+                      on KeyValueField {
+                        key
+                        value
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }`,
+    },
+    getMissingBubble: {
+        queryName: 'getEntity',
+        queryBody: `{
+        getEntity(__PARAMS__){
+          label
+          id
+          typeOfEntity
+        }
+      }`,
+    },
+};
+
+/**
+ * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/n7-boilerplate-arianna-web.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -11658,6 +11733,24 @@ const COMPONENTS$1 = [
     SmartBreadcrumbsComponent,
 ];
 class N7BoilerplateAriannaWebModule {
+    /**
+     * @param {?} initStatus
+     * @param {?} config
+     */
+    constructor(initStatus, config) {
+        // add apollo config on app init
+        // note: this is just for arianna* sites!
+        initStatus.donePromise.then((/**
+         * @return {?}
+         */
+        () => {
+            /** @type {?} */
+            const communication = config.get('communication');
+            const { defaultProvider } = communication;
+            communication.providers[defaultProvider].config = apolloConfig;
+            config.set('communication', communication);
+        }));
+    }
 }
 N7BoilerplateAriannaWebModule.decorators = [
     { type: NgModule, args: [{
@@ -11668,14 +11761,19 @@ N7BoilerplateAriannaWebModule.decorators = [
                     DvComponentsLibModule,
                     N7BoilerplateCommonModule,
                 ],
-                providers: [],
                 entryComponents: COMPONENTS$1,
                 exports: COMPONENTS$1,
             },] }
 ];
+/** @nocollapse */
+N7BoilerplateAriannaWebModule.ctorParameters = () => [
+    { type: ApplicationInitStatus },
+    { type: ConfigurationService }
+];
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/components/data-widget-wrapper/data-widget-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -11704,6 +11802,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/components/datepicker-wrapper/datepicker-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -11787,6 +11886,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/example-layout/example-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvExampleLayoutDS extends LayoutDataSource {
@@ -11854,6 +11954,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/example-layout/example-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvExampleLayoutEH extends EventHandler {
@@ -11873,6 +11974,7 @@ class DvExampleLayoutEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/data-widget-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvDataWidgetDS extends DataSource {
@@ -11891,6 +11993,7 @@ class DvDataWidgetDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/datepicker-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvDatepickerWrapperDS extends DataSource {
@@ -11984,6 +12087,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/graph.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvGraphDS extends DataSource {
@@ -12076,6 +12180,7 @@ class DvGraphDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/inner-title.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvInnerTitleDS extends DataSource {
@@ -12101,6 +12206,7 @@ class DvInnerTitleDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/widget.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvWidgetDS extends DataSource {
@@ -12115,10 +12221,12 @@ class DvWidgetDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS$2 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     DvDataWidgetDS: DvDataWidgetDS,
     DvDatepickerWrapperDS: DvDatepickerWrapperDS,
     DvGraphDS: DvGraphDS,
@@ -12128,6 +12236,7 @@ var DS$2 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/event-handlers/datepicker-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvDatepickerWrapperEH extends EventHandler {
@@ -12165,15 +12274,18 @@ class DvDatepickerWrapperEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH$2 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     DvDatepickerWrapperEH: DvDatepickerWrapperEH
 });
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/example-layout/example-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -12200,6 +12312,7 @@ const DvExampleLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/example-layout/example-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvExampleLayoutComponent extends AbstractLayout {
@@ -12236,6 +12349,7 @@ DvExampleLayoutComponent.ctorParameters = () => [];
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/n7-boilerplate-data-viz.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -12261,6 +12375,7 @@ N7BoilerplateDataVizModule.decorators = [
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/home-layout/home-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrHomeLayoutDS extends LayoutDataSource {
@@ -12304,6 +12419,7 @@ class MrHomeLayoutDS extends LayoutDataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/home-layout/home-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrHomeLayoutEH extends EventHandler {
@@ -12329,6 +12445,7 @@ class MrHomeLayoutEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/item-previews.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrItemPreviewsDS extends DataSource {
@@ -12459,6 +12576,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/inner-title.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrInnerTitleDS extends DataSource {
@@ -12496,6 +12614,7 @@ class MrInnerTitleDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/hero.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrHeroDS extends DataSource {
@@ -12512,6 +12631,7 @@ class MrHeroDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/filters.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrFiltersDS extends DataSource {
@@ -12528,10 +12648,12 @@ class MrFiltersDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS$3 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     MrItemPreviewsDS: MrItemPreviewsDS,
     MrInnerTitleDS: MrInnerTitleDS,
     MrHeroDS: MrHeroDS,
@@ -12540,6 +12662,7 @@ var DS$3 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/event-handlers/dummy.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrDummyEH extends EventHandler {
@@ -12553,6 +12676,7 @@ class MrDummyEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/event-handlers/filters.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrFiltersEH extends EventHandler {
@@ -12566,16 +12690,19 @@ class MrFiltersEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH$3 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     MrDummyEH: MrDummyEH,
     MrFiltersEH: MrFiltersEH
 });
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/home-layout/home-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -12603,6 +12730,7 @@ const MrHomeLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/home-layout/home-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrHomeLayoutComponent extends AbstractLayout {
@@ -12647,6 +12775,7 @@ MrHomeLayoutComponent.ctorParameters = () => [
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-layout/search-facets.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var facetsConfig$2 = {
@@ -12812,6 +12941,7 @@ var facetsConfig$2 = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-layout/search-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 // import helpers from '../../../common/helpers';
@@ -12851,6 +12981,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-layout/search-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrSearchLayoutEH extends EventHandler {
@@ -12881,6 +13012,7 @@ class MrSearchLayoutEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-layout/search-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -12904,6 +13036,7 @@ const MrSearchLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-layout/search-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 // import { CommunicationService } from '../../../common/services/communication.service';
@@ -12964,6 +13097,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/glossary-layout/glossary-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrGlossaryLayoutDS extends LayoutDataSource$1 {
@@ -12978,6 +13112,7 @@ class MrGlossaryLayoutDS extends LayoutDataSource$1 {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/glossary-layout/glossary-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrGlossaryLayoutEH extends EventHandler {
@@ -13008,6 +13143,7 @@ class MrGlossaryLayoutEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/glossary-layout/glossary-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -13028,6 +13164,7 @@ const MrGlossaryLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/glossary-layout/glossary-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrGlossaryLayoutComponent extends AbstractLayout {
@@ -13072,6 +13209,7 @@ MrGlossaryLayoutComponent.ctorParameters = () => [
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/static-layout/static-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrStaticLayoutDS extends LayoutDataSource$1 {
@@ -13086,6 +13224,7 @@ class MrStaticLayoutDS extends LayoutDataSource$1 {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/static-layout/static-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrStaticLayoutEH extends EventHandler {
@@ -13116,6 +13255,7 @@ class MrStaticLayoutEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/static-layout/static-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -13136,6 +13276,7 @@ const MrStaticLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/static-layout/static-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrStaticLayoutComponent extends AbstractLayout {
@@ -13180,6 +13321,7 @@ MrStaticLayoutComponent.ctorParameters = () => [
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-facets-layout/search-facets-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SearchFacetsLayoutDS extends LayoutDataSource$1 {
@@ -13228,6 +13370,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-facets-layout/search-facets-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -13304,6 +13447,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-facets-layout/search-facets-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -13319,6 +13463,7 @@ const SearchFacetsLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/facets/facet-text.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetTextDS extends DataSource {
@@ -13366,6 +13511,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/facets/facet-checkbox.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetCheckboxDS extends DataSource {
@@ -13420,6 +13566,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/facets/facet-select.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetSelectDS extends DataSource {
@@ -13474,6 +13621,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/data-sources/facets/facet-link.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -13530,6 +13678,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/event-handlers/facets/facet-generic.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetGenericEH extends EventHandler {
@@ -13555,6 +13704,7 @@ class FacetGenericEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-facets-layout/search-facets-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -13632,6 +13782,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-test-layout/search-test-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SearchTestLayoutDS extends LayoutDataSource$1 {
@@ -13645,6 +13796,7 @@ class SearchTestLayoutDS extends LayoutDataSource$1 {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-test-layout/search-test-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SearchTestLayoutEH extends EventHandler {
@@ -13676,6 +13828,7 @@ class SearchTestLayoutEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-test-layout/search-test-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -13693,6 +13846,7 @@ const SearchTestLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/search-test-layout/search-test-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrSearchTestLayoutComponent extends AbstractLayout {
@@ -13780,6 +13934,7 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/n7-boilerplate-muruca.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -13808,6 +13963,7 @@ N7BoilerplateMurucaModule.decorators = [
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/n7-boilerplate-lib.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class N7BoilerplateLibModule {
@@ -13833,48 +13989,57 @@ N7BoilerplateLibModule.decorators = [
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/layouts/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/common/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/layouts/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/arianna-web/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/layout/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/data-viz/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: lib/muruca/layouts/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: public-api.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
+ * Generated from: n7-frontend-boilerplate.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { AbstractLayout, ApolloProvider, ApolloProviderConfig, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrInnerTitleDS, MrItemPreviewsDS, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, RestProviderConfig, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrStaticLayoutComponent as ɵba, MrSearchFacetsLayoutComponent as ɵbb, MrSearchTestLayoutComponent as ɵbc, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, AwGalleryLayoutComponent as ɵq, BubbleChartWrapperComponent as ɵr, ChartTippyComponent as ɵs, SmartBreadcrumbsComponent as ɵt, DataWidgetWrapperComponent as ɵu, DatepickerWrapperComponent as ɵv, DvExampleLayoutComponent as ɵw, MrHomeLayoutComponent as ɵx, MrSearchLayoutComponent as ɵy, MrGlossaryLayoutComponent as ɵz };
+export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrInnerTitleDS, MrItemPreviewsDS, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrStaticLayoutComponent as ɵba, MrSearchFacetsLayoutComponent as ɵbb, MrSearchTestLayoutComponent as ɵbc, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, AwGalleryLayoutComponent as ɵq, BubbleChartWrapperComponent as ɵr, ChartTippyComponent as ɵs, SmartBreadcrumbsComponent as ɵt, DataWidgetWrapperComponent as ɵu, DatepickerWrapperComponent as ɵv, DvExampleLayoutComponent as ɵw, MrHomeLayoutComponent as ɵx, MrSearchLayoutComponent as ɵy, MrGlossaryLayoutComponent as ɵz };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

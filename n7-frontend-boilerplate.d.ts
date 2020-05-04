@@ -15,8 +15,8 @@ export { SmartPaginationComponent as ɵh } from './lib/common/components/smart-p
 export { MainLayoutComponent as ɵa } from './lib/common/layouts/main-layout/main-layout';
 export { Page404LayoutComponent as ɵf } from './lib/common/layouts/page404-layout/page404-layout';
 export { AbstractLayout as ɵb } from './lib/common/models/abstract-layout';
-export { ApolloProvider as ɵj } from './lib/common/services/communication-providers/apollo/apollo.provider';
-export { RestProvider as ɵk } from './lib/common/services/communication-providers/rest/rest.provider';
+export { ApolloProvider as ɵj } from './lib/common/services/communication-providers/apollo.provider';
+export { RestProvider as ɵk } from './lib/common/services/communication-providers/rest.provider';
 export { CommunicationService as ɵi } from './lib/common/services/communication.service';
 export { ConfigurationService as ɵc } from './lib/common/services/configuration.service';
 export { LayoutsConfigurationService as ɵd } from './lib/common/services/layouts-configuration.service';
