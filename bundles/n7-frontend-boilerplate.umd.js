@@ -2,7 +2,7 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('@angular/common'), require('@angular/common/http'), require('@n7-frontend/components'), require('rxjs'), require('rxjs/operators'), require('@angular/router'), require('@angular/platform-browser'), require('@n7-frontend/core'), require('@n7-frontend/core/dist/layout-data-source'), require('tippy.js'), require('lodash'), require('slugify'), require('@n7-frontend/core/dist/data-source')) :
     typeof define === 'function' && define.amd ? define('@n7-frontend/boilerplate', ['exports', '@angular/core', '@angular/common', '@angular/common/http', '@n7-frontend/components', 'rxjs', 'rxjs/operators', '@angular/router', '@angular/platform-browser', '@n7-frontend/core', '@n7-frontend/core/dist/layout-data-source', 'tippy.js', 'lodash', 'slugify', '@n7-frontend/core/dist/data-source'], factory) :
     (global = global || self, factory((global['n7-frontend'] = global['n7-frontend'] || {}, global['n7-frontend'].boilerplate = {}), global.ng.core, global.ng.common, global.ng.common.http, global.components, global.rxjs, global.rxjs.operators, global.ng.router, global.ng.platformBrowser, global.core$1, global.layoutDataSource, global.tippy, global.lodash, global.slugify, global.dataSource));
-}(this, (function (exports, core, common, http, components, rxjs, operators, router, platformBrowser, core$1, layoutDataSource, tippy, lodash, slugify, dataSource) { 'use strict';
+}(this, function (exports, core, common, http, components, rxjs, operators, router, platformBrowser, core$1, layoutDataSource, tippy, lodash, slugify, dataSource) { 'use strict';
 
     var tippy__default = 'default' in tippy ? tippy['default'] : tippy;
     slugify = slugify && slugify.hasOwnProperty('default') ? slugify['default'] : slugify;
@@ -75,11 +75,10 @@
     }
 
     function __awaiter(thisArg, _arguments, P, generator) {
-        function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
         return new (P || (P = Promise))(function (resolve, reject) {
             function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
             function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-            function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+            function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     }
@@ -117,15 +116,14 @@
     }
 
     function __values(o) {
-        var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
         if (m) return m.call(o);
-        if (o && typeof o.length === "number") return {
+        return {
             next: function () {
                 if (o && i >= o.length) o = void 0;
                 return { value: o && o[i++], done: !o };
             }
         };
-        throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
     }
 
     function __read(o, n) {
@@ -206,24 +204,8 @@
         return (mod && mod.__esModule) ? mod : { default: mod };
     }
 
-    function __classPrivateFieldGet(receiver, privateMap) {
-        if (!privateMap.has(receiver)) {
-            throw new TypeError("attempted to get private field on non-instance");
-        }
-        return privateMap.get(receiver);
-    }
-
-    function __classPrivateFieldSet(receiver, privateMap, value) {
-        if (!privateMap.has(receiver)) {
-            throw new TypeError("attempted to set private field on non-instance");
-        }
-        privateMap.set(receiver, value);
-        return value;
-    }
-
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/services/configuration.service.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var ConfigurationService = /** @class */ (function () {
@@ -264,7 +246,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/services/layouts-configuration.service.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var LayoutsConfigurationService = /** @class */ (function () {
@@ -324,7 +305,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/services/main-state.service.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MainStateService = /** @class */ (function () {
@@ -463,7 +443,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/services/communication-providers/apollo.provider.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var ApolloProvider = /** @class */ (function () {
@@ -598,7 +577,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/services/communication-providers/rest.provider.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var RestProvider = /** @class */ (function () {
@@ -664,7 +642,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/services/communication.service.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var CommunicationService = /** @class */ (function () {
@@ -779,7 +756,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/models/abstract-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /**
@@ -859,7 +835,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/layouts/main-layout/main-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MainLayoutDS = /** @class */ (function (_super) {
@@ -1024,7 +999,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/services/json-config.service.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var JsonConfigService = /** @class */ (function () {
@@ -1141,7 +1115,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/models/facet-inputs/facet-input.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /**
@@ -1324,7 +1297,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/models/facet-inputs/facet-input-checkbox.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FacetInputCheckbox = /** @class */ (function (_super) {
@@ -1395,7 +1367,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/helpers.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -1470,7 +1441,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/models/facet-inputs/facet-input-text.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FacetInputText = /** @class */ (function (_super) {
@@ -1523,7 +1493,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/models/facet-inputs/facet-input-link.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -1724,7 +1693,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/models/facet-inputs/facet-input-select.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FacetInputSelect = /** @class */ (function (_super) {
@@ -1793,13 +1761,11 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/models/index.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/services/search.service.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -2344,12 +2310,7 @@
          * @return {?}
          */
         function () {
-            this._inputs.forEach((/**
-             * @param {?} input
-             * @return {?}
-             */
-            function (input) {
-            }));
+            // do nothing
         };
         /**
          * @private
@@ -2830,13 +2791,11 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/services/index.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/layouts/main-layout/main-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MainLayoutEH = /** @class */ (function (_super) {
@@ -2978,7 +2937,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/data-sources/header.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var HeaderDS = /** @class */ (function (_super) {
@@ -3026,7 +2984,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/data-sources/subnav.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var SubnavDS = /** @class */ (function (_super) {
@@ -3092,7 +3049,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/data-sources/breadcrumbs.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var BreadcrumbsDS = /** @class */ (function (_super) {
@@ -3118,7 +3074,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/data-sources/facets.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FacetsDS = /** @class */ (function (_super) {
@@ -3151,7 +3106,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/data-sources/facets-wrapper.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -3496,7 +3450,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/data-sources/footer.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FooterDS = /** @class */ (function (_super) {
@@ -3525,7 +3478,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/data-sources/smart-pagination.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var SmartPaginationDS = /** @class */ (function (_super) {
@@ -3711,12 +3663,10 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/data-sources/index.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     var DS = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         HeaderDS: HeaderDS,
         SubnavDS: SubnavDS,
         BreadcrumbsDS: BreadcrumbsDS,
@@ -3728,7 +3678,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/event-handlers/header.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var HeaderEH = /** @class */ (function (_super) {
@@ -3764,7 +3713,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/event-handlers/subnav.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var SubnavEH = /** @class */ (function (_super) {
@@ -3805,7 +3753,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/event-handlers/breadcrumbs.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var BreadcrumbsEH = /** @class */ (function (_super) {
@@ -3846,7 +3793,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/event-handlers/facets-wrapper.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FacetsWrapperEH = /** @class */ (function (_super) {
@@ -4004,7 +3950,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/event-handlers/footer.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FooterEH = /** @class */ (function (_super) {
@@ -4026,7 +3971,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/event-handlers/smart-pagination.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var SmartPaginationEH = /** @class */ (function (_super) {
@@ -4066,12 +4010,10 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/event-handlers/index.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     var EH = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         HeaderEH: HeaderEH,
         SubnavEH: SubnavEH,
         BreadcrumbsEH: BreadcrumbsEH,
@@ -4082,7 +4024,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/layouts/main-layout/main-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -4108,7 +4049,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/layouts/main-layout/main-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MainLayoutComponent = /** @class */ (function (_super) {
@@ -4211,7 +4151,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/layouts/page404-layout/page404-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var Page404LayoutDS = /** @class */ (function (_super) {
@@ -4240,7 +4179,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/layouts/page404-layout/page404-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var Page404LayoutEH = /** @class */ (function (_super) {
@@ -4301,7 +4239,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/layouts/page404-layout/page404-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -4319,7 +4256,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/layouts/page404-layout/page404-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var Page404LayoutComponent = /** @class */ (function (_super) {
@@ -4373,7 +4309,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/components/facets-wrapper/facets-wrapper.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FacetsWrapperComponent = /** @class */ (function () {
@@ -4432,7 +4367,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/components/smart-pagination/smart-pagination.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var SmartPaginationComponent = /** @class */ (function () {
@@ -4477,7 +4411,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/common/n7-boilerplate-common.module.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -4519,6 +4452,7 @@
                             components.DvComponentsLibModule,
                         ],
                         providers: [],
+                        entryComponents: COMPONENTS,
                         exports: COMPONENTS,
                     },] }
         ];
@@ -4527,7 +4461,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwEntitaLayoutDS = /** @class */ (function (_super) {
@@ -4666,7 +4599,7 @@
             // navigation update
             this.mainState.updateCustom('currentNav', 'entita');
             // update head title
-            this.mainState.update('headTitle', 'Arianna Web > Entità');
+            this.mainState.update('headTitle', 'Arianna4View - Entità');
         };
         /**
          * @param {?} id
@@ -4834,7 +4767,7 @@
             this.one('aw-linked-objects').update({ items: res.relatedItems });
             this.drawPagination();
             // update head title
-            this.mainState.update('headTitle', "Arianna Web > Entit\u00E0 > " + this.myResponse.label);
+            this.mainState.update('headTitle', "Arianna4View - Entit\u00E0 - " + this.myResponse.label);
         };
         /**
          * @private
@@ -4944,7 +4877,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwEntitaLayoutEH = /** @class */ (function (_super) {
@@ -5166,7 +5098,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/linked-objects.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwLinkedObjectsDS = /** @class */ (function (_super) {
@@ -5494,7 +5425,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/autocomplete-wrapper.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwAutocompleteWrapperDS = /** @class */ (function (_super) {
@@ -5581,7 +5511,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/bubble-chart.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwBubbleChartDS = /** @class */ (function (_super) {
@@ -5746,7 +5675,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/chart-tippy.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwChartTippyDS = /** @class */ (function (_super) {
@@ -5799,7 +5727,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/hero.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHeroDS = /** @class */ (function (_super) {
@@ -5846,7 +5773,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/table.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwTableDS = /** @class */ (function (_super) {
@@ -5870,7 +5796,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/home-hero-patrimonio.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeHeroPatrimonioDS = /** @class */ (function (_super) {
@@ -5896,7 +5821,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/home-facets-wrapper.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeFacetsWrapperDS = /** @class */ (function (_super) {
@@ -6166,7 +6090,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/home-item-tags-wrapper.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeItemTagsWrapperDS = /** @class */ (function (_super) {
@@ -6192,7 +6115,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/home-autocomplete.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeAutocompleteDS = /** @class */ (function (_super) {
@@ -6314,7 +6236,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/entita-nav.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwEntitaNavDS = /** @class */ (function (_super) {
@@ -6392,7 +6313,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/entita-metadata-viewer.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwEntitaMetadataViewerDS = /** @class */ (function (_super) {
@@ -6551,7 +6471,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/tree.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwTreeDS = /** @class */ (function (_super) {
@@ -6900,7 +6819,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/sidebar-header.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSidebarHeaderDS = /** @class */ (function (_super) {
@@ -6950,7 +6868,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/scheda-breadcrumbs.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSchedaBreadcrumbsDS = /** @class */ (function (_super) {
@@ -6993,7 +6910,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/scheda-metadata.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSchedaMetadataDS = /** @class */ (function (_super) {
@@ -7066,7 +6982,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/scheda-image.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSchedaImageDS = /** @class */ (function (_super) {
@@ -7170,7 +7085,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/scheda-inner-title.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSchedaInnerTitleDS = /** @class */ (function (_super) {
@@ -7196,7 +7110,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/search-layout-tabs.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSearchLayoutTabsDS = /** @class */ (function (_super) {
@@ -7254,7 +7167,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/gallery-results.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwGalleryResultsDS = /** @class */ (function (_super) {
@@ -7416,12 +7328,10 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/data-sources/index.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     var DS$1 = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         AwLinkedObjectsDS: AwLinkedObjectsDS,
         AwAutocompleteWrapperDS: AwAutocompleteWrapperDS,
         AwBubbleChartDS: AwBubbleChartDS,
@@ -7446,7 +7356,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/event-handlers/hero.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHeroEH = /** @class */ (function (_super) {
@@ -7492,7 +7401,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/event-handlers/home-facets-wrapper.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeFacetsWrapperEH = /** @class */ (function (_super) {
@@ -7669,7 +7577,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/event-handlers/home-hero-patrimonio.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeHeroPatrimonioEH = /** @class */ (function (_super) {
@@ -7691,7 +7598,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/event-handlers/home-item-tags-wrapper.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeItemTagsWrapperEH = /** @class */ (function (_super) {
@@ -7729,7 +7635,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/event-handlers/home-autocomplete.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeAutocompleteEH = /** @class */ (function (_super) {
@@ -7765,7 +7670,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/event-handlers/entita-nav.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwEntitaNavEH = /** @class */ (function (_super) {
@@ -7808,7 +7712,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/event-handlers/scheda-breadcrumbs.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSchedaSidebarEH = /** @class */ (function (_super) {
@@ -7841,7 +7744,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/event-handlers/sidebar-header.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSidebarHeaderEH = /** @class */ (function (_super) {
@@ -7877,7 +7779,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/event-handlers/tree.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwTreeEH = /** @class */ (function (_super) {
@@ -8085,7 +7986,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/event-handlers/search-layout-tabs.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSearchLayoutTabsEH = /** @class */ (function (_super) {
@@ -8107,7 +8007,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/event-handlers/gallery-results.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwGalleryResultsEH = /** @class */ (function (_super) {
@@ -8167,7 +8066,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/event-handlers/linked-objects.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwLinkedObjectsEH = /** @class */ (function (_super) {
@@ -8260,7 +8158,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/event-handlers/autocomplete-wrapper.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwAutocompleteWrapperEH = /** @class */ (function (_super) {
@@ -8299,7 +8196,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/event-handlers/bubble-chart.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwBubbleChartEH = /** @class */ (function (_super) {
@@ -8453,7 +8349,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/event-handlers/table.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwTableEH = /** @class */ (function (_super) {
@@ -8483,7 +8378,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/event-handlers/chart-tippy.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwChartTippyEH = /** @class */ (function (_super) {
@@ -8600,12 +8494,10 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/event-handlers/index.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     var EH$1 = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         AwHeroEH: AwHeroEH,
         AwHomeFacetsWrapperEH: AwHomeFacetsWrapperEH,
         AwHomeHeroPatrimonioEH: AwHomeHeroPatrimonioEH,
@@ -8626,7 +8518,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -8655,7 +8546,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwEntitaLayoutComponent = /** @class */ (function (_super) {
@@ -8789,7 +8679,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeLayoutDS = /** @class */ (function (_super) {
@@ -8850,8 +8739,8 @@
             this.one('aw-hero').update(this.configuration.get('home-layout')['top-hero']);
             this.one('aw-home-hero-patrimonio').update(this.configuration.get('home-layout')['bottom-hero']);
             // update streams
-            this.mainState.update('headTitle', 'Arianna Web > Home');
-            this.mainState.update('pageTitle', 'Arianna Web: Home Layout');
+            this.mainState.update('headTitle', 'Arianna4View - Homepage');
+            this.mainState.update('pageTitle', 'Arianna4View - Homepage');
             this.mainState.updateCustom('currentNav', 'home');
             // listen autocomplete changes
             this._listenAutoCompleteChanges();
@@ -9325,7 +9214,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/home-layout/home-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeLayoutEH = /** @class */ (function (_super) {
@@ -9678,7 +9566,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/home-layout/home-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -9714,7 +9601,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwHomeLayoutComponent = /** @class */ (function (_super) {
@@ -9804,7 +9690,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSchedaLayoutDS = /** @class */ (function (_super) {
@@ -9857,8 +9742,8 @@
             });
             this.emptyLabel = this.configuration.get('scheda-layout')['empty-label'];
             this.one('aw-tree').updateOptions({ config: this.configuration.get('config-keys') });
-            this.mainState.update('headTitle', 'Arianna Web > Patrimonio');
-            this.mainState.update('pageTitle', 'Arianna Web: patrimonio Layout');
+            this.mainState.update('headTitle', 'Arianna4View - Patrimonio');
+            this.mainState.update('pageTitle', 'Arianna4View - Patrimonio');
             this.mainState.updateCustom('currentNav', 'patrimonio');
             // sidebar sticky control
             this._sidebarStickyControl();
@@ -10012,7 +9897,7 @@
                     this.one('aw-scheda-breadcrumbs').update(breadcrumbs_1);
                 }
                 // update head title
-                this.mainState.update('headTitle', "Arianna Web > Patrimonio > " + (response.title || response.label));
+                this.mainState.update('headTitle', "Arianna4View - Patrimonio - " + (response.title || response.label));
             }
             if (response.relatedItems) {
                 this.one('aw-linked-objects').updateOptions({ context: 'scheda', config: this.configuration });
@@ -10168,7 +10053,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSchedaLayoutEH = /** @class */ (function (_super) {
@@ -10349,7 +10233,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -10381,7 +10264,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSchedaLayoutComponent = /** @class */ (function (_super) {
@@ -10503,7 +10385,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/search-layout/search-facets.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var facetsConfig = {
@@ -10671,7 +10552,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -10772,7 +10652,7 @@
             // sidebar sticky control
             this._sidebarStickyControl();
             this.mainState.updateCustom('currentNav', 'ricerca');
-            this.mainState.update('headTitle', 'Arianna Web > Ricerca');
+            this.mainState.update('headTitle', 'Arianna4View - Ricerca');
         };
         /**
          * @return {?}
@@ -11225,7 +11105,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/search-layout/search-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSearchLayoutEH = /** @class */ (function (_super) {
@@ -11420,7 +11299,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/search-layout/search-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -11451,7 +11329,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwSearchLayoutComponent = /** @class */ (function (_super) {
@@ -11565,7 +11442,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-facets.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var facetsConfig$1 = {
@@ -11716,7 +11592,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -11817,7 +11692,7 @@
             // sidebar sticky control
             this._sidebarStickyControl();
             this.mainState.updateCustom('currentNav', 'galleria');
-            this.mainState.update('headTitle', 'Arianna Web > Galleria');
+            this.mainState.update('headTitle', 'Arianna4View - Galleria');
         };
         /**
          * @return {?}
@@ -12270,7 +12145,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwGalleryLayoutEH = /** @class */ (function (_super) {
@@ -12465,7 +12339,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -12496,7 +12369,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AwGalleryLayoutComponent = /** @class */ (function (_super) {
@@ -12615,7 +12487,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/components/chart-tippy/chart-tippy.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var ChartTippyComponent = /** @class */ (function () {
@@ -12658,7 +12529,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/components/bubble-chart-wrapper/bubble-chart-wrapper.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var BubbleChartWrapperComponent = /** @class */ (function () {
@@ -12701,7 +12571,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/components/smart-breadcrumbs/smart-breadcrumbs.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /**
@@ -12880,7 +12749,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/config/apollo.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var apolloConfig = {
@@ -12924,7 +12792,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/arianna-web/n7-boilerplate-arianna-web.module.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -12976,7 +12843,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/data-viz/components/data-widget-wrapper/data-widget-wrapper.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /**
@@ -13008,7 +12874,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/data-viz/components/datepicker-wrapper/datepicker-wrapper.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /**
@@ -13103,7 +12968,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/data-viz/layout/example-layout/example-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var DvExampleLayoutDS = /** @class */ (function (_super) {
@@ -13177,7 +13041,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/data-viz/layout/example-layout/example-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var DvExampleLayoutEH = /** @class */ (function (_super) {
@@ -13207,7 +13070,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/data-viz/data-sources/data-widget-wrapper.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var DvDataWidgetDS = /** @class */ (function (_super) {
@@ -13236,7 +13098,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/data-viz/data-sources/datepicker-wrapper.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var DvDatepickerWrapperDS = /** @class */ (function (_super) {
@@ -13354,7 +13215,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/data-viz/data-sources/graph.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var DvGraphDS = /** @class */ (function (_super) {
@@ -13456,7 +13316,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/data-viz/data-sources/inner-title.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var DvInnerTitleDS = /** @class */ (function (_super) {
@@ -13491,7 +13350,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/data-viz/data-sources/widget.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var DvWidgetDS = /** @class */ (function (_super) {
@@ -13515,12 +13373,10 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/data-viz/data-sources/index.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     var DS$2 = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         DvDataWidgetDS: DvDataWidgetDS,
         DvDatepickerWrapperDS: DvDatepickerWrapperDS,
         DvGraphDS: DvGraphDS,
@@ -13530,7 +13386,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/data-viz/event-handlers/datepicker-wrapper.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var DvDatepickerWrapperEH = /** @class */ (function (_super) {
@@ -13578,18 +13433,15 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/data-viz/event-handlers/index.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     var EH$2 = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         DvDatepickerWrapperEH: DvDatepickerWrapperEH
     });
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/data-viz/layout/example-layout/example-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -13616,7 +13468,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/data-viz/layout/example-layout/example-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var DvExampleLayoutComponent = /** @class */ (function (_super) {
@@ -13664,7 +13515,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/data-viz/n7-boilerplate-data-viz.module.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -13693,7 +13543,133 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/home-layout/home-layout.ds.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var EscapeHtmlPipe = /** @class */ (function () {
+        function EscapeHtmlPipe(sanitizer) {
+            this.sanitizer = sanitizer;
+        }
+        /**
+         * @param {?} content
+         * @return {?}
+         */
+        EscapeHtmlPipe.prototype.transform = /**
+         * @param {?} content
+         * @return {?}
+         */
+        function (content) {
+            return this.sanitizer.bypassSecurityTrustHtml(content);
+        };
+        EscapeHtmlPipe.decorators = [
+            { type: core.Pipe, args: [{ name: 'keepHtml', pure: false },] }
+        ];
+        /** @nocollapse */
+        EscapeHtmlPipe.ctorParameters = function () { return [
+            { type: platformBrowser.DomSanitizer }
+        ]; };
+        return EscapeHtmlPipe;
+    }());
+    if (false) {
+        /**
+         * @type {?}
+         * @private
+         */
+        EscapeHtmlPipe.prototype.sanitizer;
+    }
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var homeMock = {
+        'slider-1': components.CAROUSEL_MOCK,
+        'collection-1': {
+            header: {
+                title: 'Le mappe',
+                subtitle: 'Una selezione di alcune mappe di Totus Mundus.',
+                button: {
+                    text: 'Visita il catalogo',
+                    link: '/catalogo'
+                }
+            },
+            items: [
+                {
+                    image: 'https://i.imgur.com/8bNcgR6.png',
+                    title: 'Unattributed version',
+                    text: 'A japanese colored version',
+                    metadata: [{
+                            classes: 'metadata',
+                            items: [
+                                { label: 'Artista', value: 'Massimo Berruti' },
+                                { label: 'Tecnica', value: 'Fotografia' },
+                                { label: 'Galleria', value: 'Galleria Tonelli' },
+                            ]
+                        }]
+                }, {
+                    image: 'https://i.imgur.com/52UFqca.png',
+                    title: 'Yudi Shanhai Quantu',
+                    text: 'Complete Map of all mountains and seas',
+                }, {
+                    image: 'https://i.imgur.com/sLu7u2v.png',
+                    title: 'Reconstruction of D\'Elia\'s map',
+                    text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
+                    metadata: [{
+                            classes: 'metadata',
+                            items: [
+                                { label: 'Artista', value: 'Massimo Berruti' },
+                                { label: 'Tecnica', value: 'Fotografia' },
+                                { label: 'Galleria', value: 'Galleria Tonelli' },
+                            ]
+                        }]
+                }, {
+                    image: 'https://i.imgur.com/8bNcgR6.png',
+                    title: 'Unattributed version',
+                    text: 'A japanese colored version',
+                }
+            ]
+        },
+        'hero-1': {
+            title: 'L\'archivio',
+            text: 'Il progetto Unus sufficit orbis presenta infromazioni e dati relativi al lavoro e la vita del gesuita Matteo Ricci: le sue mappe che ha creato e le persone con cui ha collaborato.',
+            button: {
+                title: '',
+                text: 'Vai alle opere',
+                anchor: {
+                    href: '/button-url',
+                    target: '_blank'
+                }
+            },
+            image: 'https://i.imgur.com/VHTbVbm.png'
+        },
+        'collection-2': {
+            header: {
+                title: 'I percorsi',
+                subtitle: 'Visita il mondo di Totus Mundus con una serie di percorsi per te.',
+                button: {
+                    text: 'Visita il catalogo',
+                    link: '/catalogo'
+                }
+            },
+            items: [
+                {
+                    image: 'https://i.imgur.com/8bNcgR6.png',
+                    title: 'Unattributed version',
+                    text: 'A japanese colored version',
+                }, {
+                    image: 'https://i.imgur.com/52UFqca.png',
+                    title: 'Yudi Shanhai Quantu',
+                    text: 'Complete Map of all mountains and seas',
+                }, {
+                    image: 'https://i.imgur.com/sLu7u2v.png',
+                    title: 'Reconstruction of D\'Elia\'s map',
+                    text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
+                }
+            ]
+        }
+    };
+
+    /**
+     * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MrHomeLayoutDS = /** @class */ (function (_super) {
@@ -13702,50 +13678,97 @@
             return _super !== null && _super.apply(this, arguments) || this;
         }
         /**
+         * @param {?} payload
          * @return {?}
          */
         MrHomeLayoutDS.prototype.onInit = /**
+         * @param {?} payload
+         * @return {?}
+         */
+        function (payload) {
+            this.configuration = payload.configuration;
+            this.communication = payload.communication;
+            this.configId = payload.configId;
+            this.pageConfig = this.configuration.get(this.configId) || {};
+            this.doRequest();
+        };
+        /**
+         * @return {?}
+         */
+        MrHomeLayoutDS.prototype.doRequest = /**
          * @return {?}
          */
         function () {
-            this.one('mr-resources').updateOptions({ source: 'resources' });
-            this.one('mr-collections').updateOptions({ source: 'collections' });
-            this.some(['mr-resources', 'mr-collections']).update({});
-            this.one('mr-res-header').update({
-                title: 'Le mappe',
-                subtitle: 'Una selezione di alcune mappe di Totus Mundus.',
-                button: {
-                    text: 'Visita il catalogo',
-                    link: '/catalogo'
-                }
-            });
-            this.one('mr-coll-header').update({
-                title: 'I percorsi',
-                subtitle: 'Visita il mondo di Totus Mundus con una serie di percorsi per te.',
-                button: {
-                    text: 'Visita il catalogo',
-                    link: '/catalogo'
-                }
-            });
-            this.one('mr-hero').update({
-                text: 'The Totus Mundus project presents a series of information and data about the jesuit Matteo Ricci, its life, the maps he created and the people he collaborated with',
-                button: {
-                    title: '',
-                    text: 'Cerca',
-                    anchor: {
-                        href: '/button-url',
-                        target: '_blank'
+            var sections = this.pageConfig.sections;
+            if (sections) {
+                // FIXME: collegare API
+                // this.communication.request$('sections', {
+                //   method: 'POST',
+                //   params: sections.map(({ id }) => id)
+                // }).subscribe((response) => {
+                //   this.initSections(response);
+                // });
+                this.initSections(homeMock);
+            }
+        };
+        /**
+         * @param {?} response
+         * @return {?}
+         */
+        MrHomeLayoutDS.prototype.initSections = /**
+         * @param {?} response
+         * @return {?}
+         */
+        function (response) {
+            var _this = this;
+            var sections = this.pageConfig.sections;
+            if (sections) {
+                sections.forEach((/**
+                 * @param {?} __0
+                 * @return {?}
+                 */
+                function (_a) {
+                    var id = _a.id;
+                    /** @type {?} */
+                    var widgetDataSource = _this.getWidgetDataSource(id);
+                    /** @type {?} */
+                    var responseData = response[id];
+                    // set id
+                    widgetDataSource.id = id;
+                    // update data
+                    if (responseData) {
+                        _this.one(id).update(responseData);
                     }
-                },
-                image: 'https://i.imgur.com/VHTbVbm.png'
-            });
+                }));
+            }
         };
         return MrHomeLayoutDS;
     }(layoutDataSource.LayoutDataSource));
+    if (false) {
+        /**
+         * @type {?}
+         * @private
+         */
+        MrHomeLayoutDS.prototype.configuration;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrHomeLayoutDS.prototype.communication;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrHomeLayoutDS.prototype.configId;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrHomeLayoutDS.prototype.pageConfig;
+    }
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/home-layout/home-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MrHomeLayoutEH = /** @class */ (function (_super) {
@@ -13775,13 +13798,23 @@
                         break;
                 }
             }));
+            this.outerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type;
+                switch (type) {
+                    default:
+                        break;
+                }
+            }));
         };
         return MrHomeLayoutEH;
     }(core$1.EventHandler));
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/data-sources/item-previews.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MrItemPreviewsDS = /** @class */ (function (_super) {
@@ -13923,7 +13956,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/data-sources/inner-title.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MrInnerTitleDS = /** @class */ (function (_super) {
@@ -13974,7 +14006,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/data-sources/hero.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MrHeroDS = /** @class */ (function (_super) {
@@ -13982,16 +14013,12 @@
         function MrHeroDS() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         /**
          * @protected
          * @param {?} data
          * @return {?}
          */
-        MrHeroDS.prototype.transform = 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        /**
+        MrHeroDS.prototype.transform = /**
          * @protected
          * @param {?} data
          * @return {?}
@@ -14001,10 +14028,13 @@
         };
         return MrHeroDS;
     }(core$1.DataSource));
+    if (false) {
+        /** @type {?} */
+        MrHeroDS.prototype.id;
+    }
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/data-sources/filters.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MrFiltersDS = /** @class */ (function (_super) {
@@ -14034,21 +14064,66 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/data-sources/index.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var MrNavDS = /** @class */ (function (_super) {
+        __extends(MrNavDS, _super);
+        function MrNavDS() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        MrNavDS.prototype.transform = 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        function (data) {
+            /** @type {?} */
+            var items = [];
+            data.nav.forEach((/**
+             * @param {?} el
+             * @return {?}
+             */
+            function (el) {
+                items.push({
+                    text: el.title,
+                    anchor: {
+                        href: "http://localhost:4200/mr/static/" + el.id,
+                        target: '_blank',
+                        payload: el.id
+                    }
+                });
+            }));
+            return {
+                items: items,
+            };
+        };
+        return MrNavDS;
+    }(core$1.DataSource));
+
+    /**
+     * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     var DS$3 = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         MrItemPreviewsDS: MrItemPreviewsDS,
         MrInnerTitleDS: MrInnerTitleDS,
         MrHeroDS: MrHeroDS,
-        MrFiltersDS: MrFiltersDS
+        MrFiltersDS: MrFiltersDS,
+        MrNavDS: MrNavDS
     });
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/event-handlers/dummy.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MrDummyEH = /** @class */ (function (_super) {
@@ -14070,7 +14145,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/event-handlers/filters.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MrFiltersEH = /** @class */ (function (_super) {
@@ -14092,35 +14166,59 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/event-handlers/index.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var MrNavEH = /** @class */ (function (_super) {
+        __extends(MrNavEH, _super);
+        function MrNavEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        MrNavEH.prototype.listen = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.innerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case 'dv-nav.click':
+                        _this.emitOuter('navclick', payload);
+                        break;
+                    default:
+                        console.warn('unhandled event of type', type);
+                        break;
+                }
+            }));
+        };
+        return MrNavEH;
+    }(core$1.EventHandler));
+
+    /**
+     * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     var EH$3 = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         MrDummyEH: MrDummyEH,
-        MrFiltersEH: MrFiltersEH
+        MrFiltersEH: MrFiltersEH,
+        MrNavEH: MrNavEH
     });
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/home-layout/home-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
     var MrHomeLayoutConfig = {
         layoutId: 'mr-home-layout',
-        widgets: [{
-                id: 'mr-resources', dataSource: MrItemPreviewsDS,
-            }, {
-                id: 'mr-collections', dataSource: MrItemPreviewsDS,
-            }, {
-                id: 'mr-res-header', dataSource: MrInnerTitleDS,
-            }, {
-                id: 'mr-coll-header', dataSource: MrInnerTitleDS,
-            }, {
-                id: 'mr-hero', dataSource: MrHeroDS,
-            }],
+        widgets: [],
         layoutDS: MrHomeLayoutDS,
         layoutEH: MrHomeLayoutEH,
         widgetsDataSources: DS$3,
@@ -14132,13 +14230,194 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/home-layout/home-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
+    var MrSliderDS = /** @class */ (function (_super) {
+        __extends(MrSliderDS, _super);
+        function MrSliderDS() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        MrSliderDS.prototype.transform = /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        function (data) {
+            return data;
+        };
+        return MrSliderDS;
+    }(core$1.DataSource));
+    if (false) {
+        /** @type {?} */
+        MrSliderDS.prototype.id;
+    }
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var MrCollectionDS = /** @class */ (function (_super) {
+        __extends(MrCollectionDS, _super);
+        function MrCollectionDS() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        MrCollectionDS.prototype.transform = /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        function (data) {
+            var header = data.header;
+            return __assign({}, data, { header: {
+                    title: {
+                        main: {
+                            text: header.title,
+                            classes: 'bold'
+                        },
+                        secondary: {
+                            text: header.subtitle,
+                            classes: 'italic'
+                        }
+                    },
+                    actions: {
+                        buttons: [
+                            {
+                                text: header.button.text,
+                                payload: header.button.link,
+                                classes: 'n7-btn-cta'
+                            }
+                        ]
+                    }
+                } });
+        };
+        return MrCollectionDS;
+    }(core$1.DataSource));
+    if (false) {
+        /** @type {?} */
+        MrCollectionDS.prototype.id;
+    }
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var MrSliderEH = /** @class */ (function (_super) {
+        __extends(MrSliderEH, _super);
+        function MrSliderEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        MrSliderEH.prototype.listen = /**
+         * @return {?}
+         */
+        function () {
+            // this.innerEvents$.subscribe(({ type, payload }) => {
+            //   switch (type) {
+            //     case `${this.dataSource.id}.<event-type>`:
+            //       // TODO
+            //       break;
+            //     default:
+            //       break;
+            //   }
+            // });
+        };
+        return MrSliderEH;
+    }(core$1.EventHandler));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var MrCollectionEH = /** @class */ (function (_super) {
+        __extends(MrCollectionEH, _super);
+        function MrCollectionEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        MrCollectionEH.prototype.listen = /**
+         * @return {?}
+         */
+        function () {
+            // this.innerEvents$.subscribe(({ type, payload }) => {
+            //   switch (type) {
+            //     case `${this.dataSource.id}.<event-type>`:
+            //       // TODO
+            //       break;
+            //     default:
+            //       break;
+            //   }
+            // });
+        };
+        return MrCollectionEH;
+    }(core$1.EventHandler));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var MrHeroEH = /** @class */ (function (_super) {
+        __extends(MrHeroEH, _super);
+        function MrHeroEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        MrHeroEH.prototype.listen = /**
+         * @return {?}
+         */
+        function () {
+            // this.innerEvents$.subscribe(({ type, payload }) => {
+            //   switch (type) {
+            //     case `${this.dataSource.id}.<event-type>`:
+            //       // TODO
+            //       break;
+            //     default:
+            //       break;
+            //   }
+            // });
+        };
+        return MrHeroEH;
+    }(core$1.EventHandler));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    /** @type {?} */
+    var DATASOURCE_MAP = {
+        slider: MrSliderDS,
+        collection: MrCollectionDS,
+        hero: MrHeroDS,
+    };
+    /** @type {?} */
+    var EVENTHANDLER_MAP = {
+        slider: MrSliderEH,
+        collection: MrCollectionEH,
+        hero: MrHeroEH,
+    };
     var MrHomeLayoutComponent = /** @class */ (function (_super) {
         __extends(MrHomeLayoutComponent, _super);
-        function MrHomeLayoutComponent(layoutsConfiguration) {
-            return _super.call(this, layoutsConfiguration.get('MrHomeLayoutConfig') || MrHomeLayoutConfig) || this;
+        function MrHomeLayoutComponent(layoutsConfiguration, activatedRoute, configuration, communication) {
+            var _this = _super.call(this, layoutsConfiguration.get('MrHomeLayoutConfig') || MrHomeLayoutConfig) || this;
+            _this.activatedRoute = activatedRoute;
+            _this.configuration = configuration;
+            _this.communication = communication;
+            return _this;
         }
         /**
          * @protected
@@ -14150,6 +14429,9 @@
          */
         function () {
             return {
+                configId: this.configId,
+                configuration: this.configuration,
+                communication: this.communication,
                 options: this.config.options || {}
             };
         };
@@ -14160,7 +14442,16 @@
          * @return {?}
          */
         function () {
-            this.onInit();
+            var _this = this;
+            this.activatedRoute.data.subscribe((/**
+             * @param {?} data
+             * @return {?}
+             */
+            function (data) {
+                _this.configId = data.configId;
+                _this.loadWidgets();
+                _this.onInit();
+            }));
         };
         /**
          * @return {?}
@@ -14171,244 +14462,362 @@
         function () {
             this.onDestroy();
         };
+        /**
+         * @return {?}
+         */
+        MrHomeLayoutComponent.prototype.loadWidgets = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            /** @type {?} */
+            var homeConfig = this.configuration.get(this.configId) || {};
+            var sections = homeConfig.sections;
+            this.widgets = [];
+            if (sections) {
+                sections.forEach((/**
+                 * @param {?} __0
+                 * @return {?}
+                 */
+                function (_a) {
+                    var id = _a.id, type = _a.type;
+                    _this.widgets.push({
+                        id: id,
+                        dataSource: DATASOURCE_MAP[type],
+                        eventHandler: EVENTHANDLER_MAP[type]
+                    });
+                }));
+            }
+        };
         MrHomeLayoutComponent.decorators = [
             { type: core.Component, args: [{
                         selector: 'mr-home-layout',
-                        template: "<div class=\"mr-home\" *ngIf=\"lb.dataSource\">\n    <!-- TODO: Replace with <n7-carousel-component> -->\n    <div style=\"\n        height: 300px;\n        border: 1px solid #dddddd;\n        line-height: 300px;\n        text-align: center;\">\n        <em>n7-carousel-component</em>\n    </div>\n    <!-- ========================================== -->\n    <n7-inner-title [data]=\"lb.widgets['mr-res-header'].ds.out$ | async\"></n7-inner-title>\n    <n7-item-preview\n        *ngFor=\"let resource of (lb.widgets['mr-resources'].ds.out$ | async)\"\n        [data]=\"resource\">\n    </n7-item-preview>\n    <n7-hero [data]=\"lb.widgets['mr-hero'].ds.out$ | async\">\n    </n7-hero>\n    <n7-inner-title [data]=\"lb.widgets['mr-coll-header'].ds.out$ | async\">\n    </n7-inner-title>\n    <n7-item-preview\n        *ngFor=\"let collection of (lb.widgets['mr-collections'].ds.out$ | async)\" \n        [data]=\"collection\">\n    </n7-item-preview>\n</div>\n"
+                        template: "<div class=\"mr-home mr-layout\" *ngIf=\"lb.dataSource\">\n    <section *ngFor=\"let section of lb.dataSource.pageConfig.sections\" class=\"{{ 'mr-layout__' + section.type }}\">\n        <ng-container [ngSwitch]=\"section.type\">\n\n            <!-- SLIDER -->\n            <ng-container *ngSwitchCase=\"'slider'\">\n                <n7-carousel \n                [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[section.id].emit\">\n                </n7-carousel> \n            </ng-container>\n\n            <!-- COLLECTION -->\n            <ng-container *ngSwitchCase=\"'collection'\">\n                <n7-inner-title \n                [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                [emit]=\"lb.widgets[section.id].emit\">\n                </n7-inner-title>\n                <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                    <n7-item-preview\n                    *ngFor=\"let item of (lb.widgets[section.id].ds.out$ | async)?.items\"\n                    [data]=\"item\"\n                    [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-item-preview>\n                </div>\n            </ng-container>\n\n            <!-- HERO -->\n            <ng-container *ngSwitchCase=\"'hero'\">\n                <n7-hero \n                [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[section.id].emit\">\n                </n7-hero> \n            </ng-container>\n        \n        </ng-container>\n    </section>\n    \n</div>\n"
                     }] }
         ];
         /** @nocollapse */
         MrHomeLayoutComponent.ctorParameters = function () { return [
-            { type: LayoutsConfigurationService }
+            { type: LayoutsConfigurationService },
+            { type: router.ActivatedRoute },
+            { type: ConfigurationService },
+            { type: CommunicationService }
         ]; };
         return MrHomeLayoutComponent;
     }(AbstractLayout));
+    if (false) {
+        /**
+         * @type {?}
+         * @private
+         */
+        MrHomeLayoutComponent.prototype.configId;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrHomeLayoutComponent.prototype.activatedRoute;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrHomeLayoutComponent.prototype.configuration;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrHomeLayoutComponent.prototype.communication;
+    }
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/search-layout/search-facets.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
-    var facetsConfig$2 = {
-        totalCount: 0,
-        facets: [
-            {
-                id: 'query',
-                type: 'value',
-            },
-            {
-                id: 'query-all',
-                type: 'value',
-                hasStaticData: true,
-                data: [
-                    {
-                        value: '1',
-                        label: 'Cerca in tutti campi delle schede',
-                    },
-                ],
-            },
-            {
-                id: 'query-links',
-                type: 'value',
-            },
-            {
-                id: 'entity-types',
-                type: 'value',
-                operator: 'OR',
-                limit: 10,
-                order: 'count',
-            },
-            {
-                id: 'entity-search',
-                type: 'value',
-            },
-            {
-                id: 'entity-links',
-                type: 'value',
-                searchData: ['entity-type'],
-            },
-        ],
-        fields: [
-            {
-                inputs: [
-                    {
-                        type: 'text',
-                        facetId: 'query',
-                        placeholder: 'Cerca nei titoli delle schede',
-                        filterConfig: {
-                            delay: 500,
-                            minChars: 3,
-                            searchIn: [
-                                {
-                                    key: 'label.ngrams',
-                                    operator: 'LIKE',
-                                },
-                            ],
-                        },
-                    },
-                    {
-                        type: 'checkbox',
-                        facetId: 'query-all',
-                        filterConfig: {
-                            searchIn: [
-                                {
-                                    key: 'label.ngrams^5,text^4,fields.*^3',
-                                    operator: '=',
-                                },
-                            ],
-                        },
-                    },
-                    {
-                        type: 'link',
-                        facetId: 'query-links',
-                        filterConfig: {
-                            isArray: true,
-                            searchIn: [
-                                {
-                                    key: 'source.entityType',
-                                    operator: '=',
-                                },
-                            ],
-                        },
-                    },
-                ],
-            },
-            {
+    var ɵ0 = {
+        text: 'Filtra i risultati'
+    }, ɵ1 = {
+        id: 'input-text-00',
+        placeholder: 'Cerca nei titoli',
+        icon: 'n7-icon-search',
+        inputPayload: 'search-input',
+        enterPayload: 'search-enter',
+        iconPayload: 'search-icon'
+    }, ɵ2 = {
+        text: 'Toponimi',
+        additionalText: '786',
+    }, ɵ3 = {
+        id: 'input-text-01',
+        placeholder: 'Search',
+        icon: 'n7-icon-search',
+        inputPayload: 'search-input',
+        enterPayload: 'search-enter',
+        iconPayload: 'search-icon',
+    }, ɵ4 = {
+        links: [{
+                text: 'Title',
+                counter: 28,
+                payload: 'i02t28'
+            }, {
+                text: 'Title',
+                counter: 21,
+                payload: 'i02t21'
+            }, {
+                text: 'Title',
+                counter: 18,
+                payload: 'i02t18'
+            }, {
+                text: 'Title',
+                counter: 16,
+                payload: 'i02t16'
+            }, {
+                text: 'Title',
+                counter: 11,
+                payload: 'i02t11'
+            }, {
+                text: 'Title',
+                counter: 9,
+                payload: 'i02t9'
+            }, {
+                text: 'Title',
+                counter: 4,
+                payload: 'i02t4'
+            }]
+    }, ɵ5 = {
+        text: 'Glossario',
+        additionalText: '96',
+    }, ɵ6 = {
+        id: 'input-text-02',
+        placeholder: 'Search',
+        icon: 'n7-icon-search',
+        inputPayload: 'search-input',
+        enterPayload: 'search-enter',
+        iconPayload: 'search-icon',
+    }, ɵ7 = {
+        links: [{
+                text: 'Title',
+                counter: 28,
+                payload: 'i04t28'
+            }, {
+                text: 'Title',
+                counter: 21,
+                payload: 'i04t21'
+            }, {
+                text: 'Title',
+                counter: 18,
+                payload: 'i04t18'
+            }, {
+                text: 'Title',
+                counter: 16,
+                payload: 'i04t16'
+            }, {
+                text: 'Title',
+                counter: 11,
+                payload: 'i04t11'
+            }, {
+                text: 'Title',
+                counter: 9,
+                payload: 'i04t9'
+            }, {
+                text: 'Title',
+                counter: 4,
+                payload: 'i04t4'
+            }]
+    }, ɵ8 = {
+        text: 'Continenti',
+        additionalText: '3'
+    }, ɵ9 = {
+        links: [{
+                text: 'Title',
+                counter: 32,
+                payload: 'input-05-1'
+            }, {
+                text: 'Title',
+                counter: 27,
+                payload: 'input-05-2'
+            }, {
+                text: 'Title',
+                counter: 18,
+                payload: 'input-05-3'
+            }]
+    }, ɵ10 = {
+        text: 'Keywords',
+        additionalText: '108',
+        iconRight: 'n7-icon-angle-right'
+    }, ɵ11 = {
+        text: 'Data di pubblicazione',
+        additionalText: '20',
+        iconRight: 'n7-icon-angle-right'
+    }, ɵ12 = {
+        text: 'Luogo di pubblicazione',
+        additionalText: '15',
+        iconRight: 'n7-icon-angle-right'
+    };
+    /** @type {?} */
+    var configuration = {
+        sections: [{
                 header: {
-                    label: 'Relazione con',
-                    classes: 'related-class',
+                    id: 'header-filtra',
+                    data: ɵ0
                 },
-                inputs: [
-                    {
-                        type: 'checkbox',
-                        facetId: 'entity-types',
-                        filterConfig: {
-                            isArray: true,
-                            context: 'internal',
-                            target: 'entity-links',
-                            searchIn: [
-                                {
-                                    key: 'searchData.entity-type',
-                                    operator: '=',
-                                },
-                            ],
-                        },
-                    },
-                    {
+                inputs: [{
+                        id: 'input-00',
                         type: 'text',
-                        facetId: 'entity-search',
-                        placeholder: 'Cerca entità',
-                        filterConfig: {
-                            delay: 500,
-                            minChars: 3,
-                            context: 'internal',
-                            target: 'entity-links',
-                            searchIn: [
-                                {
-                                    key: 'label',
-                                    operator: 'LIKE',
-                                },
-                            ],
-                        },
-                    },
-                    {
-                        type: 'link',
-                        facetId: 'entity-links',
-                        emptyState: {
-                            label: 'La tua ricerca non ha dato risultati, prova a cambiare i filtri',
-                        },
-                        filterConfig: {
-                            isArray: true,
-                            limit: 20,
-                            searchIn: [
-                                {
-                                    key: 'relatedEntities.id',
-                                    operator: '=',
-                                },
-                            ],
-                        },
-                    },
-                ],
-            },
-        ],
-        results: {
-            order: {
-                type: 'text',
-                // score | text | date
-                key: 'label_sort',
-                // docPath, elastic key, ecc
-                direction: 'ASC',
-            },
-            fields: [
-                {
-                    id: 'description',
-                    highlight: true,
-                    limit: 200,
+                        data: ɵ1
+                    }]
+            }, {
+                header: {
+                    id: 'header-toponimi',
+                    data: ɵ2
                 },
-            ],
-        },
-        page: { offset: 0, limit: 10 },
+                inputs: [{
+                        id: 'input-01',
+                        type: 'text',
+                        data: ɵ3
+                    }, {
+                        id: 'input-02',
+                        type: 'link',
+                        data: ɵ4
+                    }]
+            }, {
+                header: {
+                    id: 'header-glossario',
+                    data: ɵ5
+                },
+                inputs: [{
+                        id: 'input-03',
+                        type: 'text',
+                        data: ɵ6
+                    }, {
+                        id: 'input-04',
+                        type: 'link',
+                        data: ɵ7
+                    }]
+            }, {
+                header: {
+                    id: 'header-continenti',
+                    data: ɵ8
+                },
+                inputs: [{
+                        id: 'input-05',
+                        type: 'link',
+                        data: ɵ9
+                    }]
+            }, {
+                header: {
+                    id: 'header-keywords',
+                    data: ɵ10
+                },
+                inputs: [],
+            }, {
+                header: {
+                    id: 'header-data',
+                    data: ɵ11
+                },
+                inputs: [],
+            }, {
+                header: {
+                    id: 'header-luogo',
+                    data: ɵ12
+                },
+                inputs: [],
+            }],
+        classes: 'facets-wrapper'
     };
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/search-layout/search-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
-    // import helpers from '../../../common/helpers';
-    /** @type {?} */
-    var SEARCH_MODEL_ID$2 = 'mr-search-layout';
     var MrSearchLayoutDS = /** @class */ (function (_super) {
         __extends(MrSearchLayoutDS, _super);
         function MrSearchLayoutDS() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
         /**
-         * @param {?} __0
          * @return {?}
          */
         MrSearchLayoutDS.prototype.onInit = /**
-         * @param {?} __0
          * @return {?}
          */
-        function (_a) {
-            var 
-            // configuration, mainState, options, communication,
-            search = _a.search;
-            this.search = search;
-            if (this.search.model(SEARCH_MODEL_ID$2)) {
-                this.search.remove(SEARCH_MODEL_ID$2);
-            }
-            this.search.add(SEARCH_MODEL_ID$2, lodash.cloneDeep(facetsConfig$2));
-            this.searchModel = this.search.model(SEARCH_MODEL_ID$2);
-            // this.one('facets-wrapper').update({ searchModel: this.searchModel });
+        function () {
+            this.facetsConfig = configuration;
             this.one('mr-resources').updateOptions({ source: 'search' });
             this.one('mr-resources').update({});
         };
         return MrSearchLayoutDS;
     }(core$1.LayoutDataSource));
     if (false) {
-        /**
-         * @type {?}
-         * @private
-         */
-        MrSearchLayoutDS.prototype.search;
-        /**
-         * @type {?}
-         * @private
-         */
-        MrSearchLayoutDS.prototype.searchModel;
+        /** @type {?} */
+        MrSearchLayoutDS.prototype.facetsConfig;
     }
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/search-layout/search-layout.eh.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    /** @type {?} */
+    var hasValue = (/**
+     * @param {?} value
+     * @return {?}
+     */
+    function (value) {
+        if (Array.isArray(value)) {
+            return value.length > 0;
+        }
+        return !!value;
+    });
+    var ɵ0$1 = hasValue;
+    var searchHelper = {
+        stateToQueryParams: /**
+         * @param {?} state
+         * @return {?}
+         */
+        function (state) {
+            /** @type {?} */
+            var queryParams = (/** @type {?} */ ({}));
+            Object.keys(state).forEach((/**
+             * @param {?} key
+             * @return {?}
+             */
+            function (key) {
+                /** @type {?} */
+                var value = state[key];
+                if (hasValue(value)) {
+                    queryParams[key] = Array.isArray(value) ? value.join(',') : value;
+                }
+            }));
+            return queryParams;
+        },
+        queryParamsToState: /**
+         * @param {?} queryParams
+         * @return {?}
+         */
+        function (queryParams) {
+            /** @type {?} */
+            var state = (/** @type {?} */ ({}));
+            Object.keys(queryParams).forEach((/**
+             * @param {?} key
+             * @return {?}
+             */
+            function (key) {
+                /** @type {?} */
+                var value = queryParams[key];
+                if (hasValue(value)) {
+                    state[key] = value.indexOf(',') !== -1 ? value.split(',') : value;
+                }
+            }));
+            return state;
+        }
+    };
+
+    /**
+     * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MrSearchLayoutEH = /** @class */ (function (_super) {
         __extends(MrSearchLayoutEH, _super);
         function MrSearchLayoutEH() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.destroyed$ = new rxjs.Subject();
+            return _this;
         }
         /**
          * @return {?}
@@ -14426,7 +14835,34 @@
                 var type = _a.type, payload = _a.payload;
                 switch (type) {
                     case 'mr-search-layout.init':
+                        _this.hostEmit$ = payload.hostEmit$;
+                        _this.guestEmit$ = payload.guestEmit$;
+                        _this.router = payload.router;
+                        _this.activatedRoute = payload.activatedRoute;
                         _this.dataSource.onInit(payload);
+                        _this.listenToGuest();
+                        _this.listenToRouterChanges();
+                        /* setTimeout(() => {
+                          this.hostEmit$.next({
+                            type: 'updateinputdata',
+                            payload: {
+                              id: 'input-00',
+                              data: {
+                                placeholder: 'Cerca su tutto',
+                              }
+                            }
+                          });
+                          this.hostEmit$.next({
+                            type: 'updateinputvalue',
+                            payload: {
+                              id: 'input-00',
+                              value: 'Sto cercando...'
+                            }
+                          });
+                        }, 5000); */
+                        break;
+                    case 'mr-search-layout.destroy':
+                        _this.destroyed$.next(true);
                         break;
                     default:
                         console.warn('unhandled inner event of type', type);
@@ -14438,12 +14874,82 @@
               });
             */
         };
+        /**
+         * @return {?}
+         */
+        MrSearchLayoutEH.prototype.listenToGuest = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.guestEmit$.pipe(operators.takeUntil(this.destroyed$)).subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case 'change': {
+                        /** @type {?} */
+                        var queryParams = searchHelper.stateToQueryParams(payload.state);
+                        _this.router.navigate([], {
+                            queryParams: queryParams
+                        });
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }));
+        };
+        /**
+         * @return {?}
+         */
+        MrSearchLayoutEH.prototype.listenToRouterChanges = /**
+         * @return {?}
+         */
+        function () {
+            this.activatedRoute.queryParams.pipe(operators.takeUntil(this.destroyed$)).subscribe((/**
+             * @param {?} params
+             * @return {?}
+             */
+            function (params) {
+                // TODO: aggiungere logica richieste
+                console.warn('query params', params);
+            }));
+        };
         return MrSearchLayoutEH;
     }(core$1.EventHandler));
+    if (false) {
+        /**
+         * @type {?}
+         * @private
+         */
+        MrSearchLayoutEH.prototype.destroyed$;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrSearchLayoutEH.prototype.hostEmit$;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrSearchLayoutEH.prototype.guestEmit$;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrSearchLayoutEH.prototype.router;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrSearchLayoutEH.prototype.activatedRoute;
+    }
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/search-layout/search-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -14467,15 +14973,17 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/search-layout/search-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     // import { CommunicationService } from '../../../common/services/communication.service';
     var MrSearchLayoutComponent = /** @class */ (function (_super) {
         __extends(MrSearchLayoutComponent, _super);
-        function MrSearchLayoutComponent(layoutsConfiguration, search) {
+        function MrSearchLayoutComponent(layoutsConfiguration, router, activatedRoute) {
             var _this = _super.call(this, layoutsConfiguration.get('MrSearchLayoutConfig') || MrSearchLayoutConfig) || this;
-            _this.search = search;
+            _this.router = router;
+            _this.activatedRoute = activatedRoute;
+            _this.hostEmit$ = new rxjs.Subject();
+            _this.guestEmit$ = new rxjs.Subject();
             return _this;
         }
         /**
@@ -14490,9 +14998,11 @@
             return {
                 // configuration: this.configuration,
                 // mainState: this.mainState,
+                router: this.router,
+                activatedRoute: this.activatedRoute,
                 // communication: this.communication,
-                search: this.search,
-                // route: this.route,
+                hostEmit$: this.hostEmit$,
+                guestEmit$: this.guestEmit$,
                 options: this.config.options || {},
             };
         };
@@ -14517,27 +15027,36 @@
         MrSearchLayoutComponent.decorators = [
             { type: core.Component, args: [{
                         selector: 'mr-search-layout',
-                        template: "<div class=\"search-layout\" *ngIf=\"lb.dataSource\">\n    <div class=\"search-wrapper\">\n        <div class=\"filter-section\">\n            <h2>Filtra i risultati</h2>\n            <n7-facets-wrapper \n                [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\" \n                [emit]=\"lb.widgets['facets-wrapper'].emit\">\n            </n7-facets-wrapper>\n        </div>\n        <n7-item-preview \n            *ngFor=\"let resource of (lb.widgets['mr-resources'].ds.out$ | async)\" \n            [data]=\"resource\">\n        </n7-item-preview>\n    </div>\n</div>\n"
+                        template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth\">\n\n        <div class=\"mr-search__title\">\n            INNER TITLE COMPONENT HERE\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <aside class=\"mr-search__facets\">\n                <div class=\"filter-section\">\n                    <h2>Filtra i risultati</h2>\n                    <mr-search-facets-layout \n                    [data]=\"lb.dataSource.facetsConfig\"\n                    [hostEmit$]=\"hostEmit$\"\n                    [guestEmit$]=\"guestEmit$\">\n                    </mr-search-facets-layout>\n                </div>\n            </aside>\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    Inner title with results number and sorting\n                </div>\n                <div class=\"mr-search__results-filters\">\n                    Filter, when active\n                </div>\n                <main class=\"mr-search__results\">\n                    <n7-item-preview *ngFor=\"let resource of (lb.widgets['mr-resources'].ds.out$ | async)\"\n                                    [data]=\"resource\">\n                    </n7-item-preview>\n                </main>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
                     }] }
         ];
         /** @nocollapse */
         MrSearchLayoutComponent.ctorParameters = function () { return [
             { type: LayoutsConfigurationService },
-            { type: SearchService }
+            { type: router.Router },
+            { type: router.ActivatedRoute }
         ]; };
         return MrSearchLayoutComponent;
     }(AbstractLayout));
     if (false) {
+        /** @type {?} */
+        MrSearchLayoutComponent.prototype.hostEmit$;
+        /** @type {?} */
+        MrSearchLayoutComponent.prototype.guestEmit$;
         /**
          * @type {?}
          * @private
          */
-        MrSearchLayoutComponent.prototype.search;
+        MrSearchLayoutComponent.prototype.router;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrSearchLayoutComponent.prototype.activatedRoute;
     }
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/glossary-layout/glossary-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MrGlossaryLayoutDS = /** @class */ (function (_super) {
@@ -14563,7 +15082,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/glossary-layout/glossary-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MrGlossaryLayoutEH = /** @class */ (function (_super) {
@@ -14604,7 +15122,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/glossary-layout/glossary-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -14625,7 +15142,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/glossary-layout/glossary-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MrGlossaryLayoutComponent = /** @class */ (function (_super) {
@@ -14679,7 +15195,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/static-layout/static-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MrStaticLayoutDS = /** @class */ (function (_super) {
@@ -14687,25 +15202,58 @@
         function MrStaticLayoutDS() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        // private communication;
-        // private communication;
+        /**
+         * @param {?} payload
+         * @return {?}
+         */
+        MrStaticLayoutDS.prototype.onInit = /**
+         * @param {?} payload
+         * @return {?}
+         */
+        function (payload) {
+            this.communication = payload.communication;
+        };
         /**
          * @return {?}
          */
-        MrStaticLayoutDS.prototype.onInit = 
-        // private communication;
-        /**
+        MrStaticLayoutDS.prototype.pageRequest$ = /**
          * @return {?}
          */
         function () {
-            // this.communication = payload.communication;
+            /** @type {?} */
+            var getPageNum = window.location.href.match(/([^/]*)\/*$/)[1];
+            return this.communication.request$('page', { urlParams: getPageNum }, 'rest-local');
+        };
+        /**
+         * @param {?} title
+         * @param {?} body
+         * @return {?}
+         */
+        MrStaticLayoutDS.prototype.renderHTML = /**
+         * @param {?} title
+         * @param {?} body
+         * @return {?}
+         */
+        function (title, body) {
+            this.RENDER_HTML = {
+                title: title,
+                body: body,
+            };
         };
         return MrStaticLayoutDS;
     }(core$1.LayoutDataSource));
+    if (false) {
+        /**
+         * @type {?}
+         * @private
+         */
+        MrStaticLayoutDS.prototype.communication;
+        /** @type {?} */
+        MrStaticLayoutDS.prototype.RENDER_HTML;
+    }
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/static-layout/static-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MrStaticLayoutEH = /** @class */ (function (_super) {
@@ -14730,6 +15278,7 @@
                 switch (type) {
                     case 'mr-static-layout.init':
                         _this.dataSource.onInit(payload);
+                        _this.fetchJson();
                         break;
                     default:
                         console.warn('unhandled inner event of type', type);
@@ -14741,17 +15290,37 @@
               });
             */
         };
+        /**
+         * @private
+         * @return {?}
+         */
+        MrStaticLayoutEH.prototype.fetchJson = /**
+         * @private
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.dataSource.pageRequest$()
+                .subscribe((/**
+             * @param {?} response
+             * @return {?}
+             */
+            function (response) {
+                var title = response.title;
+                var body = response.body;
+                _this.dataSource.renderHTML(title, body);
+            }));
+        };
         return MrStaticLayoutEH;
     }(core$1.EventHandler));
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/static-layout/static-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
     var MrStaticLayoutConfig = {
-        layoutId: 'n7-static-layout',
+        layoutId: 'mr-static-layout',
         widgets: [
         // {
         //   id: 'title',          ← Insert a component here.
@@ -14767,13 +15336,14 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/static-layout/static-layout.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var MrStaticLayoutComponent = /** @class */ (function (_super) {
         __extends(MrStaticLayoutComponent, _super);
-        function MrStaticLayoutComponent(layoutsConfiguration) {
-            return _super.call(this, layoutsConfiguration.get('MrStaticLayoutConfig') || MrStaticLayoutConfig) || this;
+        function MrStaticLayoutComponent(communication, layoutsConfiguration) {
+            var _this = _super.call(this, layoutsConfiguration.get('MrStaticLayoutConfig') || MrStaticLayoutConfig) || this;
+            _this.communication = communication;
+            return _this;
         }
         /**
          * @protected
@@ -14785,6 +15355,7 @@
          */
         function () {
             return {
+                communication: this.communication,
                 options: this.config.options || {}
             };
         };
@@ -14809,25 +15380,34 @@
         MrStaticLayoutComponent.decorators = [
             { type: core.Component, args: [{
                         selector: 'mr-static-layout',
-                        template: "<div class=\"static-layout\" *ngIf=\"lb.dataSource\">\n    Hello, from Static layout!\n</div>\n"
+                        template: "<div class=\"mr-static-layout\" *ngIf=\"lb.dataSource.RENDER_HTML\">\n    <h1 class=\"mr-generated-title-WP\">{{lb.dataSource.RENDER_HTML.title}}</h1>\n    <div class=\"mr-generated-page-WP\" [innerHTML]=\"lb.dataSource.RENDER_HTML.body | keepHtml\"></div>\n</div>\n"
                     }] }
         ];
         /** @nocollapse */
         MrStaticLayoutComponent.ctorParameters = function () { return [
+            { type: CommunicationService },
             { type: LayoutsConfigurationService }
         ]; };
         return MrStaticLayoutComponent;
     }(AbstractLayout));
+    if (false) {
+        /**
+         * @type {?}
+         * @private
+         */
+        MrStaticLayoutComponent.prototype.communication;
+    }
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/search-facets-layout/search-facets-layout.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var SearchFacetsLayoutDS = /** @class */ (function (_super) {
         __extends(SearchFacetsLayoutDS, _super);
         function SearchFacetsLayoutDS() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.state = {};
+            return _this;
         }
         /**
          * @param {?} payload
@@ -14859,11 +15439,12 @@
         function () {
             var _this = this;
             this.data.sections.forEach((/**
-             * @param {?} section
+             * @param {?} __0
              * @return {?}
              */
-            function (section) {
-                section.inputs.forEach((/**
+            function (_a) {
+                var header = _a.header, inputs = _a.inputs;
+                __spread([header], inputs).forEach((/**
                  * @param {?} input
                  * @return {?}
                  */
@@ -14877,16 +15458,73 @@
                 }));
             }));
         };
+        /**
+         * @param {?} id
+         * @param {?} newValue
+         * @return {?}
+         */
+        SearchFacetsLayoutDS.prototype.updateInputValue = /**
+         * @param {?} id
+         * @param {?} newValue
+         * @return {?}
+         */
+        function (id, newValue) {
+            /** @type {?} */
+            var widgetDataSource = this.getWidgetDataSource(id);
+            widgetDataSource.setValue(newValue, true);
+        };
+        /**
+         * @param {?} id
+         * @param {?} newData
+         * @return {?}
+         */
+        SearchFacetsLayoutDS.prototype.updateInputData = /**
+         * @param {?} id
+         * @param {?} newData
+         * @return {?}
+         */
+        function (id, newData) {
+            /** @type {?} */
+            var widgetDataSource = this.getWidgetDataSource(id);
+            widgetDataSource.update(__assign({}, widgetDataSource.input, newData));
+        };
+        /**
+         * @param {?=} id
+         * @return {?}
+         */
+        SearchFacetsLayoutDS.prototype.getState = /**
+         * @param {?=} id
+         * @return {?}
+         */
+        function (id) {
+            return id ? this.state[id] : this.state;
+        };
+        /**
+         * @param {?} __0
+         * @return {?}
+         */
+        SearchFacetsLayoutDS.prototype.setState = /**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var value = _a.value, id = _a.id;
+            this.state[id] = value;
+        };
         return SearchFacetsLayoutDS;
     }(core$1.LayoutDataSource));
     if (false) {
         /** @type {?} */
         SearchFacetsLayoutDS.prototype.data;
+        /**
+         * @type {?}
+         * @private
+         */
+        SearchFacetsLayoutDS.prototype.state;
     }
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/search-facets-layout/search-facets-layout.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /**
@@ -14898,6 +15536,7 @@
         function SearchFacetsLayoutEH() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.changed$ = {};
+            _this.destroyed$ = new rxjs.Subject();
             return _this;
         }
         /**
@@ -14916,8 +15555,11 @@
                 var type = _a.type, payload = _a.payload;
                 switch (type) {
                     case 'mr-search-facets-layout.init':
+                        _this.hostEmit$ = payload.hostEmit$;
+                        _this.guestEmit$ = payload.guestEmit$;
                         _this.dataSource.onInit(payload);
                         _this.initChangedListener(payload.data);
+                        _this.listenToHost();
                         break;
                     case 'mr-search-facets-layout.destroy':
                         _this.dataSource.onDestroy();
@@ -14952,20 +15594,67 @@
              * @return {?}
              */
             function (section) {
+                /** @type {?} */
+                var sources = [];
+                if (section.header) {
+                    var _a = section.header, id = _a.id, delay = _a.delay;
+                    sources.push({ id: id, delay: delay });
+                }
                 section.inputs.forEach((/**
-                 * @param {?} input
+                 * @param {?} __0
                  * @return {?}
                  */
-                function (input) {
-                    _this.changed$[input.id] = new rxjs.Subject();
-                    _this.changed$[input.id].pipe(operators.debounceTime(input.delay || 1)).subscribe((/**
+                function (_a) {
+                    var id = _a.id, delay = _a.delay;
+                    sources.push({ id: id, delay: delay });
+                }));
+                sources.forEach((/**
+                 * @param {?} source
+                 * @return {?}
+                 */
+                function (source) {
+                    _this.changed$[source.id] = new rxjs.Subject();
+                    _this.changed$[source.id].pipe(operators.debounceTime(source.delay || 1)).subscribe((/**
                      * @param {?} payload
                      * @return {?}
                      */
                     function (payload) {
-                        console.warn('#todo', payload);
+                        _this.dataSource.setState(payload);
+                        _this.guestEmit$.next({
+                            type: 'change',
+                            payload: {
+                                lastUpdate: payload,
+                                state: _this.dataSource.getState()
+                            }
+                        });
                     }));
                 }));
+            }));
+        };
+        /**
+         * @return {?}
+         */
+        SearchFacetsLayoutEH.prototype.listenToHost = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.hostEmit$.pipe(operators.takeUntil(this.destroyed$)).subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case 'updateinputvalue':
+                        _this.dataSource.updateInputValue(payload.id, payload.value);
+                        break;
+                    case 'updateinputdata':
+                        _this.dataSource.updateInputData(payload.id, payload.data);
+                        break;
+                    default:
+                        break;
+                }
             }));
         };
         return SearchFacetsLayoutEH;
@@ -14973,11 +15662,25 @@
     if (false) {
         /** @type {?} */
         SearchFacetsLayoutEH.prototype.changed$;
+        /**
+         * @type {?}
+         * @private
+         */
+        SearchFacetsLayoutEH.prototype.destroyed$;
+        /**
+         * @type {?}
+         * @private
+         */
+        SearchFacetsLayoutEH.prototype.hostEmit$;
+        /**
+         * @type {?}
+         * @private
+         */
+        SearchFacetsLayoutEH.prototype.guestEmit$;
     }
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/search-facets-layout/search-facets-layout.config.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -14993,7 +15696,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/data-sources/facets/facet-text.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FacetTextDS = /** @class */ (function (_super) {
@@ -15058,13 +15760,13 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/data-sources/facets/facet-checkbox.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FacetCheckboxDS = /** @class */ (function (_super) {
         __extends(FacetCheckboxDS, _super);
         function FacetCheckboxDS() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.value = [];
             _this.getValue = (/**
              * @return {?}
              */
@@ -15109,6 +15811,25 @@
             }
         };
         /**
+         * @param {?} __0
+         * @return {?}
+         */
+        FacetCheckboxDS.prototype.toggleValue = /**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var inputPayload = _a.inputPayload, isChecked = _a.value;
+            /** @type {?} */
+            var exists = this.value.indexOf(inputPayload) !== -1;
+            if (isChecked && !exists) {
+                this.value.push(inputPayload);
+            }
+            else if (!isChecked && exists) {
+                this.value.splice(this.value.indexOf(inputPayload), 1);
+            }
+        };
+        /**
          * @return {?}
          */
         FacetCheckboxDS.prototype.clear = /**
@@ -15130,7 +15851,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/data-sources/facets/facet-select.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var FacetSelectDS = /** @class */ (function (_super) {
@@ -15202,7 +15922,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/data-sources/facets/facet-link.ds.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -15211,6 +15930,7 @@
         __extends(FacetLinkDS, _super);
         function FacetLinkDS() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.value = [];
             _this.getValue = (/**
              * @return {?}
              */
@@ -15255,6 +15975,26 @@
             }
         };
         /**
+         * @param {?} linkValue
+         * @return {?}
+         */
+        FacetLinkDS.prototype.toggleValue = /**
+         * @param {?} linkValue
+         * @return {?}
+         */
+        function (linkValue) {
+            /** @type {?} */
+            var exists = this.value.indexOf(linkValue) !== -1;
+            if (!exists) {
+                this.value.push(linkValue);
+            }
+            else if (exists) {
+                this.value.splice(this.value.indexOf(linkValue), 1);
+            }
+            // update
+            this.setValue(this.value, true);
+        };
+        /**
          * @return {?}
          */
         FacetLinkDS.prototype.clear = /**
@@ -15276,18 +16016,144 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/event-handlers/facets/facet-generic.eh.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
-    var FacetGenericEH = /** @class */ (function (_super) {
-        __extends(FacetGenericEH, _super);
-        function FacetGenericEH() {
+    /** @type {?} */
+    var ICON_OPEN = 'n7-icon-angle-down';
+    /** @type {?} */
+    var ICON_CLOSE = 'n7-icon-angle-right';
+    var FacetHeaderDS = /** @class */ (function (_super) {
+        __extends(FacetHeaderDS, _super);
+        function FacetHeaderDS() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.getValue = (/**
+             * @return {?}
+             */
+            function () { return _this.value; });
+            return _this;
+        }
+        /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        FacetHeaderDS.prototype.transform = /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        function (data) {
+            return __assign({}, data, { iconRight: data.iconRight || ICON_OPEN });
+        };
+        /**
+         * @param {?} value
+         * @param {?=} update
+         * @return {?}
+         */
+        FacetHeaderDS.prototype.setValue = /**
+         * @param {?} value
+         * @param {?=} update
+         * @return {?}
+         */
+        function (value, update) {
+            if (update === void 0) { update = false; }
+            this.value = value;
+            if (update) {
+                this.update(__assign({}, this.input, { additionalText: value }));
+            }
+        };
+        /**
+         * @return {?}
+         */
+        FacetHeaderDS.prototype.toggle = /**
+         * @return {?}
+         */
+        function () {
+            var iconRight = this.output.iconRight;
+            iconRight = iconRight === ICON_OPEN ? ICON_CLOSE : ICON_OPEN;
+            this.update(__assign({}, this.input, { iconRight: iconRight }));
+        };
+        /**
+         * @return {?}
+         */
+        FacetHeaderDS.prototype.isOpen = /**
+         * @return {?}
+         */
+        function () {
+            return this.output.iconRight === ICON_OPEN;
+        };
+        /**
+         * @return {?}
+         */
+        FacetHeaderDS.prototype.clear = /**
+         * @return {?}
+         */
+        function () {
+            this.value = null;
+        };
+        return FacetHeaderDS;
+    }(core$1.DataSource));
+    if (false) {
+        /** @type {?} */
+        FacetHeaderDS.prototype.id;
+        /** @type {?} */
+        FacetHeaderDS.prototype.value;
+        /** @type {?} */
+        FacetHeaderDS.prototype.getValue;
+    }
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var FacetHeaderEH = /** @class */ (function (_super) {
+        __extends(FacetHeaderEH, _super);
+        function FacetHeaderEH() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
         /**
          * @return {?}
          */
-        FacetGenericEH.prototype.listen = /**
+        FacetHeaderEH.prototype.listen = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.innerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type;
+                switch (type) {
+                    case _this.dataSource.id + ".click":
+                        _this.dataSource.toggle();
+                        _this.emitOuter('change', {
+                            isOpen: _this.dataSource.isOpen(),
+                            id: _this.dataSource.id
+                        });
+                        break;
+                    default:
+                        break;
+                }
+            }));
+        };
+        return FacetHeaderEH;
+    }(core$1.EventHandler));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var FacetTextEH = /** @class */ (function (_super) {
+        __extends(FacetTextEH, _super);
+        function FacetTextEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        FacetTextEH.prototype.listen = /**
          * @return {?}
          */
         function () {
@@ -15300,6 +16166,7 @@
                 var type = _a.type, payload = _a.payload;
                 switch (type) {
                     case _this.dataSource.id + ".change":
+                        _this.dataSource.setValue(payload.value);
                         _this.emitOuter('change', __assign({}, payload, { id: _this.dataSource.id }));
                         break;
                     default:
@@ -15307,20 +16174,142 @@
                 }
             }));
         };
-        return FacetGenericEH;
+        return FacetTextEH;
     }(core$1.EventHandler));
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/search-facets-layout/search-facets-layout.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var FacetCheckboxEH = /** @class */ (function (_super) {
+        __extends(FacetCheckboxEH, _super);
+        function FacetCheckboxEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        FacetCheckboxEH.prototype.listen = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.innerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case _this.dataSource.id + ".change":
+                        _this.dataSource.toggleValue(payload);
+                        _this.emitOuter('change', {
+                            value: _this.dataSource.getValue(),
+                            id: _this.dataSource.id
+                        });
+                        break;
+                    default:
+                        break;
+                }
+            }));
+        };
+        return FacetCheckboxEH;
+    }(core$1.EventHandler));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var FacetSelectEH = /** @class */ (function (_super) {
+        __extends(FacetSelectEH, _super);
+        function FacetSelectEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        FacetSelectEH.prototype.listen = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.innerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case _this.dataSource.id + ".change":
+                        _this.dataSource.setValue(payload.value);
+                        _this.emitOuter('change', __assign({}, payload, { id: _this.dataSource.id }));
+                        break;
+                    default:
+                        break;
+                }
+            }));
+        };
+        return FacetSelectEH;
+    }(core$1.EventHandler));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var FacetLinkEH = /** @class */ (function (_super) {
+        __extends(FacetLinkEH, _super);
+        function FacetLinkEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        FacetLinkEH.prototype.listen = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.innerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case _this.dataSource.id + ".change":
+                        _this.dataSource.toggleValue(payload);
+                        _this.emitOuter('change', {
+                            value: _this.dataSource.getValue(),
+                            id: _this.dataSource.id
+                        });
+                        break;
+                    default:
+                        break;
+                }
+            }));
+        };
+        return FacetLinkEH;
+    }(core$1.EventHandler));
+
+    /**
+     * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
-    var DATASOURCE_MAP = {
+    var DATASOURCE_MAP$1 = {
+        header: FacetHeaderDS,
         text: FacetTextDS,
         checkbox: FacetCheckboxDS,
         select: FacetSelectDS,
         link: FacetLinkDS,
+    };
+    /** @type {?} */
+    var EVENTHANDLER_MAP$1 = {
+        header: FacetHeaderEH,
+        text: FacetTextEH,
+        checkbox: FacetCheckboxEH,
+        select: FacetSelectEH,
+        link: FacetLinkEH,
     };
     var MrSearchFacetsLayoutComponent = /** @class */ (function (_super) {
         __extends(MrSearchFacetsLayoutComponent, _super);
@@ -15337,7 +16326,9 @@
          */
         function () {
             return {
-                data: this.data
+                data: this.data,
+                guestEmit$: this.guestEmit$,
+                hostEmit$: this.hostEmit$
             };
         };
         /**
@@ -15369,19 +16360,27 @@
             var _this = this;
             this.widgets = [];
             this.data.sections.forEach((/**
-             * @param {?} section
+             * @param {?} __0
              * @return {?}
              */
-            function (section) {
-                section.inputs.forEach((/**
+            function (_a) {
+                var header = _a.header, inputs = _a.inputs;
+                if (header) {
+                    _this.widgets.push({
+                        id: header.id,
+                        dataSource: DATASOURCE_MAP$1.header,
+                        eventHandler: EVENTHANDLER_MAP$1.header
+                    });
+                }
+                inputs.forEach((/**
                  * @param {?} input
                  * @return {?}
                  */
                 function (input) {
                     _this.widgets.push({
                         id: input.id,
-                        dataSource: DATASOURCE_MAP[input.type],
-                        eventHandler: FacetGenericEH
+                        dataSource: DATASOURCE_MAP$1[input.type],
+                        eventHandler: EVENTHANDLER_MAP$1[input.type]
                     });
                 }));
             }));
@@ -15389,207 +16388,29 @@
         MrSearchFacetsLayoutComponent.decorators = [
             { type: core.Component, args: [{
                         selector: 'mr-search-facets-layout',
-                        template: "<div *ngIf=\"lb.dataSource.data\" class=\"mr-search-facets {{ lb.dataSource.data.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.data.sections\" class=\"mr-search-facets__section {{ section.classes || '' }}\">\n        <n7-facet-header\n            [data]=\"section.header\"\n        ></n7-facet-header>\n\n        <div *ngFor=\"let input of section.inputs\" class=\"mr-search-facets__input {{ input.classes || '' }}\">\n            <ng-container [ngSwitch]=\"input.type\">\n\n                <!-- INPUT TEXT -->\n                <n7-input-text \n                *ngSwitchCase=\"'text'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n\n                <!-- INPUT CHECKBOX -->\n                <n7-input-checkbox \n                *ngSwitchCase=\"'checkbox'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                \n                <!-- INPUT SELECT -->\n                <n7-input-select \n                *ngSwitchCase=\"'select'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                \n                <!-- INPUT LINK -->\n                <n7-input-link \n                *ngSwitchCase=\"'link'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n            \n            </ng-container>\n        </div>\n        \n    </div>\n</div>"
+                        template: "<div *ngIf=\"lb.dataSource.data\" class=\"mr-search-facets {{ lb.dataSource.data.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.data.sections\" class=\"mr-search-facets__section {{ section.classes || '' }}\">\n        <n7-facet-header\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\n        [emit]=\"lb.widgets[section.header.id].emit\"\n        ></n7-facet-header>\n\n        <div *ngFor=\"let input of section.inputs\" class=\"mr-search-facets__input {{ input.classes || '' }}\">\n            <ng-container [ngSwitch]=\"input.type\">\n\n                <!-- INPUT TEXT -->\n                <n7-input-text \n                *ngSwitchCase=\"'text'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n\n                <!-- INPUT CHECKBOX -->\n                <n7-input-checkbox \n                *ngSwitchCase=\"'checkbox'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                \n                <!-- INPUT SELECT -->\n                <n7-input-select \n                *ngSwitchCase=\"'select'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                \n                <!-- INPUT LINK -->\n                <n7-input-link \n                *ngSwitchCase=\"'link'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n            \n            </ng-container>\n        </div>\n        \n    </div>\n</div>"
                     }] }
         ];
         /** @nocollapse */
         MrSearchFacetsLayoutComponent.ctorParameters = function () { return []; };
         MrSearchFacetsLayoutComponent.propDecorators = {
-            data: [{ type: core.Input }]
+            data: [{ type: core.Input }],
+            guestEmit$: [{ type: core.Input }],
+            hostEmit$: [{ type: core.Input }]
         };
         return MrSearchFacetsLayoutComponent;
     }(AbstractLayout));
     if (false) {
         /** @type {?} */
         MrSearchFacetsLayoutComponent.prototype.data;
-    }
-
-    /**
-     * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/search-test-layout/search-test-layout.ds.ts
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-    var SearchTestLayoutDS = /** @class */ (function (_super) {
-        __extends(SearchTestLayoutDS, _super);
-        function SearchTestLayoutDS() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        /**
-         * @return {?}
-         */
-        SearchTestLayoutDS.prototype.onInit = /**
-         * @return {?}
-         */
-        function () {
-            // TODO
-        };
-        return SearchTestLayoutDS;
-    }(core$1.LayoutDataSource));
-
-    /**
-     * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/search-test-layout/search-test-layout.eh.ts
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-    var SearchTestLayoutEH = /** @class */ (function (_super) {
-        __extends(SearchTestLayoutEH, _super);
-        function SearchTestLayoutEH() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        /**
-         * @return {?}
-         */
-        SearchTestLayoutEH.prototype.listen = /**
-         * @return {?}
-         */
-        function () {
-            var _this = this;
-            this.innerEvents$.subscribe((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            function (_a) {
-                var type = _a.type, payload = _a.payload;
-                switch (type) {
-                    case 'mr-search-test-layout.init':
-                        _this.dataSource.onInit(payload);
-                        break;
-                    default:
-                        break;
-                }
-            }));
-            /* this.outerEvents$.subscribe(({ type, payload }) => {
-              switch (type) {
-                default:
-                  break;
-              }
-            }); */
-        };
-        return SearchTestLayoutEH;
-    }(core$1.EventHandler));
-
-    /**
-     * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/search-test-layout/search-test-layout.config.ts
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-    /** @type {?} */
-    var SearchTestLayoutConfig = {
-        layoutId: 'mr-search-test-layout',
-        widgets: [
-        // TODO
-        ],
-        layoutDS: SearchTestLayoutDS,
-        layoutEH: SearchTestLayoutEH,
-        widgetsDataSources: DS$3,
-        widgetsEventHandlers: EH$3,
-        layoutOptions: {}
-    };
-
-    /**
-     * @fileoverview added by tsickle
-     * Generated from: lib/muruca/layouts/search-test-layout/search-test-layout.ts
-     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-    var MrSearchTestLayoutComponent = /** @class */ (function (_super) {
-        __extends(MrSearchTestLayoutComponent, _super);
-        function MrSearchTestLayoutComponent() {
-            var _this = _super.call(this, SearchTestLayoutConfig) || this;
-            _this.searchConfig = {
-                classes: 'search-test-facets',
-                sections: [{
-                        header: {
-                            text: 'Sezione I',
-                            classes: 'first-section',
-                        },
-                        inputs: [{
-                                id: 'fullsearch',
-                                type: 'text',
-                                delay: 300,
-                                data: {
-                                    id: 'fullsearch',
-                                    placeholder: 'Search...',
-                                    inputPayload: 'key-event',
-                                    enterPayload: 'enter-event'
-                                },
-                            }]
-                    }, {
-                        header: {
-                            text: 'Sezione II',
-                            classes: 'second-section',
-                        },
-                        inputs: [{
-                                id: 'hasinternal',
-                                type: 'checkbox',
-                                data: {
-                                    checkboxes: [{
-                                            id: 'hasinternal',
-                                            label: 'Filtro interno',
-                                            payload: 'click'
-                                        }]
-                                },
-                            }, {
-                                id: 'internalsearch',
-                                type: 'text',
-                                delay: 5000,
-                                data: {
-                                    id: 'internalsearch',
-                                    placeholder: 'Internal...',
-                                    inputPayload: 'key-event',
-                                    enterPayload: 'enter-event'
-                                },
-                            }]
-                    }]
-            };
-            return _this;
-        }
-        /**
-         * @protected
-         * @return {?}
-         */
-        MrSearchTestLayoutComponent.prototype.initPayload = /**
-         * @protected
-         * @return {?}
-         */
-        function () {
-            return {};
-        };
-        /**
-         * @return {?}
-         */
-        MrSearchTestLayoutComponent.prototype.ngOnInit = /**
-         * @return {?}
-         */
-        function () {
-            this.onInit();
-        };
-        /**
-         * @return {?}
-         */
-        MrSearchTestLayoutComponent.prototype.ngOnDestroy = /**
-         * @return {?}
-         */
-        function () {
-            this.onDestroy();
-        };
-        MrSearchTestLayoutComponent.decorators = [
-            { type: core.Component, args: [{
-                        selector: 'mr-search-test-layout',
-                        template: "<div>\n    <mr-search-facets-layout\n    [data]=\"searchConfig\"></mr-search-facets-layout>\n</div>"
-                    }] }
-        ];
-        /** @nocollapse */
-        MrSearchTestLayoutComponent.ctorParameters = function () { return []; };
-        return MrSearchTestLayoutComponent;
-    }(AbstractLayout));
-    if (false) {
         /** @type {?} */
-        MrSearchTestLayoutComponent.prototype.searchConfig;
+        MrSearchFacetsLayoutComponent.prototype.guestEmit$;
+        /** @type {?} */
+        MrSearchFacetsLayoutComponent.prototype.hostEmit$;
     }
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/muruca/n7-boilerplate-muruca.module.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
@@ -15599,20 +16420,23 @@
         MrGlossaryLayoutComponent,
         MrStaticLayoutComponent,
         MrSearchFacetsLayoutComponent,
-        MrSearchTestLayoutComponent,
     ];
     var N7BoilerplateMurucaModule = /** @class */ (function () {
         function N7BoilerplateMurucaModule() {
         }
         N7BoilerplateMurucaModule.decorators = [
             { type: core.NgModule, args: [{
-                        declarations: COMPONENTS$3,
+                        declarations: [
+                            EscapeHtmlPipe,
+                            COMPONENTS$3
+                        ],
                         imports: [
                             common.CommonModule,
                             components.DvComponentsLibModule,
                             N7BoilerplateCommonModule,
                         ],
                         providers: [],
+                        entryComponents: COMPONENTS$3,
                         exports: COMPONENTS$3,
                     },] }
         ];
@@ -15621,7 +16445,6 @@
 
     /**
      * @fileoverview added by tsickle
-     * Generated from: lib/n7-boilerplate-lib.module.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var N7BoilerplateLibModule = /** @class */ (function () {
@@ -15758,6 +16581,8 @@
     exports.MrHomeLayoutEH = MrHomeLayoutEH;
     exports.MrInnerTitleDS = MrInnerTitleDS;
     exports.MrItemPreviewsDS = MrItemPreviewsDS;
+    exports.MrNavDS = MrNavDS;
+    exports.MrNavEH = MrNavEH;
     exports.MrSearchLayoutComponent = MrSearchLayoutComponent;
     exports.MrSearchLayoutConfig = MrSearchLayoutConfig;
     exports.MrSearchLayoutDS = MrSearchLayoutDS;
@@ -15786,9 +16611,9 @@
     exports.SubnavEH = SubnavEH;
     exports.ɵa = MainLayoutComponent;
     exports.ɵb = AbstractLayout;
-    exports.ɵba = MrStaticLayoutComponent;
-    exports.ɵbb = MrSearchFacetsLayoutComponent;
-    exports.ɵbc = MrSearchTestLayoutComponent;
+    exports.ɵba = MrGlossaryLayoutComponent;
+    exports.ɵbb = MrStaticLayoutComponent;
+    exports.ɵbc = MrSearchFacetsLayoutComponent;
     exports.ɵc = ConfigurationService;
     exports.ɵd = LayoutsConfigurationService;
     exports.ɵe = MainStateService;
@@ -15810,11 +16635,11 @@
     exports.ɵu = DataWidgetWrapperComponent;
     exports.ɵv = DatepickerWrapperComponent;
     exports.ɵw = DvExampleLayoutComponent;
-    exports.ɵx = MrHomeLayoutComponent;
-    exports.ɵy = MrSearchLayoutComponent;
-    exports.ɵz = MrGlossaryLayoutComponent;
+    exports.ɵx = EscapeHtmlPipe;
+    exports.ɵy = MrHomeLayoutComponent;
+    exports.ɵz = MrSearchLayoutComponent;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
-})));
+}));
 //# sourceMappingURL=n7-frontend-boilerplate.umd.js.map

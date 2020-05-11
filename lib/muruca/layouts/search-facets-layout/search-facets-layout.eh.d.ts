@@ -6,7 +6,11 @@ interface ChangedSubjects {
 }
 export declare class SearchFacetsLayoutEH extends EventHandler {
     changed$: ChangedSubjects;
+    private destroyed$;
+    private hostEmit$;
+    private guestEmit$;
     listen(): void;
     initChangedListener(data: SearchFacetsConfig): void;
+    listenToHost(): void;
 }
 export {};

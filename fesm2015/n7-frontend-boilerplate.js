@@ -1,11 +1,11 @@
-import { Injectable, ɵɵdefineInjectable, Inject, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef, ApplicationInitStatus } from '@angular/core';
+import { Injectable, ɵɵdefineInjectable, Inject, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef, ApplicationInitStatus, Pipe } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK } from '@n7-frontend/components';
+import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK, CAROUSEL_MOCK } from '@n7-frontend/components';
 import { ReplaySubject, empty, of, Subject, forkJoin, fromEvent, merge } from 'rxjs';
 import { map, catchError, tap, takeUntil, filter, debounceTime, first, withLatestFrom } from 'rxjs/operators';
 import { NavigationStart, Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { Title } from '@angular/platform-browser';
+import { Title, DomSanitizer } from '@angular/platform-browser';
 import { LayoutBuilder, EventHandler, DataSource, LayoutDataSource as LayoutDataSource$1 } from '@n7-frontend/core';
 import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
 import tippy, { hideAll } from 'tippy.js';
@@ -15,7 +15,6 @@ import { DataSource as DataSource$1 } from '@n7-frontend/core/dist/data-source';
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/configuration.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class ConfigurationService {
@@ -54,7 +53,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/layouts-configuration.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class LayoutsConfigurationService {
@@ -115,7 +113,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/main-state.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainStateService {
@@ -234,7 +231,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/communication-providers/apollo.provider.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class ApolloProvider {
@@ -359,7 +355,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/communication-providers/rest.provider.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class RestProvider {
@@ -420,7 +415,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/communication.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class CommunicationService {
@@ -526,7 +520,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/abstract-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -596,7 +589,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/main-layout/main-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainLayoutDS extends LayoutDataSource {
@@ -733,7 +725,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/json-config.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class JsonConfigService {
@@ -840,7 +831,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/facet-inputs/facet-input.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -1017,7 +1007,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/facet-inputs/facet-input-checkbox.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetInputCheckbox extends FacetInput {
@@ -1071,7 +1060,6 @@ class FacetInputCheckbox extends FacetInput {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/helpers.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -1145,7 +1133,6 @@ var helpers = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/facet-inputs/facet-input-text.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetInputText extends FacetInput {
@@ -1185,7 +1172,6 @@ class FacetInputText extends FacetInput {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/facet-inputs/facet-input-link.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -1352,7 +1338,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/facet-inputs/facet-input-select.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetInputSelect extends FacetInput {
@@ -1405,13 +1390,11 @@ class FacetInputSelect extends FacetInput {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/models/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/search.service.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -1859,12 +1842,7 @@ class SearchModel {
      * @return {?}
      */
     _clearInputs() {
-        this._inputs.forEach((/**
-         * @param {?} input
-         * @return {?}
-         */
-        (input) => {
-        }));
+        // do nothing
     }
     /**
      * @private
@@ -2247,13 +2225,11 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/services/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/main-layout/main-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainLayoutEH extends EventHandler {
@@ -2376,7 +2352,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/header.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class HeaderDS extends DataSource {
@@ -2410,7 +2385,6 @@ class HeaderDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/subnav.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SubnavDS extends DataSource {
@@ -2459,7 +2433,6 @@ class SubnavDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/breadcrumbs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class BreadcrumbsDS extends DataSource {
@@ -2475,7 +2448,6 @@ class BreadcrumbsDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/facets.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetsDS extends DataSource {
@@ -2497,7 +2469,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/facets-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -2803,7 +2774,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/footer.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FooterDS extends DataSource {
@@ -2822,7 +2792,6 @@ class FooterDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/smart-pagination.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SmartPaginationDS extends DataSource {
@@ -2992,12 +2961,10 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     HeaderDS: HeaderDS,
     SubnavDS: SubnavDS,
     BreadcrumbsDS: BreadcrumbsDS,
@@ -3009,7 +2976,6 @@ var DS = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/header.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class HeaderEH extends EventHandler {
@@ -3035,7 +3001,6 @@ class HeaderEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/subnav.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SubnavEH extends EventHandler {
@@ -3066,7 +3031,6 @@ class SubnavEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/breadcrumbs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class BreadcrumbsEH extends EventHandler {
@@ -3097,7 +3061,6 @@ class BreadcrumbsEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/facets-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetsWrapperEH extends EventHandler {
@@ -3245,7 +3208,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/footer.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FooterEH extends EventHandler {
@@ -3259,7 +3221,6 @@ class FooterEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/smart-pagination.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SmartPaginationEH extends EventHandler {
@@ -3289,12 +3250,10 @@ class SmartPaginationEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     HeaderEH: HeaderEH,
     SubnavEH: SubnavEH,
     BreadcrumbsEH: BreadcrumbsEH,
@@ -3305,7 +3264,6 @@ var EH = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/main-layout/main-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -3331,7 +3289,6 @@ const MainLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/main-layout/main-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MainLayoutComponent extends AbstractLayout {
@@ -3429,7 +3386,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/page404-layout/page404-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class Page404LayoutDS extends LayoutDataSource {
@@ -3448,7 +3404,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/page404-layout/page404-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class Page404LayoutEH extends EventHandler {
@@ -3501,7 +3456,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/page404-layout/page404-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -3519,7 +3473,6 @@ const Page404LayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/page404-layout/page404-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class Page404LayoutComponent extends AbstractLayout {
@@ -3564,7 +3517,6 @@ Page404LayoutComponent.ctorParameters = () => [
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/components/facets-wrapper/facets-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetsWrapperComponent {
@@ -3610,7 +3562,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/components/smart-pagination/smart-pagination.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SmartPaginationComponent {
@@ -3649,7 +3600,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/n7-boilerplate-common.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -3686,13 +3636,13 @@ N7BoilerplateCommonModule.decorators = [
                     DvComponentsLibModule,
                 ],
                 providers: [],
+                entryComponents: COMPONENTS,
                 exports: COMPONENTS,
             },] }
 ];
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaLayoutDS extends LayoutDataSource {
@@ -3824,7 +3774,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         // navigation update
         this.mainState.updateCustom('currentNav', 'entita');
         // update head title
-        this.mainState.update('headTitle', 'Arianna Web > Entità');
+        this.mainState.update('headTitle', 'Arianna4View - Entità');
     }
     /**
      * @param {?} id
@@ -3969,7 +3919,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         this.one('aw-linked-objects').update({ items: res.relatedItems });
         this.drawPagination();
         // update head title
-        this.mainState.update('headTitle', `Arianna Web > Entità > ${this.myResponse.label}`);
+        this.mainState.update('headTitle', `Arianna4View - Entità - ${this.myResponse.label}`);
     }
     /**
      * @private
@@ -4071,7 +4021,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaLayoutEH extends EventHandler {
@@ -4271,7 +4220,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/linked-objects.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwLinkedObjectsDS extends DataSource {
@@ -4589,7 +4537,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/autocomplete-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwAutocompleteWrapperDS extends DataSource$1 {
@@ -4667,7 +4614,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/bubble-chart.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwBubbleChartDS extends DataSource {
@@ -4821,7 +4767,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/chart-tippy.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwChartTippyDS extends DataSource {
@@ -4864,7 +4809,6 @@ class AwChartTippyDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/hero.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHeroDS extends DataSource {
@@ -4903,7 +4847,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/table.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwTableDS extends DataSource {
@@ -4918,7 +4861,6 @@ class AwTableDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/home-hero-patrimonio.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeHeroPatrimonioDS extends DataSource {
@@ -4934,7 +4876,6 @@ class AwHomeHeroPatrimonioDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/home-facets-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeFacetsWrapperDS extends DataSource {
@@ -5193,7 +5134,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/home-item-tags-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeItemTagsWrapperDS extends DataSource {
@@ -5209,7 +5149,6 @@ class AwHomeItemTagsWrapperDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/home-autocomplete.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeAutocompleteDS extends DataSource {
@@ -5319,7 +5258,6 @@ class AwHomeAutocompleteDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/entita-nav.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaNavDS extends DataSource {
@@ -5387,7 +5325,6 @@ class AwEntitaNavDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/entita-metadata-viewer.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaMetadataViewerDS extends DataSource {
@@ -5531,7 +5468,6 @@ class AwEntitaMetadataViewerDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/tree.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwTreeDS extends DataSource$1 {
@@ -5850,7 +5786,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/sidebar-header.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSidebarHeaderDS extends DataSource {
@@ -5887,7 +5822,6 @@ class AwSidebarHeaderDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/scheda-breadcrumbs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaBreadcrumbsDS extends DataSource {
@@ -5924,7 +5858,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/scheda-metadata.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaMetadataDS extends DataSource {
@@ -5987,7 +5920,6 @@ class AwSchedaMetadataDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/scheda-image.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaImageDS extends DataSource {
@@ -6067,7 +5999,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/scheda-inner-title.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaInnerTitleDS extends DataSource {
@@ -6083,7 +6014,6 @@ class AwSchedaInnerTitleDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/search-layout-tabs.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutTabsDS extends DataSource {
@@ -6130,7 +6060,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/gallery-results.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwGalleryResultsDS extends DataSource {
@@ -6279,12 +6208,10 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS$1 = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     AwLinkedObjectsDS: AwLinkedObjectsDS,
     AwAutocompleteWrapperDS: AwAutocompleteWrapperDS,
     AwBubbleChartDS: AwBubbleChartDS,
@@ -6309,7 +6236,6 @@ var DS$1 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/hero.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHeroEH extends EventHandler {
@@ -6345,7 +6271,6 @@ class AwHeroEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/home-facets-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeFacetsWrapperEH extends EventHandler {
@@ -6513,7 +6438,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/home-hero-patrimonio.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeHeroPatrimonioEH extends EventHandler {
@@ -6527,7 +6451,6 @@ class AwHomeHeroPatrimonioEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/home-item-tags-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeItemTagsWrapperEH extends EventHandler {
@@ -6556,7 +6479,6 @@ class AwHomeItemTagsWrapperEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/home-autocomplete.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeAutocompleteEH extends EventHandler {
@@ -6582,7 +6504,6 @@ class AwHomeAutocompleteEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/entita-nav.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaNavEH extends EventHandler {
@@ -6615,7 +6536,6 @@ class AwEntitaNavEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/scheda-breadcrumbs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaSidebarEH extends EventHandler {
@@ -6638,7 +6558,6 @@ class AwSchedaSidebarEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/sidebar-header.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSidebarHeaderEH extends EventHandler {
@@ -6664,7 +6583,6 @@ class AwSidebarHeaderEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/tree.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwTreeEH extends EventHandler {
@@ -6862,7 +6780,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/search-layout-tabs.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutTabsEH extends EventHandler {
@@ -6876,7 +6793,6 @@ class AwSearchLayoutTabsEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/gallery-results.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwGalleryResultsEH extends EventHandler {
@@ -6926,7 +6842,6 @@ class AwGalleryResultsEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/linked-objects.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwLinkedObjectsEH extends EventHandler {
@@ -7010,7 +6925,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/autocomplete-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwAutocompleteWrapperEH extends EventHandler {
@@ -7039,7 +6953,6 @@ class AwAutocompleteWrapperEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/bubble-chart.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwBubbleChartEH extends EventHandler {
@@ -7184,7 +7097,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/table.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwTableEH extends EventHandler {
@@ -7206,7 +7118,6 @@ class AwTableEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/chart-tippy.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwChartTippyEH extends EventHandler {
@@ -7312,12 +7223,10 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH$1 = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     AwHeroEH: AwHeroEH,
     AwHomeFacetsWrapperEH: AwHomeFacetsWrapperEH,
     AwHomeHeroPatrimonioEH: AwHomeHeroPatrimonioEH,
@@ -7338,7 +7247,6 @@ var EH$1 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -7367,7 +7275,6 @@ const AwEntitaLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/entita-layout/entita-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaLayoutComponent extends AbstractLayout {
@@ -7488,7 +7395,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeLayoutDS extends LayoutDataSource {
@@ -7539,8 +7445,8 @@ class AwHomeLayoutDS extends LayoutDataSource {
         this.one('aw-hero').update(this.configuration.get('home-layout')['top-hero']);
         this.one('aw-home-hero-patrimonio').update(this.configuration.get('home-layout')['bottom-hero']);
         // update streams
-        this.mainState.update('headTitle', 'Arianna Web > Home');
-        this.mainState.update('pageTitle', 'Arianna Web: Home Layout');
+        this.mainState.update('headTitle', 'Arianna4View - Homepage');
+        this.mainState.update('pageTitle', 'Arianna4View - Homepage');
         this.mainState.updateCustom('currentNav', 'home');
         // listen autocomplete changes
         this._listenAutoCompleteChanges();
@@ -7955,7 +7861,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/home-layout/home-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeLayoutEH extends EventHandler {
@@ -8289,7 +8194,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/home-layout/home-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -8325,7 +8229,6 @@ const AwHomeLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/home-layout/home-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwHomeLayoutComponent extends AbstractLayout {
@@ -8409,7 +8312,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaLayoutDS extends LayoutDataSource {
@@ -8455,8 +8357,8 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         });
         this.emptyLabel = this.configuration.get('scheda-layout')['empty-label'];
         this.one('aw-tree').updateOptions({ config: this.configuration.get('config-keys') });
-        this.mainState.update('headTitle', 'Arianna Web > Patrimonio');
-        this.mainState.update('pageTitle', 'Arianna Web: patrimonio Layout');
+        this.mainState.update('headTitle', 'Arianna4View - Patrimonio');
+        this.mainState.update('pageTitle', 'Arianna4View - Patrimonio');
         this.mainState.updateCustom('currentNav', 'patrimonio');
         // sidebar sticky control
         this._sidebarStickyControl();
@@ -8586,7 +8488,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
                 this.one('aw-scheda-breadcrumbs').update(breadcrumbs);
             }
             // update head title
-            this.mainState.update('headTitle', `Arianna Web > Patrimonio > ${response.title || response.label}`);
+            this.mainState.update('headTitle', `Arianna4View - Patrimonio - ${response.title || response.label}`);
         }
         if (response.relatedItems) {
             this.one('aw-linked-objects').updateOptions({ context: 'scheda', config: this.configuration });
@@ -8733,7 +8635,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaLayoutEH extends EventHandler {
@@ -8894,7 +8795,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -8926,7 +8826,6 @@ const AwPatrimonioLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/scheda-layout/scheda-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSchedaLayoutComponent extends AbstractLayout {
@@ -9036,7 +8935,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/search-layout/search-facets.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var facetsConfig = {
@@ -9204,7 +9102,6 @@ var facetsConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -9298,7 +9195,7 @@ class AwSearchLayoutDS extends LayoutDataSource {
         // sidebar sticky control
         this._sidebarStickyControl();
         this.mainState.updateCustom('currentNav', 'ricerca');
-        this.mainState.update('headTitle', 'Arianna Web > Ricerca');
+        this.mainState.update('headTitle', 'Arianna4View - Ricerca');
     }
     /**
      * @return {?}
@@ -9681,7 +9578,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/search-layout/search-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutEH extends EventHandler {
@@ -9852,7 +9748,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/search-layout/search-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -9883,7 +9778,6 @@ const AwSearchLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/search-layout/search-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwSearchLayoutComponent extends AbstractLayout {
@@ -9984,7 +9878,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-facets.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var facetsConfig$1 = {
@@ -10135,7 +10028,6 @@ var facetsConfig$1 = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -10229,7 +10121,7 @@ class AwGalleryLayoutDS extends LayoutDataSource {
         // sidebar sticky control
         this._sidebarStickyControl();
         this.mainState.updateCustom('currentNav', 'galleria');
-        this.mainState.update('headTitle', 'Arianna Web > Galleria');
+        this.mainState.update('headTitle', 'Arianna4View - Galleria');
     }
     /**
      * @return {?}
@@ -10612,7 +10504,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwGalleryLayoutEH extends EventHandler {
@@ -10783,7 +10674,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -10814,7 +10704,6 @@ const AwGalleryLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/gallery-layout/gallery-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwGalleryLayoutComponent extends AbstractLayout {
@@ -10930,7 +10819,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/components/chart-tippy/chart-tippy.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class ChartTippyComponent {
@@ -10965,7 +10853,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/components/bubble-chart-wrapper/bubble-chart-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class BubbleChartWrapperComponent {
@@ -11000,7 +10887,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/components/smart-breadcrumbs/smart-breadcrumbs.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -11169,7 +11055,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/config/apollo.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 var apolloConfig = {
@@ -11718,7 +11603,6 @@ var apolloConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/n7-boilerplate-arianna-web.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -11773,7 +11657,6 @@ N7BoilerplateAriannaWebModule.ctorParameters = () => [
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/components/data-widget-wrapper/data-widget-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -11802,7 +11685,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/components/datepicker-wrapper/datepicker-wrapper.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -11886,7 +11768,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/layout/example-layout/example-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvExampleLayoutDS extends LayoutDataSource {
@@ -11954,7 +11835,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/layout/example-layout/example-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvExampleLayoutEH extends EventHandler {
@@ -11974,7 +11854,6 @@ class DvExampleLayoutEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/data-sources/data-widget-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvDataWidgetDS extends DataSource {
@@ -11993,7 +11872,6 @@ class DvDataWidgetDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/data-sources/datepicker-wrapper.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvDatepickerWrapperDS extends DataSource {
@@ -12087,7 +11965,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/data-sources/graph.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvGraphDS extends DataSource {
@@ -12180,7 +12057,6 @@ class DvGraphDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/data-sources/inner-title.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvInnerTitleDS extends DataSource {
@@ -12206,7 +12082,6 @@ class DvInnerTitleDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/data-sources/widget.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvWidgetDS extends DataSource {
@@ -12221,12 +12096,10 @@ class DvWidgetDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/data-sources/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS$2 = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     DvDataWidgetDS: DvDataWidgetDS,
     DvDatepickerWrapperDS: DvDatepickerWrapperDS,
     DvGraphDS: DvGraphDS,
@@ -12236,7 +12109,6 @@ var DS$2 = /*#__PURE__*/Object.freeze({
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/event-handlers/datepicker-wrapper.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvDatepickerWrapperEH extends EventHandler {
@@ -12274,18 +12146,15 @@ class DvDatepickerWrapperEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/event-handlers/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH$2 = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     DvDatepickerWrapperEH: DvDatepickerWrapperEH
 });
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/layout/example-layout/example-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -12312,7 +12181,6 @@ const DvExampleLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/layout/example-layout/example-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class DvExampleLayoutComponent extends AbstractLayout {
@@ -12349,7 +12217,6 @@ DvExampleLayoutComponent.ctorParameters = () => [];
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/n7-boilerplate-data-viz.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -12375,51 +12242,212 @@ N7BoilerplateDataVizModule.decorators = [
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/home-layout/home-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-class MrHomeLayoutDS extends LayoutDataSource {
+class EscapeHtmlPipe {
     /**
+     * @param {?} sanitizer
+     */
+    constructor(sanitizer) {
+        this.sanitizer = sanitizer;
+    }
+    /**
+     * @param {?} content
      * @return {?}
      */
-    onInit() {
-        this.one('mr-resources').updateOptions({ source: 'resources' });
-        this.one('mr-collections').updateOptions({ source: 'collections' });
-        this.some(['mr-resources', 'mr-collections']).update({});
-        this.one('mr-res-header').update({
+    transform(content) {
+        return this.sanitizer.bypassSecurityTrustHtml(content);
+    }
+}
+EscapeHtmlPipe.decorators = [
+    { type: Pipe, args: [{ name: 'keepHtml', pure: false },] }
+];
+/** @nocollapse */
+EscapeHtmlPipe.ctorParameters = () => [
+    { type: DomSanitizer }
+];
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    EscapeHtmlPipe.prototype.sanitizer;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+var homeMock = {
+    'slider-1': CAROUSEL_MOCK,
+    'collection-1': {
+        header: {
             title: 'Le mappe',
             subtitle: 'Una selezione di alcune mappe di Totus Mundus.',
             button: {
                 text: 'Visita il catalogo',
                 link: '/catalogo'
             }
-        });
-        this.one('mr-coll-header').update({
+        },
+        items: [
+            {
+                image: 'https://i.imgur.com/8bNcgR6.png',
+                title: 'Unattributed version',
+                text: 'A japanese colored version',
+                metadata: [{
+                        classes: 'metadata',
+                        items: [
+                            { label: 'Artista', value: 'Massimo Berruti' },
+                            { label: 'Tecnica', value: 'Fotografia' },
+                            { label: 'Galleria', value: 'Galleria Tonelli' },
+                        ]
+                    }]
+            }, {
+                image: 'https://i.imgur.com/52UFqca.png',
+                title: 'Yudi Shanhai Quantu',
+                text: 'Complete Map of all mountains and seas',
+            }, {
+                image: 'https://i.imgur.com/sLu7u2v.png',
+                title: 'Reconstruction of D\'Elia\'s map',
+                text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
+                metadata: [{
+                        classes: 'metadata',
+                        items: [
+                            { label: 'Artista', value: 'Massimo Berruti' },
+                            { label: 'Tecnica', value: 'Fotografia' },
+                            { label: 'Galleria', value: 'Galleria Tonelli' },
+                        ]
+                    }]
+            }, {
+                image: 'https://i.imgur.com/8bNcgR6.png',
+                title: 'Unattributed version',
+                text: 'A japanese colored version',
+            }
+        ]
+    },
+    'hero-1': {
+        title: 'L\'archivio',
+        text: 'Il progetto Unus sufficit orbis presenta infromazioni e dati relativi al lavoro e la vita del gesuita Matteo Ricci: le sue mappe che ha creato e le persone con cui ha collaborato.',
+        button: {
+            title: '',
+            text: 'Vai alle opere',
+            anchor: {
+                href: '/button-url',
+                target: '_blank'
+            }
+        },
+        image: 'https://i.imgur.com/VHTbVbm.png'
+    },
+    'collection-2': {
+        header: {
             title: 'I percorsi',
             subtitle: 'Visita il mondo di Totus Mundus con una serie di percorsi per te.',
             button: {
                 text: 'Visita il catalogo',
                 link: '/catalogo'
             }
-        });
-        this.one('mr-hero').update({
-            text: 'The Totus Mundus project presents a series of information and data about the jesuit Matteo Ricci, its life, the maps he created and the people he collaborated with',
-            button: {
-                title: '',
-                text: 'Cerca',
-                anchor: {
-                    href: '/button-url',
-                    target: '_blank'
-                }
-            },
-            image: 'https://i.imgur.com/VHTbVbm.png'
-        });
+        },
+        items: [
+            {
+                image: 'https://i.imgur.com/8bNcgR6.png',
+                title: 'Unattributed version',
+                text: 'A japanese colored version',
+            }, {
+                image: 'https://i.imgur.com/52UFqca.png',
+                title: 'Yudi Shanhai Quantu',
+                text: 'Complete Map of all mountains and seas',
+            }, {
+                image: 'https://i.imgur.com/sLu7u2v.png',
+                title: 'Reconstruction of D\'Elia\'s map',
+                text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
+            }
+        ]
     }
+};
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class MrHomeLayoutDS extends LayoutDataSource {
+    /**
+     * @param {?} payload
+     * @return {?}
+     */
+    onInit(payload) {
+        this.configuration = payload.configuration;
+        this.communication = payload.communication;
+        this.configId = payload.configId;
+        this.pageConfig = this.configuration.get(this.configId) || {};
+        this.doRequest();
+    }
+    /**
+     * @return {?}
+     */
+    doRequest() {
+        const { sections } = this.pageConfig;
+        if (sections) {
+            // FIXME: collegare API
+            // this.communication.request$('sections', {
+            //   method: 'POST',
+            //   params: sections.map(({ id }) => id)
+            // }).subscribe((response) => {
+            //   this.initSections(response);
+            // });
+            this.initSections(homeMock);
+        }
+    }
+    /**
+     * @param {?} response
+     * @return {?}
+     */
+    initSections(response) {
+        const { sections } = this.pageConfig;
+        if (sections) {
+            sections.forEach((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            ({ id }) => {
+                /** @type {?} */
+                const widgetDataSource = this.getWidgetDataSource(id);
+                /** @type {?} */
+                const responseData = response[id];
+                // set id
+                widgetDataSource.id = id;
+                // update data
+                if (responseData) {
+                    this.one(id).update(responseData);
+                }
+            }));
+        }
+    }
+}
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    MrHomeLayoutDS.prototype.configuration;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrHomeLayoutDS.prototype.communication;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrHomeLayoutDS.prototype.configId;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrHomeLayoutDS.prototype.pageConfig;
 }
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/home-layout/home-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrHomeLayoutEH extends EventHandler {
@@ -12440,12 +12468,21 @@ class MrHomeLayoutEH extends EventHandler {
                     break;
             }
         }));
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type }) => {
+            switch (type) {
+                default:
+                    break;
+            }
+        }));
     }
 }
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/data-sources/item-previews.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrItemPreviewsDS extends DataSource {
@@ -12576,7 +12613,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/data-sources/inner-title.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrInnerTitleDS extends DataSource {
@@ -12614,11 +12650,9 @@ class MrInnerTitleDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/data-sources/hero.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrHeroDS extends DataSource {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     /**
      * @protected
      * @param {?} data
@@ -12628,10 +12662,13 @@ class MrHeroDS extends DataSource {
         return data;
     }
 }
+if (false) {
+    /** @type {?} */
+    MrHeroDS.prototype.id;
+}
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/data-sources/filters.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrFiltersDS extends DataSource {
@@ -12648,21 +12685,53 @@ class MrFiltersDS extends DataSource {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/data-sources/index.ts
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class MrNavDS extends DataSource {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        /** @type {?} */
+        const items = [];
+        data.nav.forEach((/**
+         * @param {?} el
+         * @return {?}
+         */
+        (el) => {
+            items.push({
+                text: el.title,
+                anchor: {
+                    href: `http://localhost:4200/mr/static/${el.id}`,
+                    target: '_blank',
+                    payload: el.id
+                }
+            });
+        }));
+        return {
+            items,
+        };
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var DS$3 = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     MrItemPreviewsDS: MrItemPreviewsDS,
     MrInnerTitleDS: MrInnerTitleDS,
     MrHeroDS: MrHeroDS,
-    MrFiltersDS: MrFiltersDS
+    MrFiltersDS: MrFiltersDS,
+    MrNavDS: MrNavDS
 });
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/event-handlers/dummy.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrDummyEH extends EventHandler {
@@ -12676,7 +12745,6 @@ class MrDummyEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/event-handlers/filters.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrFiltersEH extends EventHandler {
@@ -12690,35 +12758,49 @@ class MrFiltersEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/event-handlers/index.ts
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class MrNavEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'dv-nav.click':
+                    this.emitOuter('navclick', payload);
+                    break;
+                default:
+                    console.warn('unhandled event of type', type);
+                    break;
+            }
+        }));
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 var EH$3 = /*#__PURE__*/Object.freeze({
-    __proto__: null,
     MrDummyEH: MrDummyEH,
-    MrFiltersEH: MrFiltersEH
+    MrFiltersEH: MrFiltersEH,
+    MrNavEH: MrNavEH
 });
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/home-layout/home-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
 const MrHomeLayoutConfig = {
     layoutId: 'mr-home-layout',
-    widgets: [{
-            id: 'mr-resources', dataSource: MrItemPreviewsDS,
-        }, {
-            id: 'mr-collections', dataSource: MrItemPreviewsDS,
-        }, {
-            id: 'mr-res-header', dataSource: MrInnerTitleDS,
-        }, {
-            id: 'mr-coll-header', dataSource: MrInnerTitleDS,
-        }, {
-            id: 'mr-hero', dataSource: MrHeroDS,
-        }],
+    widgets: [],
     layoutDS: MrHomeLayoutDS,
     layoutEH: MrHomeLayoutEH,
     widgetsDataSources: DS$3,
@@ -12730,15 +12812,154 @@ const MrHomeLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/home-layout/home-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+class MrSliderDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        return data;
+    }
+}
+if (false) {
+    /** @type {?} */
+    MrSliderDS.prototype.id;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class MrCollectionDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        const { header } = data;
+        return Object.assign({}, data, { header: {
+                title: {
+                    main: {
+                        text: header.title,
+                        classes: 'bold'
+                    },
+                    secondary: {
+                        text: header.subtitle,
+                        classes: 'italic'
+                    }
+                },
+                actions: {
+                    buttons: [
+                        {
+                            text: header.button.text,
+                            payload: header.button.link,
+                            classes: 'n7-btn-cta'
+                        }
+                    ]
+                }
+            } });
+    }
+}
+if (false) {
+    /** @type {?} */
+    MrCollectionDS.prototype.id;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class MrSliderEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        // this.innerEvents$.subscribe(({ type, payload }) => {
+        //   switch (type) {
+        //     case `${this.dataSource.id}.<event-type>`:
+        //       // TODO
+        //       break;
+        //     default:
+        //       break;
+        //   }
+        // });
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class MrCollectionEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        // this.innerEvents$.subscribe(({ type, payload }) => {
+        //   switch (type) {
+        //     case `${this.dataSource.id}.<event-type>`:
+        //       // TODO
+        //       break;
+        //     default:
+        //       break;
+        //   }
+        // });
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class MrHeroEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        // this.innerEvents$.subscribe(({ type, payload }) => {
+        //   switch (type) {
+        //     case `${this.dataSource.id}.<event-type>`:
+        //       // TODO
+        //       break;
+        //     default:
+        //       break;
+        //   }
+        // });
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/** @type {?} */
+const DATASOURCE_MAP = {
+    slider: MrSliderDS,
+    collection: MrCollectionDS,
+    hero: MrHeroDS,
+};
+/** @type {?} */
+const EVENTHANDLER_MAP = {
+    slider: MrSliderEH,
+    collection: MrCollectionEH,
+    hero: MrHeroEH,
+};
 class MrHomeLayoutComponent extends AbstractLayout {
     /**
      * @param {?} layoutsConfiguration
+     * @param {?} activatedRoute
+     * @param {?} configuration
+     * @param {?} communication
      */
-    constructor(layoutsConfiguration) {
+    constructor(layoutsConfiguration, activatedRoute, configuration, communication) {
         super(layoutsConfiguration.get('MrHomeLayoutConfig') || MrHomeLayoutConfig);
+        this.activatedRoute = activatedRoute;
+        this.configuration = configuration;
+        this.communication = communication;
     }
     /**
      * @protected
@@ -12746,6 +12967,9 @@ class MrHomeLayoutComponent extends AbstractLayout {
      */
     initPayload() {
         return {
+            configId: this.configId,
+            configuration: this.configuration,
+            communication: this.communication,
             options: this.config.options || {}
         };
     }
@@ -12753,7 +12977,15 @@ class MrHomeLayoutComponent extends AbstractLayout {
      * @return {?}
      */
     ngOnInit() {
-        this.onInit();
+        this.activatedRoute.data.subscribe((/**
+         * @param {?} data
+         * @return {?}
+         */
+        (data) => {
+            this.configId = data.configId;
+            this.loadWidgets();
+            this.onInit();
+        }));
     }
     /**
      * @return {?}
@@ -12761,230 +12993,347 @@ class MrHomeLayoutComponent extends AbstractLayout {
     ngOnDestroy() {
         this.onDestroy();
     }
+    /**
+     * @return {?}
+     */
+    loadWidgets() {
+        /** @type {?} */
+        const homeConfig = this.configuration.get(this.configId) || {};
+        const { sections } = homeConfig;
+        this.widgets = [];
+        if (sections) {
+            sections.forEach((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            ({ id, type }) => {
+                this.widgets.push({
+                    id,
+                    dataSource: DATASOURCE_MAP[type],
+                    eventHandler: EVENTHANDLER_MAP[type]
+                });
+            }));
+        }
+    }
 }
 MrHomeLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'mr-home-layout',
-                template: "<div class=\"mr-home\" *ngIf=\"lb.dataSource\">\n    <!-- TODO: Replace with <n7-carousel-component> -->\n    <div style=\"\n        height: 300px;\n        border: 1px solid #dddddd;\n        line-height: 300px;\n        text-align: center;\">\n        <em>n7-carousel-component</em>\n    </div>\n    <!-- ========================================== -->\n    <n7-inner-title [data]=\"lb.widgets['mr-res-header'].ds.out$ | async\"></n7-inner-title>\n    <n7-item-preview\n        *ngFor=\"let resource of (lb.widgets['mr-resources'].ds.out$ | async)\"\n        [data]=\"resource\">\n    </n7-item-preview>\n    <n7-hero [data]=\"lb.widgets['mr-hero'].ds.out$ | async\">\n    </n7-hero>\n    <n7-inner-title [data]=\"lb.widgets['mr-coll-header'].ds.out$ | async\">\n    </n7-inner-title>\n    <n7-item-preview\n        *ngFor=\"let collection of (lb.widgets['mr-collections'].ds.out$ | async)\" \n        [data]=\"collection\">\n    </n7-item-preview>\n</div>\n"
+                template: "<div class=\"mr-home mr-layout\" *ngIf=\"lb.dataSource\">\n    <section *ngFor=\"let section of lb.dataSource.pageConfig.sections\" class=\"{{ 'mr-layout__' + section.type }}\">\n        <ng-container [ngSwitch]=\"section.type\">\n\n            <!-- SLIDER -->\n            <ng-container *ngSwitchCase=\"'slider'\">\n                <n7-carousel \n                [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[section.id].emit\">\n                </n7-carousel> \n            </ng-container>\n\n            <!-- COLLECTION -->\n            <ng-container *ngSwitchCase=\"'collection'\">\n                <n7-inner-title \n                [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                [emit]=\"lb.widgets[section.id].emit\">\n                </n7-inner-title>\n                <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                    <n7-item-preview\n                    *ngFor=\"let item of (lb.widgets[section.id].ds.out$ | async)?.items\"\n                    [data]=\"item\"\n                    [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-item-preview>\n                </div>\n            </ng-container>\n\n            <!-- HERO -->\n            <ng-container *ngSwitchCase=\"'hero'\">\n                <n7-hero \n                [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[section.id].emit\">\n                </n7-hero> \n            </ng-container>\n        \n        </ng-container>\n    </section>\n    \n</div>\n"
             }] }
 ];
 /** @nocollapse */
 MrHomeLayoutComponent.ctorParameters = () => [
-    { type: LayoutsConfigurationService }
+    { type: LayoutsConfigurationService },
+    { type: ActivatedRoute },
+    { type: ConfigurationService },
+    { type: CommunicationService }
 ];
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/search-layout/search-facets.config.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-var facetsConfig$2 = {
-    totalCount: 0,
-    facets: [
-        {
-            id: 'query',
-            type: 'value',
-        },
-        {
-            id: 'query-all',
-            type: 'value',
-            hasStaticData: true,
-            data: [
-                {
-                    value: '1',
-                    label: 'Cerca in tutti campi delle schede',
-                },
-            ],
-        },
-        {
-            id: 'query-links',
-            type: 'value',
-        },
-        {
-            id: 'entity-types',
-            type: 'value',
-            operator: 'OR',
-            limit: 10,
-            order: 'count',
-        },
-        {
-            id: 'entity-search',
-            type: 'value',
-        },
-        {
-            id: 'entity-links',
-            type: 'value',
-            searchData: ['entity-type'],
-        },
-    ],
-    fields: [
-        {
-            inputs: [
-                {
-                    type: 'text',
-                    facetId: 'query',
-                    placeholder: 'Cerca nei titoli delle schede',
-                    filterConfig: {
-                        delay: 500,
-                        minChars: 3,
-                        searchIn: [
-                            {
-                                key: 'label.ngrams',
-                                operator: 'LIKE',
-                            },
-                        ],
-                    },
-                },
-                {
-                    type: 'checkbox',
-                    facetId: 'query-all',
-                    filterConfig: {
-                        searchIn: [
-                            {
-                                key: 'label.ngrams^5,text^4,fields.*^3',
-                                operator: '=',
-                            },
-                        ],
-                    },
-                },
-                {
-                    type: 'link',
-                    facetId: 'query-links',
-                    filterConfig: {
-                        isArray: true,
-                        searchIn: [
-                            {
-                                key: 'source.entityType',
-                                operator: '=',
-                            },
-                        ],
-                    },
-                },
-            ],
-        },
-        {
-            header: {
-                label: 'Relazione con',
-                classes: 'related-class',
-            },
-            inputs: [
-                {
-                    type: 'checkbox',
-                    facetId: 'entity-types',
-                    filterConfig: {
-                        isArray: true,
-                        context: 'internal',
-                        target: 'entity-links',
-                        searchIn: [
-                            {
-                                key: 'searchData.entity-type',
-                                operator: '=',
-                            },
-                        ],
-                    },
-                },
-                {
-                    type: 'text',
-                    facetId: 'entity-search',
-                    placeholder: 'Cerca entità',
-                    filterConfig: {
-                        delay: 500,
-                        minChars: 3,
-                        context: 'internal',
-                        target: 'entity-links',
-                        searchIn: [
-                            {
-                                key: 'label',
-                                operator: 'LIKE',
-                            },
-                        ],
-                    },
-                },
-                {
-                    type: 'link',
-                    facetId: 'entity-links',
-                    emptyState: {
-                        label: 'La tua ricerca non ha dato risultati, prova a cambiare i filtri',
-                    },
-                    filterConfig: {
-                        isArray: true,
-                        limit: 20,
-                        searchIn: [
-                            {
-                                key: 'relatedEntities.id',
-                                operator: '=',
-                            },
-                        ],
-                    },
-                },
-            ],
-        },
-    ],
-    results: {
-        order: {
-            type: 'text',
-            // score | text | date
-            key: 'label_sort',
-            // docPath, elastic key, ecc
-            direction: 'ASC',
-        },
-        fields: [
-            {
-                id: 'description',
-                highlight: true,
-                limit: 200,
-            },
-        ],
-    },
-    page: { offset: 0, limit: 10 },
-};
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/search-layout/search-layout.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-// import helpers from '../../../common/helpers';
-/** @type {?} */
-const SEARCH_MODEL_ID$2 = 'mr-search-layout';
-class MrSearchLayoutDS extends LayoutDataSource$1 {
-    /**
-     * @param {?} __0
-     * @return {?}
-     */
-    onInit({ 
-    // configuration, mainState, options, communication,
-    search, }) {
-        this.search = search;
-        if (this.search.model(SEARCH_MODEL_ID$2)) {
-            this.search.remove(SEARCH_MODEL_ID$2);
-        }
-        this.search.add(SEARCH_MODEL_ID$2, cloneDeep(facetsConfig$2));
-        this.searchModel = this.search.model(SEARCH_MODEL_ID$2);
-        // this.one('facets-wrapper').update({ searchModel: this.searchModel });
-        this.one('mr-resources').updateOptions({ source: 'search' });
-        this.one('mr-resources').update({});
-    }
-}
 if (false) {
     /**
      * @type {?}
      * @private
      */
-    MrSearchLayoutDS.prototype.search;
+    MrHomeLayoutComponent.prototype.configId;
     /**
      * @type {?}
      * @private
      */
-    MrSearchLayoutDS.prototype.searchModel;
+    MrHomeLayoutComponent.prototype.activatedRoute;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrHomeLayoutComponent.prototype.configuration;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrHomeLayoutComponent.prototype.communication;
 }
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/search-layout/search-layout.eh.ts
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+const ɵ0 = {
+    text: 'Filtra i risultati'
+}, ɵ1 = {
+    id: 'input-text-00',
+    placeholder: 'Cerca nei titoli',
+    icon: 'n7-icon-search',
+    inputPayload: 'search-input',
+    enterPayload: 'search-enter',
+    iconPayload: 'search-icon'
+}, ɵ2 = {
+    text: 'Toponimi',
+    additionalText: '786',
+}, ɵ3 = {
+    id: 'input-text-01',
+    placeholder: 'Search',
+    icon: 'n7-icon-search',
+    inputPayload: 'search-input',
+    enterPayload: 'search-enter',
+    iconPayload: 'search-icon',
+}, ɵ4 = {
+    links: [{
+            text: 'Title',
+            counter: 28,
+            payload: 'i02t28'
+        }, {
+            text: 'Title',
+            counter: 21,
+            payload: 'i02t21'
+        }, {
+            text: 'Title',
+            counter: 18,
+            payload: 'i02t18'
+        }, {
+            text: 'Title',
+            counter: 16,
+            payload: 'i02t16'
+        }, {
+            text: 'Title',
+            counter: 11,
+            payload: 'i02t11'
+        }, {
+            text: 'Title',
+            counter: 9,
+            payload: 'i02t9'
+        }, {
+            text: 'Title',
+            counter: 4,
+            payload: 'i02t4'
+        }]
+}, ɵ5 = {
+    text: 'Glossario',
+    additionalText: '96',
+}, ɵ6 = {
+    id: 'input-text-02',
+    placeholder: 'Search',
+    icon: 'n7-icon-search',
+    inputPayload: 'search-input',
+    enterPayload: 'search-enter',
+    iconPayload: 'search-icon',
+}, ɵ7 = {
+    links: [{
+            text: 'Title',
+            counter: 28,
+            payload: 'i04t28'
+        }, {
+            text: 'Title',
+            counter: 21,
+            payload: 'i04t21'
+        }, {
+            text: 'Title',
+            counter: 18,
+            payload: 'i04t18'
+        }, {
+            text: 'Title',
+            counter: 16,
+            payload: 'i04t16'
+        }, {
+            text: 'Title',
+            counter: 11,
+            payload: 'i04t11'
+        }, {
+            text: 'Title',
+            counter: 9,
+            payload: 'i04t9'
+        }, {
+            text: 'Title',
+            counter: 4,
+            payload: 'i04t4'
+        }]
+}, ɵ8 = {
+    text: 'Continenti',
+    additionalText: '3'
+}, ɵ9 = {
+    links: [{
+            text: 'Title',
+            counter: 32,
+            payload: 'input-05-1'
+        }, {
+            text: 'Title',
+            counter: 27,
+            payload: 'input-05-2'
+        }, {
+            text: 'Title',
+            counter: 18,
+            payload: 'input-05-3'
+        }]
+}, ɵ10 = {
+    text: 'Keywords',
+    additionalText: '108',
+    iconRight: 'n7-icon-angle-right'
+}, ɵ11 = {
+    text: 'Data di pubblicazione',
+    additionalText: '20',
+    iconRight: 'n7-icon-angle-right'
+}, ɵ12 = {
+    text: 'Luogo di pubblicazione',
+    additionalText: '15',
+    iconRight: 'n7-icon-angle-right'
+};
+/** @type {?} */
+const configuration = {
+    sections: [{
+            header: {
+                id: 'header-filtra',
+                data: ɵ0
+            },
+            inputs: [{
+                    id: 'input-00',
+                    type: 'text',
+                    data: ɵ1
+                }]
+        }, {
+            header: {
+                id: 'header-toponimi',
+                data: ɵ2
+            },
+            inputs: [{
+                    id: 'input-01',
+                    type: 'text',
+                    data: ɵ3
+                }, {
+                    id: 'input-02',
+                    type: 'link',
+                    data: ɵ4
+                }]
+        }, {
+            header: {
+                id: 'header-glossario',
+                data: ɵ5
+            },
+            inputs: [{
+                    id: 'input-03',
+                    type: 'text',
+                    data: ɵ6
+                }, {
+                    id: 'input-04',
+                    type: 'link',
+                    data: ɵ7
+                }]
+        }, {
+            header: {
+                id: 'header-continenti',
+                data: ɵ8
+            },
+            inputs: [{
+                    id: 'input-05',
+                    type: 'link',
+                    data: ɵ9
+                }]
+        }, {
+            header: {
+                id: 'header-keywords',
+                data: ɵ10
+            },
+            inputs: [],
+        }, {
+            header: {
+                id: 'header-data',
+                data: ɵ11
+            },
+            inputs: [],
+        }, {
+            header: {
+                id: 'header-luogo',
+                data: ɵ12
+            },
+            inputs: [],
+        }],
+    classes: 'facets-wrapper'
+};
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class MrSearchLayoutDS extends LayoutDataSource$1 {
+    /**
+     * @return {?}
+     */
+    onInit() {
+        this.facetsConfig = configuration;
+        this.one('mr-resources').updateOptions({ source: 'search' });
+        this.one('mr-resources').update({});
+    }
+}
+if (false) {
+    /** @type {?} */
+    MrSearchLayoutDS.prototype.facetsConfig;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/** @type {?} */
+const hasValue = (/**
+ * @param {?} value
+ * @return {?}
+ */
+(value) => {
+    if (Array.isArray(value)) {
+        return value.length > 0;
+    }
+    return !!value;
+});
+const ɵ0$1 = hasValue;
+var searchHelper = {
+    /**
+     * @param {?} state
+     * @return {?}
+     */
+    stateToQueryParams(state) {
+        /** @type {?} */
+        const queryParams = (/** @type {?} */ ({}));
+        Object.keys(state).forEach((/**
+         * @param {?} key
+         * @return {?}
+         */
+        (key) => {
+            /** @type {?} */
+            const value = state[key];
+            if (hasValue(value)) {
+                queryParams[key] = Array.isArray(value) ? value.join(',') : value;
+            }
+        }));
+        return queryParams;
+    },
+    /**
+     * @param {?} queryParams
+     * @return {?}
+     */
+    queryParamsToState(queryParams) {
+        /** @type {?} */
+        const state = (/** @type {?} */ ({}));
+        Object.keys(queryParams).forEach((/**
+         * @param {?} key
+         * @return {?}
+         */
+        (key) => {
+            /** @type {?} */
+            const value = queryParams[key];
+            if (hasValue(value)) {
+                state[key] = value.indexOf(',') !== -1 ? value.split(',') : value;
+            }
+        }));
+        return state;
+    }
+};
+
+/**
+ * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrSearchLayoutEH extends EventHandler {
+    constructor() {
+        super(...arguments);
+        this.destroyed$ = new Subject();
+    }
     /**
      * @return {?}
      */
@@ -12996,7 +13345,34 @@ class MrSearchLayoutEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'mr-search-layout.init':
+                    this.hostEmit$ = payload.hostEmit$;
+                    this.guestEmit$ = payload.guestEmit$;
+                    this.router = payload.router;
+                    this.activatedRoute = payload.activatedRoute;
                     this.dataSource.onInit(payload);
+                    this.listenToGuest();
+                    this.listenToRouterChanges();
+                    /* setTimeout(() => {
+                      this.hostEmit$.next({
+                        type: 'updateinputdata',
+                        payload: {
+                          id: 'input-00',
+                          data: {
+                            placeholder: 'Cerca su tutto',
+                          }
+                        }
+                      });
+                      this.hostEmit$.next({
+                        type: 'updateinputvalue',
+                        payload: {
+                          id: 'input-00',
+                          value: 'Sto cercando...'
+                        }
+                      });
+                    }, 5000); */
+                    break;
+                case 'mr-search-layout.destroy':
+                    this.destroyed$.next(true);
                     break;
                 default:
                     console.warn('unhandled inner event of type', type);
@@ -13008,11 +13384,73 @@ class MrSearchLayoutEH extends EventHandler {
           });
         */
     }
+    /**
+     * @return {?}
+     */
+    listenToGuest() {
+        this.guestEmit$.pipe(takeUntil(this.destroyed$)).subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'change': {
+                    /** @type {?} */
+                    const queryParams = searchHelper.stateToQueryParams(payload.state);
+                    this.router.navigate([], {
+                        queryParams
+                    });
+                    break;
+                }
+                default:
+                    break;
+            }
+        }));
+    }
+    /**
+     * @return {?}
+     */
+    listenToRouterChanges() {
+        this.activatedRoute.queryParams.pipe(takeUntil(this.destroyed$)).subscribe((/**
+         * @param {?} params
+         * @return {?}
+         */
+        (params) => {
+            // TODO: aggiungere logica richieste
+            console.warn('query params', params);
+        }));
+    }
+}
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutEH.prototype.destroyed$;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutEH.prototype.hostEmit$;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutEH.prototype.guestEmit$;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutEH.prototype.router;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutEH.prototype.activatedRoute;
 }
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/search-layout/search-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -13036,18 +13474,21 @@ const MrSearchLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/search-layout/search-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 // import { CommunicationService } from '../../../common/services/communication.service';
 class MrSearchLayoutComponent extends AbstractLayout {
     /**
      * @param {?} layoutsConfiguration
-     * @param {?} search
+     * @param {?} router
+     * @param {?} activatedRoute
      */
-    constructor(layoutsConfiguration, search) {
+    constructor(layoutsConfiguration, router, activatedRoute) {
         super(layoutsConfiguration.get('MrSearchLayoutConfig') || MrSearchLayoutConfig);
-        this.search = search;
+        this.router = router;
+        this.activatedRoute = activatedRoute;
+        this.hostEmit$ = new Subject();
+        this.guestEmit$ = new Subject();
     }
     /**
      * @protected
@@ -13057,9 +13498,11 @@ class MrSearchLayoutComponent extends AbstractLayout {
         return {
             // configuration: this.configuration,
             // mainState: this.mainState,
+            router: this.router,
+            activatedRoute: this.activatedRoute,
             // communication: this.communication,
-            search: this.search,
-            // route: this.route,
+            hostEmit$: this.hostEmit$,
+            guestEmit$: this.guestEmit$,
             options: this.config.options || {},
         };
     }
@@ -13079,25 +13522,34 @@ class MrSearchLayoutComponent extends AbstractLayout {
 MrSearchLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'mr-search-layout',
-                template: "<div class=\"search-layout\" *ngIf=\"lb.dataSource\">\n    <div class=\"search-wrapper\">\n        <div class=\"filter-section\">\n            <h2>Filtra i risultati</h2>\n            <n7-facets-wrapper \n                [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\" \n                [emit]=\"lb.widgets['facets-wrapper'].emit\">\n            </n7-facets-wrapper>\n        </div>\n        <n7-item-preview \n            *ngFor=\"let resource of (lb.widgets['mr-resources'].ds.out$ | async)\" \n            [data]=\"resource\">\n        </n7-item-preview>\n    </div>\n</div>\n"
+                template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth\">\n\n        <div class=\"mr-search__title\">\n            INNER TITLE COMPONENT HERE\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <aside class=\"mr-search__facets\">\n                <div class=\"filter-section\">\n                    <h2>Filtra i risultati</h2>\n                    <mr-search-facets-layout \n                    [data]=\"lb.dataSource.facetsConfig\"\n                    [hostEmit$]=\"hostEmit$\"\n                    [guestEmit$]=\"guestEmit$\">\n                    </mr-search-facets-layout>\n                </div>\n            </aside>\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    Inner title with results number and sorting\n                </div>\n                <div class=\"mr-search__results-filters\">\n                    Filter, when active\n                </div>\n                <main class=\"mr-search__results\">\n                    <n7-item-preview *ngFor=\"let resource of (lb.widgets['mr-resources'].ds.out$ | async)\"\n                                    [data]=\"resource\">\n                    </n7-item-preview>\n                </main>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
             }] }
 ];
 /** @nocollapse */
 MrSearchLayoutComponent.ctorParameters = () => [
     { type: LayoutsConfigurationService },
-    { type: SearchService }
+    { type: Router },
+    { type: ActivatedRoute }
 ];
 if (false) {
+    /** @type {?} */
+    MrSearchLayoutComponent.prototype.hostEmit$;
+    /** @type {?} */
+    MrSearchLayoutComponent.prototype.guestEmit$;
     /**
      * @type {?}
      * @private
      */
-    MrSearchLayoutComponent.prototype.search;
+    MrSearchLayoutComponent.prototype.router;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutComponent.prototype.activatedRoute;
 }
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/glossary-layout/glossary-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrGlossaryLayoutDS extends LayoutDataSource$1 {
@@ -13112,7 +13564,6 @@ class MrGlossaryLayoutDS extends LayoutDataSource$1 {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/glossary-layout/glossary-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrGlossaryLayoutEH extends EventHandler {
@@ -13143,7 +13594,6 @@ class MrGlossaryLayoutEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/glossary-layout/glossary-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -13164,7 +13614,6 @@ const MrGlossaryLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/glossary-layout/glossary-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrGlossaryLayoutComponent extends AbstractLayout {
@@ -13209,22 +13658,48 @@ MrGlossaryLayoutComponent.ctorParameters = () => [
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/static-layout/static-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrStaticLayoutDS extends LayoutDataSource$1 {
-    // private communication;
+    /**
+     * @param {?} payload
+     * @return {?}
+     */
+    onInit(payload) {
+        this.communication = payload.communication;
+    }
     /**
      * @return {?}
      */
-    onInit() {
-        // this.communication = payload.communication;
+    pageRequest$() {
+        /** @type {?} */
+        const getPageNum = window.location.href.match(/([^/]*)\/*$/)[1];
+        return this.communication.request$('page', { urlParams: getPageNum }, 'rest-local');
     }
+    /**
+     * @param {?} title
+     * @param {?} body
+     * @return {?}
+     */
+    renderHTML(title, body) {
+        this.RENDER_HTML = {
+            title,
+            body,
+        };
+    }
+}
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    MrStaticLayoutDS.prototype.communication;
+    /** @type {?} */
+    MrStaticLayoutDS.prototype.RENDER_HTML;
 }
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/static-layout/static-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrStaticLayoutEH extends EventHandler {
@@ -13240,6 +13715,7 @@ class MrStaticLayoutEH extends EventHandler {
             switch (type) {
                 case 'mr-static-layout.init':
                     this.dataSource.onInit(payload);
+                    this.fetchJson();
                     break;
                 default:
                     console.warn('unhandled inner event of type', type);
@@ -13251,16 +13727,31 @@ class MrStaticLayoutEH extends EventHandler {
           });
         */
     }
+    /**
+     * @private
+     * @return {?}
+     */
+    fetchJson() {
+        this.dataSource.pageRequest$()
+            .subscribe((/**
+         * @param {?} response
+         * @return {?}
+         */
+        (response) => {
+            const { title } = response;
+            const { body } = response;
+            this.dataSource.renderHTML(title, body);
+        }));
+    }
 }
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/static-layout/static-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
 const MrStaticLayoutConfig = {
-    layoutId: 'n7-static-layout',
+    layoutId: 'mr-static-layout',
     widgets: [
     // {
     //   id: 'title',          ← Insert a component here.
@@ -13276,15 +13767,16 @@ const MrStaticLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/static-layout/static-layout.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class MrStaticLayoutComponent extends AbstractLayout {
     /**
+     * @param {?} communication
      * @param {?} layoutsConfiguration
      */
-    constructor(layoutsConfiguration) {
+    constructor(communication, layoutsConfiguration) {
         super(layoutsConfiguration.get('MrStaticLayoutConfig') || MrStaticLayoutConfig);
+        this.communication = communication;
     }
     /**
      * @protected
@@ -13292,6 +13784,7 @@ class MrStaticLayoutComponent extends AbstractLayout {
      */
     initPayload() {
         return {
+            communication: this.communication,
             options: this.config.options || {}
         };
     }
@@ -13311,20 +13804,31 @@ class MrStaticLayoutComponent extends AbstractLayout {
 MrStaticLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'mr-static-layout',
-                template: "<div class=\"static-layout\" *ngIf=\"lb.dataSource\">\n    Hello, from Static layout!\n</div>\n"
+                template: "<div class=\"mr-static-layout\" *ngIf=\"lb.dataSource.RENDER_HTML\">\n    <h1 class=\"mr-generated-title-WP\">{{lb.dataSource.RENDER_HTML.title}}</h1>\n    <div class=\"mr-generated-page-WP\" [innerHTML]=\"lb.dataSource.RENDER_HTML.body | keepHtml\"></div>\n</div>\n"
             }] }
 ];
 /** @nocollapse */
 MrStaticLayoutComponent.ctorParameters = () => [
+    { type: CommunicationService },
     { type: LayoutsConfigurationService }
 ];
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    MrStaticLayoutComponent.prototype.communication;
+}
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/search-facets-layout/search-facets-layout.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class SearchFacetsLayoutDS extends LayoutDataSource$1 {
+    constructor() {
+        super(...arguments);
+        this.state = {};
+    }
     /**
      * @param {?} payload
      * @return {?}
@@ -13344,11 +13848,11 @@ class SearchFacetsLayoutDS extends LayoutDataSource$1 {
      */
     initInputs() {
         this.data.sections.forEach((/**
-         * @param {?} section
+         * @param {?} __0
          * @return {?}
          */
-        (section) => {
-            section.inputs.forEach((/**
+        ({ header, inputs }) => {
+            [header, ...inputs].forEach((/**
              * @param {?} input
              * @return {?}
              */
@@ -13362,15 +13866,53 @@ class SearchFacetsLayoutDS extends LayoutDataSource$1 {
             }));
         }));
     }
+    /**
+     * @param {?} id
+     * @param {?} newValue
+     * @return {?}
+     */
+    updateInputValue(id, newValue) {
+        /** @type {?} */
+        const widgetDataSource = this.getWidgetDataSource(id);
+        widgetDataSource.setValue(newValue, true);
+    }
+    /**
+     * @param {?} id
+     * @param {?} newData
+     * @return {?}
+     */
+    updateInputData(id, newData) {
+        /** @type {?} */
+        const widgetDataSource = this.getWidgetDataSource(id);
+        widgetDataSource.update(Object.assign({}, widgetDataSource.input, newData));
+    }
+    /**
+     * @param {?=} id
+     * @return {?}
+     */
+    getState(id) {
+        return id ? this.state[id] : this.state;
+    }
+    /**
+     * @param {?} __0
+     * @return {?}
+     */
+    setState({ value, id }) {
+        this.state[id] = value;
+    }
 }
 if (false) {
     /** @type {?} */
     SearchFacetsLayoutDS.prototype.data;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchFacetsLayoutDS.prototype.state;
 }
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/search-facets-layout/search-facets-layout.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /**
@@ -13381,6 +13923,7 @@ class SearchFacetsLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.changed$ = {};
+        this.destroyed$ = new Subject();
     }
     /**
      * @return {?}
@@ -13393,8 +13936,11 @@ class SearchFacetsLayoutEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'mr-search-facets-layout.init':
+                    this.hostEmit$ = payload.hostEmit$;
+                    this.guestEmit$ = payload.guestEmit$;
                     this.dataSource.onInit(payload);
                     this.initChangedListener(payload.data);
+                    this.listenToHost();
                     break;
                 case 'mr-search-facets-layout.destroy':
                     this.dataSource.onDestroy();
@@ -13423,31 +13969,86 @@ class SearchFacetsLayoutEH extends EventHandler {
          * @return {?}
          */
         (section) => {
+            /** @type {?} */
+            const sources = [];
+            if (section.header) {
+                const { id, delay } = section.header;
+                sources.push({ id, delay });
+            }
             section.inputs.forEach((/**
-             * @param {?} input
+             * @param {?} __0
              * @return {?}
              */
-            (input) => {
-                this.changed$[input.id] = new Subject();
-                this.changed$[input.id].pipe(debounceTime(input.delay || 1)).subscribe((/**
+            ({ id, delay }) => {
+                sources.push({ id, delay });
+            }));
+            sources.forEach((/**
+             * @param {?} source
+             * @return {?}
+             */
+            (source) => {
+                this.changed$[source.id] = new Subject();
+                this.changed$[source.id].pipe(debounceTime(source.delay || 1)).subscribe((/**
                  * @param {?} payload
                  * @return {?}
                  */
                 (payload) => {
-                    console.warn('#todo', payload);
+                    this.dataSource.setState(payload);
+                    this.guestEmit$.next({
+                        type: 'change',
+                        payload: {
+                            lastUpdate: payload,
+                            state: this.dataSource.getState()
+                        }
+                    });
                 }));
             }));
+        }));
+    }
+    /**
+     * @return {?}
+     */
+    listenToHost() {
+        this.hostEmit$.pipe(takeUntil(this.destroyed$)).subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'updateinputvalue':
+                    this.dataSource.updateInputValue(payload.id, payload.value);
+                    break;
+                case 'updateinputdata':
+                    this.dataSource.updateInputData(payload.id, payload.data);
+                    break;
+                default:
+                    break;
+            }
         }));
     }
 }
 if (false) {
     /** @type {?} */
     SearchFacetsLayoutEH.prototype.changed$;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchFacetsLayoutEH.prototype.destroyed$;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchFacetsLayoutEH.prototype.hostEmit$;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchFacetsLayoutEH.prototype.guestEmit$;
 }
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/search-facets-layout/search-facets-layout.config.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -13463,7 +14064,6 @@ const SearchFacetsLayoutConfig = {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/data-sources/facets/facet-text.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetTextDS extends DataSource {
@@ -13511,12 +14111,12 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/data-sources/facets/facet-checkbox.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetCheckboxDS extends DataSource {
     constructor() {
         super(...arguments);
+        this.value = [];
         this.getValue = (/**
          * @return {?}
          */
@@ -13549,6 +14149,20 @@ class FacetCheckboxDS extends DataSource {
         }
     }
     /**
+     * @param {?} __0
+     * @return {?}
+     */
+    toggleValue({ inputPayload, value: isChecked }) {
+        /** @type {?} */
+        const exists = this.value.indexOf(inputPayload) !== -1;
+        if (isChecked && !exists) {
+            this.value.push(inputPayload);
+        }
+        else if (!isChecked && exists) {
+            this.value.splice(this.value.indexOf(inputPayload), 1);
+        }
+    }
+    /**
      * @return {?}
      */
     clear() {
@@ -13566,7 +14180,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/data-sources/facets/facet-select.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class FacetSelectDS extends DataSource {
@@ -13621,7 +14234,6 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/data-sources/facets/facet-link.ds.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -13629,6 +14241,7 @@ const ACTIVE_CLASS = 'is-active';
 class FacetLinkDS extends DataSource {
     constructor() {
         super(...arguments);
+        this.value = [];
         this.getValue = (/**
          * @return {?}
          */
@@ -13661,6 +14274,22 @@ class FacetLinkDS extends DataSource {
         }
     }
     /**
+     * @param {?} linkValue
+     * @return {?}
+     */
+    toggleValue(linkValue) {
+        /** @type {?} */
+        const exists = this.value.indexOf(linkValue) !== -1;
+        if (!exists) {
+            this.value.push(linkValue);
+        }
+        else if (exists) {
+            this.value.splice(this.value.indexOf(linkValue), 1);
+        }
+        // update
+        this.setValue(this.value, true);
+    }
+    /**
      * @return {?}
      */
     clear() {
@@ -13678,10 +14307,103 @@ if (false) {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/event-handlers/facets/facet-generic.eh.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-class FacetGenericEH extends EventHandler {
+/** @type {?} */
+const ICON_OPEN = 'n7-icon-angle-down';
+/** @type {?} */
+const ICON_CLOSE = 'n7-icon-angle-right';
+class FacetHeaderDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.getValue = (/**
+         * @return {?}
+         */
+        () => this.value);
+    }
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        return Object.assign({}, data, { iconRight: data.iconRight || ICON_OPEN });
+    }
+    /**
+     * @param {?} value
+     * @param {?=} update
+     * @return {?}
+     */
+    setValue(value, update = false) {
+        this.value = value;
+        if (update) {
+            this.update(Object.assign({}, this.input, { additionalText: value }));
+        }
+    }
+    /**
+     * @return {?}
+     */
+    toggle() {
+        let { iconRight } = this.output;
+        iconRight = iconRight === ICON_OPEN ? ICON_CLOSE : ICON_OPEN;
+        this.update(Object.assign({}, this.input, { iconRight }));
+    }
+    /**
+     * @return {?}
+     */
+    isOpen() {
+        return this.output.iconRight === ICON_OPEN;
+    }
+    /**
+     * @return {?}
+     */
+    clear() {
+        this.value = null;
+    }
+}
+if (false) {
+    /** @type {?} */
+    FacetHeaderDS.prototype.id;
+    /** @type {?} */
+    FacetHeaderDS.prototype.value;
+    /** @type {?} */
+    FacetHeaderDS.prototype.getValue;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class FacetHeaderEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type }) => {
+            switch (type) {
+                case `${this.dataSource.id}.click`:
+                    this.dataSource.toggle();
+                    this.emitOuter('change', {
+                        isOpen: this.dataSource.isOpen(),
+                        id: this.dataSource.id
+                    });
+                    break;
+                default:
+                    break;
+            }
+        }));
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class FacetTextEH extends EventHandler {
     /**
      * @return {?}
      */
@@ -13693,6 +14415,7 @@ class FacetGenericEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case `${this.dataSource.id}.change`:
+                    this.dataSource.setValue(payload.value);
                     this.emitOuter('change', Object.assign({}, payload, { id: this.dataSource.id }));
                     break;
                 default:
@@ -13704,15 +14427,107 @@ class FacetGenericEH extends EventHandler {
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/search-facets-layout/search-facets-layout.ts
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class FacetCheckboxEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case `${this.dataSource.id}.change`:
+                    this.dataSource.toggleValue(payload);
+                    this.emitOuter('change', {
+                        value: this.dataSource.getValue(),
+                        id: this.dataSource.id
+                    });
+                    break;
+                default:
+                    break;
+            }
+        }));
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class FacetSelectEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case `${this.dataSource.id}.change`:
+                    this.dataSource.setValue(payload.value);
+                    this.emitOuter('change', Object.assign({}, payload, { id: this.dataSource.id }));
+                    break;
+                default:
+                    break;
+            }
+        }));
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class FacetLinkEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case `${this.dataSource.id}.change`:
+                    this.dataSource.toggleValue(payload);
+                    this.emitOuter('change', {
+                        value: this.dataSource.getValue(),
+                        id: this.dataSource.id
+                    });
+                    break;
+                default:
+                    break;
+            }
+        }));
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
-const DATASOURCE_MAP = {
+const DATASOURCE_MAP$1 = {
+    header: FacetHeaderDS,
     text: FacetTextDS,
     checkbox: FacetCheckboxDS,
     select: FacetSelectDS,
     link: FacetLinkDS,
+};
+/** @type {?} */
+const EVENTHANDLER_MAP$1 = {
+    header: FacetHeaderEH,
+    text: FacetTextEH,
+    checkbox: FacetCheckboxEH,
+    select: FacetSelectEH,
+    link: FacetLinkEH,
 };
 class MrSearchFacetsLayoutComponent extends AbstractLayout {
     constructor() {
@@ -13724,7 +14539,9 @@ class MrSearchFacetsLayoutComponent extends AbstractLayout {
      */
     initPayload() {
         return {
-            data: this.data
+            data: this.data,
+            guestEmit$: this.guestEmit$,
+            hostEmit$: this.hostEmit$
         };
     }
     /**
@@ -13746,19 +14563,26 @@ class MrSearchFacetsLayoutComponent extends AbstractLayout {
     loadWidgets() {
         this.widgets = [];
         this.data.sections.forEach((/**
-         * @param {?} section
+         * @param {?} __0
          * @return {?}
          */
-        (section) => {
-            section.inputs.forEach((/**
+        ({ header, inputs }) => {
+            if (header) {
+                this.widgets.push({
+                    id: header.id,
+                    dataSource: DATASOURCE_MAP$1.header,
+                    eventHandler: EVENTHANDLER_MAP$1.header
+                });
+            }
+            inputs.forEach((/**
              * @param {?} input
              * @return {?}
              */
             (input) => {
                 this.widgets.push({
                     id: input.id,
-                    dataSource: DATASOURCE_MAP[input.type],
-                    eventHandler: FacetGenericEH
+                    dataSource: DATASOURCE_MAP$1[input.type],
+                    eventHandler: EVENTHANDLER_MAP$1[input.type]
                 });
             }));
         }));
@@ -13767,174 +14591,27 @@ class MrSearchFacetsLayoutComponent extends AbstractLayout {
 MrSearchFacetsLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'mr-search-facets-layout',
-                template: "<div *ngIf=\"lb.dataSource.data\" class=\"mr-search-facets {{ lb.dataSource.data.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.data.sections\" class=\"mr-search-facets__section {{ section.classes || '' }}\">\n        <n7-facet-header\n            [data]=\"section.header\"\n        ></n7-facet-header>\n\n        <div *ngFor=\"let input of section.inputs\" class=\"mr-search-facets__input {{ input.classes || '' }}\">\n            <ng-container [ngSwitch]=\"input.type\">\n\n                <!-- INPUT TEXT -->\n                <n7-input-text \n                *ngSwitchCase=\"'text'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n\n                <!-- INPUT CHECKBOX -->\n                <n7-input-checkbox \n                *ngSwitchCase=\"'checkbox'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                \n                <!-- INPUT SELECT -->\n                <n7-input-select \n                *ngSwitchCase=\"'select'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                \n                <!-- INPUT LINK -->\n                <n7-input-link \n                *ngSwitchCase=\"'link'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n            \n            </ng-container>\n        </div>\n        \n    </div>\n</div>"
+                template: "<div *ngIf=\"lb.dataSource.data\" class=\"mr-search-facets {{ lb.dataSource.data.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.data.sections\" class=\"mr-search-facets__section {{ section.classes || '' }}\">\n        <n7-facet-header\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\n        [emit]=\"lb.widgets[section.header.id].emit\"\n        ></n7-facet-header>\n\n        <div *ngFor=\"let input of section.inputs\" class=\"mr-search-facets__input {{ input.classes || '' }}\">\n            <ng-container [ngSwitch]=\"input.type\">\n\n                <!-- INPUT TEXT -->\n                <n7-input-text \n                *ngSwitchCase=\"'text'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n\n                <!-- INPUT CHECKBOX -->\n                <n7-input-checkbox \n                *ngSwitchCase=\"'checkbox'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                \n                <!-- INPUT SELECT -->\n                <n7-input-select \n                *ngSwitchCase=\"'select'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                \n                <!-- INPUT LINK -->\n                <n7-input-link \n                *ngSwitchCase=\"'link'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n            \n            </ng-container>\n        </div>\n        \n    </div>\n</div>"
             }] }
 ];
 /** @nocollapse */
 MrSearchFacetsLayoutComponent.ctorParameters = () => [];
 MrSearchFacetsLayoutComponent.propDecorators = {
-    data: [{ type: Input }]
+    data: [{ type: Input }],
+    guestEmit$: [{ type: Input }],
+    hostEmit$: [{ type: Input }]
 };
 if (false) {
     /** @type {?} */
     MrSearchFacetsLayoutComponent.prototype.data;
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/search-test-layout/search-test-layout.ds.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class SearchTestLayoutDS extends LayoutDataSource$1 {
-    /**
-     * @return {?}
-     */
-    onInit() {
-        // TODO
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/search-test-layout/search-test-layout.eh.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class SearchTestLayoutEH extends EventHandler {
-    /**
-     * @return {?}
-     */
-    listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                case 'mr-search-test-layout.init':
-                    this.dataSource.onInit(payload);
-                    break;
-                default:
-                    break;
-            }
-        }));
-        /* this.outerEvents$.subscribe(({ type, payload }) => {
-          switch (type) {
-            default:
-              break;
-          }
-        }); */
-    }
-}
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/search-test-layout/search-test-layout.config.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-const SearchTestLayoutConfig = {
-    layoutId: 'mr-search-test-layout',
-    widgets: [
-    // TODO
-    ],
-    layoutDS: SearchTestLayoutDS,
-    layoutEH: SearchTestLayoutEH,
-    widgetsDataSources: DS$3,
-    widgetsEventHandlers: EH$3,
-    layoutOptions: {}
-};
-
-/**
- * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/search-test-layout/search-test-layout.ts
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class MrSearchTestLayoutComponent extends AbstractLayout {
-    constructor() {
-        super(SearchTestLayoutConfig);
-        this.searchConfig = {
-            classes: 'search-test-facets',
-            sections: [{
-                    header: {
-                        text: 'Sezione I',
-                        classes: 'first-section',
-                    },
-                    inputs: [{
-                            id: 'fullsearch',
-                            type: 'text',
-                            delay: 300,
-                            data: {
-                                id: 'fullsearch',
-                                placeholder: 'Search...',
-                                inputPayload: 'key-event',
-                                enterPayload: 'enter-event'
-                            },
-                        }]
-                }, {
-                    header: {
-                        text: 'Sezione II',
-                        classes: 'second-section',
-                    },
-                    inputs: [{
-                            id: 'hasinternal',
-                            type: 'checkbox',
-                            data: {
-                                checkboxes: [{
-                                        id: 'hasinternal',
-                                        label: 'Filtro interno',
-                                        payload: 'click'
-                                    }]
-                            },
-                        }, {
-                            id: 'internalsearch',
-                            type: 'text',
-                            delay: 5000,
-                            data: {
-                                id: 'internalsearch',
-                                placeholder: 'Internal...',
-                                inputPayload: 'key-event',
-                                enterPayload: 'enter-event'
-                            },
-                        }]
-                }]
-        };
-    }
-    /**
-     * @protected
-     * @return {?}
-     */
-    initPayload() {
-        return {};
-    }
-    /**
-     * @return {?}
-     */
-    ngOnInit() {
-        this.onInit();
-    }
-    /**
-     * @return {?}
-     */
-    ngOnDestroy() {
-        this.onDestroy();
-    }
-}
-MrSearchTestLayoutComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'mr-search-test-layout',
-                template: "<div>\n    <mr-search-facets-layout\n    [data]=\"searchConfig\"></mr-search-facets-layout>\n</div>"
-            }] }
-];
-/** @nocollapse */
-MrSearchTestLayoutComponent.ctorParameters = () => [];
-if (false) {
     /** @type {?} */
-    MrSearchTestLayoutComponent.prototype.searchConfig;
+    MrSearchFacetsLayoutComponent.prototype.guestEmit$;
+    /** @type {?} */
+    MrSearchFacetsLayoutComponent.prototype.hostEmit$;
 }
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/n7-boilerplate-muruca.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
@@ -13944,26 +14621,28 @@ const COMPONENTS$3 = [
     MrGlossaryLayoutComponent,
     MrStaticLayoutComponent,
     MrSearchFacetsLayoutComponent,
-    MrSearchTestLayoutComponent,
 ];
 class N7BoilerplateMurucaModule {
 }
 N7BoilerplateMurucaModule.decorators = [
     { type: NgModule, args: [{
-                declarations: COMPONENTS$3,
+                declarations: [
+                    EscapeHtmlPipe,
+                    COMPONENTS$3
+                ],
                 imports: [
                     CommonModule,
                     DvComponentsLibModule,
                     N7BoilerplateCommonModule,
                 ],
                 providers: [],
+                entryComponents: COMPONENTS$3,
                 exports: COMPONENTS$3,
             },] }
 ];
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/n7-boilerplate-lib.module.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class N7BoilerplateLibModule {
@@ -13989,57 +14668,48 @@ N7BoilerplateLibModule.decorators = [
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/layouts/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/common/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/layouts/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/arianna-web/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/layout/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/data-viz/components/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: lib/muruca/layouts/index.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: public-api.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
- * Generated from: n7-frontend-boilerplate.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrInnerTitleDS, MrItemPreviewsDS, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrStaticLayoutComponent as ɵba, MrSearchFacetsLayoutComponent as ɵbb, MrSearchTestLayoutComponent as ɵbc, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, AwGalleryLayoutComponent as ɵq, BubbleChartWrapperComponent as ɵr, ChartTippyComponent as ɵs, SmartBreadcrumbsComponent as ɵt, DataWidgetWrapperComponent as ɵu, DatepickerWrapperComponent as ɵv, DvExampleLayoutComponent as ɵw, MrHomeLayoutComponent as ɵx, MrSearchLayoutComponent as ɵy, MrGlossaryLayoutComponent as ɵz };
+export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrInnerTitleDS, MrItemPreviewsDS, MrNavDS, MrNavEH, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrGlossaryLayoutComponent as ɵba, MrStaticLayoutComponent as ɵbb, MrSearchFacetsLayoutComponent as ɵbc, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, AwGalleryLayoutComponent as ɵq, BubbleChartWrapperComponent as ɵr, ChartTippyComponent as ɵs, SmartBreadcrumbsComponent as ɵt, DataWidgetWrapperComponent as ɵu, DatepickerWrapperComponent as ɵv, DvExampleLayoutComponent as ɵw, EscapeHtmlPipe as ɵx, MrHomeLayoutComponent as ɵy, MrSearchLayoutComponent as ɵz };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

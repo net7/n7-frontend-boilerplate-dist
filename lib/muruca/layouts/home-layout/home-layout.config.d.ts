@@ -4,16 +4,7 @@ import * as DS from '../../data-sources';
 import * as EH from '../../event-handlers';
 export declare const MrHomeLayoutConfig: {
     layoutId: string;
-    widgets: ({
-        id: string;
-        dataSource: typeof DS.MrItemPreviewsDS;
-    } | {
-        id: string;
-        dataSource: typeof DS.MrInnerTitleDS;
-    } | {
-        id: string;
-        dataSource: typeof DS.MrHeroDS;
-    })[];
+    widgets: any[];
     layoutDS: typeof MrHomeLayoutDS;
     layoutEH: typeof MrHomeLayoutEH;
     widgetsDataSources: typeof DS;

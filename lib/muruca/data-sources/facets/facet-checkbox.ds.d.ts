@@ -7,6 +7,10 @@ export declare class FacetCheckboxDS extends DataSource implements FacetDataSour
     value: FACET_VALUE;
     protected transform(data: InputCheckboxData): InputCheckboxData;
     setValue(value: FACET_VALUE, update?: boolean): void;
+    toggleValue({ inputPayload, value: isChecked }: {
+        inputPayload: any;
+        value: any;
+    }): void;
     getValue: () => string[];
     clear(): void;
 }

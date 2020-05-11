@@ -7,6 +7,7 @@ export declare class FacetLinkDS extends DataSource implements FacetDataSource {
     value: FACET_VALUE;
     protected transform(data: InputLinkData): InputLinkData;
     setValue(value: FACET_VALUE, update?: boolean): void;
+    toggleValue(linkValue: any): void;
     getValue: () => string[];
     clear(): void;
 }
