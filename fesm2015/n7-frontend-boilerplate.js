@@ -5346,7 +5346,7 @@ class AwEntitaMetadataViewerDS extends DataSource {
         /** @type {?} */
         const labels = this.options.labels || {};
         /** @type {?} */
-        const metadataToExclude = (config.get('entita-layout') || {})['metadata-to-exclude'];
+        const metadataToShow = (config.get('entita-layout') || {})['metadata-to-show'];
         /** @type {?} */
         let unpackedData = [];
         if (context === 'overview' && data) {
@@ -5358,10 +5358,10 @@ class AwEntitaMetadataViewerDS extends DataSource {
              * @return {?}
              */
             (d) => configuredKeys.includes(d.key)));
-            unpackedData = AwEntitaMetadataViewerDS.unpackFields(filteredData, metadataToExclude);
+            unpackedData = AwEntitaMetadataViewerDS.unpackFields(filteredData, metadataToShow);
         }
         else {
-            unpackedData = AwEntitaMetadataViewerDS.unpackFields(data, metadataToExclude);
+            unpackedData = AwEntitaMetadataViewerDS.unpackFields(data, metadataToShow);
         }
         // prettify labels
         unpackedData.forEach((/**
@@ -5389,10 +5389,10 @@ class AwEntitaMetadataViewerDS extends DataSource {
     }
     /**
      * @param {?} fields
-     * @param {?=} metadataToExclude
+     * @param {?=} metadataToShow
      * @return {?}
      */
-    static unpackFields(fields, metadataToExclude) {
+    static unpackFields(fields, metadataToShow) {
         /*
               Recursive unpacking for rendering res.fields
               - - -
@@ -5409,10 +5409,10 @@ class AwEntitaMetadataViewerDS extends DataSource {
              * @return {?}
              */
             (el) => {
-                if (Array.isArray(metadataToExclude) && metadataToExclude.length) {
-                    return metadataToExclude.indexOf(el.key) === -1;
+                if (Array.isArray(metadataToShow) && metadataToShow.length) {
+                    return metadataToShow.indexOf(el.key) !== -1;
                 }
-                return true;
+                return false;
             }))
                 .map((/**
              * @param {?} el
@@ -5867,10 +5867,10 @@ class AwSchedaMetadataDS extends DataSource {
      * @return {?}
      */
     transform(data) {
-        let { labels, metadataToExclude } = this.options;
+        let { labels, metadataToShow } = this.options;
         labels = labels || {};
-        metadataToExclude = metadataToExclude || {};
-        metadataToExclude = metadataToExclude[data.document_type] || [];
+        metadataToShow = metadataToShow || {};
+        metadataToShow = metadataToShow[data.document_type] || [];
         /** @type {?} */
         const group = { group: [] };
         if (data.fields) {
@@ -5887,7 +5887,7 @@ class AwSchedaMetadataDS extends DataSource {
                      * @param {?} item
                      * @return {?}
                      */
-                    (item) => metadataToExclude.indexOf(item.key) === -1))
+                    (item) => metadataToShow.indexOf(item.key) !== -1))
                         .forEach((/**
                      * @param {?} item
                      * @return {?}
@@ -5903,7 +5903,7 @@ class AwSchedaMetadataDS extends DataSource {
                         title: field.label,
                     });
                 }
-                else if (metadataToExclude.indexOf(field.key) === -1) {
+                else if (metadataToShow.indexOf(field.key) !== -1) {
                     items.push({
                         label: helpers.prettifySnakeCase(field.key, labels[field.key]),
                         value: field.value.replace(/(\|\|\|)/g, '\n') // replace repeat sequence ("|||") with end of line
@@ -8460,7 +8460,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
             this.one('aw-scheda-inner-title').update(titleObj);
             this.one('aw-scheda-metadata').updateOptions({
                 labels: this.configuration.get('labels'),
-                metadataToExclude: this.configuration.get('scheda-layout')['metadata-to-exclude']
+                metadataToShow: this.configuration.get('scheda-layout')['metadata-to-show']
             });
             this.one('aw-scheda-metadata').update(response);
             // Breadcrumb section
