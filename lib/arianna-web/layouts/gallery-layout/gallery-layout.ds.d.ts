@@ -1,5 +1,5 @@
 import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 export declare class AwGalleryLayoutDS extends LayoutDataSource {
     private destroyed$;
     private communication;
@@ -19,7 +19,11 @@ export declare class AwGalleryLayoutDS extends LayoutDataSource {
     sidebarIsSticky: boolean;
     isFirstLoading: boolean;
     resultsLoading: boolean;
+    /** True when the user has input a text string */
+    isSearchingText: BehaviorSubject<boolean>;
+    /** Current order method */
     orderBy: string;
+    /** Current order direction */
     orderDirection: string;
     options: any;
     orderByLabel: string;
@@ -33,6 +37,10 @@ export declare class AwGalleryLayoutDS extends LayoutDataSource {
     }): void;
     onDestroy(): void;
     onSearchResponse(): void;
+    /**
+    * Handles changes of the HTMLSelect order control
+    * @param payload _score_DESC, label_sort_ASC, label_sort_DESC
+    */
     onOrderByChange(payload: any): void;
     onPageSizeChange(size: any): Observable<boolean>;
     onPaginationChange(payload: any): Observable<boolean>;

@@ -11,6 +11,7 @@ export declare class SearchFacetsLayoutEH extends EventHandler {
     private guestEmit$;
     listen(): void;
     initChangedListener(data: SearchFacetsConfig): void;
+    listenFacetsReady(): void;
     listenToHost(): void;
 }
 export {};

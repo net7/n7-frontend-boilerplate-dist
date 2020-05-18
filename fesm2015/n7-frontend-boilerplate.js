@@ -2,14 +2,14 @@ import { Injectable, ɵɵdefineInjectable, Inject, ɵɵinject, Component, Input,
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK, CAROUSEL_MOCK } from '@n7-frontend/components';
-import { ReplaySubject, empty, of, Subject, forkJoin, fromEvent, merge } from 'rxjs';
-import { map, catchError, tap, takeUntil, filter, debounceTime, first, withLatestFrom } from 'rxjs/operators';
+import { ReplaySubject, empty, of, Subject, forkJoin, fromEvent, merge, BehaviorSubject } from 'rxjs';
+import { map, catchError, tap, takeUntil, filter, debounceTime, first, withLatestFrom, delay, switchMap } from 'rxjs/operators';
 import { NavigationStart, Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Title, DomSanitizer } from '@angular/platform-browser';
 import { LayoutBuilder, EventHandler, DataSource, LayoutDataSource as LayoutDataSource$1 } from '@n7-frontend/core';
 import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
 import tippy, { hideAll } from 'tippy.js';
-import { get, cloneDeep } from 'lodash';
+import { get, cloneDeep, isEmpty } from 'lodash';
 import slugify from 'slugify';
 import { DataSource as DataSource$1 } from '@n7-frontend/core/dist/data-source';
 
@@ -9083,11 +9083,12 @@ var facetsConfig = {
     ],
     results: {
         order: {
-            type: 'score',
+            // Default Sorting Method
+            type: 'text',
             // score | text | date
-            key: '_score',
+            key: 'label_sort',
             // docPath, elastic key, ecc
-            direction: 'DESC' // ASC | DESC
+            direction: 'ASC' // ASC | DESC
         },
         fields: [
             {
@@ -9111,30 +9112,45 @@ class AwSearchLayoutDS extends LayoutDataSource {
         super(...arguments);
         this.destroyed$ = new Subject();
         this.resetButtonEnabled = true;
-        this.currentPage = 1; // pagination value (url param)
-        // pagination value (url param)
-        this.pageSize = 10; // linked objects page size
-        // linked objects page size
+        /**
+         * Pagination value (url parameter)
+         */
+        this.currentPage = 1;
+        /**
+         * Linked objects page size
+         */
+        this.pageSize = 10;
         this.sidebarIsSticky = false;
         this.isFirstLoading = true;
         this.resultsLoading = false;
-        this.orderBy = '_score';
-        this.orderDirection = 'DESC';
+        /**
+         * True when the user has input a text string
+         */
+        this.isSearchingText = new BehaviorSubject(false);
+        /**
+         * Current order method
+         */
+        this.orderBy = 'label_sort';
+        /**
+         * Current order direction
+         */
+        this.orderDirection = 'ASC';
         this.orderByLabel = 'Ordina per';
+        /**
+         * Options used to render the HTMLSelect
+         */
         this.orderByOptions = [
             {
                 value: '_score_DESC',
                 label: 'Ordine per pertinenza',
                 type: 'score',
-                selected: true
-            },
-            {
+                selected: false
+            }, {
                 value: 'label_sort_ASC',
                 label: 'Ordine alfabetico (A→Z)',
                 type: 'text',
-                selected: false
-            },
-            {
+                selected: true // Mirrors the default sorting method in `search-facets.config.ts`
+            }, {
                 value: 'label_sort_DESC',
                 label: 'Ordine alfabetico (Z→A)',
                 type: 'text',
@@ -9192,7 +9208,6 @@ class AwSearchLayoutDS extends LayoutDataSource {
             this.searchModel.updateFiltersFromQueryParams(SearchService.queryParams);
             SearchService.queryParams = null;
         }
-        // sidebar sticky control
         this._sidebarStickyControl();
         this.mainState.updateCustom('currentNav', 'ricerca');
         this.mainState.update('headTitle', 'Arianna4View - Ricerca');
@@ -9216,7 +9231,8 @@ class AwSearchLayoutDS extends LayoutDataSource {
         }
     }
     /**
-     * @param {?} payload
+     * Handles changes of the HTMLSelect order control
+     * @param {?} payload _score_DESC, label_sort_ASC, label_sort_DESC
      * @return {?}
      */
     onOrderByChange(payload) {
@@ -9550,9 +9566,15 @@ if (false) {
     AwSearchLayoutDS.prototype.resultsTitle;
     /** @type {?} */
     AwSearchLayoutDS.prototype.totalCount;
-    /** @type {?} */
+    /**
+     * Pagination value (url parameter)
+     * @type {?}
+     */
     AwSearchLayoutDS.prototype.currentPage;
-    /** @type {?} */
+    /**
+     * Linked objects page size
+     * @type {?}
+     */
     AwSearchLayoutDS.prototype.pageSize;
     /** @type {?} */
     AwSearchLayoutDS.prototype.sidebarIsSticky;
@@ -9560,15 +9582,29 @@ if (false) {
     AwSearchLayoutDS.prototype.isFirstLoading;
     /** @type {?} */
     AwSearchLayoutDS.prototype.resultsLoading;
-    /** @type {?} */
+    /**
+     * True when the user has input a text string
+     * @type {?}
+     */
+    AwSearchLayoutDS.prototype.isSearchingText;
+    /**
+     * Current order method
+     * @type {?}
+     */
     AwSearchLayoutDS.prototype.orderBy;
-    /** @type {?} */
+    /**
+     * Current order direction
+     * @type {?}
+     */
     AwSearchLayoutDS.prototype.orderDirection;
     /** @type {?} */
     AwSearchLayoutDS.prototype.options;
     /** @type {?} */
     AwSearchLayoutDS.prototype.orderByLabel;
-    /** @type {?} */
+    /**
+     * Options used to render the HTMLSelect
+     * @type {?}
+     */
     AwSearchLayoutDS.prototype.orderByOptions;
     /** @type {?} */
     AwSearchLayoutDS.prototype.drawPagination;
@@ -9584,8 +9620,23 @@ class AwSearchLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.destroyed$ = new Subject();
+        /**
+         * Emits when any of the search-facets are changed
+         */
         this.facetsChange$ = new Subject();
-        this.aditionalParamsChange$ = new Subject();
+        /**
+         * Emits when the pagination element
+         * or the select-sort element are changed
+         */
+        this.additionalParamsChange$ = new Subject();
+        /**
+         * Last queried text, used to check if the text has changed
+         */
+        this.previousText = '';
+        /**
+         * Is true when the search is triggered with a new text-string
+         */
+        this.textHasChanged = false;
     }
     /**
      * @return {?}
@@ -9602,7 +9653,7 @@ class AwSearchLayoutEH extends EventHandler {
                     this.configuration = payload.configuration;
                     this.dataSource.onInit(payload);
                     this._listenToFacetsChange();
-                    this._listenToAditionalParamsChange();
+                    this._listenToAdditionalParamsChange();
                     this._listenToRouterChanges();
                     break;
                 case 'aw-search-layout.destroy':
@@ -9610,13 +9661,14 @@ class AwSearchLayoutEH extends EventHandler {
                     this.destroyed$.next();
                     break;
                 case 'aw-search-layout.orderbychange':
+                    // handle the change of result-order
                     this.dataSource.onOrderByChange(payload);
-                    this.aditionalParamsChange$.next();
+                    this.additionalParamsChange$.next(); // emit from observable stream
                     break;
                 case 'aw-search-layout.searchreset':
                     this.dataSource.resetButtonEnabled = false;
                     this.dataSource.searchModel.clear();
-                    this.aditionalParamsChange$.next();
+                    this.additionalParamsChange$.next();
                     break;
                 default:
                     console.warn('(search) unhandled inner event of type', type);
@@ -9630,11 +9682,32 @@ class AwSearchLayoutEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'facets-wrapper.facetschange':
-                    this.dataSource.resetPagination();
+                    {
+                        this.dataSource.resetPagination();
+                        const { value: textInput } = this.dataSource.searchModel.getFiltersByFacetId('query')[0];
+                        // Checks if <input type=text>'s value has changed
+                        this.textHasChanged = !!(textInput && (textInput !== this.previousText));
+                        this.previousText = textInput;
+                        if (this.textHasChanged && textInput.length > 0) {
+                            // Add sort by score option
+                            this.dataSource.isSearchingText.next(true);
+                        }
+                        else if (textInput.length === 0) {
+                            // Remove sort by score option
+                            this.dataSource.isSearchingText.next(false);
+                            setTimeout((/**
+                             * @return {?}
+                             */
+                            () => {
+                                this.dataSource.onOrderByChange('label_sort_DESC');
+                                this.additionalParamsChange$.next(); // emit from observable stream
+                            }), 100);
+                        }
+                    }
                     break;
                 case 'n7-smart-pagination.change':
                     this.dataSource.onResultsLimitChange(payload.value);
-                    this.aditionalParamsChange$.next();
+                    this.additionalParamsChange$.next();
                     break;
                 default:
                     break;
@@ -9642,6 +9715,7 @@ class AwSearchLayoutEH extends EventHandler {
         }));
     }
     /**
+     * Handles changes to any of the search-facets
      * @private
      * @return {?}
      */
@@ -9651,22 +9725,29 @@ class AwSearchLayoutEH extends EventHandler {
          */
         () => {
             this.dataSource.resultsLoading = true;
-            this.dataSource.doSearchRequest$().subscribe((/**
-             * @return {?}
-             */
-            () => {
-                this.dataSource.resultsLoading = false;
-                this.dataSource.onSearchResponse();
-                this.emitGlobal('searchresponse', this.dataSource.getSearchModelId());
-            }));
+            if (this.textHasChanged) {
+                this.additionalParamsChange$.next();
+                this.textHasChanged = false; // reset
+            }
+            else {
+                this.dataSource.doSearchRequest$().subscribe((/**
+                 * @return {?}
+                 */
+                () => {
+                    this.dataSource.resultsLoading = false;
+                    this.dataSource.onSearchResponse();
+                    this.emitGlobal('searchresponse', this.dataSource.getSearchModelId());
+                }));
+            }
         }));
     }
     /**
+     * Handles changes happening on pagination and select elements.
      * @private
      * @return {?}
      */
-    _listenToAditionalParamsChange() {
-        this.aditionalParamsChange$.subscribe((/**
+    _listenToAdditionalParamsChange() {
+        this.additionalParamsChange$.subscribe((/**
          * @return {?}
          */
         () => {
@@ -9685,7 +9766,11 @@ class AwSearchLayoutEH extends EventHandler {
             queryParams.orderdirection = this.dataSource.orderDirection;
             queryParams.page = this.dataSource.currentPage;
             queryParams.limit = this.dataSource.pageSize;
-            // router signal
+            // If the searched text was updated, overwrite the query params and force sorting by "score".
+            if (this.textHasChanged) {
+                queryParams.orderby = '_score';
+                queryParams.orderdirection = 'DESC';
+            }
             this.emitGlobal('navigate', {
                 handler: 'router',
                 path: [],
@@ -9694,6 +9779,7 @@ class AwSearchLayoutEH extends EventHandler {
         }));
     }
     /**
+     * URL changes
      * @private
      * @return {?}
      */
@@ -9728,22 +9814,37 @@ if (false) {
      * @type {?}
      * @private
      */
+    AwSearchLayoutEH.prototype.configuration;
+    /**
+     * @type {?}
+     * @private
+     */
     AwSearchLayoutEH.prototype.route;
     /**
+     * Emits when any of the search-facets are changed
      * @type {?}
      * @private
      */
     AwSearchLayoutEH.prototype.facetsChange$;
     /**
+     * Emits when the pagination element
+     * or the select-sort element are changed
      * @type {?}
      * @private
      */
-    AwSearchLayoutEH.prototype.aditionalParamsChange$;
+    AwSearchLayoutEH.prototype.additionalParamsChange$;
     /**
+     * Last queried text, used to check if the text has changed
      * @type {?}
      * @private
      */
-    AwSearchLayoutEH.prototype.configuration;
+    AwSearchLayoutEH.prototype.previousText;
+    /**
+     * Is true when the search is triggered with a new text-string
+     * @type {?}
+     * @private
+     */
+    AwSearchLayoutEH.prototype.textHasChanged;
 }
 
 /**
@@ -9831,7 +9932,7 @@ class AwSearchLayoutComponent extends AbstractLayout {
 AwSearchLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-search-layout',
-                template: "<div class=\"aw-search n7-side-auto-padding\" id=\"search-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n        <!--\n        <div class=\"aw-search__header-right\">\n            <n7-nav\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\n            </n7-nav>\n        </div>\n        -->\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar sticky-target\"\n            [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                        for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                        id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\" [value]=\"option.value\"\n                            [selected]=\"option.selected\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper\">\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                    <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                    </n7-smart-breadcrumbs>\n                    <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\" class=\"n7-btn aw-search__fallback-button\"\n                            (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"aw-search n7-side-auto-padding\"\n     id=\"search-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n        <!--\n        <div class=\"aw-search__header-right\">\n            <n7-nav\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\n            </n7-nav>\n        </div>\n        -->\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                                   [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\"\n                        class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                           for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                            id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\"\n                                [value]=\"option.value\"\n                                [selected]=\"option.selected\"\n                                [hidden]=\"option.type === 'score' && lb.dataSource.isSearchingText.value === false\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\"\n                                        [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper\">\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                    <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                    </n7-smart-breadcrumbs>\n                    <n7-item-preview [data]=\"preview\"\n                                     [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\"\n                                class=\"n7-btn aw-search__fallback-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>\n"
             }] }
 ];
 /** @nocollapse */
@@ -10044,21 +10145,31 @@ class AwGalleryLayoutDS extends LayoutDataSource {
         this.sidebarIsSticky = false;
         this.isFirstLoading = true;
         this.resultsLoading = false;
-        this.orderBy = '_score';
-        this.orderDirection = 'DESC';
+        /**
+         * True when the user has input a text string
+         */
+        this.isSearchingText = new BehaviorSubject(false);
+        /**
+         * Current order method
+         */
+        this.orderBy = 'label_sort';
+        /**
+         * Current order direction
+         */
+        this.orderDirection = 'ASC';
         this.orderByLabel = 'Ordina per';
         this.orderByOptions = [
             {
                 value: '_score_DESC',
                 label: 'Ordine per pertinenza',
                 type: 'score',
-                selected: true
+                selected: false
             },
             {
                 value: 'label_sort_ASC',
                 label: 'Ordine alfabetico (A→Z)',
                 type: 'text',
-                selected: false
+                selected: true
             },
             {
                 value: 'label_sort_DESC',
@@ -10142,7 +10253,8 @@ class AwGalleryLayoutDS extends LayoutDataSource {
         }
     }
     /**
-     * @param {?} payload
+     * Handles changes of the HTMLSelect order control
+     * @param {?} payload _score_DESC, label_sort_ASC, label_sort_DESC
      * @return {?}
      */
     onOrderByChange(payload) {
@@ -10486,9 +10598,20 @@ if (false) {
     AwGalleryLayoutDS.prototype.isFirstLoading;
     /** @type {?} */
     AwGalleryLayoutDS.prototype.resultsLoading;
-    /** @type {?} */
+    /**
+     * True when the user has input a text string
+     * @type {?}
+     */
+    AwGalleryLayoutDS.prototype.isSearchingText;
+    /**
+     * Current order method
+     * @type {?}
+     */
     AwGalleryLayoutDS.prototype.orderBy;
-    /** @type {?} */
+    /**
+     * Current order direction
+     * @type {?}
+     */
     AwGalleryLayoutDS.prototype.orderDirection;
     /** @type {?} */
     AwGalleryLayoutDS.prototype.options;
@@ -10510,8 +10633,23 @@ class AwGalleryLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.destroyed$ = new Subject();
+        /**
+         * Emits when any of the gallery-facets are changed
+         */
         this.facetsChange$ = new Subject();
-        this.aditionalParamsChange$ = new Subject();
+        /**
+         * Emits when the pagination element
+         * or the select-sort element are changed
+         */
+        this.additionalParamsChange$ = new Subject();
+        /**
+         * Last queried text, used to check if the text has changed
+         */
+        this.previousText = '';
+        /**
+         * Is true when the search is triggered with a new text-string
+         */
+        this.textHasChanged = false;
     }
     /**
      * @return {?}
@@ -10528,7 +10666,7 @@ class AwGalleryLayoutEH extends EventHandler {
                     this.configuration = payload.configuration;
                     this.dataSource.onInit(payload);
                     this._listenToFacetsChange();
-                    this._listenToAditionalParamsChange();
+                    this._listenToAdditionalParamsChange();
                     this._listenToRouterChanges();
                     break;
                 case 'aw-gallery-layout.destroy':
@@ -10536,13 +10674,14 @@ class AwGalleryLayoutEH extends EventHandler {
                     this.destroyed$.next();
                     break;
                 case 'aw-gallery-layout.orderbychange':
+                    // handle the change of result-order
                     this.dataSource.onOrderByChange(payload);
-                    this.aditionalParamsChange$.next();
+                    this.additionalParamsChange$.next(); // emit from observable stream
                     break;
                 case 'aw-gallery-layout.searchreset':
                     this.dataSource.resetButtonEnabled = false;
                     this.dataSource.searchModel.clear();
-                    this.aditionalParamsChange$.next();
+                    this.additionalParamsChange$.next();
                     break;
                 default:
                     console.warn('(search) unhandled inner event of type', type);
@@ -10556,11 +10695,32 @@ class AwGalleryLayoutEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'facets-wrapper.facetschange':
-                    this.dataSource.resetPagination();
+                    {
+                        this.dataSource.resetPagination();
+                        const { value: textInput } = this.dataSource.searchModel.getFiltersByFacetId('query')[0];
+                        // Checks if <input type=text>'s value has changed
+                        this.textHasChanged = !!(textInput && (textInput !== this.previousText));
+                        this.previousText = textInput;
+                        if (this.textHasChanged && textInput.length > 0) {
+                            // Add sort by score option
+                            this.dataSource.isSearchingText.next(true);
+                        }
+                        else if (textInput.length === 0) {
+                            // Remove sort by score option
+                            this.dataSource.isSearchingText.next(false);
+                            setTimeout((/**
+                             * @return {?}
+                             */
+                            () => {
+                                this.dataSource.onOrderByChange('label_sort_DESC');
+                                this.additionalParamsChange$.next(); // emit from observable stream
+                            }), 100);
+                        }
+                    }
                     break;
                 case 'n7-smart-pagination.change':
                     this.dataSource.onResultsLimitChange(payload.value);
-                    this.aditionalParamsChange$.next();
+                    this.additionalParamsChange$.next();
                     break;
                 default:
                     break;
@@ -10568,6 +10728,7 @@ class AwGalleryLayoutEH extends EventHandler {
         }));
     }
     /**
+     * Handles changes to any of the search-facets
      * @private
      * @return {?}
      */
@@ -10577,22 +10738,29 @@ class AwGalleryLayoutEH extends EventHandler {
          */
         () => {
             this.dataSource.resultsLoading = true;
-            this.dataSource.doSearchRequest$().subscribe((/**
-             * @return {?}
-             */
-            () => {
-                this.dataSource.resultsLoading = false;
-                this.dataSource.onSearchResponse();
-                this.emitGlobal('searchresponse', this.dataSource.getSearchModelId());
-            }));
+            if (this.textHasChanged) {
+                this.additionalParamsChange$.next();
+                this.textHasChanged = false; // reset
+            }
+            else {
+                this.dataSource.doSearchRequest$().subscribe((/**
+                 * @return {?}
+                 */
+                () => {
+                    this.dataSource.resultsLoading = false;
+                    this.dataSource.onSearchResponse();
+                    this.emitGlobal('searchresponse', this.dataSource.getSearchModelId());
+                }));
+            }
         }));
     }
     /**
+     * Handles changes happening on pagination and select elements.
      * @private
      * @return {?}
      */
-    _listenToAditionalParamsChange() {
-        this.aditionalParamsChange$.subscribe((/**
+    _listenToAdditionalParamsChange() {
+        this.additionalParamsChange$.subscribe((/**
          * @return {?}
          */
         () => {
@@ -10611,7 +10779,11 @@ class AwGalleryLayoutEH extends EventHandler {
             queryParams.orderdirection = this.dataSource.orderDirection;
             queryParams.page = this.dataSource.currentPage;
             queryParams.limit = this.dataSource.pageSize;
-            // router signal
+            // If the searched text was updated, overwrite the query params and force sorting by "score".
+            if (this.textHasChanged) {
+                queryParams.orderby = '_score';
+                queryParams.orderdirection = 'DESC';
+            }
             this.emitGlobal('navigate', {
                 handler: 'router',
                 path: [],
@@ -10620,6 +10792,7 @@ class AwGalleryLayoutEH extends EventHandler {
         }));
     }
     /**
+     * URL changes
      * @private
      * @return {?}
      */
@@ -10654,22 +10827,37 @@ if (false) {
      * @type {?}
      * @private
      */
+    AwGalleryLayoutEH.prototype.configuration;
+    /**
+     * @type {?}
+     * @private
+     */
     AwGalleryLayoutEH.prototype.route;
     /**
+     * Emits when any of the gallery-facets are changed
      * @type {?}
      * @private
      */
     AwGalleryLayoutEH.prototype.facetsChange$;
     /**
+     * Emits when the pagination element
+     * or the select-sort element are changed
      * @type {?}
      * @private
      */
-    AwGalleryLayoutEH.prototype.aditionalParamsChange$;
+    AwGalleryLayoutEH.prototype.additionalParamsChange$;
     /**
+     * Last queried text, used to check if the text has changed
      * @type {?}
      * @private
      */
-    AwGalleryLayoutEH.prototype.configuration;
+    AwGalleryLayoutEH.prototype.previousText;
+    /**
+     * Is true when the search is triggered with a new text-string
+     * @type {?}
+     * @private
+     */
+    AwGalleryLayoutEH.prototype.textHasChanged;
 }
 
 /**
@@ -10760,7 +10948,7 @@ class AwGalleryLayoutComponent extends AbstractLayout {
 AwGalleryLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-gallery-layout',
-                template: "<div class=\"aw-search aw-gallery n7-side-auto-padding\" id=\"gallery-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar sticky-target\"\n            [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                        for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                        id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\" [value]=\"option.value\"\n                            [selected]=\"option.selected\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper\">\n                <div class=\"n7-grid-3\">\n                    <div *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\" class=\"n7-btn aw-search__fallback-button\"\n                            (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"aw-search aw-gallery n7-side-auto-padding\"\n     id=\"gallery-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                                   [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\"\n                        class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                           for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                            id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\"\n                                [value]=\"option.value\"\n                                [selected]=\"option.selected\"\n                                [hidden]=\"option.type === 'score' && lb.dataSource.isSearchingText.value === false\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\"\n                                        [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper\">\n                <div class=\"n7-grid-3\">\n                    <div *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\"\n                                         [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\"\n                                class=\"n7-btn aw-search__fallback-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>\n"
             }] }
 ];
 /** @nocollapse */
@@ -12721,13 +12909,144 @@ class MrNavDS extends DataSource {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+class MrSearchResultsDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        const { results } = data;
+        return results;
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class MrSearchPageTitleDS extends DataSource {
+    /**
+     * @protected
+     * @return {?}
+     */
+    transform() {
+        const { title } = this.options.config;
+        return {
+            title: {
+                main: {
+                    text: title
+                }
+            }
+        };
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class MrSearchResultsTitleDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        const { totalResultsText, sort } = this.options.config;
+        const { totalCount, sort: currentSort } = data;
+        return {
+            title: {
+                main: {
+                    text: totalCount
+                },
+                secondary: {
+                    text: totalResultsText[totalCount === 1 ? 1 : 0]
+                }
+            },
+            actions: {
+                select: {
+                    label: sort.label,
+                    options: sort.options.map((/**
+                     * @param {?} __0
+                     * @return {?}
+                     */
+                    ({ label, value, selected }) => ({
+                        value,
+                        selected: currentSort ? value === currentSort : selected,
+                        text: label
+                    }))),
+                    payload: 'sort'
+                }
+            }
+        };
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class MrSearchTagsDS extends DataSource {
+    /**
+     * @protected
+     * @param {?} data
+     * @return {?}
+     */
+    transform(data) {
+        const { state, facetsConfig } = data;
+        /** @type {?} */
+        const tags = [];
+        // inputs config
+        facetsConfig.sections.forEach((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ inputs }) => {
+            inputs.forEach((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            ({ id }) => {
+                if (state[id]) {
+                    /** @type {?} */
+                    const values = Array.isArray(state[id]) ? state[id] : [state[id]];
+                    values.forEach((/**
+                     * @param {?} value
+                     * @return {?}
+                     */
+                    (value) => {
+                        tags.push({
+                            text: value,
+                            icon: 'n7-icon-close',
+                            payload: {
+                                id,
+                                value
+                            }
+                        });
+                    }));
+                }
+            }));
+        }));
+        return tags;
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 
 var DS$3 = /*#__PURE__*/Object.freeze({
     MrItemPreviewsDS: MrItemPreviewsDS,
     MrInnerTitleDS: MrInnerTitleDS,
     MrHeroDS: MrHeroDS,
     MrFiltersDS: MrFiltersDS,
-    MrNavDS: MrNavDS
+    MrNavDS: MrNavDS,
+    MrSearchResultsDS: MrSearchResultsDS,
+    MrSearchPageTitleDS: MrSearchPageTitleDS,
+    MrSearchResultsTitleDS: MrSearchResultsTitleDS,
+    MrSearchTagsDS: MrSearchTagsDS
 });
 
 /**
@@ -12786,11 +13105,63 @@ class MrNavEH extends EventHandler {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+class MrSearchTagsEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'mr-search-tags.click':
+                    this.emitOuter('click', payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class MrSearchResultsTitleEH extends EventHandler {
+    /**
+     * @return {?}
+     */
+    listen() {
+        this.innerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'mr-search-results-title.change':
+                    this.emitOuter('change', payload);
+                    break;
+                default:
+                    break;
+            }
+        }));
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 
 var EH$3 = /*#__PURE__*/Object.freeze({
     MrDummyEH: MrDummyEH,
     MrFiltersEH: MrFiltersEH,
-    MrNavEH: MrNavEH
+    MrNavEH: MrNavEH,
+    MrSearchTagsEH: MrSearchTagsEH,
+    MrSearchResultsTitleEH: MrSearchResultsTitleEH
 });
 
 /**
@@ -13056,6 +13427,28 @@ if (false) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+/**
+ * @param {?} prefix
+ * @return {?}
+ */
+function getLinks(prefix) {
+    /** @type {?} */
+    let i;
+    /** @type {?} */
+    const limit = Math.round(Math.random() * 10);
+    /** @type {?} */
+    const links = [];
+    for (i = 0; i < limit; i += 1) {
+        /** @type {?} */
+        const text = `${prefix} ${i + 1}`;
+        links.push({
+            text,
+            counter: Math.round(Math.random() * 100),
+            payload: text
+        });
+    }
+    return links;
+}
 const ɵ0 = {
     text: 'Filtra i risultati'
 }, ɵ1 = {
@@ -13075,105 +13468,6 @@ const ɵ0 = {
     inputPayload: 'search-input',
     enterPayload: 'search-enter',
     iconPayload: 'search-icon',
-}, ɵ4 = {
-    links: [{
-            text: 'Title',
-            counter: 28,
-            payload: 'i02t28'
-        }, {
-            text: 'Title',
-            counter: 21,
-            payload: 'i02t21'
-        }, {
-            text: 'Title',
-            counter: 18,
-            payload: 'i02t18'
-        }, {
-            text: 'Title',
-            counter: 16,
-            payload: 'i02t16'
-        }, {
-            text: 'Title',
-            counter: 11,
-            payload: 'i02t11'
-        }, {
-            text: 'Title',
-            counter: 9,
-            payload: 'i02t9'
-        }, {
-            text: 'Title',
-            counter: 4,
-            payload: 'i02t4'
-        }]
-}, ɵ5 = {
-    text: 'Glossario',
-    additionalText: '96',
-}, ɵ6 = {
-    id: 'input-text-02',
-    placeholder: 'Search',
-    icon: 'n7-icon-search',
-    inputPayload: 'search-input',
-    enterPayload: 'search-enter',
-    iconPayload: 'search-icon',
-}, ɵ7 = {
-    links: [{
-            text: 'Title',
-            counter: 28,
-            payload: 'i04t28'
-        }, {
-            text: 'Title',
-            counter: 21,
-            payload: 'i04t21'
-        }, {
-            text: 'Title',
-            counter: 18,
-            payload: 'i04t18'
-        }, {
-            text: 'Title',
-            counter: 16,
-            payload: 'i04t16'
-        }, {
-            text: 'Title',
-            counter: 11,
-            payload: 'i04t11'
-        }, {
-            text: 'Title',
-            counter: 9,
-            payload: 'i04t9'
-        }, {
-            text: 'Title',
-            counter: 4,
-            payload: 'i04t4'
-        }]
-}, ɵ8 = {
-    text: 'Continenti',
-    additionalText: '3'
-}, ɵ9 = {
-    links: [{
-            text: 'Title',
-            counter: 32,
-            payload: 'input-05-1'
-        }, {
-            text: 'Title',
-            counter: 27,
-            payload: 'input-05-2'
-        }, {
-            text: 'Title',
-            counter: 18,
-            payload: 'input-05-3'
-        }]
-}, ɵ10 = {
-    text: 'Keywords',
-    additionalText: '108',
-    iconRight: 'n7-icon-angle-right'
-}, ɵ11 = {
-    text: 'Data di pubblicazione',
-    additionalText: '20',
-    iconRight: 'n7-icon-angle-right'
-}, ɵ12 = {
-    text: 'Luogo di pubblicazione',
-    additionalText: '15',
-    iconRight: 'n7-icon-angle-right'
 };
 /** @type {?} */
 const configuration = {
@@ -13195,54 +13489,105 @@ const configuration = {
             inputs: [{
                     id: 'input-01',
                     type: 'text',
+                    internal: true,
                     data: ɵ3
                 }, {
                     id: 'input-02',
                     type: 'link',
-                    data: ɵ4
+                    data: {
+                        links: getLinks('Toponimo')
+                    }
                 }]
         }, {
             header: {
                 id: 'header-glossario',
-                data: ɵ5
+                data: {
+                    text: 'Glossario',
+                    additionalText: '96',
+                }
             },
             inputs: [{
                     id: 'input-03',
                     type: 'text',
-                    data: ɵ6
+                    internal: true,
+                    data: {
+                        id: 'input-text-02',
+                        placeholder: 'Search',
+                        icon: 'n7-icon-search',
+                        inputPayload: 'search-input',
+                        enterPayload: 'search-enter',
+                        iconPayload: 'search-icon',
+                    }
                 }, {
                     id: 'input-04',
                     type: 'link',
-                    data: ɵ7
+                    data: {
+                        links: getLinks('Concetto')
+                    }
                 }]
         }, {
             header: {
                 id: 'header-continenti',
-                data: ɵ8
+                data: {
+                    text: 'Continenti',
+                    additionalText: '3'
+                }
             },
             inputs: [{
                     id: 'input-05',
                     type: 'link',
-                    data: ɵ9
+                    data: {
+                        links: getLinks('Continente')
+                    }
                 }]
         }, {
             header: {
                 id: 'header-keywords',
-                data: ɵ10
+                data: {
+                    text: 'Keywords',
+                    additionalText: '108',
+                    iconRight: 'n7-icon-angle-right'
+                }
             },
-            inputs: [],
+            inputs: [{
+                    id: 'input-06',
+                    type: 'link',
+                    data: {
+                        links: getLinks('Keyword')
+                    }
+                }],
         }, {
             header: {
                 id: 'header-data',
-                data: ɵ11
+                data: {
+                    text: 'Data di pubblicazione',
+                    additionalText: '20',
+                    iconRight: 'n7-icon-angle-right'
+                }
             },
-            inputs: [],
+            inputs: [{
+                    id: 'input-07',
+                    type: 'link',
+                    data: {
+                        links: getLinks('Data')
+                    }
+                }],
         }, {
             header: {
                 id: 'header-luogo',
-                data: ɵ12
+                data: {
+                    text: 'Luogo di pubblicazione',
+                    additionalText: '15',
+                    iconRight: 'n7-icon-angle-right'
+                }
             },
-            inputs: [],
+            inputs: [{
+                    id: 'input-08',
+                    type: 'link',
+                    data: {
+                        links: getLinks('Luogo')
+                    }
+                }],
         }],
     classes: 'facets-wrapper'
 };
@@ -13251,19 +13596,265 @@ const configuration = {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+/**
+ * @return {?}
+ */
+function getHeaders() {
+    /** @type {?} */
+    const headers = {};
+    configuration.sections.forEach((/**
+     * @param {?} __0
+     * @return {?}
+     */
+    ({ header }) => {
+        headers[header.id] = Math.round(Math.random() * 100);
+    }));
+    return headers;
+}
+var resultsMock = (/**
+ * @param {?} page
+ * @param {?} sort
+ * @return {?}
+ */
+(page, sort) => ({
+    sort,
+    totalCount: Math.round(Math.random() * 1000),
+    page: { current: page, limit: 10 },
+    headers: getHeaders(),
+    results: [
+        {
+            image: 'https://i.imgur.com/52UFqca.png',
+            title: 'Yudi Shanhai Quantu',
+            text: 'Complete Map of all mountains and seas',
+        }, {
+            image: 'https://i.imgur.com/52UFqca.png',
+            title: 'World Map based on Matteo Ricci 1850',
+            text: 'Complete Map fo all mountains and seas',
+        }, {
+            image: '',
+            title: 'Reconstruction of D\'Elia\'s map',
+            text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
+        }, {
+            image: '',
+            title: 'Unattributed version',
+            text: 'A japanese colored version',
+        }, {
+            image: '',
+            title: 'Matteo Ricci\'s way from Macau to Beijing',
+            text: 'A japanese colored version',
+        }, {
+            image: '',
+            title: 'The 400-year-old map that shows China as the centre of the world',
+            text: 'A japanese colored version',
+        }, {
+            image: 'https://i.imgur.com/52UFqca.png',
+            title: 'Yudi Shanhai Quantu',
+            text: 'Complete Map of all mountains and seas',
+        }, {
+            image: 'https://i.imgur.com/52UFqca.png',
+            title: 'World Map based on Matteo Ricci 1850',
+            text: 'Complete Map fo all mountains and seas',
+        }, {
+            image: '',
+            title: 'Reconstruction of D\'Elia\'s map',
+            text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
+        }, {
+            image: '',
+            title: 'Unattributed version',
+            text: 'A japanese colored version',
+        }, {
+            image: '',
+            title: 'Matteo Ricci\'s way from Macau to Beijing',
+            text: 'A japanese colored version',
+        }, {
+            image: '',
+            title: 'The 400-year-old map that shows China as the centre of the world',
+            text: 'A japanese colored version',
+        }
+    ]
+}));
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 class MrSearchLayoutDS extends LayoutDataSource$1 {
+    constructor() {
+        super(...arguments);
+        this.inputsConfig = {};
+        this.state = {};
+        this.sectionState = {};
+        this.totalResultsText = null;
+        this.inputIsInternal = (/**
+         * @param {?=} id
+         * @return {?}
+         */
+        (id) => this.inputsConfig[id].internal);
+        this.getInputType = (/**
+         * @param {?=} id
+         * @return {?}
+         */
+        (id) => this.inputsConfig[id].type);
+    }
+    /**
+     * @param {?} payload
+     * @return {?}
+     */
+    onInit(payload) {
+        this.configuration = payload.configuration;
+        this.communication = payload.communication;
+        this.facetsConfig = configuration;
+        this.configId = payload.configId;
+        this.pageConfig = this.configuration.get(this.configId);
+        // inputs config
+        this.facetsConfig.sections.forEach((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ inputs }) => {
+            inputs.forEach((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            ({ id, type, internal }) => {
+                this.inputsConfig[id] = {
+                    type,
+                    internal: !!internal
+                };
+            }));
+        }));
+        // config
+        this.all().updateOptions({ config: this.pageConfig });
+        // manual updates
+        this.one('mr-search-page-title').update({});
+    }
+    /**
+     * @param {?=} params
+     * @return {?}
+     */
+    doRequest$(params = {}) {
+        console.warn('#TODO: doRequest', params);
+        // FIXME: togliere commento
+        /* return this.communication.request$('search', {
+              params,
+              onError: (error) => {
+                this.setSectionState('results', 'KO');
+                console.warn('SEARCH ERROR', error);
+              }
+            }); */
+        /** @type {?} */
+        const page = this.getState('page') || 1;
+        /** @type {?} */
+        const sort = this.getState('sort') || '_score_DESC';
+        return of(resultsMock(page, sort)).pipe(delay(Math.round(Math.random() * 5000)));
+    }
+    /**
+     * @param {?} response
+     * @return {?}
+     */
+    handleResponse(response) {
+        this.some([
+            'mr-search-results-title',
+            'mr-search-results',
+        ]).update(response);
+        this.setSectionState('results', isEmpty(response.results) ? 'EMPTY' : 'OK');
+        // pagination
+        this.one('n7-smart-pagination').updateOptions({ mode: 'payload' });
+        this.one('n7-smart-pagination').update(this.getPaginationParams(response));
+    }
     /**
      * @return {?}
      */
-    onInit() {
-        this.facetsConfig = configuration;
-        this.one('mr-resources').updateOptions({ source: 'search' });
-        this.one('mr-resources').update({});
+    updateActiveFilters() {
+        // active "tags" filters
+        this.one('mr-search-tags').update({
+            state: this.state,
+            facetsConfig: this.facetsConfig
+        });
+    }
+    /**
+     * @private
+     * @param {?} response
+     * @return {?}
+     */
+    getPaginationParams(response) {
+        const { totalCount, page } = response;
+        const { pagination: paginationConfig } = this.pageConfig;
+        return {
+            totalPages: Math.ceil(totalCount / page.limit),
+            currentPage: page.current,
+            pageLimit: paginationConfig.limit,
+            sizes: {
+                list: paginationConfig.options,
+                active: page.limit,
+            },
+        };
+    }
+    /**
+     * @param {?=} id
+     * @return {?}
+     */
+    getState(id) {
+        return id ? this.state[id] : this.state;
+    }
+    /**
+     * @param {?} id
+     * @param {?} value
+     * @return {?}
+     */
+    setState(id, value) {
+        this.state[id] = value;
+    }
+    /**
+     * @return {?}
+     */
+    clearState() {
+        this.state = {};
+    }
+    /**
+     * @param {?} id
+     * @param {?} newState
+     * @return {?}
+     */
+    setSectionState(id, newState) {
+        this.sectionState[id] = newState;
     }
 }
 if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutDS.prototype.configuration;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutDS.prototype.communication;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutDS.prototype.configId;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutDS.prototype.inputsConfig;
+    /** @type {?} */
+    MrSearchLayoutDS.prototype.state;
+    /** @type {?} */
+    MrSearchLayoutDS.prototype.sectionState;
     /** @type {?} */
     MrSearchLayoutDS.prototype.facetsConfig;
+    /** @type {?} */
+    MrSearchLayoutDS.prototype.pageConfig;
+    /** @type {?} */
+    MrSearchLayoutDS.prototype.totalResultsText;
+    /** @type {?} */
+    MrSearchLayoutDS.prototype.inputIsInternal;
+    /** @type {?} */
+    MrSearchLayoutDS.prototype.getInputType;
 }
 
 /**
@@ -13333,6 +13924,8 @@ class MrSearchLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.destroyed$ = new Subject();
+        this.facetsReady$ = new Subject();
+        this.doSearch$ = new Subject();
     }
     /**
      * @return {?}
@@ -13349,40 +13942,85 @@ class MrSearchLayoutEH extends EventHandler {
                     this.guestEmit$ = payload.guestEmit$;
                     this.router = payload.router;
                     this.activatedRoute = payload.activatedRoute;
-                    this.dataSource.onInit(payload);
+                    // listeners
                     this.listenToGuest();
                     this.listenToRouterChanges();
-                    /* setTimeout(() => {
-                      this.hostEmit$.next({
-                        type: 'updateinputdata',
-                        payload: {
-                          id: 'input-00',
-                          data: {
-                            placeholder: 'Cerca su tutto',
-                          }
-                        }
-                      });
-                      this.hostEmit$.next({
-                        type: 'updateinputvalue',
-                        payload: {
-                          id: 'input-00',
-                          value: 'Sto cercando...'
-                        }
-                      });
-                    }, 5000); */
+                    // init
+                    this.dataSource.onInit(payload);
                     break;
                 case 'mr-search-layout.destroy':
                     this.destroyed$.next(true);
+                    break;
+                case 'mr-search-layout.searchreset':
+                    this.clearSearchState();
+                    this.updateRoute();
                     break;
                 default:
                     console.warn('unhandled inner event of type', type);
                     break;
             }
         }));
-        /*
-          this.outerEvents$.subscribe(({ type, payload }) => {
-          });
-        */
+        this.outerEvents$.subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ type, payload }) => {
+            switch (type) {
+                case 'n7-smart-pagination.click':
+                    this.dataSource.setState('page', payload.page);
+                    this.updateRoute();
+                    break;
+                case 'n7-smart-pagination.change':
+                    this.dataSource.setState('limit', payload.value);
+                    this.updateRoute();
+                    break;
+                case 'mr-search-results-title.change':
+                    this.dataSource.setState('sort', payload.value);
+                    this.updateRoute();
+                    break;
+                case 'mr-search-tags.click': {
+                    /** @type {?} */
+                    const stateValue = this.dataSource.getState(payload.id);
+                    /** @type {?} */
+                    let newValue = null;
+                    if (Array.isArray(stateValue)) {
+                        stateValue.splice(stateValue.indexOf(payload.value), 1);
+                        newValue = stateValue;
+                    }
+                    this.dataSource.setState(payload.id, newValue);
+                    this.hostEmit$.next({
+                        type: 'updateinputvalue',
+                        payload: {
+                            id: payload.id,
+                            value: newValue
+                        }
+                    });
+                    this.updateRoute();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }));
+        // search request stream
+        this.doSearch$.pipe(debounceTime(500), tap((/**
+         * @return {?}
+         */
+        () => {
+            this.dataSource.updateActiveFilters();
+            this.dataSource.setSectionState('results', 'LOADING');
+        })), switchMap((/**
+         * @param {?} params
+         * @return {?}
+         */
+        (params) => this.dataSource.doRequest$(params)))).subscribe((/**
+         * @param {?} response
+         * @return {?}
+         */
+        (response) => {
+            this.dataSource.handleResponse(response);
+            this.updateFacetHeaders(response.headers);
+        }));
     }
     /**
      * @return {?}
@@ -13394,12 +14032,13 @@ class MrSearchLayoutEH extends EventHandler {
          */
         ({ type, payload }) => {
             switch (type) {
+                case 'facetsready': {
+                    this.facetsReady$.next();
+                    break;
+                }
                 case 'change': {
-                    /** @type {?} */
-                    const queryParams = searchHelper.stateToQueryParams(payload.state);
-                    this.router.navigate([], {
-                        queryParams
-                    });
+                    this.dataSource.setState(payload.id, payload.value);
+                    this.updateRoute();
                     break;
                 }
                 default:
@@ -13416,12 +14055,88 @@ class MrSearchLayoutEH extends EventHandler {
          * @return {?}
          */
         (params) => {
-            // TODO: aggiungere logica richieste
-            console.warn('query params', params);
+            /** @type {?} */
+            const searchState = searchHelper.queryParamsToState(params);
+            // params state control
+            if (isEmpty(params) && !isEmpty(this.dataSource.getState())) {
+                this.clearSearchState();
+            }
+            else if (isEmpty(this.dataSource.getState()) && !isEmpty(params)) {
+                this.setSearchState(params);
+            }
+            this.doSearch$.next(searchState);
+        }));
+    }
+    /**
+     * @return {?}
+     */
+    updateRoute() {
+        /** @type {?} */
+        const queryParams = searchHelper.stateToQueryParams(this.dataSource.getState());
+        this.router.navigate([], {
+            queryParams
+        });
+    }
+    /**
+     * @private
+     * @param {?} headers
+     * @return {?}
+     */
+    updateFacetHeaders(headers) {
+        Object.keys(headers).forEach((/**
+         * @param {?} id
+         * @return {?}
+         */
+        (id) => {
+            this.hostEmit$.next({
+                type: 'updateinputvalue',
+                payload: {
+                    id,
+                    value: headers[id]
+                }
+            });
+        }));
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    clearSearchState() {
+        this.dataSource.clearState();
+        this.hostEmit$.next({ type: 'clearinputs' });
+    }
+    /**
+     * @private
+     * @param {?} params
+     * @return {?}
+     */
+    setSearchState(params) {
+        this.facetsReady$.subscribe((/**
+         * @return {?}
+         */
+        () => {
+            /** @type {?} */
+            const stateParams = searchHelper.queryParamsToState(params);
+            Object.keys(stateParams).forEach((/**
+             * @param {?} key
+             * @return {?}
+             */
+            (key) => {
+                this.dataSource.setState(key, stateParams[key]);
+                this.hostEmit$.next({
+                    type: 'updateinputvalue',
+                    payload: {
+                        id: key,
+                        value: stateParams[key]
+                    }
+                });
+            }));
         }));
     }
 }
 if (false) {
+    /** @type {?} */
+    MrSearchLayoutEH.prototype.dataSource;
     /**
      * @type {?}
      * @private
@@ -13437,6 +14152,16 @@ if (false) {
      * @private
      */
     MrSearchLayoutEH.prototype.guestEmit$;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutEH.prototype.facetsReady$;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutEH.prototype.doSearch$;
     /**
      * @type {?}
      * @private
@@ -13457,7 +14182,17 @@ if (false) {
 const MrSearchLayoutConfig = {
     layoutId: 'mr-search-layout',
     widgets: [{
-            id: 'facets-wrapper', dataSource: FacetsWrapperDS, eventHandler: FacetsWrapperEH
+            id: 'facets-wrapper',
+            dataSource: FacetsWrapperDS,
+            eventHandler: FacetsWrapperEH
+        }, {
+            id: 'mr-search-page-title'
+        }, {
+            id: 'mr-search-results-title'
+        }, {
+            id: 'mr-search-results'
+        }, {
+            id: 'mr-search-tags'
         }, {
             id: 'mr-resources', dataSource: MrItemPreviewsDS,
         }, {
@@ -13476,17 +14211,20 @@ const MrSearchLayoutConfig = {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-// import { CommunicationService } from '../../../common/services/communication.service';
 class MrSearchLayoutComponent extends AbstractLayout {
     /**
      * @param {?} layoutsConfiguration
      * @param {?} router
      * @param {?} activatedRoute
+     * @param {?} communication
+     * @param {?} configuration
      */
-    constructor(layoutsConfiguration, router, activatedRoute) {
+    constructor(layoutsConfiguration, router, activatedRoute, communication, configuration) {
         super(layoutsConfiguration.get('MrSearchLayoutConfig') || MrSearchLayoutConfig);
         this.router = router;
         this.activatedRoute = activatedRoute;
+        this.communication = communication;
+        this.configuration = configuration;
         this.hostEmit$ = new Subject();
         this.guestEmit$ = new Subject();
     }
@@ -13496,11 +14234,12 @@ class MrSearchLayoutComponent extends AbstractLayout {
      */
     initPayload() {
         return {
-            // configuration: this.configuration,
+            configId: this.configId,
+            configuration: this.configuration,
             // mainState: this.mainState,
             router: this.router,
             activatedRoute: this.activatedRoute,
-            // communication: this.communication,
+            communication: this.communication,
             hostEmit$: this.hostEmit$,
             guestEmit$: this.guestEmit$,
             options: this.config.options || {},
@@ -13510,7 +14249,14 @@ class MrSearchLayoutComponent extends AbstractLayout {
      * @return {?}
      */
     ngOnInit() {
-        this.onInit();
+        this.activatedRoute.data.subscribe((/**
+         * @param {?} data
+         * @return {?}
+         */
+        (data) => {
+            this.configId = data.configId;
+            this.onInit();
+        }));
     }
     /**
      * @return {?}
@@ -13522,16 +14268,23 @@ class MrSearchLayoutComponent extends AbstractLayout {
 MrSearchLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'mr-search-layout',
-                template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth\">\n\n        <div class=\"mr-search__title\">\n            INNER TITLE COMPONENT HERE\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <aside class=\"mr-search__facets\">\n                <div class=\"filter-section\">\n                    <h2>Filtra i risultati</h2>\n                    <mr-search-facets-layout \n                    [data]=\"lb.dataSource.facetsConfig\"\n                    [hostEmit$]=\"hostEmit$\"\n                    [guestEmit$]=\"guestEmit$\">\n                    </mr-search-facets-layout>\n                </div>\n            </aside>\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    Inner title with results number and sorting\n                </div>\n                <div class=\"mr-search__results-filters\">\n                    Filter, when active\n                </div>\n                <main class=\"mr-search__results\">\n                    <n7-item-preview *ngFor=\"let resource of (lb.widgets['mr-resources'].ds.out$ | async)\"\n                                    [data]=\"resource\">\n                    </n7-item-preview>\n                </main>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
+                template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth\">\n\n        <div class=\"mr-search__title\">\n            <n7-inner-title\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <aside class=\"mr-search__facets\">\n                <div class=\"filter-section\">\n                    <h2>{{ lb.dataSource.pageConfig['facets-title'] }}</h2>\n                    <mr-search-facets-layout \n                    [data]=\"lb.dataSource.facetsConfig\"\n                    [hostEmit$]=\"hostEmit$\"\n                    [guestEmit$]=\"guestEmit$\">\n                    </mr-search-facets-layout>\n                </div>\n            </aside>\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    <n7-inner-title\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\n                    </n7-inner-title>\n                </div>\n                <div class=\"mr-search__results-filters\">\n                    <n7-tag *ngFor=\"let tag of (lb.widgets['mr-search-tags'].ds.out$ | async)\"\n                    [data]=\"tag\"\n                    [emit]=\"lb.widgets['mr-search-tags'].emit\">\n                    </n7-tag>\n                </div>\n                <main class=\"mr-search__results\">\n                    <!-- SEARCH RESULTS -->\n                    <ng-container [ngSwitch]=\"lb.dataSource.sectionState.results\">\n                        \n                        <!-- loading -->\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\n                            <div class=\"mr-search__results-loading\">\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                                    blocks: [\n                                        { classes: 'search-result-placeholder-title' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' }\n                                    ]\n                                }\"></n7-content-placeholder>\n                            </div>\n                        </ng-container>\n                        \n                        <!-- ok: items > 0 -->\n                        <ng-container *ngSwitchCase=\"'OK'\">\n                            <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\n                            [data]=\"item\">\n                            </n7-item-preview>\n                        </ng-container>\n\n                        <!-- ok: items === 0 -->\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\n                            <div class=\"mr-search__results-fallback\">\n                                <p class=\"mr-search__results-fallback-string\">\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\n                                </p>\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\n                                </button>\n                            </div>\n                        </ng-container>\n\n                        <!-- ko: request problem -->\n                        <ng-container *ngSwitchCase=\"'KO'\">\n                            <p class=\"mr-search__results-ko-string\">\n                                {{ lb.dataSource.pageConfig.ko.text }}\n                            </p>\n                            <button class=\"n7-btn mr-search__results-ko-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                {{ lb.dataSource.pageConfig.ko.button }}\n                            </button>\n                        </ng-container>\n                        \n                    </ng-container>\n                </main>               \n                <n7-smart-pagination\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
             }] }
 ];
 /** @nocollapse */
 MrSearchLayoutComponent.ctorParameters = () => [
     { type: LayoutsConfigurationService },
     { type: Router },
-    { type: ActivatedRoute }
+    { type: ActivatedRoute },
+    { type: CommunicationService },
+    { type: ConfigurationService }
 ];
 if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutComponent.prototype.configId;
     /** @type {?} */
     MrSearchLayoutComponent.prototype.hostEmit$;
     /** @type {?} */
@@ -13546,6 +14299,16 @@ if (false) {
      * @private
      */
     MrSearchLayoutComponent.prototype.activatedRoute;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutComponent.prototype.communication;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutComponent.prototype.configuration;
 }
 
 /**
@@ -13827,7 +14590,7 @@ if (false) {
 class SearchFacetsLayoutDS extends LayoutDataSource$1 {
     constructor() {
         super(...arguments);
-        this.state = {};
+        this.ready$ = new Subject();
     }
     /**
      * @param {?} payload
@@ -13865,6 +14628,8 @@ class SearchFacetsLayoutDS extends LayoutDataSource$1 {
                 this.one(input.id).update(input.data);
             }));
         }));
+        // signal
+        this.ready$.next();
     }
     /**
      * @param {?} id
@@ -13874,7 +14639,9 @@ class SearchFacetsLayoutDS extends LayoutDataSource$1 {
     updateInputValue(id, newValue) {
         /** @type {?} */
         const widgetDataSource = this.getWidgetDataSource(id);
-        widgetDataSource.setValue(newValue, true);
+        if (widgetDataSource) {
+            widgetDataSource.setValue(newValue, true);
+        }
     }
     /**
      * @param {?} id
@@ -13884,31 +14651,46 @@ class SearchFacetsLayoutDS extends LayoutDataSource$1 {
     updateInputData(id, newData) {
         /** @type {?} */
         const widgetDataSource = this.getWidgetDataSource(id);
-        widgetDataSource.update(Object.assign({}, widgetDataSource.input, newData));
+        if (widgetDataSource) {
+            widgetDataSource.update(Object.assign({}, widgetDataSource.input, newData));
+        }
     }
     /**
-     * @param {?=} id
+     * @param {?} id
      * @return {?}
      */
-    getState(id) {
-        return id ? this.state[id] : this.state;
+    clearInput(id) {
+        /** @type {?} */
+        const widgetDataSource = this.getWidgetDataSource(id);
+        if (widgetDataSource) {
+            widgetDataSource.clear();
+            widgetDataSource.setValue(widgetDataSource.value, true);
+        }
     }
     /**
-     * @param {?} __0
      * @return {?}
      */
-    setState({ value, id }) {
-        this.state[id] = value;
+    clearInputs() {
+        this.data.sections.forEach((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ header, inputs }) => {
+            [header, ...inputs].forEach((/**
+             * @param {?} input
+             * @return {?}
+             */
+            (input) => {
+                this.clearInput(input.id);
+            }));
+        }));
     }
 }
 if (false) {
     /** @type {?} */
     SearchFacetsLayoutDS.prototype.data;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchFacetsLayoutDS.prototype.state;
+    /** @type {?} */
+    SearchFacetsLayoutDS.prototype.ready$;
 }
 
 /**
@@ -13938,9 +14720,12 @@ class SearchFacetsLayoutEH extends EventHandler {
                 case 'mr-search-facets-layout.init':
                     this.hostEmit$ = payload.hostEmit$;
                     this.guestEmit$ = payload.guestEmit$;
-                    this.dataSource.onInit(payload);
-                    this.initChangedListener(payload.data);
+                    // listeners
+                    this.listenFacetsReady();
                     this.listenToHost();
+                    this.initChangedListener(payload.data);
+                    // init
+                    this.dataSource.onInit(payload);
                     break;
                 case 'mr-search-facets-layout.destroy':
                     this.dataSource.onDestroy();
@@ -13993,16 +14778,25 @@ class SearchFacetsLayoutEH extends EventHandler {
                  * @return {?}
                  */
                 (payload) => {
-                    this.dataSource.setState(payload);
                     this.guestEmit$.next({
-                        type: 'change',
-                        payload: {
-                            lastUpdate: payload,
-                            state: this.dataSource.getState()
-                        }
+                        payload,
+                        type: 'change'
                     });
                 }));
             }));
+        }));
+    }
+    /**
+     * @return {?}
+     */
+    listenFacetsReady() {
+        this.dataSource.ready$.subscribe((/**
+         * @return {?}
+         */
+        () => {
+            this.guestEmit$.next({
+                type: 'facetsready'
+            });
         }));
     }
     /**
@@ -14020,6 +14814,12 @@ class SearchFacetsLayoutEH extends EventHandler {
                     break;
                 case 'updateinputdata':
                     this.dataSource.updateInputData(payload.id, payload.data);
+                    break;
+                case 'clearinput':
+                    this.dataSource.clearInput(payload.id);
+                    break;
+                case 'clearinputs':
+                    this.dataSource.clearInputs();
                     break;
                 default:
                     break;
@@ -14091,6 +14891,12 @@ class FacetTextDS extends DataSource {
         this.value = value;
         if (update) {
             this.update(Object.assign({}, this.input, { value }));
+            // fix element update
+            /** @type {?} */
+            const el = (/** @type {?} */ (document.getElementById(this.output.id)));
+            if (el) {
+                el.value = value;
+            }
         }
     }
     /**
@@ -14136,7 +14942,7 @@ class FacetCheckboxDS extends DataSource {
      * @return {?}
      */
     setValue(value, update = false) {
-        this.value = value;
+        this.value = Array.isArray(value) ? value : [value];
         if (update) {
             const { checkboxes } = this.input;
             /** @type {?} */
@@ -14144,7 +14950,7 @@ class FacetCheckboxDS extends DataSource {
              * @param {?} checkbox
              * @return {?}
              */
-            (checkbox) => (Object.assign({}, checkbox, { checked: value.indexOf(checkbox.payload) !== -1 }))));
+            (checkbox) => (Object.assign({}, checkbox, { checked: this.value.indexOf(checkbox.payload) !== -1 }))));
             this.update(Object.assign({}, this.input, { checkboxes: updatedCheckboxes }));
         }
     }
@@ -14261,7 +15067,7 @@ class FacetLinkDS extends DataSource {
      * @return {?}
      */
     setValue(value, update = false) {
-        this.value = value;
+        this.value = Array.isArray(value) ? value : [value];
         if (update) {
             const { links } = this.input;
             /** @type {?} */
@@ -14269,7 +15075,7 @@ class FacetLinkDS extends DataSource {
              * @param {?} link
              * @return {?}
              */
-            (link) => (Object.assign({}, link, { classes: value.indexOf(link.payload) !== -1 ? ACTIVE_CLASS : '' }))));
+            (link) => (Object.assign({}, link, { classes: this.value.indexOf(link.payload) !== -1 ? ACTIVE_CLASS : '' }))));
             this.update(Object.assign({}, this.input, { links: updatedLinks }));
         }
     }
@@ -14591,7 +15397,7 @@ class MrSearchFacetsLayoutComponent extends AbstractLayout {
 MrSearchFacetsLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'mr-search-facets-layout',
-                template: "<div *ngIf=\"lb.dataSource.data\" class=\"mr-search-facets {{ lb.dataSource.data.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.data.sections\" class=\"mr-search-facets__section {{ section.classes || '' }}\">\n        <n7-facet-header\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\n        [emit]=\"lb.widgets[section.header.id].emit\"\n        ></n7-facet-header>\n\n        <div *ngFor=\"let input of section.inputs\" class=\"mr-search-facets__input {{ input.classes || '' }}\">\n            <ng-container [ngSwitch]=\"input.type\">\n\n                <!-- INPUT TEXT -->\n                <n7-input-text \n                *ngSwitchCase=\"'text'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n\n                <!-- INPUT CHECKBOX -->\n                <n7-input-checkbox \n                *ngSwitchCase=\"'checkbox'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                \n                <!-- INPUT SELECT -->\n                <n7-input-select \n                *ngSwitchCase=\"'select'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                \n                <!-- INPUT LINK -->\n                <n7-input-link \n                *ngSwitchCase=\"'link'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n            \n            </ng-container>\n        </div>\n        \n    </div>\n</div>"
+                template: "<div *ngIf=\"lb.dataSource.data\" class=\"mr-search-facets {{ lb.dataSource.data.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.data.sections\" class=\"mr-search-facets__section {{ section.classes || '' }}\">\n        <n7-facet-header\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\n        [emit]=\"lb.widgets[section.header.id].emit\"\n        ></n7-facet-header>\n\n        <div [hidden]=\"!lb.widgets[section.header.id].ds.isOpen()\" class=\"mr-search-facets__wrapper\">\n            <div *ngFor=\"let input of section.inputs\" class=\"mr-search-facets__input {{ input.classes || '' }}\">\n                <ng-container [ngSwitch]=\"input.type\">\n    \n                    <!-- INPUT TEXT -->\n                    <n7-input-text \n                    *ngSwitchCase=\"'text'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n    \n                    <!-- INPUT CHECKBOX -->\n                    <n7-input-checkbox \n                    *ngSwitchCase=\"'checkbox'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                    \n                    <!-- INPUT SELECT -->\n                    <n7-input-select \n                    *ngSwitchCase=\"'select'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                    \n                    <!-- INPUT LINK -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'link'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n                \n                </ng-container>\n            </div>\n        </div>\n        \n        \n    </div>\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -14711,5 +15517,5 @@ N7BoilerplateLibModule.decorators = [
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrInnerTitleDS, MrItemPreviewsDS, MrNavDS, MrNavEH, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrGlossaryLayoutComponent as ɵba, MrStaticLayoutComponent as ɵbb, MrSearchFacetsLayoutComponent as ɵbc, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, AwGalleryLayoutComponent as ɵq, BubbleChartWrapperComponent as ɵr, ChartTippyComponent as ɵs, SmartBreadcrumbsComponent as ɵt, DataWidgetWrapperComponent as ɵu, DatepickerWrapperComponent as ɵv, DvExampleLayoutComponent as ɵw, EscapeHtmlPipe as ɵx, MrHomeLayoutComponent as ɵy, MrSearchLayoutComponent as ɵz };
+export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrInnerTitleDS, MrItemPreviewsDS, MrNavDS, MrNavEH, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageTitleDS, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrGlossaryLayoutComponent as ɵba, MrStaticLayoutComponent as ɵbb, MrSearchFacetsLayoutComponent as ɵbc, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, AwGalleryLayoutComponent as ɵq, BubbleChartWrapperComponent as ɵr, ChartTippyComponent as ɵs, SmartBreadcrumbsComponent as ɵt, DataWidgetWrapperComponent as ɵu, DatepickerWrapperComponent as ɵv, DvExampleLayoutComponent as ɵw, EscapeHtmlPipe as ɵx, MrHomeLayoutComponent as ɵy, MrSearchLayoutComponent as ɵz };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

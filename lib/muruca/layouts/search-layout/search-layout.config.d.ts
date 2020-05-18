@@ -12,6 +12,10 @@ export declare const MrSearchLayoutConfig: {
         eventHandler: typeof FacetsWrapperEH;
     } | {
         id: string;
+        dataSource?: undefined;
+        eventHandler?: undefined;
+    } | {
+        id: string;
         dataSource: typeof DS.MrItemPreviewsDS;
         eventHandler?: undefined;
     } | {

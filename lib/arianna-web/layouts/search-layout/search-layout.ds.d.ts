@@ -1,5 +1,5 @@
 import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 export declare class AwSearchLayoutDS extends LayoutDataSource {
     private destroyed$;
     private communication;
@@ -14,15 +14,22 @@ export declare class AwSearchLayoutDS extends LayoutDataSource {
     pageTitle: string;
     resultsTitle: string;
     totalCount: number;
+    /** Pagination value (url parameter) */
     currentPage: any;
+    /** Linked objects page size */
     pageSize: number;
     sidebarIsSticky: boolean;
     isFirstLoading: boolean;
     resultsLoading: boolean;
+    /** True when the user has input a text string */
+    isSearchingText: BehaviorSubject<boolean>;
+    /** Current order method */
     orderBy: string;
+    /** Current order direction */
     orderDirection: string;
     options: any;
     orderByLabel: string;
+    /** Options used to render the HTMLSelect */
     orderByOptions: any;
     onInit({ configuration, mainState, options, communication, search, }: {
         configuration: any;
@@ -33,7 +40,11 @@ export declare class AwSearchLayoutDS extends LayoutDataSource {
     }): void;
     onDestroy(): void;
     onSearchResponse(): void;
-    onOrderByChange(payload: any): void;
+    /**
+     * Handles changes of the HTMLSelect order control
+     * @param payload _score_DESC, label_sort_ASC, label_sort_DESC
+     */
+    onOrderByChange(payload: string): void;
     onPageSizeChange(size: any): Observable<boolean>;
     onPaginationChange(payload: any): Observable<boolean>;
     onPaginationGoToChange(payload: any): Observable<boolean>;

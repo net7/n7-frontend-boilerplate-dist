@@ -10533,11 +10533,12 @@
         ],
         results: {
             order: {
-                type: 'score',
+                // Default Sorting Method
+                type: 'text',
                 // score | text | date
-                key: '_score',
+                key: 'label_sort',
                 // docPath, elastic key, ecc
-                direction: 'DESC' // ASC | DESC
+                direction: 'ASC' // ASC | DESC
             },
             fields: [
                 {
@@ -10562,30 +10563,45 @@
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.destroyed$ = new rxjs.Subject();
             _this.resetButtonEnabled = true;
-            _this.currentPage = 1; // pagination value (url param)
-            // pagination value (url param)
-            _this.pageSize = 10; // linked objects page size
-            // linked objects page size
+            /**
+             * Pagination value (url parameter)
+             */
+            _this.currentPage = 1;
+            /**
+             * Linked objects page size
+             */
+            _this.pageSize = 10;
             _this.sidebarIsSticky = false;
             _this.isFirstLoading = true;
             _this.resultsLoading = false;
-            _this.orderBy = '_score';
-            _this.orderDirection = 'DESC';
+            /**
+             * True when the user has input a text string
+             */
+            _this.isSearchingText = new rxjs.BehaviorSubject(false);
+            /**
+             * Current order method
+             */
+            _this.orderBy = 'label_sort';
+            /**
+             * Current order direction
+             */
+            _this.orderDirection = 'ASC';
             _this.orderByLabel = 'Ordina per';
+            /**
+             * Options used to render the HTMLSelect
+             */
             _this.orderByOptions = [
                 {
                     value: '_score_DESC',
                     label: 'Ordine per pertinenza',
                     type: 'score',
-                    selected: true
-                },
-                {
+                    selected: false
+                }, {
                     value: 'label_sort_ASC',
                     label: 'Ordine alfabetico (A→Z)',
                     type: 'text',
-                    selected: false
-                },
-                {
+                    selected: true // Mirrors the default sorting method in `search-facets.config.ts`
+                }, {
                     value: 'label_sort_DESC',
                     label: 'Ordine alfabetico (Z→A)',
                     type: 'text',
@@ -10649,7 +10665,6 @@
                 this.searchModel.updateFiltersFromQueryParams(SearchService.queryParams);
                 SearchService.queryParams = null;
             }
-            // sidebar sticky control
             this._sidebarStickyControl();
             this.mainState.updateCustom('currentNav', 'ricerca');
             this.mainState.update('headTitle', 'Arianna4View - Ricerca');
@@ -10679,11 +10694,17 @@
             }
         };
         /**
-         * @param {?} payload
+         * Handles changes of the HTMLSelect order control
+         * @param payload _score_DESC, label_sort_ASC, label_sort_DESC
+         */
+        /**
+         * Handles changes of the HTMLSelect order control
+         * @param {?} payload _score_DESC, label_sort_ASC, label_sort_DESC
          * @return {?}
          */
         AwSearchLayoutDS.prototype.onOrderByChange = /**
-         * @param {?} payload
+         * Handles changes of the HTMLSelect order control
+         * @param {?} payload _score_DESC, label_sort_ASC, label_sort_DESC
          * @return {?}
          */
         function (payload) {
@@ -11077,9 +11098,15 @@
         AwSearchLayoutDS.prototype.resultsTitle;
         /** @type {?} */
         AwSearchLayoutDS.prototype.totalCount;
-        /** @type {?} */
+        /**
+         * Pagination value (url parameter)
+         * @type {?}
+         */
         AwSearchLayoutDS.prototype.currentPage;
-        /** @type {?} */
+        /**
+         * Linked objects page size
+         * @type {?}
+         */
         AwSearchLayoutDS.prototype.pageSize;
         /** @type {?} */
         AwSearchLayoutDS.prototype.sidebarIsSticky;
@@ -11087,15 +11114,29 @@
         AwSearchLayoutDS.prototype.isFirstLoading;
         /** @type {?} */
         AwSearchLayoutDS.prototype.resultsLoading;
-        /** @type {?} */
+        /**
+         * True when the user has input a text string
+         * @type {?}
+         */
+        AwSearchLayoutDS.prototype.isSearchingText;
+        /**
+         * Current order method
+         * @type {?}
+         */
         AwSearchLayoutDS.prototype.orderBy;
-        /** @type {?} */
+        /**
+         * Current order direction
+         * @type {?}
+         */
         AwSearchLayoutDS.prototype.orderDirection;
         /** @type {?} */
         AwSearchLayoutDS.prototype.options;
         /** @type {?} */
         AwSearchLayoutDS.prototype.orderByLabel;
-        /** @type {?} */
+        /**
+         * Options used to render the HTMLSelect
+         * @type {?}
+         */
         AwSearchLayoutDS.prototype.orderByOptions;
         /** @type {?} */
         AwSearchLayoutDS.prototype.drawPagination;
@@ -11112,8 +11153,23 @@
         function AwSearchLayoutEH() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.destroyed$ = new rxjs.Subject();
+            /**
+             * Emits when any of the search-facets are changed
+             */
             _this.facetsChange$ = new rxjs.Subject();
-            _this.aditionalParamsChange$ = new rxjs.Subject();
+            /**
+             * Emits when the pagination element
+             * or the select-sort element are changed
+             */
+            _this.additionalParamsChange$ = new rxjs.Subject();
+            /**
+             * Last queried text, used to check if the text has changed
+             */
+            _this.previousText = '';
+            /**
+             * Is true when the search is triggered with a new text-string
+             */
+            _this.textHasChanged = false;
             return _this;
         }
         /**
@@ -11136,7 +11192,7 @@
                         _this.configuration = payload.configuration;
                         _this.dataSource.onInit(payload);
                         _this._listenToFacetsChange();
-                        _this._listenToAditionalParamsChange();
+                        _this._listenToAdditionalParamsChange();
                         _this._listenToRouterChanges();
                         break;
                     case 'aw-search-layout.destroy':
@@ -11144,13 +11200,14 @@
                         _this.destroyed$.next();
                         break;
                     case 'aw-search-layout.orderbychange':
+                        // handle the change of result-order
                         _this.dataSource.onOrderByChange(payload);
-                        _this.aditionalParamsChange$.next();
+                        _this.additionalParamsChange$.next(); // emit from observable stream
                         break;
                     case 'aw-search-layout.searchreset':
                         _this.dataSource.resetButtonEnabled = false;
                         _this.dataSource.searchModel.clear();
-                        _this.aditionalParamsChange$.next();
+                        _this.additionalParamsChange$.next();
                         break;
                     default:
                         console.warn('(search) unhandled inner event of type', type);
@@ -11165,11 +11222,32 @@
                 var type = _a.type, payload = _a.payload;
                 switch (type) {
                     case 'facets-wrapper.facetschange':
-                        _this.dataSource.resetPagination();
+                        {
+                            _this.dataSource.resetPagination();
+                            var textInput = _this.dataSource.searchModel.getFiltersByFacetId('query')[0].value;
+                            // Checks if <input type=text>'s value has changed
+                            _this.textHasChanged = !!(textInput && (textInput !== _this.previousText));
+                            _this.previousText = textInput;
+                            if (_this.textHasChanged && textInput.length > 0) {
+                                // Add sort by score option
+                                _this.dataSource.isSearchingText.next(true);
+                            }
+                            else if (textInput.length === 0) {
+                                // Remove sort by score option
+                                _this.dataSource.isSearchingText.next(false);
+                                setTimeout((/**
+                                 * @return {?}
+                                 */
+                                function () {
+                                    _this.dataSource.onOrderByChange('label_sort_DESC');
+                                    _this.additionalParamsChange$.next(); // emit from observable stream
+                                }), 100);
+                            }
+                        }
                         break;
                     case 'n7-smart-pagination.change':
                         _this.dataSource.onResultsLimitChange(payload.value);
-                        _this.aditionalParamsChange$.next();
+                        _this.additionalParamsChange$.next();
                         break;
                     default:
                         break;
@@ -11177,10 +11255,15 @@
             }));
         };
         /**
+         * Handles changes to any of the search-facets
+         */
+        /**
+         * Handles changes to any of the search-facets
          * @private
          * @return {?}
          */
         AwSearchLayoutEH.prototype._listenToFacetsChange = /**
+         * Handles changes to any of the search-facets
          * @private
          * @return {?}
          */
@@ -11191,27 +11274,38 @@
              */
             function () {
                 _this.dataSource.resultsLoading = true;
-                _this.dataSource.doSearchRequest$().subscribe((/**
-                 * @return {?}
-                 */
-                function () {
-                    _this.dataSource.resultsLoading = false;
-                    _this.dataSource.onSearchResponse();
-                    _this.emitGlobal('searchresponse', _this.dataSource.getSearchModelId());
-                }));
+                if (_this.textHasChanged) {
+                    _this.additionalParamsChange$.next();
+                    _this.textHasChanged = false; // reset
+                }
+                else {
+                    _this.dataSource.doSearchRequest$().subscribe((/**
+                     * @return {?}
+                     */
+                    function () {
+                        _this.dataSource.resultsLoading = false;
+                        _this.dataSource.onSearchResponse();
+                        _this.emitGlobal('searchresponse', _this.dataSource.getSearchModelId());
+                    }));
+                }
             }));
         };
         /**
+         * Handles changes happening on pagination and select elements.
+         */
+        /**
+         * Handles changes happening on pagination and select elements.
          * @private
          * @return {?}
          */
-        AwSearchLayoutEH.prototype._listenToAditionalParamsChange = /**
+        AwSearchLayoutEH.prototype._listenToAdditionalParamsChange = /**
+         * Handles changes happening on pagination and select elements.
          * @private
          * @return {?}
          */
         function () {
             var _this = this;
-            this.aditionalParamsChange$.subscribe((/**
+            this.additionalParamsChange$.subscribe((/**
              * @return {?}
              */
             function () {
@@ -11230,7 +11324,11 @@
                 queryParams.orderdirection = _this.dataSource.orderDirection;
                 queryParams.page = _this.dataSource.currentPage;
                 queryParams.limit = _this.dataSource.pageSize;
-                // router signal
+                // If the searched text was updated, overwrite the query params and force sorting by "score".
+                if (_this.textHasChanged) {
+                    queryParams.orderby = '_score';
+                    queryParams.orderdirection = 'DESC';
+                }
                 _this.emitGlobal('navigate', {
                     handler: 'router',
                     path: [],
@@ -11238,11 +11336,14 @@
                 });
             }));
         };
+        /** URL changes */
         /**
+         * URL changes
          * @private
          * @return {?}
          */
         AwSearchLayoutEH.prototype._listenToRouterChanges = /**
+         * URL changes
          * @private
          * @return {?}
          */
@@ -11279,22 +11380,37 @@
          * @type {?}
          * @private
          */
+        AwSearchLayoutEH.prototype.configuration;
+        /**
+         * @type {?}
+         * @private
+         */
         AwSearchLayoutEH.prototype.route;
         /**
+         * Emits when any of the search-facets are changed
          * @type {?}
          * @private
          */
         AwSearchLayoutEH.prototype.facetsChange$;
         /**
+         * Emits when the pagination element
+         * or the select-sort element are changed
          * @type {?}
          * @private
          */
-        AwSearchLayoutEH.prototype.aditionalParamsChange$;
+        AwSearchLayoutEH.prototype.additionalParamsChange$;
         /**
+         * Last queried text, used to check if the text has changed
          * @type {?}
          * @private
          */
-        AwSearchLayoutEH.prototype.configuration;
+        AwSearchLayoutEH.prototype.previousText;
+        /**
+         * Is true when the search is triggered with a new text-string
+         * @type {?}
+         * @private
+         */
+        AwSearchLayoutEH.prototype.textHasChanged;
     }
 
     /**
@@ -11393,7 +11509,7 @@
         AwSearchLayoutComponent.decorators = [
             { type: core.Component, args: [{
                         selector: 'aw-search-layout',
-                        template: "<div class=\"aw-search n7-side-auto-padding\" id=\"search-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n        <!--\n        <div class=\"aw-search__header-right\">\n            <n7-nav\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\n            </n7-nav>\n        </div>\n        -->\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar sticky-target\"\n            [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                        for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                        id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\" [value]=\"option.value\"\n                            [selected]=\"option.selected\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper\">\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                    <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                    </n7-smart-breadcrumbs>\n                    <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\" class=\"n7-btn aw-search__fallback-button\"\n                            (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>"
+                        template: "<div class=\"aw-search n7-side-auto-padding\"\n     id=\"search-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n        <!--\n        <div class=\"aw-search__header-right\">\n            <n7-nav\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\n            </n7-nav>\n        </div>\n        -->\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                                   [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\"\n                        class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                           for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                            id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\"\n                                [value]=\"option.value\"\n                                [selected]=\"option.selected\"\n                                [hidden]=\"option.type === 'score' && lb.dataSource.isSearchingText.value === false\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\"\n                                        [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper\">\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                    <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                    </n7-smart-breadcrumbs>\n                    <n7-item-preview [data]=\"preview\"\n                                     [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\"\n                                class=\"n7-btn aw-search__fallback-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>\n"
                     }] }
         ];
         /** @nocollapse */
@@ -11609,21 +11725,31 @@
             _this.sidebarIsSticky = false;
             _this.isFirstLoading = true;
             _this.resultsLoading = false;
-            _this.orderBy = '_score';
-            _this.orderDirection = 'DESC';
+            /**
+             * True when the user has input a text string
+             */
+            _this.isSearchingText = new rxjs.BehaviorSubject(false);
+            /**
+             * Current order method
+             */
+            _this.orderBy = 'label_sort';
+            /**
+             * Current order direction
+             */
+            _this.orderDirection = 'ASC';
             _this.orderByLabel = 'Ordina per';
             _this.orderByOptions = [
                 {
                     value: '_score_DESC',
                     label: 'Ordine per pertinenza',
                     type: 'score',
-                    selected: true
+                    selected: false
                 },
                 {
                     value: 'label_sort_ASC',
                     label: 'Ordine alfabetico (A→Z)',
                     type: 'text',
-                    selected: false
+                    selected: true
                 },
                 {
                     value: 'label_sort_DESC',
@@ -11719,11 +11845,17 @@
             }
         };
         /**
-         * @param {?} payload
+        * Handles changes of the HTMLSelect order control
+        * @param payload _score_DESC, label_sort_ASC, label_sort_DESC
+        */
+        /**
+         * Handles changes of the HTMLSelect order control
+         * @param {?} payload _score_DESC, label_sort_ASC, label_sort_DESC
          * @return {?}
          */
         AwGalleryLayoutDS.prototype.onOrderByChange = /**
-         * @param {?} payload
+         * Handles changes of the HTMLSelect order control
+         * @param {?} payload _score_DESC, label_sort_ASC, label_sort_DESC
          * @return {?}
          */
         function (payload) {
@@ -12127,9 +12259,20 @@
         AwGalleryLayoutDS.prototype.isFirstLoading;
         /** @type {?} */
         AwGalleryLayoutDS.prototype.resultsLoading;
-        /** @type {?} */
+        /**
+         * True when the user has input a text string
+         * @type {?}
+         */
+        AwGalleryLayoutDS.prototype.isSearchingText;
+        /**
+         * Current order method
+         * @type {?}
+         */
         AwGalleryLayoutDS.prototype.orderBy;
-        /** @type {?} */
+        /**
+         * Current order direction
+         * @type {?}
+         */
         AwGalleryLayoutDS.prototype.orderDirection;
         /** @type {?} */
         AwGalleryLayoutDS.prototype.options;
@@ -12152,8 +12295,23 @@
         function AwGalleryLayoutEH() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.destroyed$ = new rxjs.Subject();
+            /**
+             * Emits when any of the gallery-facets are changed
+             */
             _this.facetsChange$ = new rxjs.Subject();
-            _this.aditionalParamsChange$ = new rxjs.Subject();
+            /**
+             * Emits when the pagination element
+             * or the select-sort element are changed
+             */
+            _this.additionalParamsChange$ = new rxjs.Subject();
+            /**
+             * Last queried text, used to check if the text has changed
+             */
+            _this.previousText = '';
+            /**
+             * Is true when the search is triggered with a new text-string
+             */
+            _this.textHasChanged = false;
             return _this;
         }
         /**
@@ -12176,7 +12334,7 @@
                         _this.configuration = payload.configuration;
                         _this.dataSource.onInit(payload);
                         _this._listenToFacetsChange();
-                        _this._listenToAditionalParamsChange();
+                        _this._listenToAdditionalParamsChange();
                         _this._listenToRouterChanges();
                         break;
                     case 'aw-gallery-layout.destroy':
@@ -12184,13 +12342,14 @@
                         _this.destroyed$.next();
                         break;
                     case 'aw-gallery-layout.orderbychange':
+                        // handle the change of result-order
                         _this.dataSource.onOrderByChange(payload);
-                        _this.aditionalParamsChange$.next();
+                        _this.additionalParamsChange$.next(); // emit from observable stream
                         break;
                     case 'aw-gallery-layout.searchreset':
                         _this.dataSource.resetButtonEnabled = false;
                         _this.dataSource.searchModel.clear();
-                        _this.aditionalParamsChange$.next();
+                        _this.additionalParamsChange$.next();
                         break;
                     default:
                         console.warn('(search) unhandled inner event of type', type);
@@ -12205,11 +12364,32 @@
                 var type = _a.type, payload = _a.payload;
                 switch (type) {
                     case 'facets-wrapper.facetschange':
-                        _this.dataSource.resetPagination();
+                        {
+                            _this.dataSource.resetPagination();
+                            var textInput = _this.dataSource.searchModel.getFiltersByFacetId('query')[0].value;
+                            // Checks if <input type=text>'s value has changed
+                            _this.textHasChanged = !!(textInput && (textInput !== _this.previousText));
+                            _this.previousText = textInput;
+                            if (_this.textHasChanged && textInput.length > 0) {
+                                // Add sort by score option
+                                _this.dataSource.isSearchingText.next(true);
+                            }
+                            else if (textInput.length === 0) {
+                                // Remove sort by score option
+                                _this.dataSource.isSearchingText.next(false);
+                                setTimeout((/**
+                                 * @return {?}
+                                 */
+                                function () {
+                                    _this.dataSource.onOrderByChange('label_sort_DESC');
+                                    _this.additionalParamsChange$.next(); // emit from observable stream
+                                }), 100);
+                            }
+                        }
                         break;
                     case 'n7-smart-pagination.change':
                         _this.dataSource.onResultsLimitChange(payload.value);
-                        _this.aditionalParamsChange$.next();
+                        _this.additionalParamsChange$.next();
                         break;
                     default:
                         break;
@@ -12217,10 +12397,15 @@
             }));
         };
         /**
+         * Handles changes to any of the search-facets
+         */
+        /**
+         * Handles changes to any of the search-facets
          * @private
          * @return {?}
          */
         AwGalleryLayoutEH.prototype._listenToFacetsChange = /**
+         * Handles changes to any of the search-facets
          * @private
          * @return {?}
          */
@@ -12231,27 +12416,38 @@
              */
             function () {
                 _this.dataSource.resultsLoading = true;
-                _this.dataSource.doSearchRequest$().subscribe((/**
-                 * @return {?}
-                 */
-                function () {
-                    _this.dataSource.resultsLoading = false;
-                    _this.dataSource.onSearchResponse();
-                    _this.emitGlobal('searchresponse', _this.dataSource.getSearchModelId());
-                }));
+                if (_this.textHasChanged) {
+                    _this.additionalParamsChange$.next();
+                    _this.textHasChanged = false; // reset
+                }
+                else {
+                    _this.dataSource.doSearchRequest$().subscribe((/**
+                     * @return {?}
+                     */
+                    function () {
+                        _this.dataSource.resultsLoading = false;
+                        _this.dataSource.onSearchResponse();
+                        _this.emitGlobal('searchresponse', _this.dataSource.getSearchModelId());
+                    }));
+                }
             }));
         };
         /**
+         * Handles changes happening on pagination and select elements.
+         */
+        /**
+         * Handles changes happening on pagination and select elements.
          * @private
          * @return {?}
          */
-        AwGalleryLayoutEH.prototype._listenToAditionalParamsChange = /**
+        AwGalleryLayoutEH.prototype._listenToAdditionalParamsChange = /**
+         * Handles changes happening on pagination and select elements.
          * @private
          * @return {?}
          */
         function () {
             var _this = this;
-            this.aditionalParamsChange$.subscribe((/**
+            this.additionalParamsChange$.subscribe((/**
              * @return {?}
              */
             function () {
@@ -12270,7 +12466,11 @@
                 queryParams.orderdirection = _this.dataSource.orderDirection;
                 queryParams.page = _this.dataSource.currentPage;
                 queryParams.limit = _this.dataSource.pageSize;
-                // router signal
+                // If the searched text was updated, overwrite the query params and force sorting by "score".
+                if (_this.textHasChanged) {
+                    queryParams.orderby = '_score';
+                    queryParams.orderdirection = 'DESC';
+                }
                 _this.emitGlobal('navigate', {
                     handler: 'router',
                     path: [],
@@ -12278,11 +12478,14 @@
                 });
             }));
         };
+        /** URL changes */
         /**
+         * URL changes
          * @private
          * @return {?}
          */
         AwGalleryLayoutEH.prototype._listenToRouterChanges = /**
+         * URL changes
          * @private
          * @return {?}
          */
@@ -12319,22 +12522,37 @@
          * @type {?}
          * @private
          */
+        AwGalleryLayoutEH.prototype.configuration;
+        /**
+         * @type {?}
+         * @private
+         */
         AwGalleryLayoutEH.prototype.route;
         /**
+         * Emits when any of the gallery-facets are changed
          * @type {?}
          * @private
          */
         AwGalleryLayoutEH.prototype.facetsChange$;
         /**
+         * Emits when the pagination element
+         * or the select-sort element are changed
          * @type {?}
          * @private
          */
-        AwGalleryLayoutEH.prototype.aditionalParamsChange$;
+        AwGalleryLayoutEH.prototype.additionalParamsChange$;
         /**
+         * Last queried text, used to check if the text has changed
          * @type {?}
          * @private
          */
-        AwGalleryLayoutEH.prototype.configuration;
+        AwGalleryLayoutEH.prototype.previousText;
+        /**
+         * Is true when the search is triggered with a new text-string
+         * @type {?}
+         * @private
+         */
+        AwGalleryLayoutEH.prototype.textHasChanged;
     }
 
     /**
@@ -12426,7 +12644,7 @@
         AwGalleryLayoutComponent.decorators = [
             { type: core.Component, args: [{
                         selector: 'aw-gallery-layout',
-                        template: "<div class=\"aw-search aw-gallery n7-side-auto-padding\" id=\"gallery-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\" class=\"aw-search__sidebar sticky-target\"\n            [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                        for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                        id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\" [value]=\"option.value\"\n                            [selected]=\"option.selected\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\" class=\"aw-search__results-wrapper\">\n                <div class=\"n7-grid-3\">\n                    <div *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\" class=\"n7-btn aw-search__fallback-button\"\n                            (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>"
+                        template: "<div class=\"aw-search aw-gallery n7-side-auto-padding\"\n     id=\"gallery-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                                   [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\"\n                        class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                           for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                            id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\"\n                                [value]=\"option.value\"\n                                [selected]=\"option.selected\"\n                                [hidden]=\"option.type === 'score' && lb.dataSource.isSearchingText.value === false\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\"\n                                        [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper\">\n                <div class=\"n7-grid-3\">\n                    <div *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\"\n                                         [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\"\n                                class=\"n7-btn aw-search__fallback-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>\n"
                     }] }
         ];
         /** @nocollapse */
@@ -14113,13 +14331,188 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
+    var MrSearchResultsDS = /** @class */ (function (_super) {
+        __extends(MrSearchResultsDS, _super);
+        function MrSearchResultsDS() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        MrSearchResultsDS.prototype.transform = /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        function (data) {
+            var results = data.results;
+            return results;
+        };
+        return MrSearchResultsDS;
+    }(core$1.DataSource));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var MrSearchPageTitleDS = /** @class */ (function (_super) {
+        __extends(MrSearchPageTitleDS, _super);
+        function MrSearchPageTitleDS() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @protected
+         * @return {?}
+         */
+        MrSearchPageTitleDS.prototype.transform = /**
+         * @protected
+         * @return {?}
+         */
+        function () {
+            var title = this.options.config.title;
+            return {
+                title: {
+                    main: {
+                        text: title
+                    }
+                }
+            };
+        };
+        return MrSearchPageTitleDS;
+    }(core$1.DataSource));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var MrSearchResultsTitleDS = /** @class */ (function (_super) {
+        __extends(MrSearchResultsTitleDS, _super);
+        function MrSearchResultsTitleDS() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        MrSearchResultsTitleDS.prototype.transform = /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        function (data) {
+            var _a = this.options.config, totalResultsText = _a.totalResultsText, sort = _a.sort;
+            var totalCount = data.totalCount, currentSort = data.sort;
+            return {
+                title: {
+                    main: {
+                        text: totalCount
+                    },
+                    secondary: {
+                        text: totalResultsText[totalCount === 1 ? 1 : 0]
+                    }
+                },
+                actions: {
+                    select: {
+                        label: sort.label,
+                        options: sort.options.map((/**
+                         * @param {?} __0
+                         * @return {?}
+                         */
+                        function (_a) {
+                            var label = _a.label, value = _a.value, selected = _a.selected;
+                            return ({
+                                value: value,
+                                selected: currentSort ? value === currentSort : selected,
+                                text: label
+                            });
+                        })),
+                        payload: 'sort'
+                    }
+                }
+            };
+        };
+        return MrSearchResultsTitleDS;
+    }(core$1.DataSource));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var MrSearchTagsDS = /** @class */ (function (_super) {
+        __extends(MrSearchTagsDS, _super);
+        function MrSearchTagsDS() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        MrSearchTagsDS.prototype.transform = /**
+         * @protected
+         * @param {?} data
+         * @return {?}
+         */
+        function (data) {
+            var state = data.state, facetsConfig = data.facetsConfig;
+            /** @type {?} */
+            var tags = [];
+            // inputs config
+            facetsConfig.sections.forEach((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var inputs = _a.inputs;
+                inputs.forEach((/**
+                 * @param {?} __0
+                 * @return {?}
+                 */
+                function (_a) {
+                    var id = _a.id;
+                    if (state[id]) {
+                        /** @type {?} */
+                        var values = Array.isArray(state[id]) ? state[id] : [state[id]];
+                        values.forEach((/**
+                         * @param {?} value
+                         * @return {?}
+                         */
+                        function (value) {
+                            tags.push({
+                                text: value,
+                                icon: 'n7-icon-close',
+                                payload: {
+                                    id: id,
+                                    value: value
+                                }
+                            });
+                        }));
+                    }
+                }));
+            }));
+            return tags;
+        };
+        return MrSearchTagsDS;
+    }(core$1.DataSource));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
 
     var DS$3 = /*#__PURE__*/Object.freeze({
         MrItemPreviewsDS: MrItemPreviewsDS,
         MrInnerTitleDS: MrInnerTitleDS,
         MrHeroDS: MrHeroDS,
         MrFiltersDS: MrFiltersDS,
-        MrNavDS: MrNavDS
+        MrNavDS: MrNavDS,
+        MrSearchResultsDS: MrSearchResultsDS,
+        MrSearchPageTitleDS: MrSearchPageTitleDS,
+        MrSearchResultsTitleDS: MrSearchResultsTitleDS,
+        MrSearchTagsDS: MrSearchTagsDS
     });
 
     /**
@@ -14204,11 +14597,83 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
+    var MrSearchTagsEH = /** @class */ (function (_super) {
+        __extends(MrSearchTagsEH, _super);
+        function MrSearchTagsEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        MrSearchTagsEH.prototype.listen = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.innerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case 'mr-search-tags.click':
+                        _this.emitOuter('click', payload);
+                        break;
+                    default:
+                        break;
+                }
+            }));
+        };
+        return MrSearchTagsEH;
+    }(core$1.EventHandler));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var MrSearchResultsTitleEH = /** @class */ (function (_super) {
+        __extends(MrSearchResultsTitleEH, _super);
+        function MrSearchResultsTitleEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * @return {?}
+         */
+        MrSearchResultsTitleEH.prototype.listen = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.innerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case 'mr-search-results-title.change':
+                        _this.emitOuter('change', payload);
+                        break;
+                    default:
+                        break;
+                }
+            }));
+        };
+        return MrSearchResultsTitleEH;
+    }(core$1.EventHandler));
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
 
     var EH$3 = /*#__PURE__*/Object.freeze({
         MrDummyEH: MrDummyEH,
         MrFiltersEH: MrFiltersEH,
-        MrNavEH: MrNavEH
+        MrNavEH: MrNavEH,
+        MrSearchTagsEH: MrSearchTagsEH,
+        MrSearchResultsTitleEH: MrSearchResultsTitleEH
     });
 
     /**
@@ -14531,6 +14996,28 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
+    /**
+     * @param {?} prefix
+     * @return {?}
+     */
+    function getLinks(prefix) {
+        /** @type {?} */
+        var i;
+        /** @type {?} */
+        var limit = Math.round(Math.random() * 10);
+        /** @type {?} */
+        var links = [];
+        for (i = 0; i < limit; i += 1) {
+            /** @type {?} */
+            var text = prefix + " " + (i + 1);
+            links.push({
+                text: text,
+                counter: Math.round(Math.random() * 100),
+                payload: text
+            });
+        }
+        return links;
+    }
     var ɵ0 = {
         text: 'Filtra i risultati'
     }, ɵ1 = {
@@ -14550,105 +15037,6 @@
         inputPayload: 'search-input',
         enterPayload: 'search-enter',
         iconPayload: 'search-icon',
-    }, ɵ4 = {
-        links: [{
-                text: 'Title',
-                counter: 28,
-                payload: 'i02t28'
-            }, {
-                text: 'Title',
-                counter: 21,
-                payload: 'i02t21'
-            }, {
-                text: 'Title',
-                counter: 18,
-                payload: 'i02t18'
-            }, {
-                text: 'Title',
-                counter: 16,
-                payload: 'i02t16'
-            }, {
-                text: 'Title',
-                counter: 11,
-                payload: 'i02t11'
-            }, {
-                text: 'Title',
-                counter: 9,
-                payload: 'i02t9'
-            }, {
-                text: 'Title',
-                counter: 4,
-                payload: 'i02t4'
-            }]
-    }, ɵ5 = {
-        text: 'Glossario',
-        additionalText: '96',
-    }, ɵ6 = {
-        id: 'input-text-02',
-        placeholder: 'Search',
-        icon: 'n7-icon-search',
-        inputPayload: 'search-input',
-        enterPayload: 'search-enter',
-        iconPayload: 'search-icon',
-    }, ɵ7 = {
-        links: [{
-                text: 'Title',
-                counter: 28,
-                payload: 'i04t28'
-            }, {
-                text: 'Title',
-                counter: 21,
-                payload: 'i04t21'
-            }, {
-                text: 'Title',
-                counter: 18,
-                payload: 'i04t18'
-            }, {
-                text: 'Title',
-                counter: 16,
-                payload: 'i04t16'
-            }, {
-                text: 'Title',
-                counter: 11,
-                payload: 'i04t11'
-            }, {
-                text: 'Title',
-                counter: 9,
-                payload: 'i04t9'
-            }, {
-                text: 'Title',
-                counter: 4,
-                payload: 'i04t4'
-            }]
-    }, ɵ8 = {
-        text: 'Continenti',
-        additionalText: '3'
-    }, ɵ9 = {
-        links: [{
-                text: 'Title',
-                counter: 32,
-                payload: 'input-05-1'
-            }, {
-                text: 'Title',
-                counter: 27,
-                payload: 'input-05-2'
-            }, {
-                text: 'Title',
-                counter: 18,
-                payload: 'input-05-3'
-            }]
-    }, ɵ10 = {
-        text: 'Keywords',
-        additionalText: '108',
-        iconRight: 'n7-icon-angle-right'
-    }, ɵ11 = {
-        text: 'Data di pubblicazione',
-        additionalText: '20',
-        iconRight: 'n7-icon-angle-right'
-    }, ɵ12 = {
-        text: 'Luogo di pubblicazione',
-        additionalText: '15',
-        iconRight: 'n7-icon-angle-right'
     };
     /** @type {?} */
     var configuration = {
@@ -14670,54 +15058,105 @@
                 inputs: [{
                         id: 'input-01',
                         type: 'text',
+                        internal: true,
                         data: ɵ3
                     }, {
                         id: 'input-02',
                         type: 'link',
-                        data: ɵ4
+                        data: {
+                            links: getLinks('Toponimo')
+                        }
                     }]
             }, {
                 header: {
                     id: 'header-glossario',
-                    data: ɵ5
+                    data: {
+                        text: 'Glossario',
+                        additionalText: '96',
+                    }
                 },
                 inputs: [{
                         id: 'input-03',
                         type: 'text',
-                        data: ɵ6
+                        internal: true,
+                        data: {
+                            id: 'input-text-02',
+                            placeholder: 'Search',
+                            icon: 'n7-icon-search',
+                            inputPayload: 'search-input',
+                            enterPayload: 'search-enter',
+                            iconPayload: 'search-icon',
+                        }
                     }, {
                         id: 'input-04',
                         type: 'link',
-                        data: ɵ7
+                        data: {
+                            links: getLinks('Concetto')
+                        }
                     }]
             }, {
                 header: {
                     id: 'header-continenti',
-                    data: ɵ8
+                    data: {
+                        text: 'Continenti',
+                        additionalText: '3'
+                    }
                 },
                 inputs: [{
                         id: 'input-05',
                         type: 'link',
-                        data: ɵ9
+                        data: {
+                            links: getLinks('Continente')
+                        }
                     }]
             }, {
                 header: {
                     id: 'header-keywords',
-                    data: ɵ10
+                    data: {
+                        text: 'Keywords',
+                        additionalText: '108',
+                        iconRight: 'n7-icon-angle-right'
+                    }
                 },
-                inputs: [],
+                inputs: [{
+                        id: 'input-06',
+                        type: 'link',
+                        data: {
+                            links: getLinks('Keyword')
+                        }
+                    }],
             }, {
                 header: {
                     id: 'header-data',
-                    data: ɵ11
+                    data: {
+                        text: 'Data di pubblicazione',
+                        additionalText: '20',
+                        iconRight: 'n7-icon-angle-right'
+                    }
                 },
-                inputs: [],
+                inputs: [{
+                        id: 'input-07',
+                        type: 'link',
+                        data: {
+                            links: getLinks('Data')
+                        }
+                    }],
             }, {
                 header: {
                     id: 'header-luogo',
-                    data: ɵ12
+                    data: {
+                        text: 'Luogo di pubblicazione',
+                        additionalText: '15',
+                        iconRight: 'n7-icon-angle-right'
+                    }
                 },
-                inputs: [],
+                inputs: [{
+                        id: 'input-08',
+                        type: 'link',
+                        data: {
+                            links: getLinks('Luogo')
+                        }
+                    }],
             }],
         classes: 'facets-wrapper'
     };
@@ -14726,27 +15165,310 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
+    /**
+     * @return {?}
+     */
+    function getHeaders() {
+        /** @type {?} */
+        var headers = {};
+        configuration.sections.forEach((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        function (_a) {
+            var header = _a.header;
+            headers[header.id] = Math.round(Math.random() * 100);
+        }));
+        return headers;
+    }
+    var resultsMock = (/**
+     * @param {?} page
+     * @param {?} sort
+     * @return {?}
+     */
+    function (page, sort) { return ({
+        sort: sort,
+        totalCount: Math.round(Math.random() * 1000),
+        page: { current: page, limit: 10 },
+        headers: getHeaders(),
+        results: [
+            {
+                image: 'https://i.imgur.com/52UFqca.png',
+                title: 'Yudi Shanhai Quantu',
+                text: 'Complete Map of all mountains and seas',
+            }, {
+                image: 'https://i.imgur.com/52UFqca.png',
+                title: 'World Map based on Matteo Ricci 1850',
+                text: 'Complete Map fo all mountains and seas',
+            }, {
+                image: '',
+                title: 'Reconstruction of D\'Elia\'s map',
+                text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
+            }, {
+                image: '',
+                title: 'Unattributed version',
+                text: 'A japanese colored version',
+            }, {
+                image: '',
+                title: 'Matteo Ricci\'s way from Macau to Beijing',
+                text: 'A japanese colored version',
+            }, {
+                image: '',
+                title: 'The 400-year-old map that shows China as the centre of the world',
+                text: 'A japanese colored version',
+            }, {
+                image: 'https://i.imgur.com/52UFqca.png',
+                title: 'Yudi Shanhai Quantu',
+                text: 'Complete Map of all mountains and seas',
+            }, {
+                image: 'https://i.imgur.com/52UFqca.png',
+                title: 'World Map based on Matteo Ricci 1850',
+                text: 'Complete Map fo all mountains and seas',
+            }, {
+                image: '',
+                title: 'Reconstruction of D\'Elia\'s map',
+                text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
+            }, {
+                image: '',
+                title: 'Unattributed version',
+                text: 'A japanese colored version',
+            }, {
+                image: '',
+                title: 'Matteo Ricci\'s way from Macau to Beijing',
+                text: 'A japanese colored version',
+            }, {
+                image: '',
+                title: 'The 400-year-old map that shows China as the centre of the world',
+                text: 'A japanese colored version',
+            }
+        ]
+    }); });
+
+    /**
+     * @fileoverview added by tsickle
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
     var MrSearchLayoutDS = /** @class */ (function (_super) {
         __extends(MrSearchLayoutDS, _super);
         function MrSearchLayoutDS() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.inputsConfig = {};
+            _this.state = {};
+            _this.sectionState = {};
+            _this.totalResultsText = null;
+            _this.inputIsInternal = (/**
+             * @param {?=} id
+             * @return {?}
+             */
+            function (id) { return _this.inputsConfig[id].internal; });
+            _this.getInputType = (/**
+             * @param {?=} id
+             * @return {?}
+             */
+            function (id) { return _this.inputsConfig[id].type; });
+            return _this;
         }
         /**
+         * @param {?} payload
          * @return {?}
          */
         MrSearchLayoutDS.prototype.onInit = /**
+         * @param {?} payload
+         * @return {?}
+         */
+        function (payload) {
+            var _this = this;
+            this.configuration = payload.configuration;
+            this.communication = payload.communication;
+            this.facetsConfig = configuration;
+            this.configId = payload.configId;
+            this.pageConfig = this.configuration.get(this.configId);
+            // inputs config
+            this.facetsConfig.sections.forEach((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var inputs = _a.inputs;
+                inputs.forEach((/**
+                 * @param {?} __0
+                 * @return {?}
+                 */
+                function (_a) {
+                    var id = _a.id, type = _a.type, internal = _a.internal;
+                    _this.inputsConfig[id] = {
+                        type: type,
+                        internal: !!internal
+                    };
+                }));
+            }));
+            // config
+            this.all().updateOptions({ config: this.pageConfig });
+            // manual updates
+            this.one('mr-search-page-title').update({});
+        };
+        /**
+         * @param {?=} params
+         * @return {?}
+         */
+        MrSearchLayoutDS.prototype.doRequest$ = /**
+         * @param {?=} params
+         * @return {?}
+         */
+        function (params) {
+            if (params === void 0) { params = {}; }
+            console.warn('#TODO: doRequest', params);
+            // FIXME: togliere commento
+            /* return this.communication.request$('search', {
+                  params,
+                  onError: (error) => {
+                    this.setSectionState('results', 'KO');
+                    console.warn('SEARCH ERROR', error);
+                  }
+                }); */
+            /** @type {?} */
+            var page = this.getState('page') || 1;
+            /** @type {?} */
+            var sort = this.getState('sort') || '_score_DESC';
+            return rxjs.of(resultsMock(page, sort)).pipe(operators.delay(Math.round(Math.random() * 5000)));
+        };
+        /**
+         * @param {?} response
+         * @return {?}
+         */
+        MrSearchLayoutDS.prototype.handleResponse = /**
+         * @param {?} response
+         * @return {?}
+         */
+        function (response) {
+            this.some([
+                'mr-search-results-title',
+                'mr-search-results',
+            ]).update(response);
+            this.setSectionState('results', lodash.isEmpty(response.results) ? 'EMPTY' : 'OK');
+            // pagination
+            this.one('n7-smart-pagination').updateOptions({ mode: 'payload' });
+            this.one('n7-smart-pagination').update(this.getPaginationParams(response));
+        };
+        /**
+         * @return {?}
+         */
+        MrSearchLayoutDS.prototype.updateActiveFilters = /**
          * @return {?}
          */
         function () {
-            this.facetsConfig = configuration;
-            this.one('mr-resources').updateOptions({ source: 'search' });
-            this.one('mr-resources').update({});
+            // active "tags" filters
+            this.one('mr-search-tags').update({
+                state: this.state,
+                facetsConfig: this.facetsConfig
+            });
+        };
+        /**
+         * @private
+         * @param {?} response
+         * @return {?}
+         */
+        MrSearchLayoutDS.prototype.getPaginationParams = /**
+         * @private
+         * @param {?} response
+         * @return {?}
+         */
+        function (response) {
+            var totalCount = response.totalCount, page = response.page;
+            var paginationConfig = this.pageConfig.pagination;
+            return {
+                totalPages: Math.ceil(totalCount / page.limit),
+                currentPage: page.current,
+                pageLimit: paginationConfig.limit,
+                sizes: {
+                    list: paginationConfig.options,
+                    active: page.limit,
+                },
+            };
+        };
+        /**
+         * @param {?=} id
+         * @return {?}
+         */
+        MrSearchLayoutDS.prototype.getState = /**
+         * @param {?=} id
+         * @return {?}
+         */
+        function (id) {
+            return id ? this.state[id] : this.state;
+        };
+        /**
+         * @param {?} id
+         * @param {?} value
+         * @return {?}
+         */
+        MrSearchLayoutDS.prototype.setState = /**
+         * @param {?} id
+         * @param {?} value
+         * @return {?}
+         */
+        function (id, value) {
+            this.state[id] = value;
+        };
+        /**
+         * @return {?}
+         */
+        MrSearchLayoutDS.prototype.clearState = /**
+         * @return {?}
+         */
+        function () {
+            this.state = {};
+        };
+        /**
+         * @param {?} id
+         * @param {?} newState
+         * @return {?}
+         */
+        MrSearchLayoutDS.prototype.setSectionState = /**
+         * @param {?} id
+         * @param {?} newState
+         * @return {?}
+         */
+        function (id, newState) {
+            this.sectionState[id] = newState;
         };
         return MrSearchLayoutDS;
     }(core$1.LayoutDataSource));
     if (false) {
+        /**
+         * @type {?}
+         * @private
+         */
+        MrSearchLayoutDS.prototype.configuration;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrSearchLayoutDS.prototype.communication;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrSearchLayoutDS.prototype.configId;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrSearchLayoutDS.prototype.inputsConfig;
+        /** @type {?} */
+        MrSearchLayoutDS.prototype.state;
+        /** @type {?} */
+        MrSearchLayoutDS.prototype.sectionState;
         /** @type {?} */
         MrSearchLayoutDS.prototype.facetsConfig;
+        /** @type {?} */
+        MrSearchLayoutDS.prototype.pageConfig;
+        /** @type {?} */
+        MrSearchLayoutDS.prototype.totalResultsText;
+        /** @type {?} */
+        MrSearchLayoutDS.prototype.inputIsInternal;
+        /** @type {?} */
+        MrSearchLayoutDS.prototype.getInputType;
     }
 
     /**
@@ -14817,6 +15539,8 @@
         function MrSearchLayoutEH() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.destroyed$ = new rxjs.Subject();
+            _this.facetsReady$ = new rxjs.Subject();
+            _this.doSearch$ = new rxjs.Subject();
             return _this;
         }
         /**
@@ -14839,40 +15563,86 @@
                         _this.guestEmit$ = payload.guestEmit$;
                         _this.router = payload.router;
                         _this.activatedRoute = payload.activatedRoute;
-                        _this.dataSource.onInit(payload);
+                        // listeners
                         _this.listenToGuest();
                         _this.listenToRouterChanges();
-                        /* setTimeout(() => {
-                          this.hostEmit$.next({
-                            type: 'updateinputdata',
-                            payload: {
-                              id: 'input-00',
-                              data: {
-                                placeholder: 'Cerca su tutto',
-                              }
-                            }
-                          });
-                          this.hostEmit$.next({
-                            type: 'updateinputvalue',
-                            payload: {
-                              id: 'input-00',
-                              value: 'Sto cercando...'
-                            }
-                          });
-                        }, 5000); */
+                        // init
+                        _this.dataSource.onInit(payload);
                         break;
                     case 'mr-search-layout.destroy':
                         _this.destroyed$.next(true);
+                        break;
+                    case 'mr-search-layout.searchreset':
+                        _this.clearSearchState();
+                        _this.updateRoute();
                         break;
                     default:
                         console.warn('unhandled inner event of type', type);
                         break;
                 }
             }));
-            /*
-              this.outerEvents$.subscribe(({ type, payload }) => {
-              });
-            */
+            this.outerEvents$.subscribe((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case 'n7-smart-pagination.click':
+                        _this.dataSource.setState('page', payload.page);
+                        _this.updateRoute();
+                        break;
+                    case 'n7-smart-pagination.change':
+                        _this.dataSource.setState('limit', payload.value);
+                        _this.updateRoute();
+                        break;
+                    case 'mr-search-results-title.change':
+                        _this.dataSource.setState('sort', payload.value);
+                        _this.updateRoute();
+                        break;
+                    case 'mr-search-tags.click': {
+                        /** @type {?} */
+                        var stateValue = _this.dataSource.getState(payload.id);
+                        /** @type {?} */
+                        var newValue = null;
+                        if (Array.isArray(stateValue)) {
+                            stateValue.splice(stateValue.indexOf(payload.value), 1);
+                            newValue = stateValue;
+                        }
+                        _this.dataSource.setState(payload.id, newValue);
+                        _this.hostEmit$.next({
+                            type: 'updateinputvalue',
+                            payload: {
+                                id: payload.id,
+                                value: newValue
+                            }
+                        });
+                        _this.updateRoute();
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }));
+            // search request stream
+            this.doSearch$.pipe(operators.debounceTime(500), operators.tap((/**
+             * @return {?}
+             */
+            function () {
+                _this.dataSource.updateActiveFilters();
+                _this.dataSource.setSectionState('results', 'LOADING');
+            })), operators.switchMap((/**
+             * @param {?} params
+             * @return {?}
+             */
+            function (params) { return _this.dataSource.doRequest$(params); }))).subscribe((/**
+             * @param {?} response
+             * @return {?}
+             */
+            function (response) {
+                _this.dataSource.handleResponse(response);
+                _this.updateFacetHeaders(response.headers);
+            }));
         };
         /**
          * @return {?}
@@ -14889,12 +15659,13 @@
             function (_a) {
                 var type = _a.type, payload = _a.payload;
                 switch (type) {
+                    case 'facetsready': {
+                        _this.facetsReady$.next();
+                        break;
+                    }
                     case 'change': {
-                        /** @type {?} */
-                        var queryParams = searchHelper.stateToQueryParams(payload.state);
-                        _this.router.navigate([], {
-                            queryParams: queryParams
-                        });
+                        _this.dataSource.setState(payload.id, payload.value);
+                        _this.updateRoute();
                         break;
                     }
                     default:
@@ -14909,18 +15680,114 @@
          * @return {?}
          */
         function () {
+            var _this = this;
             this.activatedRoute.queryParams.pipe(operators.takeUntil(this.destroyed$)).subscribe((/**
              * @param {?} params
              * @return {?}
              */
             function (params) {
-                // TODO: aggiungere logica richieste
-                console.warn('query params', params);
+                /** @type {?} */
+                var searchState = searchHelper.queryParamsToState(params);
+                // params state control
+                if (lodash.isEmpty(params) && !lodash.isEmpty(_this.dataSource.getState())) {
+                    _this.clearSearchState();
+                }
+                else if (lodash.isEmpty(_this.dataSource.getState()) && !lodash.isEmpty(params)) {
+                    _this.setSearchState(params);
+                }
+                _this.doSearch$.next(searchState);
+            }));
+        };
+        /**
+         * @return {?}
+         */
+        MrSearchLayoutEH.prototype.updateRoute = /**
+         * @return {?}
+         */
+        function () {
+            /** @type {?} */
+            var queryParams = searchHelper.stateToQueryParams(this.dataSource.getState());
+            this.router.navigate([], {
+                queryParams: queryParams
+            });
+        };
+        /**
+         * @private
+         * @param {?} headers
+         * @return {?}
+         */
+        MrSearchLayoutEH.prototype.updateFacetHeaders = /**
+         * @private
+         * @param {?} headers
+         * @return {?}
+         */
+        function (headers) {
+            var _this = this;
+            Object.keys(headers).forEach((/**
+             * @param {?} id
+             * @return {?}
+             */
+            function (id) {
+                _this.hostEmit$.next({
+                    type: 'updateinputvalue',
+                    payload: {
+                        id: id,
+                        value: headers[id]
+                    }
+                });
+            }));
+        };
+        /**
+         * @private
+         * @return {?}
+         */
+        MrSearchLayoutEH.prototype.clearSearchState = /**
+         * @private
+         * @return {?}
+         */
+        function () {
+            this.dataSource.clearState();
+            this.hostEmit$.next({ type: 'clearinputs' });
+        };
+        /**
+         * @private
+         * @param {?} params
+         * @return {?}
+         */
+        MrSearchLayoutEH.prototype.setSearchState = /**
+         * @private
+         * @param {?} params
+         * @return {?}
+         */
+        function (params) {
+            var _this = this;
+            this.facetsReady$.subscribe((/**
+             * @return {?}
+             */
+            function () {
+                /** @type {?} */
+                var stateParams = searchHelper.queryParamsToState(params);
+                Object.keys(stateParams).forEach((/**
+                 * @param {?} key
+                 * @return {?}
+                 */
+                function (key) {
+                    _this.dataSource.setState(key, stateParams[key]);
+                    _this.hostEmit$.next({
+                        type: 'updateinputvalue',
+                        payload: {
+                            id: key,
+                            value: stateParams[key]
+                        }
+                    });
+                }));
             }));
         };
         return MrSearchLayoutEH;
     }(core$1.EventHandler));
     if (false) {
+        /** @type {?} */
+        MrSearchLayoutEH.prototype.dataSource;
         /**
          * @type {?}
          * @private
@@ -14936,6 +15803,16 @@
          * @private
          */
         MrSearchLayoutEH.prototype.guestEmit$;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrSearchLayoutEH.prototype.facetsReady$;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrSearchLayoutEH.prototype.doSearch$;
         /**
          * @type {?}
          * @private
@@ -14956,7 +15833,17 @@
     var MrSearchLayoutConfig = {
         layoutId: 'mr-search-layout',
         widgets: [{
-                id: 'facets-wrapper', dataSource: FacetsWrapperDS, eventHandler: FacetsWrapperEH
+                id: 'facets-wrapper',
+                dataSource: FacetsWrapperDS,
+                eventHandler: FacetsWrapperEH
+            }, {
+                id: 'mr-search-page-title'
+            }, {
+                id: 'mr-search-results-title'
+            }, {
+                id: 'mr-search-results'
+            }, {
+                id: 'mr-search-tags'
             }, {
                 id: 'mr-resources', dataSource: MrItemPreviewsDS,
             }, {
@@ -14975,13 +15862,14 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
-    // import { CommunicationService } from '../../../common/services/communication.service';
     var MrSearchLayoutComponent = /** @class */ (function (_super) {
         __extends(MrSearchLayoutComponent, _super);
-        function MrSearchLayoutComponent(layoutsConfiguration, router, activatedRoute) {
+        function MrSearchLayoutComponent(layoutsConfiguration, router, activatedRoute, communication, configuration) {
             var _this = _super.call(this, layoutsConfiguration.get('MrSearchLayoutConfig') || MrSearchLayoutConfig) || this;
             _this.router = router;
             _this.activatedRoute = activatedRoute;
+            _this.communication = communication;
+            _this.configuration = configuration;
             _this.hostEmit$ = new rxjs.Subject();
             _this.guestEmit$ = new rxjs.Subject();
             return _this;
@@ -14996,11 +15884,12 @@
          */
         function () {
             return {
-                // configuration: this.configuration,
+                configId: this.configId,
+                configuration: this.configuration,
                 // mainState: this.mainState,
                 router: this.router,
                 activatedRoute: this.activatedRoute,
-                // communication: this.communication,
+                communication: this.communication,
                 hostEmit$: this.hostEmit$,
                 guestEmit$: this.guestEmit$,
                 options: this.config.options || {},
@@ -15013,7 +15902,15 @@
          * @return {?}
          */
         function () {
-            this.onInit();
+            var _this = this;
+            this.activatedRoute.data.subscribe((/**
+             * @param {?} data
+             * @return {?}
+             */
+            function (data) {
+                _this.configId = data.configId;
+                _this.onInit();
+            }));
         };
         /**
          * @return {?}
@@ -15027,18 +15924,25 @@
         MrSearchLayoutComponent.decorators = [
             { type: core.Component, args: [{
                         selector: 'mr-search-layout',
-                        template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth\">\n\n        <div class=\"mr-search__title\">\n            INNER TITLE COMPONENT HERE\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <aside class=\"mr-search__facets\">\n                <div class=\"filter-section\">\n                    <h2>Filtra i risultati</h2>\n                    <mr-search-facets-layout \n                    [data]=\"lb.dataSource.facetsConfig\"\n                    [hostEmit$]=\"hostEmit$\"\n                    [guestEmit$]=\"guestEmit$\">\n                    </mr-search-facets-layout>\n                </div>\n            </aside>\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    Inner title with results number and sorting\n                </div>\n                <div class=\"mr-search__results-filters\">\n                    Filter, when active\n                </div>\n                <main class=\"mr-search__results\">\n                    <n7-item-preview *ngFor=\"let resource of (lb.widgets['mr-resources'].ds.out$ | async)\"\n                                    [data]=\"resource\">\n                    </n7-item-preview>\n                </main>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
+                        template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth\">\n\n        <div class=\"mr-search__title\">\n            <n7-inner-title\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <aside class=\"mr-search__facets\">\n                <div class=\"filter-section\">\n                    <h2>{{ lb.dataSource.pageConfig['facets-title'] }}</h2>\n                    <mr-search-facets-layout \n                    [data]=\"lb.dataSource.facetsConfig\"\n                    [hostEmit$]=\"hostEmit$\"\n                    [guestEmit$]=\"guestEmit$\">\n                    </mr-search-facets-layout>\n                </div>\n            </aside>\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    <n7-inner-title\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\n                    </n7-inner-title>\n                </div>\n                <div class=\"mr-search__results-filters\">\n                    <n7-tag *ngFor=\"let tag of (lb.widgets['mr-search-tags'].ds.out$ | async)\"\n                    [data]=\"tag\"\n                    [emit]=\"lb.widgets['mr-search-tags'].emit\">\n                    </n7-tag>\n                </div>\n                <main class=\"mr-search__results\">\n                    <!-- SEARCH RESULTS -->\n                    <ng-container [ngSwitch]=\"lb.dataSource.sectionState.results\">\n                        \n                        <!-- loading -->\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\n                            <div class=\"mr-search__results-loading\">\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                                    blocks: [\n                                        { classes: 'search-result-placeholder-title' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' }\n                                    ]\n                                }\"></n7-content-placeholder>\n                            </div>\n                        </ng-container>\n                        \n                        <!-- ok: items > 0 -->\n                        <ng-container *ngSwitchCase=\"'OK'\">\n                            <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\n                            [data]=\"item\">\n                            </n7-item-preview>\n                        </ng-container>\n\n                        <!-- ok: items === 0 -->\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\n                            <div class=\"mr-search__results-fallback\">\n                                <p class=\"mr-search__results-fallback-string\">\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\n                                </p>\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\n                                </button>\n                            </div>\n                        </ng-container>\n\n                        <!-- ko: request problem -->\n                        <ng-container *ngSwitchCase=\"'KO'\">\n                            <p class=\"mr-search__results-ko-string\">\n                                {{ lb.dataSource.pageConfig.ko.text }}\n                            </p>\n                            <button class=\"n7-btn mr-search__results-ko-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                {{ lb.dataSource.pageConfig.ko.button }}\n                            </button>\n                        </ng-container>\n                        \n                    </ng-container>\n                </main>               \n                <n7-smart-pagination\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
                     }] }
         ];
         /** @nocollapse */
         MrSearchLayoutComponent.ctorParameters = function () { return [
             { type: LayoutsConfigurationService },
             { type: router.Router },
-            { type: router.ActivatedRoute }
+            { type: router.ActivatedRoute },
+            { type: CommunicationService },
+            { type: ConfigurationService }
         ]; };
         return MrSearchLayoutComponent;
     }(AbstractLayout));
     if (false) {
+        /**
+         * @type {?}
+         * @private
+         */
+        MrSearchLayoutComponent.prototype.configId;
         /** @type {?} */
         MrSearchLayoutComponent.prototype.hostEmit$;
         /** @type {?} */
@@ -15053,6 +15957,16 @@
          * @private
          */
         MrSearchLayoutComponent.prototype.activatedRoute;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrSearchLayoutComponent.prototype.communication;
+        /**
+         * @type {?}
+         * @private
+         */
+        MrSearchLayoutComponent.prototype.configuration;
     }
 
     /**
@@ -15406,7 +16320,7 @@
         __extends(SearchFacetsLayoutDS, _super);
         function SearchFacetsLayoutDS() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.state = {};
+            _this.ready$ = new rxjs.Subject();
             return _this;
         }
         /**
@@ -15457,6 +16371,8 @@
                     _this.one(input.id).update(input.data);
                 }));
             }));
+            // signal
+            this.ready$.next();
         };
         /**
          * @param {?} id
@@ -15471,7 +16387,9 @@
         function (id, newValue) {
             /** @type {?} */
             var widgetDataSource = this.getWidgetDataSource(id);
-            widgetDataSource.setValue(newValue, true);
+            if (widgetDataSource) {
+                widgetDataSource.setValue(newValue, true);
+            }
         };
         /**
          * @param {?} id
@@ -15486,41 +16404,56 @@
         function (id, newData) {
             /** @type {?} */
             var widgetDataSource = this.getWidgetDataSource(id);
-            widgetDataSource.update(__assign({}, widgetDataSource.input, newData));
+            if (widgetDataSource) {
+                widgetDataSource.update(__assign({}, widgetDataSource.input, newData));
+            }
         };
         /**
-         * @param {?=} id
+         * @param {?} id
          * @return {?}
          */
-        SearchFacetsLayoutDS.prototype.getState = /**
-         * @param {?=} id
+        SearchFacetsLayoutDS.prototype.clearInput = /**
+         * @param {?} id
          * @return {?}
          */
         function (id) {
-            return id ? this.state[id] : this.state;
+            /** @type {?} */
+            var widgetDataSource = this.getWidgetDataSource(id);
+            if (widgetDataSource) {
+                widgetDataSource.clear();
+                widgetDataSource.setValue(widgetDataSource.value, true);
+            }
         };
         /**
-         * @param {?} __0
          * @return {?}
          */
-        SearchFacetsLayoutDS.prototype.setState = /**
-         * @param {?} __0
+        SearchFacetsLayoutDS.prototype.clearInputs = /**
          * @return {?}
          */
-        function (_a) {
-            var value = _a.value, id = _a.id;
-            this.state[id] = value;
+        function () {
+            var _this = this;
+            this.data.sections.forEach((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
+                var header = _a.header, inputs = _a.inputs;
+                __spread([header], inputs).forEach((/**
+                 * @param {?} input
+                 * @return {?}
+                 */
+                function (input) {
+                    _this.clearInput(input.id);
+                }));
+            }));
         };
         return SearchFacetsLayoutDS;
     }(core$1.LayoutDataSource));
     if (false) {
         /** @type {?} */
         SearchFacetsLayoutDS.prototype.data;
-        /**
-         * @type {?}
-         * @private
-         */
-        SearchFacetsLayoutDS.prototype.state;
+        /** @type {?} */
+        SearchFacetsLayoutDS.prototype.ready$;
     }
 
     /**
@@ -15557,9 +16490,12 @@
                     case 'mr-search-facets-layout.init':
                         _this.hostEmit$ = payload.hostEmit$;
                         _this.guestEmit$ = payload.guestEmit$;
-                        _this.dataSource.onInit(payload);
-                        _this.initChangedListener(payload.data);
+                        // listeners
+                        _this.listenFacetsReady();
                         _this.listenToHost();
+                        _this.initChangedListener(payload.data);
+                        // init
+                        _this.dataSource.onInit(payload);
                         break;
                     case 'mr-search-facets-layout.destroy':
                         _this.dataSource.onDestroy();
@@ -15619,16 +16555,29 @@
                      * @return {?}
                      */
                     function (payload) {
-                        _this.dataSource.setState(payload);
                         _this.guestEmit$.next({
-                            type: 'change',
-                            payload: {
-                                lastUpdate: payload,
-                                state: _this.dataSource.getState()
-                            }
+                            payload: payload,
+                            type: 'change'
                         });
                     }));
                 }));
+            }));
+        };
+        /**
+         * @return {?}
+         */
+        SearchFacetsLayoutEH.prototype.listenFacetsReady = /**
+         * @return {?}
+         */
+        function () {
+            var _this = this;
+            this.dataSource.ready$.subscribe((/**
+             * @return {?}
+             */
+            function () {
+                _this.guestEmit$.next({
+                    type: 'facetsready'
+                });
             }));
         };
         /**
@@ -15651,6 +16600,12 @@
                         break;
                     case 'updateinputdata':
                         _this.dataSource.updateInputData(payload.id, payload.data);
+                        break;
+                    case 'clearinput':
+                        _this.dataSource.clearInput(payload.id);
+                        break;
+                    case 'clearinputs':
+                        _this.dataSource.clearInputs();
                         break;
                     default:
                         break;
@@ -15736,6 +16691,12 @@
             this.value = value;
             if (update) {
                 this.update(__assign({}, this.input, { value: value }));
+                // fix element update
+                /** @type {?} */
+                var el = (/** @type {?} */ (document.getElementById(this.output.id)));
+                if (el) {
+                    el.value = value;
+                }
             }
         };
         /**
@@ -15797,8 +16758,9 @@
          * @return {?}
          */
         function (value, update) {
+            var _this = this;
             if (update === void 0) { update = false; }
-            this.value = value;
+            this.value = Array.isArray(value) ? value : [value];
             if (update) {
                 var checkboxes = this.input.checkboxes;
                 /** @type {?} */
@@ -15806,7 +16768,7 @@
                  * @param {?} checkbox
                  * @return {?}
                  */
-                function (checkbox) { return (__assign({}, checkbox, { checked: value.indexOf(checkbox.payload) !== -1 })); }));
+                function (checkbox) { return (__assign({}, checkbox, { checked: _this.value.indexOf(checkbox.payload) !== -1 })); }));
                 this.update(__assign({}, this.input, { checkboxes: updatedCheckboxes }));
             }
         };
@@ -15961,8 +16923,9 @@
          * @return {?}
          */
         function (value, update) {
+            var _this = this;
             if (update === void 0) { update = false; }
-            this.value = value;
+            this.value = Array.isArray(value) ? value : [value];
             if (update) {
                 var links = this.input.links;
                 /** @type {?} */
@@ -15970,7 +16933,7 @@
                  * @param {?} link
                  * @return {?}
                  */
-                function (link) { return (__assign({}, link, { classes: value.indexOf(link.payload) !== -1 ? ACTIVE_CLASS : '' })); }));
+                function (link) { return (__assign({}, link, { classes: _this.value.indexOf(link.payload) !== -1 ? ACTIVE_CLASS : '' })); }));
                 this.update(__assign({}, this.input, { links: updatedLinks }));
             }
         };
@@ -16388,7 +17351,7 @@
         MrSearchFacetsLayoutComponent.decorators = [
             { type: core.Component, args: [{
                         selector: 'mr-search-facets-layout',
-                        template: "<div *ngIf=\"lb.dataSource.data\" class=\"mr-search-facets {{ lb.dataSource.data.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.data.sections\" class=\"mr-search-facets__section {{ section.classes || '' }}\">\n        <n7-facet-header\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\n        [emit]=\"lb.widgets[section.header.id].emit\"\n        ></n7-facet-header>\n\n        <div *ngFor=\"let input of section.inputs\" class=\"mr-search-facets__input {{ input.classes || '' }}\">\n            <ng-container [ngSwitch]=\"input.type\">\n\n                <!-- INPUT TEXT -->\n                <n7-input-text \n                *ngSwitchCase=\"'text'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n\n                <!-- INPUT CHECKBOX -->\n                <n7-input-checkbox \n                *ngSwitchCase=\"'checkbox'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                \n                <!-- INPUT SELECT -->\n                <n7-input-select \n                *ngSwitchCase=\"'select'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                \n                <!-- INPUT LINK -->\n                <n7-input-link \n                *ngSwitchCase=\"'link'\"\n                [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n            \n            </ng-container>\n        </div>\n        \n    </div>\n</div>"
+                        template: "<div *ngIf=\"lb.dataSource.data\" class=\"mr-search-facets {{ lb.dataSource.data.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.data.sections\" class=\"mr-search-facets__section {{ section.classes || '' }}\">\n        <n7-facet-header\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\n        [emit]=\"lb.widgets[section.header.id].emit\"\n        ></n7-facet-header>\n\n        <div [hidden]=\"!lb.widgets[section.header.id].ds.isOpen()\" class=\"mr-search-facets__wrapper\">\n            <div *ngFor=\"let input of section.inputs\" class=\"mr-search-facets__input {{ input.classes || '' }}\">\n                <ng-container [ngSwitch]=\"input.type\">\n    \n                    <!-- INPUT TEXT -->\n                    <n7-input-text \n                    *ngSwitchCase=\"'text'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n    \n                    <!-- INPUT CHECKBOX -->\n                    <n7-input-checkbox \n                    *ngSwitchCase=\"'checkbox'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                    \n                    <!-- INPUT SELECT -->\n                    <n7-input-select \n                    *ngSwitchCase=\"'select'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                    \n                    <!-- INPUT LINK -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'link'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n                \n                </ng-container>\n            </div>\n        </div>\n        \n        \n    </div>\n</div>"
                     }] }
         ];
         /** @nocollapse */
@@ -16587,6 +17550,12 @@
     exports.MrSearchLayoutConfig = MrSearchLayoutConfig;
     exports.MrSearchLayoutDS = MrSearchLayoutDS;
     exports.MrSearchLayoutEH = MrSearchLayoutEH;
+    exports.MrSearchPageTitleDS = MrSearchPageTitleDS;
+    exports.MrSearchResultsDS = MrSearchResultsDS;
+    exports.MrSearchResultsTitleDS = MrSearchResultsTitleDS;
+    exports.MrSearchResultsTitleEH = MrSearchResultsTitleEH;
+    exports.MrSearchTagsDS = MrSearchTagsDS;
+    exports.MrSearchTagsEH = MrSearchTagsEH;
     exports.MrStaticLayoutComponent = MrStaticLayoutComponent;
     exports.MrStaticLayoutConfig = MrStaticLayoutConfig;
     exports.MrStaticLayoutDS = MrStaticLayoutDS;
