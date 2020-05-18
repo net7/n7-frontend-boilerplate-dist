@@ -9649,12 +9649,25 @@ class AwSearchLayoutEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'aw-search-layout.init':
-                    this.route = payload.route;
-                    this.configuration = payload.configuration;
-                    this.dataSource.onInit(payload);
-                    this._listenToFacetsChange();
-                    this._listenToAdditionalParamsChange();
-                    this._listenToRouterChanges();
+                    {
+                        this.route = payload.route;
+                        this.configuration = payload.configuration;
+                        this.dataSource.onInit(payload);
+                        this._listenToFacetsChange();
+                        this._listenToAdditionalParamsChange();
+                        this._listenToRouterChanges();
+                        const { value: textInput } = this.dataSource.searchModel.getFiltersByFacetId('query')[0];
+                        if ((textInput || '').length > 0) {
+                            this.dataSource.isSearchingText.next(true);
+                            setTimeout((/**
+                             * @return {?}
+                             */
+                            () => {
+                                this.dataSource.onOrderByChange('_score_DESC');
+                                this.additionalParamsChange$.next(); // emit from observable stream
+                            }), 100);
+                        }
+                    }
                     break;
                 case 'aw-search-layout.destroy':
                     this.dataSource.onDestroy();
@@ -9688,11 +9701,11 @@ class AwSearchLayoutEH extends EventHandler {
                         // Checks if <input type=text>'s value has changed
                         this.textHasChanged = !!(textInput && (textInput !== this.previousText));
                         this.previousText = textInput;
-                        if (this.textHasChanged && textInput.length > 0) {
+                        if (this.textHasChanged && (textInput || '').length > 0) {
                             // Add sort by score option
                             this.dataSource.isSearchingText.next(true);
                         }
-                        else if (textInput.length === 0) {
+                        else if ((textInput || '').length === 0) {
                             // Remove sort by score option
                             this.dataSource.isSearchingText.next(false);
                             setTimeout((/**
@@ -10662,12 +10675,25 @@ class AwGalleryLayoutEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'aw-gallery-layout.init':
-                    this.route = payload.route;
-                    this.configuration = payload.configuration;
-                    this.dataSource.onInit(payload);
-                    this._listenToFacetsChange();
-                    this._listenToAdditionalParamsChange();
-                    this._listenToRouterChanges();
+                    {
+                        this.route = payload.route;
+                        this.configuration = payload.configuration;
+                        this.dataSource.onInit(payload);
+                        this._listenToFacetsChange();
+                        this._listenToAdditionalParamsChange();
+                        this._listenToRouterChanges();
+                        const { value: textInput } = this.dataSource.searchModel.getFiltersByFacetId('query')[0];
+                        if ((textInput || '').length > 0) {
+                            this.dataSource.isSearchingText.next(true);
+                            setTimeout((/**
+                             * @return {?}
+                             */
+                            () => {
+                                this.dataSource.onOrderByChange('_score_DESC');
+                                this.additionalParamsChange$.next(); // emit from observable stream
+                            }), 100);
+                        }
+                    }
                     break;
                 case 'aw-gallery-layout.destroy':
                     this.dataSource.onDestroy();
@@ -10701,11 +10727,11 @@ class AwGalleryLayoutEH extends EventHandler {
                         // Checks if <input type=text>'s value has changed
                         this.textHasChanged = !!(textInput && (textInput !== this.previousText));
                         this.previousText = textInput;
-                        if (this.textHasChanged && textInput.length > 0) {
+                        if (this.textHasChanged && (textInput || '').length > 0) {
                             // Add sort by score option
                             this.dataSource.isSearchingText.next(true);
                         }
-                        else if (textInput.length === 0) {
+                        else if ((textInput || '').length === 0) {
                             // Remove sort by score option
                             this.dataSource.isSearchingText.next(false);
                             setTimeout((/**

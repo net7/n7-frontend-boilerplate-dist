@@ -11188,12 +11188,25 @@
                 var type = _a.type, payload = _a.payload;
                 switch (type) {
                     case 'aw-search-layout.init':
-                        _this.route = payload.route;
-                        _this.configuration = payload.configuration;
-                        _this.dataSource.onInit(payload);
-                        _this._listenToFacetsChange();
-                        _this._listenToAdditionalParamsChange();
-                        _this._listenToRouterChanges();
+                        {
+                            _this.route = payload.route;
+                            _this.configuration = payload.configuration;
+                            _this.dataSource.onInit(payload);
+                            _this._listenToFacetsChange();
+                            _this._listenToAdditionalParamsChange();
+                            _this._listenToRouterChanges();
+                            var textInput = _this.dataSource.searchModel.getFiltersByFacetId('query')[0].value;
+                            if ((textInput || '').length > 0) {
+                                _this.dataSource.isSearchingText.next(true);
+                                setTimeout((/**
+                                 * @return {?}
+                                 */
+                                function () {
+                                    _this.dataSource.onOrderByChange('_score_DESC');
+                                    _this.additionalParamsChange$.next(); // emit from observable stream
+                                }), 100);
+                            }
+                        }
                         break;
                     case 'aw-search-layout.destroy':
                         _this.dataSource.onDestroy();
@@ -11228,11 +11241,11 @@
                             // Checks if <input type=text>'s value has changed
                             _this.textHasChanged = !!(textInput && (textInput !== _this.previousText));
                             _this.previousText = textInput;
-                            if (_this.textHasChanged && textInput.length > 0) {
+                            if (_this.textHasChanged && (textInput || '').length > 0) {
                                 // Add sort by score option
                                 _this.dataSource.isSearchingText.next(true);
                             }
-                            else if (textInput.length === 0) {
+                            else if ((textInput || '').length === 0) {
                                 // Remove sort by score option
                                 _this.dataSource.isSearchingText.next(false);
                                 setTimeout((/**
@@ -12330,12 +12343,25 @@
                 var type = _a.type, payload = _a.payload;
                 switch (type) {
                     case 'aw-gallery-layout.init':
-                        _this.route = payload.route;
-                        _this.configuration = payload.configuration;
-                        _this.dataSource.onInit(payload);
-                        _this._listenToFacetsChange();
-                        _this._listenToAdditionalParamsChange();
-                        _this._listenToRouterChanges();
+                        {
+                            _this.route = payload.route;
+                            _this.configuration = payload.configuration;
+                            _this.dataSource.onInit(payload);
+                            _this._listenToFacetsChange();
+                            _this._listenToAdditionalParamsChange();
+                            _this._listenToRouterChanges();
+                            var textInput = _this.dataSource.searchModel.getFiltersByFacetId('query')[0].value;
+                            if ((textInput || '').length > 0) {
+                                _this.dataSource.isSearchingText.next(true);
+                                setTimeout((/**
+                                 * @return {?}
+                                 */
+                                function () {
+                                    _this.dataSource.onOrderByChange('_score_DESC');
+                                    _this.additionalParamsChange$.next(); // emit from observable stream
+                                }), 100);
+                            }
+                        }
                         break;
                     case 'aw-gallery-layout.destroy':
                         _this.dataSource.onDestroy();
@@ -12370,11 +12396,11 @@
                             // Checks if <input type=text>'s value has changed
                             _this.textHasChanged = !!(textInput && (textInput !== _this.previousText));
                             _this.previousText = textInput;
-                            if (_this.textHasChanged && textInput.length > 0) {
+                            if (_this.textHasChanged && (textInput || '').length > 0) {
                                 // Add sort by score option
                                 _this.dataSource.isSearchingText.next(true);
                             }
-                            else if (textInput.length === 0) {
+                            else if ((textInput || '').length === 0) {
                                 // Remove sort by score option
                                 _this.dataSource.isSearchingText.next(false);
                                 setTimeout((/**
