@@ -37,6 +37,7 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
         communication: any;
     }): void;
     onDestroy(): void;
+    getMetadataSectionTitle(): any;
     getNavigation(id: any): any;
     setTree(tree: any): void;
     getTree: () => any;

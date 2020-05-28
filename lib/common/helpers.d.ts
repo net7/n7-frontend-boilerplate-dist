@@ -5,5 +5,6 @@ declare const _default: {
     browserIsIE(): RegExpMatchArray;
     escapeDoubleQuotes(str: any): any;
     unescapeDoubleQuotes(str: any): any;
+    metadataIsEmpty(value: any): boolean;
 };
 export default _default;

@@ -32,7 +32,6 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
     }): void;
     oneTabControl(): void;
     updateComponent: (id: any, data: any, options?: any) => void;
-    getNavigation(id: any): any;
     drawPagination: () => void;
     handlePageNavigation: () => void;
     handleNavUpdate: (tab: any) => void;

@@ -1,16 +1,11 @@
 import { OnInit, OnDestroy } from '@angular/core';
-import { Subject } from 'rxjs';
 import { AbstractLayout } from '../../../common/models/abstract-layout';
-import { SearchFacetsConfig } from './search-facets-config';
+import { MrSearchService } from '../../services/search.service';
 export declare class MrSearchFacetsLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
-    data: SearchFacetsConfig;
-    guestEmit$: Subject<any>;
-    hostEmit$: Subject<any>;
+    searchService: MrSearchService;
     constructor();
     protected initPayload(): {
-        data: SearchFacetsConfig;
-        guestEmit$: Subject<any>;
-        hostEmit$: Subject<any>;
+        searchService: MrSearchService;
     };
     ngOnInit(): void;
     ngOnDestroy(): void;

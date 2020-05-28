@@ -4,11 +4,16 @@ interface InputHeaderData {
     data: FacetHeaderData;
     delay?: number;
 }
+interface SearchLayoutInput {
+    id: string;
+    queryParam?: boolean;
+    value?: string | string[] | boolean | null;
+}
 interface SearchFacetsInput {
     id: string;
     type: 'text' | 'checkbox' | 'select' | 'link';
     data: InputCheckboxData | InputLinkData | InputSelectData | InputTextData;
-    internal?: boolean;
+    queryParam?: boolean;
     delay?: number;
     value?: string | string[] | boolean | null;
 }
@@ -17,8 +22,24 @@ interface SearchFacetsSection {
     inputs: SearchFacetsInput[];
     classes?: string;
 }
-export interface SearchFacetsConfig {
+interface SearchFacetsConfig {
     sections: SearchFacetsSection[];
     classes?: string;
+}
+export interface SearchConfig {
+    request: {
+        results: {
+            id: string;
+            delay?: number;
+            provider?: string;
+        };
+        links: {
+            id: string;
+            delay?: number;
+            provider?: string;
+        };
+    };
+    facets: SearchFacetsConfig;
+    layoutInputs: SearchLayoutInput[];
 }
 export {};

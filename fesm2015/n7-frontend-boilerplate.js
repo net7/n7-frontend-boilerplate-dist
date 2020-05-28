@@ -1129,6 +1129,14 @@ var helpers = {
     unescapeDoubleQuotes(str) {
         return (str && str !== '') ? str.replace(/\\*(")/g, '$1') : str; // thanks @slevithan!
     },
+    /**
+     * @param {?} value
+     * @return {?}
+     */
+    metadataIsEmpty(value) {
+        return (!value
+            || value === 'null');
+    }
 };
 
 /**
@@ -3668,6 +3676,14 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             }
             this.one(id).update(data);
         });
+        // DEPRECATED
+        /* getNavigation(id) {
+            // Requests data from communication provider
+            return this.communication.request$('getEntityDetails', {
+              onError: (error) => console.error(error),
+              params: { entityId: id, entitiesListSize: this.bubblesSize },
+            });
+          } */
         this.drawPagination = (/**
          * @return {?}
          */
@@ -3801,23 +3817,6 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         }));
     }
     /**
-     * @param {?} id
-     * @return {?}
-     */
-    getNavigation(id) {
-        /*
-          Requests data from communication provider
-         */
-        return this.communication.request$('getEntityDetails', {
-            onError: (/**
-             * @param {?} error
-             * @return {?}
-             */
-            (error) => console.error(error)),
-            params: { entityId: id, entitiesListSize: this.bubblesSize },
-        });
-    }
-    /**
      * @param {?} data
      * @return {?}
      */
@@ -3842,6 +3841,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             basePath: this.getNavBasePath(),
         });
         this.updateComponent('aw-entita-metadata-viewer', this.myResponse.fields, {
+            typeOfEntity: this.myResponse.typeOfEntity,
             context: this.selectedTab,
             config: this.configuration,
             labels: this.configuration.get('labels'),
@@ -3893,11 +3893,14 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         const config = this.configuration.get('config-keys')[res.typeOfEntity];
         // console.log('(entita) Apollo responded with: ', { res })
         this.myResponse = res;
-        if ((res.fields || []).filter((/**
+        /** @type {?} */
+        const allowedOverviewMetadata = get(this.configuration.get('entita-layout'), 'overview.campi', []);
+        if ((res.fields || [])
+            .filter((/**
          * @param {?} field
          * @return {?}
          */
-        (field) => ((this.configuration.get('entita-layout') || {}).overview || {}).campi.includes(field.key))).length > 0) {
+        (field) => allowedOverviewMetadata.includes(field.key))).length > 0) {
             // look at the response array, filtered by configuration values.
             // if the filtered response has some values, show the fields section.
             this.showFields = true;
@@ -4186,7 +4189,24 @@ class AwEntitaLayoutEH extends EventHandler {
                     return;
                 }
                 // get item from response with id === id and return as promise
-                this.dataSource.loadItem(params.get('id'), params.get('slug'), params.get('tab')).subscribe((/**
+                this.dataSource.loadItem(params.get('id'), params.get('slug'), params.get('tab'))
+                    .pipe(
+                // filter empty metadata values
+                map((/**
+                 * @param {?} res
+                 * @return {?}
+                 */
+                (res) => {
+                    if (res.fields) {
+                        res.fields = res.fields.filter((/**
+                         * @param {?} __0
+                         * @return {?}
+                         */
+                        ({ value }) => !helpers.metadataIsEmpty(value)));
+                    }
+                    return res;
+                })))
+                    .subscribe((/**
                  * @param {?} res
                  * @return {?}
                  */
@@ -4423,7 +4443,7 @@ class AwLinkedObjectsDS extends DataSource {
                     title: itemTitle,
                     anchor: {
                         href: itemHref,
-                        target: context === 'search' ? '_blank' : '_self'
+                        target: ['gallery', 'search'].includes(context) ? '_blank' : '_self'
                     },
                     relation: { key: el.relationName, value: el.relation },
                     metadata: infoDataItems.length || toeData ? [] : null,
@@ -5377,6 +5397,10 @@ if (false) {
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 class AwEntitaMetadataViewerDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.hasGroups = false;
+    }
     /**
      * @protected
      * @param {?} data
@@ -5391,7 +5415,7 @@ class AwEntitaMetadataViewerDS extends DataSource {
               Access and use this.options if the rendering
               changes based on context.
             */
-        const { context, config } = this.options;
+        const { context, config, typeOfEntity } = this.options;
         /** @type {?} */
         const labels = this.options.labels || {};
         /** @type {?} */
@@ -5400,7 +5424,7 @@ class AwEntitaMetadataViewerDS extends DataSource {
         let unpackedData = [];
         if (context === 'overview' && data) {
             /** @type {?} */
-            const configuredKeys = ((config.get('entita-layout') || {}).overview || {}).campi;
+            const configuredKeys = get(config.get('entita-layout'), 'overview.campi', []);
             /** @type {?} */
             const filteredData = data.filter((/**
              * @param {?} d
@@ -5429,9 +5453,10 @@ class AwEntitaMetadataViewerDS extends DataSource {
              * @return {?}
              */
             (item) => {
-                item.label = helpers.prettifySnakeCase(item.label, labels[item.label]);
+                item.label = helpers.prettifySnakeCase(item.label, labels[`${typeOfEntity}.${item.label}`]);
             }));
         }));
+        this.hasGroups = Array.isArray(unpackedData) && !!unpackedData.length;
         return {
             group: unpackedData,
         };
@@ -5467,8 +5492,18 @@ class AwEntitaMetadataViewerDS extends DataSource {
              * @param {?} el
              * @return {?}
              */
-            (el) => ({ label: el.key, value: el.value })));
-            return [{ items: extracted }];
+            (el) => ({ label: el.key, value: el.value, order: metadataToShow.indexOf(el.key) })));
+            // sort by order (metadata-to-show configuration order)
+            extracted.sort((/**
+             * @param {?} a
+             * @param {?} b
+             * @return {?}
+             */
+            (a, b) => a.order - b.order));
+            if (extracted.length) {
+                return [{ items: extracted }];
+            }
+            return [];
         }
         if (!fields) {
             return [];
@@ -5513,6 +5548,10 @@ class AwEntitaMetadataViewerDS extends DataSource {
         }
         return extracted;
     }
+}
+if (false) {
+    /** @type {?} */
+    AwEntitaMetadataViewerDS.prototype.hasGroups;
 }
 
 /**
@@ -5921,7 +5960,7 @@ class AwSchedaMetadataDS extends DataSource {
         metadataToShow = metadataToShow || {};
         metadataToShow = metadataToShow[data.document_type] || [];
         /** @type {?} */
-        const group = { group: [] };
+        const group = [];
         if (data.fields) {
             data.fields.forEach((/**
              * @param {?} field
@@ -5930,7 +5969,7 @@ class AwSchedaMetadataDS extends DataSource {
             (field) => {
                 /** @type {?} */
                 const items = [];
-                if (field.fields) {
+                if (field.fields && metadataToShow.indexOf(field.label) !== -1) {
                     field.fields
                         .filter((/**
                      * @param {?} item
@@ -5943,27 +5982,44 @@ class AwSchedaMetadataDS extends DataSource {
                      */
                     (item) => {
                         items.push({
-                            label: helpers.prettifySnakeCase(item.key, labels[item.key]),
-                            value: item.value
+                            label: helpers.prettifySnakeCase(item.key, labels[`${data.document_type}.${item.key}`]),
+                            value: item.value,
+                            order: metadataToShow.indexOf(item.key)
                         });
                     }));
-                    group.group.push({
+                    // sort by order (by metadata-to-show)
+                    items.sort((/**
+                     * @param {?} a
+                     * @param {?} b
+                     * @return {?}
+                     */
+                    (a, b) => a.order - b.order));
+                    group.push({
                         items,
                         title: field.label,
+                        order: metadataToShow.indexOf(field.label)
                     });
                 }
                 else if (metadataToShow.indexOf(field.key) !== -1) {
                     items.push({
-                        label: helpers.prettifySnakeCase(field.key, labels[field.key]),
-                        value: field.value.replace(/(\|\|\|)/g, '\n') // replace repeat sequence ("|||") with end of line
+                        label: helpers.prettifySnakeCase(field.key, labels[`${data.document_type}.${field.key}`]),
+                        value: field.value.replace(/(\|\|\|)/g, '\n'),
                     });
-                    group.group.push({
+                    group.push({
                         items,
+                        order: metadataToShow.indexOf(field.key)
                     });
                 }
             }));
         }
-        return group;
+        // sort by order (by metadata-to-show)
+        group.sort((/**
+         * @param {?} a
+         * @param {?} b
+         * @return {?}
+         */
+        (a, b) => a.order - b.order));
+        return { group };
     }
 }
 
@@ -7385,7 +7441,7 @@ class AwEntitaLayoutComponent extends AbstractLayout {
 AwEntitaLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-entita-layout',
-                template: "<div class=\"aw-entity n7-side-auto-padding\" *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-title-wrapper-loading\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\"\n            class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-nav-loading\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2]\"\n            [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-nav'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <!-- lb.dataSource.selectedTab -->\n    <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content-loading\">\n        <div class=\"aw-entity__content-loading-title\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\"></n7-content-placeholder>\n        </div>\n\n        <div class=\"aw-entity__content-loading-items\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n            [data]=\"{\n                blocks: [\n                {\n                    classes: 'entity-placeholder-item-preview'\n                }\n                ]\n            }\"></n7-content-placeholder>\n        </div>\n    </div>\n\n    <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content\">\n        <section>\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\n                class=\"aw-entity__content-section\" [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <a *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/wiki']\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                    <a *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/maxxi']\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n            </div>\n\n            <ng-container \n                *ngIf=\"(\n                    lb.widgets['aw-entita-nav'].ds.hasFields &&\n                    ['overview', 'campi'].indexOf(lb.dataSource.selectedTab) !== -1\n                )\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n                    <div class=\"aw-entity__content-section-header\">\n                        <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                        <a \n                        *ngIf=\"lb.dataSource.selectedTab !== 'campi'\"\n                        class=\"n7-btn n7-btn-light\" \n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/campi']\">\n                            TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\n                        </a>\n                    </div>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async \">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <a *ngIf=\"lb.dataSource.selectedTab === 'overview' \"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/oggetti-collegati/']\"\n                        [queryParams]=\"{ page: 1 }\" class=\"n7-btn n7-btn-light\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <div class=\"aw-entity__content-item-previews\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <div class=\"aw-entity__content-item-preview-wrapper\">\n                            <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                            </n7-smart-breadcrumbs>\n                            <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                            <!-- relation -->\n                            <div class=\"aw-entity__relation\" *ngIf=\"preview.relation.value\">\n                                <p class=\"aw-entity__relation-description\">Relazione con \n                                <span class=\"aw-entity__relation-key\">{{preview.relation.key}}</span>:\n                                <span class=\"aw-entity__relation-value\"> {{preview.relation.value}}</span>\n                                </p>\n                            </div>\n                        </div>\n                    </ng-container>\n                </div>\n                <n7-smart-pagination \n                    *ngIf=\"lb.dataSource.selectedTab === 'oggetti-collegati'\"\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview aw-bubble-chart__{{lb.dataSource.selectedTab}}\"\n                *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.myResponse.relatedEntities\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <a *ngIf=\"lb.dataSource.selectedTab == 'overview'\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/entita-collegate']\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <!-- Small Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper-small\" *ngIf=\"lb.dataSource.selectedTab == 'overview'\">\n                    <aw-bubble-chart-wrapper>\n                        <!-- Tippy template moved to end of HTML -->\n                        <n7-bubble-chart [data]=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.smallView\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n                <!-- Big Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper\" *ngIf=\"lb.dataSource.selectedTab == 'entita-collegate'\">\n                    <aw-bubble-chart-wrapper>\n                        <!-- Tippy template moved to end of HTML -->\n                        <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                *ngIf=\"lb.dataSource.myResponse.extraTab\" [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n                *ngIf=\"lb.dataSource.myResponse.wikiTab\" [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{ lb.dataSource.myResponse.wikiTab.url }}\n                </a>\n            </div>\n        </section>\n    </div>\n    <!-- Template for bubble chart tooltips -->\n    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\" [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n    </aw-chart-tippy>\n</div>"
+                template: "<div class=\"aw-entity n7-side-auto-padding\" *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-title-wrapper-loading\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\"\n            class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-nav-loading\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2]\"\n            [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-nav'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <!-- lb.dataSource.selectedTab -->\n    <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content-loading\">\n        <div class=\"aw-entity__content-loading-title\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\"></n7-content-placeholder>\n        </div>\n\n        <div class=\"aw-entity__content-loading-items\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n            [data]=\"{\n                blocks: [\n                {\n                    classes: 'entity-placeholder-item-preview'\n                }\n                ]\n            }\"></n7-content-placeholder>\n        </div>\n    </div>\n\n    <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content\">\n        <section>\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\n                class=\"aw-entity__content-section\" [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <a *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/wiki']\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                    <a *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/maxxi']\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n            </div>\n\n            <ng-container \n                *ngIf=\"(\n                    lb.widgets['aw-entita-nav'].ds.hasFields && \n                    lb.widgets['aw-entita-metadata-viewer'].ds.hasGroups &&\n                    ['overview', 'campi'].indexOf(lb.dataSource.selectedTab) !== -1\n                )\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n                    <div class=\"aw-entity__content-section-header\">\n                        <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                        <a \n                        *ngIf=\"lb.dataSource.selectedTab !== 'campi'\"\n                        class=\"n7-btn n7-btn-light\" \n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/campi']\">\n                            TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\n                        </a>\n                    </div>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async \">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <a *ngIf=\"lb.dataSource.selectedTab === 'overview' \"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/oggetti-collegati/']\"\n                        [queryParams]=\"{ page: 1 }\" class=\"n7-btn n7-btn-light\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <div class=\"aw-entity__content-item-previews\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <div class=\"aw-entity__content-item-preview-wrapper\">\n                            <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                            </n7-smart-breadcrumbs>\n                            <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                            <!-- relation -->\n                            <div class=\"aw-entity__relation\" *ngIf=\"preview.relation.value\">\n                                <p class=\"aw-entity__relation-description\">Relazione con \n                                <span class=\"aw-entity__relation-key\">{{preview.relation.key}}</span>:\n                                <span class=\"aw-entity__relation-value\"> {{preview.relation.value}}</span>\n                                </p>\n                            </div>\n                        </div>\n                    </ng-container>\n                </div>\n                <n7-smart-pagination \n                    *ngIf=\"lb.dataSource.selectedTab === 'oggetti-collegati'\"\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview aw-bubble-chart__{{lb.dataSource.selectedTab}}\"\n                *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.myResponse.relatedEntities\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <a *ngIf=\"lb.dataSource.selectedTab == 'overview'\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/entita-collegate']\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <!-- Small Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper-small\" *ngIf=\"lb.dataSource.selectedTab == 'overview'\">\n                    <aw-bubble-chart-wrapper>\n                        <!-- Tippy template moved to end of HTML -->\n                        <n7-bubble-chart [data]=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.smallView\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n                <!-- Big Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper\" *ngIf=\"lb.dataSource.selectedTab == 'entita-collegate'\">\n                    <aw-bubble-chart-wrapper>\n                        <!-- Tippy template moved to end of HTML -->\n                        <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                *ngIf=\"lb.dataSource.myResponse.extraTab\" [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n                *ngIf=\"lb.dataSource.myResponse.wikiTab\" [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{ lb.dataSource.myResponse.wikiTab.url }}\n                </a>\n            </div>\n        </section>\n    </div>\n    <!-- Template for bubble chart tooltips -->\n    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\" [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n    </aw-chart-tippy>\n</div>"
             }] }
 ];
 /** @nocollapse */
@@ -8392,7 +8448,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         this.sidebarCollapsed = false;
         this.bubbleChartSectionTitle = this.configuration.get('scheda-layout')['bubble-chart'].title;
         this.similarItemsSectionTitle = this.configuration.get('scheda-layout')['related-items'].title;
-        this.metadataSectionTitle = this.configuration.get('scheda-layout').metadata.title;
+        this.metadataSectionTitle = this.getMetadataSectionTitle();
         this.hasSimilarItems = false;
         this.bubblesEnabled = this.configuration.get('features-enabled') ? this.configuration.get('features-enabled').bubblechart : false;
         this.one('aw-bubble-chart').updateOptions({
@@ -8417,6 +8473,16 @@ class AwSchedaLayoutDS extends LayoutDataSource {
      */
     onDestroy() {
         this.destroyed$.next();
+    }
+    /**
+     * @return {?}
+     */
+    getMetadataSectionTitle() {
+        /** @type {?} */
+        const layoutConfig = this.configuration.get('scheda-layout');
+        /** @type {?} */
+        const metadataConfig = layoutConfig.metadata || {};
+        return metadataConfig.title || null;
     }
     /**
      * @param {?} id
@@ -8773,7 +8839,39 @@ class AwSchedaLayoutEH extends EventHandler {
                     this.emitOuter('routechanged', paramId);
                 }
                 this.dataSource.contentIsLoading = true;
-                this.dataSource.loadItem(paramId).subscribe((/**
+                this.dataSource.loadItem(paramId)
+                    .pipe(
+                // filter empty metadata values
+                map((/**
+                 * @param {?} response
+                 * @return {?}
+                 */
+                (response) => {
+                    if (response.fields) {
+                        /** @type {?} */
+                        const filteredFields = [];
+                        response.fields.forEach((/**
+                         * @param {?} item
+                         * @return {?}
+                         */
+                        (item) => {
+                            if (item.fields) {
+                                filteredFields.push(Object.assign({}, item, { fields: item.fields
+                                        .filter((/**
+                                     * @param {?} __0
+                                     * @return {?}
+                                     */
+                                    ({ value: subValue }) => !helpers.metadataIsEmpty(subValue))) }));
+                            }
+                            else if (!helpers.metadataIsEmpty(item.value)) {
+                                filteredFields.push(item);
+                            }
+                        }));
+                        response.fields = filteredFields;
+                    }
+                    return response;
+                })))
+                    .subscribe((/**
                  * @param {?} response
                  * @return {?}
                  */
@@ -8931,7 +9029,7 @@ class AwSchedaLayoutComponent extends AbstractLayout {
 AwSchedaLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'aw-scheda-layout',
-                template: "<div class=\"aw-scheda\"\n     id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                               [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n            <div class=\"aw-scheda__tree-content-loading\"\n                 *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                        [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n            </div>\n            <div class=\"aw-scheda__tree-content\"\n                 (click)=\"lb.eventHandler.emitOuter('treeposition', $event)\"\n                 [ngStyle]=\"{\n                    'max-height': lb.dataSource.treeMaxHeight,\n                    'overflow': 'auto'\n                }\">\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                         [emit]=\"lb.widgets['aw-tree'].emit\"\n                         *ngIf=\"!lb.dataSource.sidebarCollapsed\">\n                </n7-tree>\n            </div>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper-loading\"\n             [hidden]=\"!lb.dataSource.contentIsLoading\">\n            <!--\n                <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'content-placeholder-title'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }]\n            }\"></n7-content-placeholder>\n            -->\n        </div>\n        <div class=\"aw-scheda__scheda-wrapper\"\n             [hidden]=\"lb.dataSource.contentIsLoading\">\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                                  [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                                  [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\"\n                 class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n\n            <div *ngIf=\"!lb.dataSource.currentId\"\n                 class=\"aw-scheda__intro-text\"\n                 [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <n7-image-viewer [hidden]=\"!lb.dataSource.hasImage\"\n                             [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n            </n7-image-viewer>\n\n            <section class=\"aw-scheda__description\"\n                     *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__metadata\"\n                     *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section class=\"aw-scheda__bubble-chart\"\n                     *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\n                <div *ngIf=\"lb.dataSource.hasBubbles\"\n                     class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <aw-bubble-chart-wrapper>\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                    </aw-chart-tippy>\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </section>\n\n            <section *ngIf=\"lb.dataSource.hasSimilarItems && lb.dataSource.hasBubbles\"\n                     id=\"related-item-container\"\n                     class=\"aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.similarItemsSectionTitle}}\n                </div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview [data]=\"preview\"\n                                         [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n            </section>\n        </div>\n    </div>\n</div>\n"
+                template: "<div class=\"aw-scheda\"\n     id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                               [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n            <div class=\"aw-scheda__tree-content-loading\"\n                 *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                        [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n            </div>\n            <div class=\"aw-scheda__tree-content\"\n                 (click)=\"lb.eventHandler.emitOuter('treeposition', $event)\"\n                 [ngStyle]=\"{\n                    'max-height': lb.dataSource.treeMaxHeight,\n                    'overflow': 'auto'\n                }\">\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                         [emit]=\"lb.widgets['aw-tree'].emit\"\n                         *ngIf=\"!lb.dataSource.sidebarCollapsed\">\n                </n7-tree>\n            </div>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper-loading\"\n             [hidden]=\"!lb.dataSource.contentIsLoading\">\n            <!--\n                <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'content-placeholder-title'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }]\n            }\"></n7-content-placeholder>\n            -->\n        </div>\n        <div class=\"aw-scheda__scheda-wrapper\"\n             [hidden]=\"lb.dataSource.contentIsLoading\">\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                                  [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                                  [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\"\n                 class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n\n            <div *ngIf=\"!lb.dataSource.currentId\"\n                 class=\"aw-scheda__intro-text\"\n                 [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <section class=\"aw-scheda__section aw-scheda__image-viewer\"\n                     [hidden]=\"!lb.dataSource.hasImage\">\n                <n7-image-viewer [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n                </n7-image-viewer>\n            </section>\n\n            <section class=\"aw-scheda__section aw-scheda__description\"\n                     *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__section aw-scheda__metadata\"\n            *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\"\n                *ngIf=\"lb.dataSource.metadataSectionTitle\"> \n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section class=\"aw-scheda__section aw-scheda__bubble-chart\"\n                     *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\n                <div *ngIf=\"lb.dataSource.hasBubbles\"\n                     class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <aw-bubble-chart-wrapper>\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                    </aw-chart-tippy>\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </section>\n\n            <section *ngIf=\"lb.dataSource.hasSimilarItems && lb.dataSource.hasBubbles\"\n                     id=\"related-item-container\"\n                     class=\"aw-scheda__section aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.similarItemsSectionTitle}}\n                </div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview [data]=\"preview\"\n                                         [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n            </section>\n        </div>\n    </div>\n</div>\n"
             }] }
 ];
 /** @nocollapse */
@@ -12663,12 +12761,20 @@ class MrHomeLayoutDS extends LayoutDataSource {
         const { sections } = this.pageConfig;
         if (sections) {
             // FIXME: collegare API
-            // this.communication.request$('sections', {
-            //   method: 'POST',
-            //   params: sections.map(({ id }) => id)
-            // }).subscribe((response) => {
-            //   this.initSections(response);
-            // });
+            this.communication.request$('home', {
+                method: 'POST',
+                params: sections.map((/**
+                 * @param {?} __0
+                 * @return {?}
+                 */
+                ({ id }) => id))
+            }).subscribe((/**
+             * @param {?} response
+             * @return {?}
+             */
+            (response) => {
+                this.initSections(response);
+            }));
             this.initSections(homeMock);
         }
     }
@@ -12934,7 +13040,8 @@ class MrHeroDS extends DataSource {
      * @return {?}
      */
     transform(data) {
-        return data;
+        const { classes } = this.options;
+        return Object.assign({}, data, { classes: classes || '' });
     }
 }
 if (false) {
@@ -13090,7 +13197,13 @@ class MrSearchTagsDS extends DataSource {
          * @return {?}
          */
         ({ inputs }) => {
-            inputs.forEach((/**
+            inputs
+                .filter((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            ({ queryParam }) => queryParam))
+                .forEach((/**
              * @param {?} __0
              * @return {?}
              */
@@ -13298,8 +13411,13 @@ class MrCollectionDS extends DataSource {
      * @return {?}
      */
     transform(data) {
-        const { header } = data;
-        return Object.assign({}, data, { header: {
+        if (data === undefined) {
+            return null;
+        }
+        const { header, items } = data;
+        const { classes } = this.options;
+        return {
+            header: {
                 title: {
                     main: {
                         text: header.title,
@@ -13315,11 +13433,16 @@ class MrCollectionDS extends DataSource {
                         {
                             text: header.button.text,
                             payload: header.button.link,
-                            classes: 'n7-btn-cta'
                         }
                     ]
                 }
-            } });
+            },
+            items: items.map((/**
+             * @param {?} item
+             * @return {?}
+             */
+            (item) => (Object.assign({}, item, { classes: classes || '' }))))
+        };
     }
 }
 if (false) {
@@ -13464,9 +13587,10 @@ class MrHomeLayoutComponent extends AbstractLayout {
              * @param {?} __0
              * @return {?}
              */
-            ({ id, type }) => {
+            ({ id, type, options }) => {
                 this.widgets.push({
                     id,
+                    options,
                     dataSource: DATASOURCE_MAP[type],
                     eventHandler: EVENTHANDLER_MAP[type]
                 });
@@ -13514,29 +13638,603 @@ if (false) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-/**
- * @param {?} prefix
- * @return {?}
- */
-function getLinks(prefix) {
-    /** @type {?} */
-    let i;
-    /** @type {?} */
-    const limit = Math.round(Math.random() * 10);
-    /** @type {?} */
-    const links = [];
-    for (i = 0; i < limit; i += 1) {
-        /** @type {?} */
-        const text = `${prefix} ${i + 1}`;
-        links.push({
-            text,
-            counter: Math.round(Math.random() * 100),
-            payload: text
+class MrSearchLayoutDS extends LayoutDataSource$1 {
+    constructor() {
+        super(...arguments);
+        this.sectionState = {};
+        this.totalResultsText = null;
+    }
+    /**
+     * @param {?} payload
+     * @return {?}
+     */
+    onInit(payload) {
+        this.configuration = payload.configuration;
+        this.searchService = payload.searchService;
+        this.configId = payload.configId;
+        this.pageConfig = this.configuration.get(this.configId);
+        // config
+        this.all().updateOptions({ config: this.pageConfig });
+        // manual updates
+        this.one('mr-search-page-title').update({});
+    }
+    /**
+     * @param {?} response
+     * @return {?}
+     */
+    handleResponse(response) {
+        this.some([
+            'mr-search-results-title',
+            'mr-search-results',
+        ]).update(response);
+        // pagination
+        this.one('n7-smart-pagination').updateOptions({ mode: 'payload' });
+        this.one('n7-smart-pagination').update(this.getPaginationParams(response));
+    }
+    /**
+     * @param {?} state
+     * @return {?}
+     */
+    updateActiveFilters(state) {
+        // active "tags" filters
+        this.one('mr-search-tags').update({
+            state,
+            facetsConfig: this.searchService.getConfig().facets
         });
     }
-    return links;
+    /**
+     * @private
+     * @param {?} response
+     * @return {?}
+     */
+    getPaginationParams(response) {
+        const { totalCount, page } = response;
+        const { pagination: paginationConfig } = this.pageConfig;
+        return {
+            totalPages: Math.ceil(totalCount / page.limit),
+            currentPage: page.current,
+            pageLimit: paginationConfig.limit,
+            sizes: {
+                list: paginationConfig.options,
+                active: page.limit,
+            },
+        };
+    }
+    /**
+     * @param {?} id
+     * @param {?} newState
+     * @return {?}
+     */
+    setSectionState(id, newState) {
+        this.sectionState[id] = newState;
+    }
 }
-const ɵ0 = {
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutDS.prototype.configuration;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutDS.prototype.configId;
+    /** @type {?} */
+    MrSearchLayoutDS.prototype.searchService;
+    /** @type {?} */
+    MrSearchLayoutDS.prototype.sectionState;
+    /** @type {?} */
+    MrSearchLayoutDS.prototype.facetsConfig;
+    /** @type {?} */
+    MrSearchLayoutDS.prototype.pageConfig;
+    /** @type {?} */
+    MrSearchLayoutDS.prototype.totalResultsText;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/** @type {?} */
+const hasValue = (/**
+ * @param {?} value
+ * @return {?}
+ */
+(value) => {
+    if (Array.isArray(value)) {
+        return value.length > 0;
+    }
+    return !!value;
+});
+const ɵ0 = hasValue;
+var searchHelper = {
+    /**
+     * @param {?} state
+     * @return {?}
+     */
+    stateToQueryParams(state) {
+        /** @type {?} */
+        const queryParams = (/** @type {?} */ ({}));
+        Object.keys(state).forEach((/**
+         * @param {?} key
+         * @return {?}
+         */
+        (key) => {
+            /** @type {?} */
+            const value = state[key];
+            if (hasValue(value)) {
+                queryParams[key] = Array.isArray(value) ? value.join(',') : value;
+            }
+        }));
+        return queryParams;
+    },
+    /**
+     * @param {?} queryParams
+     * @return {?}
+     */
+    queryParamsToState(queryParams) {
+        /** @type {?} */
+        const state = (/** @type {?} */ ({}));
+        Object.keys(queryParams).forEach((/**
+         * @param {?} key
+         * @return {?}
+         */
+        (key) => {
+            /** @type {?} */
+            const value = queryParams[key];
+            if (hasValue(value)) {
+                state[key] = value.indexOf(',') !== -1 ? value.split(',') : value;
+            }
+        }));
+        return state;
+    }
+};
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/** @type {?} */
+const INPUT_STATE_CONTEXT = 'input';
+/** @type {?} */
+const FACET_STATE_CONTEXT = 'facet';
+/** @type {?} */
+const RESULTS_STATE_CONTEXT = 'results';
+/** @type {?} */
+const LINKS_STATE_CONTEXT = 'links';
+class MrSearchService {
+    /**
+     * @param {?} router
+     * @param {?} activatedRoute
+     * @param {?} communication
+     */
+    constructor(router, activatedRoute, communication) {
+        this.router = router;
+        this.activatedRoute = activatedRoute;
+        this.communication = communication;
+        this.queryParamKeys = [];
+        this.contextState = {};
+        this.state$ = {};
+        this.beforeHook = {};
+        this.getConfig = (/**
+         * @return {?}
+         */
+        () => this.config);
+    }
+    /**
+     * @param {?} config
+     * @return {?}
+     */
+    init(config) {
+        this.config = config;
+        // initial states
+        this.initInputState();
+        this.initFacetState();
+        // listeners
+        this.onInputsChange();
+        this.onRouteChange();
+        this.onResultsLoading();
+    }
+    /**
+     * @param {?} context
+     * @param {?=} id
+     * @return {?}
+     */
+    getState$(context, id) {
+        /** @type {?} */
+        const stateId = id ? `${context}.${id}` : context;
+        if (!this.state$[stateId]) {
+            throw Error(`Key "${stateId}" does'nt exists`);
+        }
+        return this.state$[stateId];
+    }
+    /**
+     * @param {?} context
+     * @return {?}
+     */
+    addStateContext(context) {
+        if (this.state$[context]) {
+            throw Error(`State key "${context}" already exists`);
+        }
+        // initial state
+        this.contextState[context] = {};
+        // create stream
+        this.state$[context] = new Subject();
+    }
+    /**
+     * @param {?} context
+     * @param {?} id
+     * @return {?}
+     */
+    addState(context, id) {
+        /** @type {?} */
+        const stateId = `${context}.${id}`;
+        if (!this.state$[context]) {
+            throw Error(`
+        State context "${context}" does'nt exists.
+        You must add context first
+      `);
+        }
+        if (this.state$[stateId]) {
+            throw Error(`State key "${stateId}" already exists`);
+        }
+        // create stream
+        this.state$[stateId] = new Subject();
+    }
+    /**
+     * @param {?} context
+     * @param {?} id
+     * @param {?} newValue
+     * @return {?}
+     */
+    setState(context, id, newValue) {
+        /** @type {?} */
+        const stateId = `${context}.${id}`;
+        if (!this.state$[stateId]) {
+            throw Error(`Key "${stateId}" does'nt exists`);
+        }
+        /** @type {?} */
+        let value = newValue;
+        // hook control
+        if (this.beforeHook[stateId]) {
+            value = this.beforeHook[stateId](value);
+        }
+        // update stream
+        this.state$[stateId].next(value);
+        // update context
+        this.setContextState(context, id, value);
+    }
+    /**
+     * @param {?} context
+     * @param {?} id
+     * @param {?} hook
+     * @return {?}
+     */
+    setBeforeHook(context, id, hook) {
+        /** @type {?} */
+        const stateId = `${context}.${id}`;
+        if (!this.state$[stateId]) {
+            throw Error(`Key "${stateId}" does'nt exists`);
+        }
+        this.beforeHook[stateId] = hook;
+    }
+    /**
+     * @return {?}
+     */
+    reset() {
+        // clear input states
+        Object.keys(this.contextState[INPUT_STATE_CONTEXT]).forEach((/**
+         * @param {?} id
+         * @return {?}
+         */
+        (id) => {
+            this.setState(INPUT_STATE_CONTEXT, id, null);
+        }));
+    }
+    /**
+     * @private
+     * @param {?} context
+     * @param {?} id
+     * @param {?} newValue
+     * @return {?}
+     */
+    setContextState(context, id, newValue) {
+        this.contextState[context] = Object.assign({}, this.contextState[context], { [`${id}`]: newValue });
+        this.state$[context].next({
+            lastUpdated: id,
+            state: this.contextState[context]
+        });
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    initInputState() {
+        const { facets, layoutInputs } = this.config;
+        // add context state
+        this.addStateContext(INPUT_STATE_CONTEXT);
+        // set facets input state
+        facets.sections.forEach((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ header, inputs }) => {
+            [header, ...inputs].forEach((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            ({ id, queryParam }) => {
+                this.addState(INPUT_STATE_CONTEXT, id);
+                if (queryParam) {
+                    this.queryParamKeys.push(id);
+                }
+            }));
+        }));
+        // set layout input state
+        layoutInputs.forEach((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ id, queryParam }) => {
+            this.addState(INPUT_STATE_CONTEXT, id);
+            if (queryParam) {
+                this.queryParamKeys.push(id);
+            }
+        }));
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    initFacetState() {
+        const { facets } = this.config;
+        // add context state
+        this.addStateContext(FACET_STATE_CONTEXT);
+        // set input state
+        facets.sections.forEach((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ header, inputs }) => {
+            [header, ...inputs].forEach((/**
+             * @param {?} input
+             * @return {?}
+             */
+            (input) => {
+                this.addState(FACET_STATE_CONTEXT, input.id);
+            }));
+        }));
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    onRouteChange() {
+        const { results } = this.config.request;
+        // add context state
+        this.addStateContext(RESULTS_STATE_CONTEXT);
+        // default states
+        ['loading', 'success', 'error'].forEach((/**
+         * @param {?} id
+         * @return {?}
+         */
+        (id) => {
+            this.addState(RESULTS_STATE_CONTEXT, id);
+        }));
+        this.activatedRoute.queryParams.pipe(
+        // fix initial listeners (symbolic timeout)
+        delay(1), 
+        // query params to state
+        map((/**
+         * @param {?} params
+         * @return {?}
+         */
+        (params) => searchHelper.queryParamsToState(params))), 
+        // state != queryParams control
+        tap((/**
+         * @param {?} params
+         * @return {?}
+         */
+        (params) => {
+            if (isEmpty(params) && !isEmpty(this.contextState[INPUT_STATE_CONTEXT])) {
+                this.reset();
+            }
+            if (!isEmpty(params) && isEmpty(this.contextState[INPUT_STATE_CONTEXT])) {
+                // update state
+                Object.keys(params).forEach((/**
+                 * @param {?} inputId
+                 * @return {?}
+                 */
+                (inputId) => {
+                    this.setState(INPUT_STATE_CONTEXT, inputId, params[inputId]);
+                }));
+            }
+        })), map((/**
+         * @param {?} params
+         * @return {?}
+         */
+        (params) => {
+            this.setState(RESULTS_STATE_CONTEXT, 'loading', params);
+            return params;
+        })), debounceTime(results.delay || 1), switchMap((/**
+         * @param {?} state
+         * @return {?}
+         */
+        (state) => this.communication.request$(results.id, {
+            params: state,
+            method: 'POST',
+            onError: (/**
+             * @param {?} error
+             * @return {?}
+             */
+            (error) => {
+                this.setState(RESULTS_STATE_CONTEXT, 'error', error);
+            })
+        }, results.provider || null)))).subscribe((/**
+         * @param {?} response
+         * @return {?}
+         */
+        (response) => {
+            this.setState(RESULTS_STATE_CONTEXT, 'success', response);
+        }));
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    onInputsChange() {
+        this.getState$(INPUT_STATE_CONTEXT).pipe(filter((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ lastUpdated }) => this.queryParamKeys.indexOf(lastUpdated) !== -1))).subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ state }) => {
+            /** @type {?} */
+            const filteredState = {};
+            Object.keys(state).forEach((/**
+             * @param {?} id
+             * @return {?}
+             */
+            (id) => {
+                if (this.queryParamKeys.indexOf(id) !== -1) {
+                    filteredState[id] = state[id];
+                }
+            }));
+            /** @type {?} */
+            const queryParams = searchHelper.stateToQueryParams(filteredState);
+            this.router.navigate([], {
+                queryParams
+            });
+        }));
+    }
+    /**
+     * @private
+     * @return {?}
+     */
+    onResultsLoading() {
+        const { links } = this.config.request;
+        if (!links) {
+            return;
+        }
+        // add context state
+        this.addStateContext(LINKS_STATE_CONTEXT);
+        // default states
+        ['loading', 'success', 'error'].forEach((/**
+         * @param {?} id
+         * @return {?}
+         */
+        (id) => {
+            this.addState(LINKS_STATE_CONTEXT, id);
+        }));
+        this.getState$(RESULTS_STATE_CONTEXT, 'loading').pipe(map((/**
+         * @param {?} params
+         * @return {?}
+         */
+        (params) => {
+            this.setState(LINKS_STATE_CONTEXT, 'loading', params);
+            return params;
+        })), debounceTime(links.delay || 1), switchMap((/**
+         * @param {?} state
+         * @return {?}
+         */
+        (state) => this.communication.request$(links.id, {
+            params: state,
+            method: 'POST',
+            onError: (/**
+             * @param {?} error
+             * @return {?}
+             */
+            (error) => {
+                this.setState(LINKS_STATE_CONTEXT, 'error', error);
+            })
+        }, links.provider || null)))).subscribe((/**
+         * @param {?} response
+         * @return {?}
+         */
+        (response) => {
+            this.setState(LINKS_STATE_CONTEXT, 'success', response);
+        }));
+        // update links
+        this.getState$(LINKS_STATE_CONTEXT, 'success').subscribe((/**
+         * @param {?} response
+         * @return {?}
+         */
+        (response) => {
+            Object.keys(response).forEach((/**
+             * @param {?} id
+             * @return {?}
+             */
+            (id) => {
+                this.setState(FACET_STATE_CONTEXT, id, {
+                    links: response[id]
+                });
+            }));
+        }));
+    }
+}
+MrSearchService.decorators = [
+    { type: Injectable }
+];
+/** @nocollapse */
+MrSearchService.ctorParameters = () => [
+    { type: Router },
+    { type: ActivatedRoute },
+    { type: CommunicationService }
+];
+if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchService.prototype.config;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchService.prototype.queryParamKeys;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchService.prototype.contextState;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchService.prototype.state$;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchService.prototype.beforeHook;
+    /** @type {?} */
+    MrSearchService.prototype.getConfig;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchService.prototype.router;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchService.prototype.activatedRoute;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchService.prototype.communication;
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+const ɵ0$1 = {
     text: 'Filtra i risultati'
 }, ɵ1 = {
     id: 'input-text-00',
@@ -13555,17 +14253,55 @@ const ɵ0 = {
     inputPayload: 'search-input',
     enterPayload: 'search-enter',
     iconPayload: 'search-icon',
+}, ɵ4 = {
+    links: []
+}, ɵ5 = {
+    text: 'Glossario',
+    additionalText: '96',
+}, ɵ6 = {
+    id: 'input-text-02',
+    placeholder: 'Search',
+    icon: 'n7-icon-search',
+    inputPayload: 'search-input',
+    enterPayload: 'search-enter',
+    iconPayload: 'search-icon',
+}, ɵ7 = {
+    links: []
+}, ɵ8 = {
+    text: 'Continenti',
+    additionalText: '3'
+}, ɵ9 = {
+    links: []
+}, ɵ10 = {
+    text: 'Keywords',
+    additionalText: '108',
+    iconRight: 'n7-icon-angle-right'
+}, ɵ11 = {
+    links: []
+}, ɵ12 = {
+    text: 'Data di pubblicazione',
+    additionalText: '20',
+    iconRight: 'n7-icon-angle-right'
+}, ɵ13 = {
+    links: []
+}, ɵ14 = {
+    text: 'Luogo di pubblicazione',
+    additionalText: '15',
+    iconRight: 'n7-icon-angle-right'
+}, ɵ15 = {
+    links: []
 };
 /** @type {?} */
-const configuration = {
+const facets = {
     sections: [{
             header: {
                 id: 'header-filtra',
-                data: ɵ0
+                data: ɵ0$1
             },
             inputs: [{
                     id: 'input-00',
                     type: 'text',
+                    queryParam: true,
                     data: ɵ1
                 }]
         }, {
@@ -13576,108 +14312,98 @@ const configuration = {
             inputs: [{
                     id: 'input-01',
                     type: 'text',
-                    internal: true,
                     data: ɵ3
                 }, {
                     id: 'input-02',
                     type: 'link',
-                    data: {
-                        links: getLinks('Toponimo')
-                    }
+                    queryParam: true,
+                    data: ɵ4
                 }]
         }, {
             header: {
                 id: 'header-glossario',
-                data: {
-                    text: 'Glossario',
-                    additionalText: '96',
-                }
+                data: ɵ5
             },
             inputs: [{
                     id: 'input-03',
                     type: 'text',
-                    internal: true,
-                    data: {
-                        id: 'input-text-02',
-                        placeholder: 'Search',
-                        icon: 'n7-icon-search',
-                        inputPayload: 'search-input',
-                        enterPayload: 'search-enter',
-                        iconPayload: 'search-icon',
-                    }
+                    data: ɵ6
                 }, {
                     id: 'input-04',
                     type: 'link',
-                    data: {
-                        links: getLinks('Concetto')
-                    }
+                    queryParam: true,
+                    data: ɵ7
                 }]
         }, {
             header: {
                 id: 'header-continenti',
-                data: {
-                    text: 'Continenti',
-                    additionalText: '3'
-                }
+                data: ɵ8
             },
             inputs: [{
                     id: 'input-05',
                     type: 'link',
-                    data: {
-                        links: getLinks('Continente')
-                    }
+                    queryParam: true,
+                    data: ɵ9
                 }]
         }, {
             header: {
                 id: 'header-keywords',
-                data: {
-                    text: 'Keywords',
-                    additionalText: '108',
-                    iconRight: 'n7-icon-angle-right'
-                }
+                data: ɵ10
             },
             inputs: [{
                     id: 'input-06',
                     type: 'link',
-                    data: {
-                        links: getLinks('Keyword')
-                    }
+                    queryParam: true,
+                    data: ɵ11
                 }],
         }, {
             header: {
                 id: 'header-data',
-                data: {
-                    text: 'Data di pubblicazione',
-                    additionalText: '20',
-                    iconRight: 'n7-icon-angle-right'
-                }
+                data: ɵ12
             },
             inputs: [{
                     id: 'input-07',
                     type: 'link',
-                    data: {
-                        links: getLinks('Data')
-                    }
+                    queryParam: true,
+                    data: ɵ13
                 }],
         }, {
             header: {
                 id: 'header-luogo',
-                data: {
-                    text: 'Luogo di pubblicazione',
-                    additionalText: '15',
-                    iconRight: 'n7-icon-angle-right'
-                }
+                data: ɵ14
             },
             inputs: [{
                     id: 'input-08',
                     type: 'link',
-                    data: {
-                        links: getLinks('Luogo')
-                    }
+                    queryParam: true,
+                    data: ɵ15
                 }],
         }],
     classes: 'facets-wrapper'
 };
+const ɵ16 = /**
+ * @param {?} id
+ * @return {?}
+ */
+(id) => ({
+    id,
+    queryParam: true,
+});
+/** @type {?} */
+const layoutInputs = ['page', 'limit', 'sort'].map((ɵ16));
+/** @type {?} */
+const request = {
+    results: {
+        id: 'search',
+        delay: 500
+    },
+    links: {
+        id: 'links',
+    },
+    provider: 'rest',
+    delay: 500
+};
+var searchConfig = (/** @type {?} */ ({ request, facets, layoutInputs }));
 
 /**
  * @fileoverview added by tsickle
@@ -13689,7 +14415,7 @@ const configuration = {
 function getHeaders() {
     /** @type {?} */
     const headers = {};
-    configuration.sections.forEach((/**
+    searchConfig.facets.sections.forEach((/**
      * @param {?} __0
      * @return {?}
      */
@@ -13765,243 +14491,55 @@ var resultsMock = (/**
  * @fileoverview added by tsickle
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-class MrSearchLayoutDS extends LayoutDataSource$1 {
-    constructor() {
-        super(...arguments);
-        this.inputsConfig = {};
-        this.state = {};
-        this.sectionState = {};
-        this.totalResultsText = null;
-        this.inputIsInternal = (/**
-         * @param {?=} id
-         * @return {?}
-         */
-        (id) => this.inputsConfig[id].internal);
-        this.getInputType = (/**
-         * @param {?=} id
-         * @return {?}
-         */
-        (id) => this.inputsConfig[id].type);
+/**
+ * @param {?} prefix
+ * @return {?}
+ */
+function getLinks(prefix) {
+    /** @type {?} */
+    let i;
+    /** @type {?} */
+    const limit = 10;
+    /** @type {?} */
+    const links = [];
+    for (i = 0; i < limit; i += 1) {
+        /** @type {?} */
+        const text = `${prefix} ${i + 1}`;
+        links.push({
+            text,
+            counter: Math.round(Math.random() * 100),
+            payload: text
+        });
     }
-    /**
-     * @param {?} payload
+    return links;
+}
+var linksMock = (/**
+ * @return {?}
+ */
+() => {
+    /** @type {?} */
+    const results = {};
+    searchConfig.facets.sections.forEach((/**
+     * @param {?} __0
      * @return {?}
      */
-    onInit(payload) {
-        this.configuration = payload.configuration;
-        this.communication = payload.communication;
-        this.facetsConfig = configuration;
-        this.configId = payload.configId;
-        this.pageConfig = this.configuration.get(this.configId);
-        // inputs config
-        this.facetsConfig.sections.forEach((/**
+    ({ inputs }) => {
+        inputs
+            .filter((/**
+         * @param {?} input
+         * @return {?}
+         */
+        (input) => input.type === 'link'))
+            .forEach((/**
          * @param {?} __0
          * @return {?}
          */
-        ({ inputs }) => {
-            inputs.forEach((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ id, type, internal }) => {
-                this.inputsConfig[id] = {
-                    type,
-                    internal: !!internal
-                };
-            }));
+        ({ id }) => {
+            results[id] = getLinks(id);
         }));
-        // config
-        this.all().updateOptions({ config: this.pageConfig });
-        // manual updates
-        this.one('mr-search-page-title').update({});
-    }
-    /**
-     * @param {?=} params
-     * @return {?}
-     */
-    doRequest$(params = {}) {
-        console.warn('#TODO: doRequest', params);
-        // FIXME: togliere commento
-        /* return this.communication.request$('search', {
-              params,
-              onError: (error) => {
-                this.setSectionState('results', 'KO');
-                console.warn('SEARCH ERROR', error);
-              }
-            }); */
-        /** @type {?} */
-        const page = this.getState('page') || 1;
-        /** @type {?} */
-        const sort = this.getState('sort') || '_score_DESC';
-        return of(resultsMock(page, sort)).pipe(delay(Math.round(Math.random() * 5000)));
-    }
-    /**
-     * @param {?} response
-     * @return {?}
-     */
-    handleResponse(response) {
-        this.some([
-            'mr-search-results-title',
-            'mr-search-results',
-        ]).update(response);
-        this.setSectionState('results', isEmpty(response.results) ? 'EMPTY' : 'OK');
-        // pagination
-        this.one('n7-smart-pagination').updateOptions({ mode: 'payload' });
-        this.one('n7-smart-pagination').update(this.getPaginationParams(response));
-    }
-    /**
-     * @return {?}
-     */
-    updateActiveFilters() {
-        // active "tags" filters
-        this.one('mr-search-tags').update({
-            state: this.state,
-            facetsConfig: this.facetsConfig
-        });
-    }
-    /**
-     * @private
-     * @param {?} response
-     * @return {?}
-     */
-    getPaginationParams(response) {
-        const { totalCount, page } = response;
-        const { pagination: paginationConfig } = this.pageConfig;
-        return {
-            totalPages: Math.ceil(totalCount / page.limit),
-            currentPage: page.current,
-            pageLimit: paginationConfig.limit,
-            sizes: {
-                list: paginationConfig.options,
-                active: page.limit,
-            },
-        };
-    }
-    /**
-     * @param {?=} id
-     * @return {?}
-     */
-    getState(id) {
-        return id ? this.state[id] : this.state;
-    }
-    /**
-     * @param {?} id
-     * @param {?} value
-     * @return {?}
-     */
-    setState(id, value) {
-        this.state[id] = value;
-    }
-    /**
-     * @return {?}
-     */
-    clearState() {
-        this.state = {};
-    }
-    /**
-     * @param {?} id
-     * @param {?} newState
-     * @return {?}
-     */
-    setSectionState(id, newState) {
-        this.sectionState[id] = newState;
-    }
-}
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutDS.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutDS.prototype.communication;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutDS.prototype.configId;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutDS.prototype.inputsConfig;
-    /** @type {?} */
-    MrSearchLayoutDS.prototype.state;
-    /** @type {?} */
-    MrSearchLayoutDS.prototype.sectionState;
-    /** @type {?} */
-    MrSearchLayoutDS.prototype.facetsConfig;
-    /** @type {?} */
-    MrSearchLayoutDS.prototype.pageConfig;
-    /** @type {?} */
-    MrSearchLayoutDS.prototype.totalResultsText;
-    /** @type {?} */
-    MrSearchLayoutDS.prototype.inputIsInternal;
-    /** @type {?} */
-    MrSearchLayoutDS.prototype.getInputType;
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-const hasValue = (/**
- * @param {?} value
- * @return {?}
- */
-(value) => {
-    if (Array.isArray(value)) {
-        return value.length > 0;
-    }
-    return !!value;
+    }));
+    return results;
 });
-const ɵ0$1 = hasValue;
-var searchHelper = {
-    /**
-     * @param {?} state
-     * @return {?}
-     */
-    stateToQueryParams(state) {
-        /** @type {?} */
-        const queryParams = (/** @type {?} */ ({}));
-        Object.keys(state).forEach((/**
-         * @param {?} key
-         * @return {?}
-         */
-        (key) => {
-            /** @type {?} */
-            const value = state[key];
-            if (hasValue(value)) {
-                queryParams[key] = Array.isArray(value) ? value.join(',') : value;
-            }
-        }));
-        return queryParams;
-    },
-    /**
-     * @param {?} queryParams
-     * @return {?}
-     */
-    queryParamsToState(queryParams) {
-        /** @type {?} */
-        const state = (/** @type {?} */ ({}));
-        Object.keys(queryParams).forEach((/**
-         * @param {?} key
-         * @return {?}
-         */
-        (key) => {
-            /** @type {?} */
-            const value = queryParams[key];
-            if (hasValue(value)) {
-                state[key] = value.indexOf(',') !== -1 ? value.split(',') : value;
-            }
-        }));
-        return state;
-    }
-};
 
 /**
  * @fileoverview added by tsickle
@@ -14011,8 +14549,7 @@ class MrSearchLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.destroyed$ = new Subject();
-        this.facetsReady$ = new Subject();
-        this.doSearch$ = new Subject();
+        this.searchState = {};
     }
     /**
      * @return {?}
@@ -14025,22 +14562,16 @@ class MrSearchLayoutEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'mr-search-layout.init':
-                    this.hostEmit$ = payload.hostEmit$;
-                    this.guestEmit$ = payload.guestEmit$;
-                    this.router = payload.router;
-                    this.activatedRoute = payload.activatedRoute;
-                    // listeners
-                    this.listenToGuest();
-                    this.listenToRouterChanges();
-                    // init
+                    this.searchService = payload.searchService;
                     this.dataSource.onInit(payload);
+                    // listeners
+                    this.initStateListener();
                     break;
                 case 'mr-search-layout.destroy':
                     this.destroyed$.next(true);
                     break;
                 case 'mr-search-layout.searchreset':
-                    this.clearSearchState();
-                    this.updateRoute();
+                    this.searchService.reset();
                     break;
                 default:
                     console.warn('unhandled inner event of type', type);
@@ -14054,170 +14585,88 @@ class MrSearchLayoutEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'n7-smart-pagination.click':
-                    this.dataSource.setState('page', payload.page);
-                    this.updateRoute();
+                    this.searchService.setState('input', 'page', payload.page);
                     break;
                 case 'n7-smart-pagination.change':
-                    this.dataSource.setState('limit', payload.value);
-                    this.updateRoute();
+                    this.searchService.setState('input', 'limit', payload.value);
                     break;
                 case 'mr-search-results-title.change':
-                    this.dataSource.setState('sort', payload.value);
-                    this.updateRoute();
+                    this.searchService.setState('input', 'sort', payload.value);
                     break;
                 case 'mr-search-tags.click': {
                     /** @type {?} */
-                    const stateValue = this.dataSource.getState(payload.id);
+                    const stateValue = this.searchState[payload.id];
                     /** @type {?} */
                     let newValue = null;
                     if (Array.isArray(stateValue)) {
-                        stateValue.splice(stateValue.indexOf(payload.value), 1);
-                        newValue = stateValue;
+                        newValue = stateValue.filter((/**
+                         * @param {?} value
+                         * @return {?}
+                         */
+                        (value) => value !== payload.value));
                     }
-                    this.dataSource.setState(payload.id, newValue);
-                    this.hostEmit$.next({
-                        type: 'updateinputvalue',
-                        payload: {
-                            id: payload.id,
-                            value: newValue
-                        }
-                    });
-                    this.updateRoute();
+                    this.searchService.setState('input', payload.id, newValue);
                     break;
                 }
                 default:
                     break;
             }
         }));
-        // search request stream
-        this.doSearch$.pipe(debounceTime(500), tap((/**
+    }
+    /**
+     * @return {?}
+     */
+    initStateListener() {
+        // request listener
+        this.searchService.getState$(RESULTS_STATE_CONTEXT)
+            .subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ lastUpdated, state }) => {
+            console.warn('request', lastUpdated, state);
+        }));
+        // inputs listener
+        this.searchService.getState$(INPUT_STATE_CONTEXT).subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ lastUpdated, state }) => {
+            this.searchState = state;
+            this.dataSource.updateActiveFilters(state);
+            console.warn('input', lastUpdated, state);
+        }));
+        this.searchService.getState$(RESULTS_STATE_CONTEXT, 'loading').subscribe((/**
          * @return {?}
          */
         () => {
-            this.dataSource.updateActiveFilters();
             this.dataSource.setSectionState('results', 'LOADING');
-        })), switchMap((/**
-         * @param {?} params
+        }));
+        // hook (test)
+        this.searchService.setBeforeHook(RESULTS_STATE_CONTEXT, 'success', (/**
          * @return {?}
          */
-        (params) => this.dataSource.doRequest$(params)))).subscribe((/**
+        () => {
+            const { page, sort } = this.searchState;
+            return resultsMock(page || 1, sort || '_score_DESC');
+        }));
+        this.searchService.setBeforeHook(LINKS_STATE_CONTEXT, 'success', (/**
+         * @param {?} response
+         * @return {?}
+         */
+        (response) => {
+            console.warn('links', response);
+            return linksMock();
+        }));
+        this.searchService.getState$(RESULTS_STATE_CONTEXT, 'success')
+            .subscribe((/**
          * @param {?} response
          * @return {?}
          */
         (response) => {
             this.dataSource.handleResponse(response);
-            this.updateFacetHeaders(response.headers);
-        }));
-    }
-    /**
-     * @return {?}
-     */
-    listenToGuest() {
-        this.guestEmit$.pipe(takeUntil(this.destroyed$)).subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
-            switch (type) {
-                case 'facetsready': {
-                    this.facetsReady$.next();
-                    break;
-                }
-                case 'change': {
-                    this.dataSource.setState(payload.id, payload.value);
-                    this.updateRoute();
-                    break;
-                }
-                default:
-                    break;
-            }
-        }));
-    }
-    /**
-     * @return {?}
-     */
-    listenToRouterChanges() {
-        this.activatedRoute.queryParams.pipe(takeUntil(this.destroyed$)).subscribe((/**
-         * @param {?} params
-         * @return {?}
-         */
-        (params) => {
-            /** @type {?} */
-            const searchState = searchHelper.queryParamsToState(params);
-            // params state control
-            if (isEmpty(params) && !isEmpty(this.dataSource.getState())) {
-                this.clearSearchState();
-            }
-            else if (isEmpty(this.dataSource.getState()) && !isEmpty(params)) {
-                this.setSearchState(params);
-            }
-            this.doSearch$.next(searchState);
-        }));
-    }
-    /**
-     * @return {?}
-     */
-    updateRoute() {
-        /** @type {?} */
-        const queryParams = searchHelper.stateToQueryParams(this.dataSource.getState());
-        this.router.navigate([], {
-            queryParams
-        });
-    }
-    /**
-     * @private
-     * @param {?} headers
-     * @return {?}
-     */
-    updateFacetHeaders(headers) {
-        Object.keys(headers).forEach((/**
-         * @param {?} id
-         * @return {?}
-         */
-        (id) => {
-            this.hostEmit$.next({
-                type: 'updateinputvalue',
-                payload: {
-                    id,
-                    value: headers[id]
-                }
-            });
-        }));
-    }
-    /**
-     * @private
-     * @return {?}
-     */
-    clearSearchState() {
-        this.dataSource.clearState();
-        this.hostEmit$.next({ type: 'clearinputs' });
-    }
-    /**
-     * @private
-     * @param {?} params
-     * @return {?}
-     */
-    setSearchState(params) {
-        this.facetsReady$.subscribe((/**
-         * @return {?}
-         */
-        () => {
-            /** @type {?} */
-            const stateParams = searchHelper.queryParamsToState(params);
-            Object.keys(stateParams).forEach((/**
-             * @param {?} key
-             * @return {?}
-             */
-            (key) => {
-                this.dataSource.setState(key, stateParams[key]);
-                this.hostEmit$.next({
-                    type: 'updateinputvalue',
-                    payload: {
-                        id: key,
-                        value: stateParams[key]
-                    }
-                });
-            }));
+            // update layout state
+            this.dataSource.setSectionState('results', isEmpty(response.results) ? 'EMPTY' : 'OK');
         }));
     }
 }
@@ -14233,32 +14682,12 @@ if (false) {
      * @type {?}
      * @private
      */
-    MrSearchLayoutEH.prototype.hostEmit$;
+    MrSearchLayoutEH.prototype.searchService;
     /**
      * @type {?}
      * @private
      */
-    MrSearchLayoutEH.prototype.guestEmit$;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutEH.prototype.facetsReady$;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutEH.prototype.doSearch$;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutEH.prototype.router;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutEH.prototype.activatedRoute;
+    MrSearchLayoutEH.prototype.searchState;
 }
 
 /**
@@ -14305,13 +14734,15 @@ class MrSearchLayoutComponent extends AbstractLayout {
      * @param {?} activatedRoute
      * @param {?} communication
      * @param {?} configuration
+     * @param {?} searchService
      */
-    constructor(layoutsConfiguration, router, activatedRoute, communication, configuration) {
+    constructor(layoutsConfiguration, router, activatedRoute, communication, configuration, searchService) {
         super(layoutsConfiguration.get('MrSearchLayoutConfig') || MrSearchLayoutConfig);
         this.router = router;
         this.activatedRoute = activatedRoute;
         this.communication = communication;
         this.configuration = configuration;
+        this.searchService = searchService;
         this.hostEmit$ = new Subject();
         this.guestEmit$ = new Subject();
     }
@@ -14327,8 +14758,7 @@ class MrSearchLayoutComponent extends AbstractLayout {
             router: this.router,
             activatedRoute: this.activatedRoute,
             communication: this.communication,
-            hostEmit$: this.hostEmit$,
-            guestEmit$: this.guestEmit$,
+            searchService: this.searchService,
             options: this.config.options || {},
         };
     }
@@ -14342,6 +14772,7 @@ class MrSearchLayoutComponent extends AbstractLayout {
          */
         (data) => {
             this.configId = data.configId;
+            this.searchService.init(searchConfig);
             this.onInit();
         }));
     }
@@ -14355,7 +14786,7 @@ class MrSearchLayoutComponent extends AbstractLayout {
 MrSearchLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'mr-search-layout',
-                template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth\">\n\n        <div class=\"mr-search__title\">\n            <n7-inner-title\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <aside class=\"mr-search__facets\">\n                <div class=\"filter-section\">\n                    <h2>{{ lb.dataSource.pageConfig['facets-title'] }}</h2>\n                    <mr-search-facets-layout \n                    [data]=\"lb.dataSource.facetsConfig\"\n                    [hostEmit$]=\"hostEmit$\"\n                    [guestEmit$]=\"guestEmit$\">\n                    </mr-search-facets-layout>\n                </div>\n            </aside>\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    <n7-inner-title\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\n                    </n7-inner-title>\n                </div>\n                <div class=\"mr-search__results-filters\">\n                    <n7-tag *ngFor=\"let tag of (lb.widgets['mr-search-tags'].ds.out$ | async)\"\n                    [data]=\"tag\"\n                    [emit]=\"lb.widgets['mr-search-tags'].emit\">\n                    </n7-tag>\n                </div>\n                <main class=\"mr-search__results\">\n                    <!-- SEARCH RESULTS -->\n                    <ng-container [ngSwitch]=\"lb.dataSource.sectionState.results\">\n                        \n                        <!-- loading -->\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\n                            <div class=\"mr-search__results-loading\">\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                                    blocks: [\n                                        { classes: 'search-result-placeholder-title' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' }\n                                    ]\n                                }\"></n7-content-placeholder>\n                            </div>\n                        </ng-container>\n                        \n                        <!-- ok: items > 0 -->\n                        <ng-container *ngSwitchCase=\"'OK'\">\n                            <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\n                            [data]=\"item\">\n                            </n7-item-preview>\n                        </ng-container>\n\n                        <!-- ok: items === 0 -->\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\n                            <div class=\"mr-search__results-fallback\">\n                                <p class=\"mr-search__results-fallback-string\">\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\n                                </p>\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\n                                </button>\n                            </div>\n                        </ng-container>\n\n                        <!-- ko: request problem -->\n                        <ng-container *ngSwitchCase=\"'KO'\">\n                            <p class=\"mr-search__results-ko-string\">\n                                {{ lb.dataSource.pageConfig.ko.text }}\n                            </p>\n                            <button class=\"n7-btn mr-search__results-ko-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                {{ lb.dataSource.pageConfig.ko.button }}\n                            </button>\n                        </ng-container>\n                        \n                    </ng-container>\n                </main>               \n                <n7-smart-pagination\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
+                template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth\">\n\n        <div class=\"mr-search__title\">\n            <n7-inner-title\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <aside class=\"mr-search__facets\">\n                <div class=\"filter-section\">\n                    <h2 *ngIf=\"lb.dataSource.pageConfig['facets-title']\">\n                        {{ lb.dataSource.pageConfig['facets-title'] }}\n                    </h2>\n                    <mr-search-facets-layout \n                    [searchService]=\"lb.dataSource.searchService\">\n                    </mr-search-facets-layout>\n                </div>\n            </aside>\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    <n7-inner-title\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\n                    </n7-inner-title>\n                </div>\n                <div class=\"mr-search__results-filters\">\n                    <n7-tag *ngFor=\"let tag of (lb.widgets['mr-search-tags'].ds.out$ | async)\"\n                    [data]=\"tag\"\n                    [emit]=\"lb.widgets['mr-search-tags'].emit\">\n                    </n7-tag>\n                </div>\n                <main class=\"mr-search__results\">\n                    <!-- SEARCH RESULTS -->\n                    <ng-container [ngSwitch]=\"lb.dataSource.sectionState.results\">\n                        \n                        <!-- loading -->\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\n                            <div class=\"mr-search__results-loading\">\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                                    blocks: [\n                                        { classes: 'search-result-placeholder-title' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' }\n                                    ]\n                                }\"></n7-content-placeholder>\n                            </div>\n                        </ng-container>\n                        \n                        <!-- ok: items > 0 -->\n                        <ng-container *ngSwitchCase=\"'OK'\">\n                            <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\n                            [data]=\"item\">\n                            </n7-item-preview>\n                        </ng-container>\n\n                        <!-- ok: items === 0 -->\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\n                            <div class=\"mr-search__results-fallback\">\n                                <p class=\"mr-search__results-fallback-string\">\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\n                                </p>\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\n                                </button>\n                            </div>\n                        </ng-container>\n\n                        <!-- ko: request problem -->\n                        <ng-container *ngSwitchCase=\"'KO'\">\n                            <p class=\"mr-search__results-ko-string\">\n                                {{ lb.dataSource.pageConfig.ko.text }}\n                            </p>\n                            <button class=\"n7-btn mr-search__results-ko-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                {{ lb.dataSource.pageConfig.ko.button }}\n                            </button>\n                        </ng-container>\n                        \n                    </ng-container>\n                </main>               \n                <n7-smart-pagination\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
             }] }
 ];
 /** @nocollapse */
@@ -14364,7 +14795,8 @@ MrSearchLayoutComponent.ctorParameters = () => [
     { type: Router },
     { type: ActivatedRoute },
     { type: CommunicationService },
-    { type: ConfigurationService }
+    { type: ConfigurationService },
+    { type: MrSearchService }
 ];
 if (false) {
     /**
@@ -14396,6 +14828,11 @@ if (false) {
      * @private
      */
     MrSearchLayoutComponent.prototype.configuration;
+    /**
+     * @type {?}
+     * @private
+     */
+    MrSearchLayoutComponent.prototype.searchService;
 }
 
 /**
@@ -14677,27 +15114,24 @@ if (false) {
 class SearchFacetsLayoutDS extends LayoutDataSource$1 {
     constructor() {
         super(...arguments);
-        this.ready$ = new Subject();
+        this.inputsDS = {};
     }
     /**
      * @param {?} payload
      * @return {?}
      */
     onInit(payload) {
-        this.data = payload.data;
+        this.searchService = payload.searchService;
+        this.searchConfig = this.searchService.getConfig();
+        this.facets = this.searchConfig.facets;
         this.initInputs();
     }
     /**
      * @return {?}
      */
-    onDestroy() {
-        // TODO
-    }
-    /**
-     * @return {?}
-     */
     initInputs() {
-        this.data.sections.forEach((/**
+        // set components data
+        this.facets.sections.forEach((/**
          * @param {?} __0
          * @return {?}
          */
@@ -14711,12 +15145,12 @@ class SearchFacetsLayoutDS extends LayoutDataSource$1 {
                 /** @type {?} */
                 const widgetDataSource = this.getWidgetDataSource(input.id);
                 widgetDataSource.id = input.id;
-                // update data
-                this.one(input.id).update(input.data);
+                // caching DS for next updates
+                this.inputsDS[input.id] = widgetDataSource;
+                // first update
+                widgetDataSource.update(input.data);
             }));
         }));
-        // signal
-        this.ready$.next();
     }
     /**
      * @param {?} id
@@ -14725,10 +15159,8 @@ class SearchFacetsLayoutDS extends LayoutDataSource$1 {
      */
     updateInputValue(id, newValue) {
         /** @type {?} */
-        const widgetDataSource = this.getWidgetDataSource(id);
-        if (widgetDataSource) {
-            widgetDataSource.setValue(newValue, true);
-        }
+        const ds = this.inputsDS[id];
+        ds.setValue(newValue, ds.value !== newValue);
     }
     /**
      * @param {?} id
@@ -14737,10 +15169,10 @@ class SearchFacetsLayoutDS extends LayoutDataSource$1 {
      */
     updateInputData(id, newData) {
         /** @type {?} */
-        const widgetDataSource = this.getWidgetDataSource(id);
-        if (widgetDataSource) {
-            widgetDataSource.update(Object.assign({}, widgetDataSource.input, newData));
-        }
+        const ds = this.inputsDS[id];
+        ds.update(Object.assign({}, ds.input, newData));
+        // refresh selected
+        ds.setValue(ds.value, true);
     }
     /**
      * @param {?} id
@@ -14748,36 +15180,38 @@ class SearchFacetsLayoutDS extends LayoutDataSource$1 {
      */
     clearInput(id) {
         /** @type {?} */
-        const widgetDataSource = this.getWidgetDataSource(id);
-        if (widgetDataSource) {
-            widgetDataSource.clear();
-            widgetDataSource.setValue(widgetDataSource.value, true);
-        }
+        const ds = this.inputsDS[id];
+        ds.clear();
+        ds.setValue(ds.value, true);
     }
     /**
      * @return {?}
      */
     clearInputs() {
-        this.data.sections.forEach((/**
-         * @param {?} __0
+        Object.keys(this.inputsDS).forEach((/**
+         * @param {?} id
          * @return {?}
          */
-        ({ header, inputs }) => {
-            [header, ...inputs].forEach((/**
-             * @param {?} input
-             * @return {?}
-             */
-            (input) => {
-                this.clearInput(input.id);
-            }));
+        (id) => {
+            this.clearInput(id);
         }));
     }
 }
 if (false) {
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchFacetsLayoutDS.prototype.searchService;
+    /**
+     * @type {?}
+     * @private
+     */
+    SearchFacetsLayoutDS.prototype.inputsDS;
     /** @type {?} */
-    SearchFacetsLayoutDS.prototype.data;
+    SearchFacetsLayoutDS.prototype.searchConfig;
     /** @type {?} */
-    SearchFacetsLayoutDS.prototype.ready$;
+    SearchFacetsLayoutDS.prototype.facets;
 }
 
 /**
@@ -14805,17 +15239,15 @@ class SearchFacetsLayoutEH extends EventHandler {
         ({ type, payload }) => {
             switch (type) {
                 case 'mr-search-facets-layout.init':
-                    this.hostEmit$ = payload.hostEmit$;
-                    this.guestEmit$ = payload.guestEmit$;
+                    this.searchService = payload.searchService;
                     // listeners
-                    this.listenFacetsReady();
-                    this.listenToHost();
-                    this.initChangedListener(payload.data);
+                    this.initChangedListener(this.searchService.getConfig());
+                    this.initStateListener();
                     // init
                     this.dataSource.onInit(payload);
                     break;
                 case 'mr-search-facets-layout.destroy':
-                    this.dataSource.onDestroy();
+                    this.destroyed$.next();
                     break;
                 default:
                     break;
@@ -14832,11 +15264,11 @@ class SearchFacetsLayoutEH extends EventHandler {
         }));
     }
     /**
-     * @param {?} data
+     * @param {?} __0
      * @return {?}
      */
-    initChangedListener(data) {
-        data.sections.forEach((/**
+    initChangedListener({ facets }) {
+        facets.sections.forEach((/**
          * @param {?} section
          * @return {?}
          */
@@ -14861,14 +15293,11 @@ class SearchFacetsLayoutEH extends EventHandler {
             (source) => {
                 this.changed$[source.id] = new Subject();
                 this.changed$[source.id].pipe(debounceTime(source.delay || 1)).subscribe((/**
-                 * @param {?} payload
+                 * @param {?} __0
                  * @return {?}
                  */
-                (payload) => {
-                    this.guestEmit$.next({
-                        payload,
-                        type: 'change'
-                    });
+                ({ id, value }) => {
+                    this.searchService.setState('input', id, value);
                 }));
             }));
         }));
@@ -14876,41 +15305,56 @@ class SearchFacetsLayoutEH extends EventHandler {
     /**
      * @return {?}
      */
-    listenFacetsReady() {
-        this.dataSource.ready$.subscribe((/**
-         * @return {?}
-         */
-        () => {
-            this.guestEmit$.next({
-                type: 'facetsready'
-            });
-        }));
-    }
-    /**
-     * @return {?}
-     */
-    listenToHost() {
-        this.hostEmit$.pipe(takeUntil(this.destroyed$)).subscribe((/**
+    initStateListener() {
+        // listener for input updates
+        this.searchService.getState$(INPUT_STATE_CONTEXT)
+            .pipe(takeUntil(this.destroyed$), filter((/**
          * @param {?} __0
          * @return {?}
          */
-        ({ type, payload }) => {
-            switch (type) {
-                case 'updateinputvalue':
-                    this.dataSource.updateInputValue(payload.id, payload.value);
-                    break;
-                case 'updateinputdata':
-                    this.dataSource.updateInputData(payload.id, payload.data);
-                    break;
-                case 'clearinput':
-                    this.dataSource.clearInput(payload.id);
-                    break;
-                case 'clearinputs':
-                    this.dataSource.clearInputs();
-                    break;
-                default:
-                    break;
+        ({ lastUpdated }) => this.dataSource.inputsDS[lastUpdated]))).subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ lastUpdated, state }) => {
+            /** @type {?} */
+            const newValue = state[lastUpdated];
+            if (newValue === null) {
+                this.dataSource.clearInput(lastUpdated);
             }
+            else {
+                this.dataSource.updateInputValue(lastUpdated, newValue);
+            }
+        }));
+        // listener for facet updates
+        this.searchService.getState$(FACET_STATE_CONTEXT)
+            .pipe(takeUntil(this.destroyed$), filter((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ lastUpdated }) => this.dataSource.inputsDS[lastUpdated]))).subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ lastUpdated, state }) => {
+            /** @type {?} */
+            const newData = state[lastUpdated];
+            this.dataSource.updateInputData(lastUpdated, newData);
+        }));
+        // listener for facet header updates
+        this.searchService.getState$(RESULTS_STATE_CONTEXT, 'success')
+            .pipe(takeUntil(this.destroyed$)).subscribe((/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ headers }) => {
+            Object.keys(headers).forEach((/**
+             * @param {?} id
+             * @return {?}
+             */
+            (id) => {
+                this.dataSource.updateInputValue(id, headers[id]);
+            }));
         }));
     }
 }
@@ -14926,12 +15370,7 @@ if (false) {
      * @type {?}
      * @private
      */
-    SearchFacetsLayoutEH.prototype.hostEmit$;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchFacetsLayoutEH.prototype.guestEmit$;
+    SearchFacetsLayoutEH.prototype.searchService;
 }
 
 /**
@@ -15432,9 +15871,7 @@ class MrSearchFacetsLayoutComponent extends AbstractLayout {
      */
     initPayload() {
         return {
-            data: this.data,
-            guestEmit$: this.guestEmit$,
-            hostEmit$: this.hostEmit$
+            searchService: this.searchService
         };
     }
     /**
@@ -15454,8 +15891,9 @@ class MrSearchFacetsLayoutComponent extends AbstractLayout {
      * @return {?}
      */
     loadWidgets() {
+        const { facets } = this.searchService.getConfig();
         this.widgets = [];
-        this.data.sections.forEach((/**
+        facets.sections.forEach((/**
          * @param {?} __0
          * @return {?}
          */
@@ -15484,23 +15922,17 @@ class MrSearchFacetsLayoutComponent extends AbstractLayout {
 MrSearchFacetsLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'mr-search-facets-layout',
-                template: "<div *ngIf=\"lb.dataSource.data\" class=\"mr-search-facets {{ lb.dataSource.data.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.data.sections\" class=\"mr-search-facets__section {{ section.classes || '' }}\">\n        <n7-facet-header\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\n        [emit]=\"lb.widgets[section.header.id].emit\"\n        ></n7-facet-header>\n\n        <div [hidden]=\"!lb.widgets[section.header.id].ds.isOpen()\" class=\"mr-search-facets__wrapper\">\n            <div *ngFor=\"let input of section.inputs\" class=\"mr-search-facets__input {{ input.classes || '' }}\">\n                <ng-container [ngSwitch]=\"input.type\">\n    \n                    <!-- INPUT TEXT -->\n                    <n7-input-text \n                    *ngSwitchCase=\"'text'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n    \n                    <!-- INPUT CHECKBOX -->\n                    <n7-input-checkbox \n                    *ngSwitchCase=\"'checkbox'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                    \n                    <!-- INPUT SELECT -->\n                    <n7-input-select \n                    *ngSwitchCase=\"'select'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                    \n                    <!-- INPUT LINK -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'link'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n                \n                </ng-container>\n            </div>\n        </div>\n        \n        \n    </div>\n</div>"
+                template: "<div *ngIf=\"lb.dataSource.facets\" class=\"mr-search-facets {{ lb.dataSource.facets.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.facets.sections\" class=\"mr-search-facets__section {{ section.classes || '' }}\">\n        <n7-facet-header\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\n        [emit]=\"lb.widgets[section.header.id].emit\"\n        ></n7-facet-header>\n\n        <div [hidden]=\"!lb.widgets[section.header.id].ds.isOpen()\" class=\"mr-search-facets__wrapper\">\n            <div *ngFor=\"let input of section.inputs\" class=\"mr-search-facets__input {{ input.classes || '' }}\">\n                <ng-container [ngSwitch]=\"input.type\">\n    \n                    <!-- INPUT TEXT -->\n                    <n7-input-text \n                    *ngSwitchCase=\"'text'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n    \n                    <!-- INPUT CHECKBOX -->\n                    <n7-input-checkbox \n                    *ngSwitchCase=\"'checkbox'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                    \n                    <!-- INPUT SELECT -->\n                    <n7-input-select \n                    *ngSwitchCase=\"'select'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                    \n                    <!-- INPUT LINK -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'link'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n                \n                </ng-container>\n            </div>\n        </div>\n        \n        \n    </div>\n</div>"
             }] }
 ];
 /** @nocollapse */
 MrSearchFacetsLayoutComponent.ctorParameters = () => [];
 MrSearchFacetsLayoutComponent.propDecorators = {
-    data: [{ type: Input }],
-    guestEmit$: [{ type: Input }],
-    hostEmit$: [{ type: Input }]
+    searchService: [{ type: Input }]
 };
 if (false) {
     /** @type {?} */
-    MrSearchFacetsLayoutComponent.prototype.data;
-    /** @type {?} */
-    MrSearchFacetsLayoutComponent.prototype.guestEmit$;
-    /** @type {?} */
-    MrSearchFacetsLayoutComponent.prototype.hostEmit$;
+    MrSearchFacetsLayoutComponent.prototype.searchService;
 }
 
 /**
@@ -15528,7 +15960,9 @@ N7BoilerplateMurucaModule.decorators = [
                     DvComponentsLibModule,
                     N7BoilerplateCommonModule,
                 ],
-                providers: [],
+                providers: [
+                    MrSearchService
+                ],
                 entryComponents: COMPONENTS$3,
                 exports: COMPONENTS$3,
             },] }
@@ -15604,5 +16038,5 @@ N7BoilerplateLibModule.decorators = [
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrInnerTitleDS, MrItemPreviewsDS, MrNavDS, MrNavEH, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageTitleDS, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrGlossaryLayoutComponent as ɵba, MrStaticLayoutComponent as ɵbb, MrSearchFacetsLayoutComponent as ɵbc, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, AwGalleryLayoutComponent as ɵq, BubbleChartWrapperComponent as ɵr, ChartTippyComponent as ɵs, SmartBreadcrumbsComponent as ɵt, DataWidgetWrapperComponent as ɵu, DatepickerWrapperComponent as ɵv, DvExampleLayoutComponent as ɵw, EscapeHtmlPipe as ɵx, MrHomeLayoutComponent as ɵy, MrSearchLayoutComponent as ɵz };
+export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrInnerTitleDS, MrItemPreviewsDS, MrNavDS, MrNavEH, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageTitleDS, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrSearchService as ɵba, MrGlossaryLayoutComponent as ɵbb, MrStaticLayoutComponent as ɵbc, MrSearchFacetsLayoutComponent as ɵbd, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, AwGalleryLayoutComponent as ɵq, BubbleChartWrapperComponent as ɵr, ChartTippyComponent as ɵs, SmartBreadcrumbsComponent as ɵt, DataWidgetWrapperComponent as ɵu, DatepickerWrapperComponent as ɵv, DvExampleLayoutComponent as ɵw, EscapeHtmlPipe as ɵx, MrHomeLayoutComponent as ɵy, MrSearchLayoutComponent as ɵz };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map
