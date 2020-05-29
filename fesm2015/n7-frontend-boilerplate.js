@@ -1064,6 +1064,10 @@ class FacetInputCheckbox extends FacetInput {
  */
 /** @type {?} */
 const domParser = new DOMParser();
+// slugify custom replacements
+slugify.extend({
+    '/': '-'
+});
 var helpers = {
     /**
      * @param {?} key
@@ -13601,7 +13605,7 @@ class MrHomeLayoutComponent extends AbstractLayout {
 MrHomeLayoutComponent.decorators = [
     { type: Component, args: [{
                 selector: 'mr-home-layout',
-                template: "<div class=\"mr-home mr-layout\" *ngIf=\"lb.dataSource\">\n    <section *ngFor=\"let section of lb.dataSource.pageConfig.sections\" class=\"{{ 'mr-layout__' + section.type }}\">\n        <ng-container [ngSwitch]=\"section.type\">\n\n            <!-- SLIDER -->\n            <ng-container *ngSwitchCase=\"'slider'\">\n                <n7-carousel \n                [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[section.id].emit\">\n                </n7-carousel> \n            </ng-container>\n\n            <!-- COLLECTION -->\n            <ng-container *ngSwitchCase=\"'collection'\">\n                <n7-inner-title \n                [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                [emit]=\"lb.widgets[section.id].emit\">\n                </n7-inner-title>\n                <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                    <n7-item-preview\n                    *ngFor=\"let item of (lb.widgets[section.id].ds.out$ | async)?.items\"\n                    [data]=\"item\"\n                    [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-item-preview>\n                </div>\n            </ng-container>\n\n            <!-- HERO -->\n            <ng-container *ngSwitchCase=\"'hero'\">\n                <n7-hero \n                [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[section.id].emit\">\n                </n7-hero> \n            </ng-container>\n        \n        </ng-container>\n    </section>\n    \n</div>\n"
+                template: "<div class=\"mr-home mr-layout\" *ngIf=\"lb.dataSource\">\n    <section *ngFor=\"let section of lb.dataSource.pageConfig.sections\" class=\"{{ 'mr-layout__' + section.type }}\">\n        <ng-container [ngSwitch]=\"section.type\">\n\n            <!-- SLIDER -->\n            <ng-container *ngSwitchCase=\"'slider'\">\n                <n7-carousel \n                [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[section.id].emit\">\n                </n7-carousel> \n            </ng-container>\n\n            <!-- COLLECTION -->\n            <ng-container *ngSwitchCase=\"'collection'\">\n                <div class=\"mr-layout__maxwidth mr-items-preview\">\n                    <n7-inner-title \n                    [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                    [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-inner-title>\n                    <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                        <n7-item-preview\n                        *ngFor=\"let item of (lb.widgets[section.id].ds.out$ | async)?.items\"\n                        [data]=\"item\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n            </ng-container>\n\n            <!-- HERO -->\n            <ng-container *ngSwitchCase=\"'hero'\">\n                <n7-hero \n                [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[section.id].emit\">\n                </n7-hero> \n            </ng-container>\n        \n        </ng-container>\n    </section>\n    \n</div>\n"
             }] }
 ];
 /** @nocollapse */
@@ -13688,15 +13692,15 @@ class MrSearchLayoutDS extends LayoutDataSource$1 {
      * @return {?}
      */
     getPaginationParams(response) {
-        const { totalCount, page } = response;
+        const { totalCount, page, limit } = response;
         const { pagination: paginationConfig } = this.pageConfig;
         return {
-            totalPages: Math.ceil(totalCount / page.limit),
-            currentPage: page.current,
+            totalPages: Math.ceil(totalCount / limit),
+            currentPage: page,
             pageLimit: paginationConfig.limit,
             sizes: {
                 list: paginationConfig.options,
-                active: page.limit,
+                active: limit,
             },
         };
     }
@@ -14160,17 +14164,17 @@ class MrSearchService {
         }));
         // update links
         this.getState$(LINKS_STATE_CONTEXT, 'success').subscribe((/**
-         * @param {?} response
+         * @param {?} __0
          * @return {?}
          */
-        (response) => {
-            Object.keys(response).forEach((/**
+        ({ inputs }) => {
+            Object.keys(inputs).forEach((/**
              * @param {?} id
              * @return {?}
              */
             (id) => {
                 this.setState(FACET_STATE_CONTEXT, id, {
-                    links: response[id]
+                    links: inputs[id]
                 });
             }));
         }));
@@ -14229,317 +14233,6 @@ if (false) {
      */
     MrSearchService.prototype.communication;
 }
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-const ɵ0$1 = {
-    text: 'Filtra i risultati'
-}, ɵ1 = {
-    id: 'input-text-00',
-    placeholder: 'Cerca nei titoli',
-    icon: 'n7-icon-search',
-    inputPayload: 'search-input',
-    enterPayload: 'search-enter',
-    iconPayload: 'search-icon'
-}, ɵ2 = {
-    text: 'Toponimi',
-    additionalText: '786',
-}, ɵ3 = {
-    id: 'input-text-01',
-    placeholder: 'Search',
-    icon: 'n7-icon-search',
-    inputPayload: 'search-input',
-    enterPayload: 'search-enter',
-    iconPayload: 'search-icon',
-}, ɵ4 = {
-    links: []
-}, ɵ5 = {
-    text: 'Glossario',
-    additionalText: '96',
-}, ɵ6 = {
-    id: 'input-text-02',
-    placeholder: 'Search',
-    icon: 'n7-icon-search',
-    inputPayload: 'search-input',
-    enterPayload: 'search-enter',
-    iconPayload: 'search-icon',
-}, ɵ7 = {
-    links: []
-}, ɵ8 = {
-    text: 'Continenti',
-    additionalText: '3'
-}, ɵ9 = {
-    links: []
-}, ɵ10 = {
-    text: 'Keywords',
-    additionalText: '108',
-    iconRight: 'n7-icon-angle-right'
-}, ɵ11 = {
-    links: []
-}, ɵ12 = {
-    text: 'Data di pubblicazione',
-    additionalText: '20',
-    iconRight: 'n7-icon-angle-right'
-}, ɵ13 = {
-    links: []
-}, ɵ14 = {
-    text: 'Luogo di pubblicazione',
-    additionalText: '15',
-    iconRight: 'n7-icon-angle-right'
-}, ɵ15 = {
-    links: []
-};
-/** @type {?} */
-const facets = {
-    sections: [{
-            header: {
-                id: 'header-filtra',
-                data: ɵ0$1
-            },
-            inputs: [{
-                    id: 'input-00',
-                    type: 'text',
-                    queryParam: true,
-                    data: ɵ1
-                }]
-        }, {
-            header: {
-                id: 'header-toponimi',
-                data: ɵ2
-            },
-            inputs: [{
-                    id: 'input-01',
-                    type: 'text',
-                    data: ɵ3
-                }, {
-                    id: 'input-02',
-                    type: 'link',
-                    queryParam: true,
-                    data: ɵ4
-                }]
-        }, {
-            header: {
-                id: 'header-glossario',
-                data: ɵ5
-            },
-            inputs: [{
-                    id: 'input-03',
-                    type: 'text',
-                    data: ɵ6
-                }, {
-                    id: 'input-04',
-                    type: 'link',
-                    queryParam: true,
-                    data: ɵ7
-                }]
-        }, {
-            header: {
-                id: 'header-continenti',
-                data: ɵ8
-            },
-            inputs: [{
-                    id: 'input-05',
-                    type: 'link',
-                    queryParam: true,
-                    data: ɵ9
-                }]
-        }, {
-            header: {
-                id: 'header-keywords',
-                data: ɵ10
-            },
-            inputs: [{
-                    id: 'input-06',
-                    type: 'link',
-                    queryParam: true,
-                    data: ɵ11
-                }],
-        }, {
-            header: {
-                id: 'header-data',
-                data: ɵ12
-            },
-            inputs: [{
-                    id: 'input-07',
-                    type: 'link',
-                    queryParam: true,
-                    data: ɵ13
-                }],
-        }, {
-            header: {
-                id: 'header-luogo',
-                data: ɵ14
-            },
-            inputs: [{
-                    id: 'input-08',
-                    type: 'link',
-                    queryParam: true,
-                    data: ɵ15
-                }],
-        }],
-    classes: 'facets-wrapper'
-};
-const ɵ16 = /**
- * @param {?} id
- * @return {?}
- */
-(id) => ({
-    id,
-    queryParam: true,
-});
-/** @type {?} */
-const layoutInputs = ['page', 'limit', 'sort'].map((ɵ16));
-/** @type {?} */
-const request = {
-    results: {
-        id: 'search',
-        delay: 500
-    },
-    links: {
-        id: 'links',
-    },
-    provider: 'rest',
-    delay: 500
-};
-var searchConfig = (/** @type {?} */ ({ request, facets, layoutInputs }));
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @return {?}
- */
-function getHeaders() {
-    /** @type {?} */
-    const headers = {};
-    searchConfig.facets.sections.forEach((/**
-     * @param {?} __0
-     * @return {?}
-     */
-    ({ header }) => {
-        headers[header.id] = Math.round(Math.random() * 100);
-    }));
-    return headers;
-}
-var resultsMock = (/**
- * @param {?} page
- * @param {?} sort
- * @return {?}
- */
-(page, sort) => ({
-    sort,
-    totalCount: Math.round(Math.random() * 1000),
-    page: { current: page, limit: 10 },
-    headers: getHeaders(),
-    results: [
-        {
-            image: 'https://i.imgur.com/52UFqca.png',
-            title: 'Yudi Shanhai Quantu',
-            text: 'Complete Map of all mountains and seas',
-        }, {
-            image: 'https://i.imgur.com/52UFqca.png',
-            title: 'World Map based on Matteo Ricci 1850',
-            text: 'Complete Map fo all mountains and seas',
-        }, {
-            image: '',
-            title: 'Reconstruction of D\'Elia\'s map',
-            text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
-        }, {
-            image: '',
-            title: 'Unattributed version',
-            text: 'A japanese colored version',
-        }, {
-            image: '',
-            title: 'Matteo Ricci\'s way from Macau to Beijing',
-            text: 'A japanese colored version',
-        }, {
-            image: '',
-            title: 'The 400-year-old map that shows China as the centre of the world',
-            text: 'A japanese colored version',
-        }, {
-            image: 'https://i.imgur.com/52UFqca.png',
-            title: 'Yudi Shanhai Quantu',
-            text: 'Complete Map of all mountains and seas',
-        }, {
-            image: 'https://i.imgur.com/52UFqca.png',
-            title: 'World Map based on Matteo Ricci 1850',
-            text: 'Complete Map fo all mountains and seas',
-        }, {
-            image: '',
-            title: 'Reconstruction of D\'Elia\'s map',
-            text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
-        }, {
-            image: '',
-            title: 'Unattributed version',
-            text: 'A japanese colored version',
-        }, {
-            image: '',
-            title: 'Matteo Ricci\'s way from Macau to Beijing',
-            text: 'A japanese colored version',
-        }, {
-            image: '',
-            title: 'The 400-year-old map that shows China as the centre of the world',
-            text: 'A japanese colored version',
-        }
-    ]
-}));
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @param {?} prefix
- * @return {?}
- */
-function getLinks(prefix) {
-    /** @type {?} */
-    let i;
-    /** @type {?} */
-    const limit = 10;
-    /** @type {?} */
-    const links = [];
-    for (i = 0; i < limit; i += 1) {
-        /** @type {?} */
-        const text = `${prefix} ${i + 1}`;
-        links.push({
-            text,
-            counter: Math.round(Math.random() * 100),
-            payload: text
-        });
-    }
-    return links;
-}
-var linksMock = (/**
- * @return {?}
- */
-() => {
-    /** @type {?} */
-    const results = {};
-    searchConfig.facets.sections.forEach((/**
-     * @param {?} __0
-     * @return {?}
-     */
-    ({ inputs }) => {
-        inputs
-            .filter((/**
-         * @param {?} input
-         * @return {?}
-         */
-        (input) => input.type === 'link'))
-            .forEach((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ id }) => {
-            results[id] = getLinks(id);
-        }));
-    }));
-    return results;
-});
 
 /**
  * @fileoverview added by tsickle
@@ -14642,22 +14335,32 @@ class MrSearchLayoutEH extends EventHandler {
         () => {
             this.dataSource.setSectionState('results', 'LOADING');
         }));
-        // hook (test)
-        this.searchService.setBeforeHook(RESULTS_STATE_CONTEXT, 'success', (/**
+        // default params hook
+        this.searchService.setBeforeHook(RESULTS_STATE_CONTEXT, 'loading', (/**
+         * @param {?=} params
          * @return {?}
          */
-        () => {
-            const { page, sort } = this.searchState;
-            return resultsMock(page || 1, sort || '_score_DESC');
+        (params = {}) => {
+            /** @type {?} */
+            const defaultParams = {
+                page: 1,
+                sort: '_score_DESC',
+                limit: 10
+            };
+            Object.keys(defaultParams).forEach((/**
+             * @param {?} key
+             * @return {?}
+             */
+            (key) => {
+                params[key] = params[key] || defaultParams[key];
+            }));
+            return params;
         }));
-        this.searchService.setBeforeHook(LINKS_STATE_CONTEXT, 'success', (/**
-         * @param {?} response
+        this.searchService.setBeforeHook(INPUT_STATE_CONTEXT, 'limit', (/**
+         * @param {?} value
          * @return {?}
          */
-        (response) => {
-            console.warn('links', response);
-            return linksMock();
-        }));
+        (value) => +value));
         this.searchService.getState$(RESULTS_STATE_CONTEXT, 'success')
             .subscribe((/**
          * @param {?} response
@@ -14722,6 +14425,181 @@ const MrSearchLayoutConfig = {
     widgetsEventHandlers: EH$3,
     layoutOptions: {}
 };
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+const ɵ0$1 = {
+    text: 'Filtra i risultati'
+}, ɵ1 = {
+    id: 'query',
+    placeholder: 'Cerca nei titoli',
+    icon: 'n7-icon-search',
+    inputPayload: 'search-input',
+    enterPayload: 'search-enter',
+    iconPayload: 'search-icon'
+}, ɵ2 = {
+    text: 'Toponimi',
+    additionalText: '786',
+}, ɵ3 = {
+    id: 'input-text-01',
+    placeholder: 'Search',
+    icon: 'n7-icon-search',
+    inputPayload: 'search-input',
+    enterPayload: 'search-enter',
+    iconPayload: 'search-icon',
+}, ɵ4 = {
+    links: []
+}, ɵ5 = {
+    text: 'Glossario',
+    additionalText: '96',
+}, ɵ6 = {
+    id: 'input-text-02',
+    placeholder: 'Search',
+    icon: 'n7-icon-search',
+    inputPayload: 'search-input',
+    enterPayload: 'search-enter',
+    iconPayload: 'search-icon',
+}, ɵ7 = {
+    links: []
+}, ɵ8 = {
+    text: 'Continenti',
+    additionalText: '3'
+}, ɵ9 = {
+    links: []
+}, ɵ10 = {
+    text: 'Keywords',
+    additionalText: '108',
+    iconRight: 'n7-icon-angle-right'
+}, ɵ11 = {
+    links: []
+}, ɵ12 = {
+    text: 'Data di pubblicazione',
+    additionalText: '20',
+    iconRight: 'n7-icon-angle-right'
+}, ɵ13 = {
+    links: []
+}, ɵ14 = {
+    text: 'Luogo di pubblicazione',
+    additionalText: '15',
+    iconRight: 'n7-icon-angle-right'
+}, ɵ15 = {
+    links: []
+};
+/** @type {?} */
+const facets = {
+    sections: [{
+            header: {
+                id: 'header-filtra',
+                data: ɵ0$1
+            },
+            inputs: [{
+                    id: 'query',
+                    type: 'text',
+                    queryParam: true,
+                    data: ɵ1
+                }]
+        }, {
+            header: {
+                id: 'header-toponimi',
+                data: ɵ2
+            },
+            inputs: [{
+                    id: 'input-toponimi-filter',
+                    type: 'text',
+                    data: ɵ3
+                }, {
+                    id: 'input-toponimi',
+                    type: 'link',
+                    queryParam: true,
+                    data: ɵ4
+                }]
+        }, {
+            header: {
+                id: 'header-glossario',
+                data: ɵ5
+            },
+            inputs: [{
+                    id: 'input-glossario-filter',
+                    type: 'text',
+                    data: ɵ6
+                }, {
+                    id: 'input-glossario',
+                    type: 'link',
+                    queryParam: true,
+                    data: ɵ7
+                }]
+        }, {
+            header: {
+                id: 'header-continenti',
+                data: ɵ8
+            },
+            inputs: [{
+                    id: 'input-continenti',
+                    type: 'link',
+                    queryParam: true,
+                    data: ɵ9
+                }]
+        }, {
+            header: {
+                id: 'header-keywords',
+                data: ɵ10
+            },
+            inputs: [{
+                    id: 'input-keywords',
+                    type: 'link',
+                    queryParam: true,
+                    data: ɵ11
+                }],
+        }, {
+            header: {
+                id: 'header-data',
+                data: ɵ12
+            },
+            inputs: [{
+                    id: 'input-data',
+                    type: 'link',
+                    queryParam: true,
+                    data: ɵ13
+                }],
+        }, {
+            header: {
+                id: 'header-luogo',
+                data: ɵ14
+            },
+            inputs: [{
+                    id: 'input-luogo',
+                    type: 'link',
+                    queryParam: true,
+                    data: ɵ15
+                }],
+        }],
+    classes: 'facets-wrapper'
+};
+const ɵ16 = /**
+ * @param {?} id
+ * @return {?}
+ */
+(id) => ({
+    id,
+    queryParam: true,
+});
+/** @type {?} */
+const layoutInputs = ['page', 'limit', 'sort'].map((ɵ16));
+/** @type {?} */
+const request = {
+    results: {
+        id: 'search',
+        delay: 500
+    },
+    links: {
+        id: 'links',
+    },
+    provider: 'rest',
+    delay: 500
+};
+var searchConfig = (/** @type {?} */ ({ request, facets, layoutInputs }));
 
 /**
  * @fileoverview added by tsickle
@@ -15342,7 +15220,7 @@ class SearchFacetsLayoutEH extends EventHandler {
             this.dataSource.updateInputData(lastUpdated, newData);
         }));
         // listener for facet header updates
-        this.searchService.getState$(RESULTS_STATE_CONTEXT, 'success')
+        this.searchService.getState$(LINKS_STATE_CONTEXT, 'success')
             .pipe(takeUntil(this.destroyed$)).subscribe((/**
          * @param {?} __0
          * @return {?}
