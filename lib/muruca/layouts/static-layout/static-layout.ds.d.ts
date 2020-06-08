@@ -4,6 +4,6 @@ export declare class MrStaticLayoutDS extends LayoutDataSource {
     private communication;
     RENDER_HTML: any;
     onInit(payload: any): void;
-    pageRequest$(): Observable<any>;
+    pageRequest$(slug: string): Observable<any>;
     renderHTML(title: any, body: any): void;
 }

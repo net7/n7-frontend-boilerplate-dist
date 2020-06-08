@@ -3,19 +3,21 @@ import { Subject } from 'rxjs';
 import { CommunicationService } from '../../common/services/communication.service';
 export declare const INPUT_STATE_CONTEXT = "input";
 export declare const FACET_STATE_CONTEXT = "facet";
-export declare const RESULTS_STATE_CONTEXT = "results";
-export declare const LINKS_STATE_CONTEXT = "links";
+export declare const RESULTS_REQUEST_STATE_CONTEXT = "resultsRequest";
+export declare const FACETS_REQUEST_STATE_CONTEXT = "facetsRequest";
 export declare class MrSearchService {
     private router;
     private activatedRoute;
     private communication;
+    private searchId;
     private config;
     private queryParamKeys;
+    private inputSchemas;
     private contextState;
     private state$;
     private beforeHook;
     constructor(router: Router, activatedRoute: ActivatedRoute, communication: CommunicationService);
-    init(config: any): void;
+    init(searchId: any, config: any): void;
     getConfig: () => any;
     getState$(context: string, id?: string): Subject<any>;
     addStateContext(context: string): void;
@@ -23,10 +25,12 @@ export declare class MrSearchService {
     setState(context: string, id: string, newValue: any): void;
     setBeforeHook(context: string, id: string, hook: any): void;
     reset(): void;
+    private clear;
     private setContextState;
     private initInputState;
     private initFacetState;
     private onRouteChange;
     private onInputsChange;
     private onResultsLoading;
+    notEquals(val1: any, val2: any): boolean;
 }

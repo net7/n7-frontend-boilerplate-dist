@@ -1,11 +1,10 @@
-declare type QueryParams = {
-    [key: string]: string;
-};
-declare type StateObject = {
-    [key: string]: string | string[];
-};
+import { InputSchema } from '../interfaces/search.interface';
 declare const _default: {
-    stateToQueryParams(state: StateObject): QueryParams;
-    queryParamsToState(queryParams: QueryParams): StateObject;
+    stateToQueryParams(state: any, schemas: {
+        [key: string]: InputSchema;
+    }): {};
+    queryParamsToState(queryParams: any, schemas: {
+        [key: string]: InputSchema;
+    }): {};
 };
 export default _default;

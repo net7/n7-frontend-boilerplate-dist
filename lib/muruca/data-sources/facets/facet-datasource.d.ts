@@ -1,4 +1,4 @@
-declare type VALUE = string | string[] | boolean | null;
+declare type VALUE = string | string[] | number | number[] | boolean | null;
 export interface FacetDataSource {
     id: string;
     value: VALUE;

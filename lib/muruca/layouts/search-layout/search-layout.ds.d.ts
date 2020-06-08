@@ -13,7 +13,7 @@ export declare class MrSearchLayoutDS extends LayoutDataSource {
     totalResultsText: string | null;
     onInit(payload: any): void;
     handleResponse(response: any): void;
-    updateActiveFilters(state: any): void;
+    updateActiveFilters(state: any, linksResponse: any): void;
     private getPaginationParams;
     setSectionState(id: string, newState: SectionStates): void;
 }
