@@ -1181,10 +1181,6 @@ var FacetInputCheckbox = /** @class */ (function (_super) {
  */
 /** @type {?} */
 var domParser = new DOMParser();
-// slugify custom replacements
-slugify.extend({
-    '/': '-'
-});
 var helpers = {
     prettifySnakeCase: /**
      * @param {?} key
@@ -1222,6 +1218,8 @@ var helpers = {
         var parsedDoc = domParser.parseFromString(str, 'text/html');
         /** @type {?} */
         var parsedString = parsedDoc.body.textContent || '';
+        // custom replacements
+        parsedString = parsedString.replace(/\//g, '-');
         return slugify(parsedString, {
             remove: /[*+~.()'"!:@,]/g,
             lower: true

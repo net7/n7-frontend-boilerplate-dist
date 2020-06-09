@@ -1064,10 +1064,6 @@ class FacetInputCheckbox extends FacetInput {
  */
 /** @type {?} */
 const domParser = new DOMParser();
-// slugify custom replacements
-slugify.extend({
-    '/': '-'
-});
 var helpers = {
     /**
      * @param {?} key
@@ -1103,7 +1099,9 @@ var helpers = {
         /** @type {?} */
         const parsedDoc = domParser.parseFromString(str, 'text/html');
         /** @type {?} */
-        const parsedString = parsedDoc.body.textContent || '';
+        let parsedString = parsedDoc.body.textContent || '';
+        // custom replacements
+        parsedString = parsedString.replace(/\//g, '-');
         return slugify(parsedString, {
             remove: /[*+~.()'"!:@,]/g,
             lower: true
