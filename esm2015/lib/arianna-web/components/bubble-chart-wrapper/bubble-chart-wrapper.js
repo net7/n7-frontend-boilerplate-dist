@@ -1,38 +1,30 @@
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 //---------------------------
 // BubbleChartWrapper.ts
 //---------------------------
+import { __decorate, __metadata } from "tslib";
 import { Component, Input } from '@angular/core';
-export class BubbleChartWrapperComponent {
-    /**
-     * @param {?} type
-     * @param {?} payload
-     * @return {?}
-     */
+let BubbleChartWrapperComponent = class BubbleChartWrapperComponent {
     onClick(type, payload) {
         this.emit(type, payload);
     }
-}
-BubbleChartWrapperComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'aw-bubble-chart-wrapper',
-                template: "<div class=\"aw-bubble-chart-wrapper\">\n    <ng-content></ng-content>\n</div>"
-            }] }
-];
-BubbleChartWrapperComponent.propDecorators = {
-    emit: [{ type: Input }],
-    container: [{ type: Input }],
-    buttons: [{ type: Input }]
 };
-if (false) {
-    /** @type {?} */
-    BubbleChartWrapperComponent.prototype.emit;
-    /** @type {?} */
-    BubbleChartWrapperComponent.prototype.container;
-    /** @type {?} */
-    BubbleChartWrapperComponent.prototype.buttons;
-}
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYnViYmxlLWNoYXJ0LXdyYXBwZXIuanMiLCJzb3VyY2VSb290Ijoibmc6Ly9AbjctZnJvbnRlbmQvYm9pbGVycGxhdGUvIiwic291cmNlcyI6WyJsaWIvYXJpYW5uYS13ZWIvY29tcG9uZW50cy9idWJibGUtY2hhcnQtd3JhcHBlci9idWJibGUtY2hhcnQtd3JhcHBlci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7O0FBSUEsT0FBTyxFQUFFLFNBQVMsRUFBRSxLQUFLLEVBQUUsTUFBTSxlQUFlLENBQUM7QUFNakQsTUFBTSxPQUFPLDJCQUEyQjs7Ozs7O0lBT3RDLE9BQU8sQ0FBQyxJQUFJLEVBQUUsT0FBTztRQUNuQixJQUFJLENBQUMsSUFBSSxDQUFDLElBQUksRUFBRSxPQUFPLENBQUMsQ0FBQztJQUMzQixDQUFDOzs7WUFiRixTQUFTLFNBQUM7Z0JBQ1QsUUFBUSxFQUFFLHlCQUF5QjtnQkFDbkMsMEZBQTBDO2FBQzNDOzs7bUJBRUUsS0FBSzt3QkFFTCxLQUFLO3NCQUVMLEtBQUs7Ozs7SUFKTiwyQ0FBbUI7O0lBRW5CLGdEQUEyQjs7SUFFM0IsOENBQXNCIiwic291cmNlc0NvbnRlbnQiOlsiLy8tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1cbi8vIEJ1YmJsZUNoYXJ0V3JhcHBlci50c1xuLy8tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1cblxuaW1wb3J0IHsgQ29tcG9uZW50LCBJbnB1dCB9IGZyb20gJ0Bhbmd1bGFyL2NvcmUnO1xuXG5AQ29tcG9uZW50KHtcbiAgc2VsZWN0b3I6ICdhdy1idWJibGUtY2hhcnQtd3JhcHBlcicsXG4gIHRlbXBsYXRlVXJsOiAnLi9idWJibGUtY2hhcnQtd3JhcHBlci5odG1sJyxcbn0pXG5leHBvcnQgY2xhc3MgQnViYmxlQ2hhcnRXcmFwcGVyQ29tcG9uZW50IHtcbiAgQElucHV0KCkgZW1pdDogYW55O1xuXG4gIEBJbnB1dCgpIGNvbnRhaW5lcjogc3RyaW5nO1xuXG4gIEBJbnB1dCgpIGJ1dHRvbnM6IGFueTtcblxuICBvbkNsaWNrKHR5cGUsIHBheWxvYWQpIHtcbiAgICB0aGlzLmVtaXQodHlwZSwgcGF5bG9hZCk7XG4gIH1cbn1cbiJdfQ==
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], BubbleChartWrapperComponent.prototype, "emit", void 0);
+__decorate([
+    Input(),
+    __metadata("design:type", String)
+], BubbleChartWrapperComponent.prototype, "container", void 0);
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], BubbleChartWrapperComponent.prototype, "buttons", void 0);
+BubbleChartWrapperComponent = __decorate([
+    Component({
+        selector: 'aw-bubble-chart-wrapper',
+        template: "<div class=\"aw-bubble-chart-wrapper\">\n    <ng-content></ng-content>\n</div>"
+    })
+], BubbleChartWrapperComponent);
+export { BubbleChartWrapperComponent };
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYnViYmxlLWNoYXJ0LXdyYXBwZXIuanMiLCJzb3VyY2VSb290Ijoibmc6Ly9AbjctZnJvbnRlbmQvYm9pbGVycGxhdGUvIiwic291cmNlcyI6WyJsaWIvYXJpYW5uYS13ZWIvY29tcG9uZW50cy9idWJibGUtY2hhcnQtd3JhcHBlci9idWJibGUtY2hhcnQtd3JhcHBlci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSw2QkFBNkI7QUFDN0Isd0JBQXdCO0FBQ3hCLDZCQUE2Qjs7QUFFN0IsT0FBTyxFQUFFLFNBQVMsRUFBRSxLQUFLLEVBQUUsTUFBTSxlQUFlLENBQUM7QUFNakQsSUFBYSwyQkFBMkIsR0FBeEMsTUFBYSwyQkFBMkI7SUFPdEMsT0FBTyxDQUFDLElBQUksRUFBRSxPQUFPO1FBQ25CLElBQUksQ0FBQyxJQUFJLENBQUMsSUFBSSxFQUFFLE9BQU8sQ0FBQyxDQUFDO0lBQzNCLENBQUM7Q0FDRixDQUFBO0FBVFU7SUFBUixLQUFLLEVBQUU7O3lEQUFXO0FBRVY7SUFBUixLQUFLLEVBQUU7OzhEQUFtQjtBQUVsQjtJQUFSLEtBQUssRUFBRTs7NERBQWM7QUFMWCwyQkFBMkI7SUFKdkMsU0FBUyxDQUFDO1FBQ1QsUUFBUSxFQUFFLHlCQUF5QjtRQUNuQywwRkFBMEM7S0FDM0MsQ0FBQztHQUNXLDJCQUEyQixDQVV2QztTQVZZLDJCQUEyQiIsInNvdXJjZXNDb250ZW50IjpbIi8vLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXG4vLyBCdWJibGVDaGFydFdyYXBwZXIudHNcbi8vLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXG5cbmltcG9ydCB7IENvbXBvbmVudCwgSW5wdXQgfSBmcm9tICdAYW5ndWxhci9jb3JlJztcblxuQENvbXBvbmVudCh7XG4gIHNlbGVjdG9yOiAnYXctYnViYmxlLWNoYXJ0LXdyYXBwZXInLFxuICB0ZW1wbGF0ZVVybDogJy4vYnViYmxlLWNoYXJ0LXdyYXBwZXIuaHRtbCcsXG59KVxuZXhwb3J0IGNsYXNzIEJ1YmJsZUNoYXJ0V3JhcHBlckNvbXBvbmVudCB7XG4gIEBJbnB1dCgpIGVtaXQ6IGFueTtcblxuICBASW5wdXQoKSBjb250YWluZXI6IHN0cmluZztcblxuICBASW5wdXQoKSBidXR0b25zOiBhbnk7XG5cbiAgb25DbGljayh0eXBlLCBwYXlsb2FkKSB7XG4gICAgdGhpcy5lbWl0KHR5cGUsIHBheWxvYWQpO1xuICB9XG59XG4iXX0=

@@ -1,33 +1,19 @@
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
+import { __decorate, __metadata } from "tslib";
 import { Component, Input } from '@angular/core';
-/**
- * @record
- */
-export function DataWidgetWrapperData() { }
-if (false) {
-    /** @type {?|undefined} */
-    DataWidgetWrapperData.prototype.classes;
-}
 var DataWidgetWrapperComponent = /** @class */ (function () {
     function DataWidgetWrapperComponent() {
     }
-    DataWidgetWrapperComponent.decorators = [
-        { type: Component, args: [{
-                    selector: 'dv-data-widget-wrapper',
-                    template: "<div class=\"dv-data-widget-wrapper {{ data && data.classes || '' }}\">\n    <ng-content></ng-content>\n</div>"
-                }] }
-    ];
-    DataWidgetWrapperComponent.propDecorators = {
-        data: [{ type: Input }]
-    };
+    __decorate([
+        Input(),
+        __metadata("design:type", Object)
+    ], DataWidgetWrapperComponent.prototype, "data", void 0);
+    DataWidgetWrapperComponent = __decorate([
+        Component({
+            selector: 'dv-data-widget-wrapper',
+            template: "<div class=\"dv-data-widget-wrapper {{ data && data.classes || '' }}\">\n    <ng-content></ng-content>\n</div>"
+        })
+    ], DataWidgetWrapperComponent);
     return DataWidgetWrapperComponent;
 }());
 export { DataWidgetWrapperComponent };
-if (false) {
-    /** @type {?} */
-    DataWidgetWrapperComponent.prototype.data;
-}
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZGF0YS13aWRnZXQtd3JhcHBlci5qcyIsInNvdXJjZVJvb3QiOiJuZzovL0BuNy1mcm9udGVuZC9ib2lsZXJwbGF0ZS8iLCJzb3VyY2VzIjpbImxpYi9kYXRhLXZpei9jb21wb25lbnRzL2RhdGEtd2lkZ2V0LXdyYXBwZXIvZGF0YS13aWRnZXQtd3JhcHBlci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7O0FBQUEsT0FBTyxFQUFFLFNBQVMsRUFBRSxLQUFLLEVBQUUsTUFBTSxlQUFlLENBQUM7Ozs7QUFFakQsMkNBRUM7OztJQURHLHdDQUFpQjs7QUFHckI7SUFBQTtJQU1BLENBQUM7O2dCQU5BLFNBQVMsU0FBQztvQkFDVCxRQUFRLEVBQUUsd0JBQXdCO29CQUNsQywwSEFBeUM7aUJBQzFDOzs7dUJBRUksS0FBSzs7SUFDVixpQ0FBQztDQUFBLEFBTkQsSUFNQztTQUZZLDBCQUEwQjs7O0lBQ25DLDBDQUFxQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IENvbXBvbmVudCwgSW5wdXQgfSBmcm9tICdAYW5ndWxhci9jb3JlJztcblxuZXhwb3J0IGludGVyZmFjZSBEYXRhV2lkZ2V0V3JhcHBlckRhdGEge1xuICAgIGNsYXNzZXM/OiBzdHJpbmc7XG59XG5cbkBDb21wb25lbnQoe1xuICBzZWxlY3RvcjogJ2R2LWRhdGEtd2lkZ2V0LXdyYXBwZXInLFxuICB0ZW1wbGF0ZVVybDogJy4vZGF0YS13aWRnZXQtd3JhcHBlci5odG1sJyxcbn0pXG5leHBvcnQgY2xhc3MgRGF0YVdpZGdldFdyYXBwZXJDb21wb25lbnQge1xuICAgIEBJbnB1dCgpIGRhdGE6IERhdGFXaWRnZXRXcmFwcGVyRGF0YTtcbn1cbiJdfQ==
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZGF0YS13aWRnZXQtd3JhcHBlci5qcyIsInNvdXJjZVJvb3QiOiJuZzovL0BuNy1mcm9udGVuZC9ib2lsZXJwbGF0ZS8iLCJzb3VyY2VzIjpbImxpYi9kYXRhLXZpei9jb21wb25lbnRzL2RhdGEtd2lkZ2V0LXdyYXBwZXIvZGF0YS13aWRnZXQtd3JhcHBlci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiO0FBQUEsT0FBTyxFQUFFLFNBQVMsRUFBRSxLQUFLLEVBQUUsTUFBTSxlQUFlLENBQUM7QUFVakQ7SUFBQTtJQUVBLENBQUM7SUFEWTtRQUFSLEtBQUssRUFBRTs7NERBQTZCO0lBRDVCLDBCQUEwQjtRQUp0QyxTQUFTLENBQUM7WUFDVCxRQUFRLEVBQUUsd0JBQXdCO1lBQ2xDLDBIQUF5QztTQUMxQyxDQUFDO09BQ1csMEJBQTBCLENBRXRDO0lBQUQsaUNBQUM7Q0FBQSxBQUZELElBRUM7U0FGWSwwQkFBMEIiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBDb21wb25lbnQsIElucHV0IH0gZnJvbSAnQGFuZ3VsYXIvY29yZSc7XG5cbmV4cG9ydCBpbnRlcmZhY2UgRGF0YVdpZGdldFdyYXBwZXJEYXRhIHtcbiAgICBjbGFzc2VzPzogc3RyaW5nO1xufVxuXG5AQ29tcG9uZW50KHtcbiAgc2VsZWN0b3I6ICdkdi1kYXRhLXdpZGdldC13cmFwcGVyJyxcbiAgdGVtcGxhdGVVcmw6ICcuL2RhdGEtd2lkZ2V0LXdyYXBwZXIuaHRtbCcsXG59KVxuZXhwb3J0IGNsYXNzIERhdGFXaWRnZXRXcmFwcGVyQ29tcG9uZW50IHtcbiAgICBASW5wdXQoKSBkYXRhOiBEYXRhV2lkZ2V0V3JhcHBlckRhdGE7XG59XG4iXX0=

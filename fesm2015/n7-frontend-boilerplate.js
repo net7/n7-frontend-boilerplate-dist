@@ -1,4 +1,5 @@
-import { Injectable, ɵɵdefineInjectable, Inject, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef, ApplicationInitStatus, Pipe } from '@angular/core';
+import { __decorate, __param, __metadata } from 'tslib';
+import { ɵɵdefineInjectable, Injectable, Inject, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef, ApplicationInitStatus, Pipe } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK, CAROUSEL_MOCK } from '@n7-frontend/components';
@@ -13,109 +14,46 @@ import { get, cloneDeep, isEmpty, xor } from 'lodash';
 import slugify from 'slugify';
 import { DataSource as DataSource$1 } from '@n7-frontend/core/dist/data-source';
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class ConfigurationService {
+let ConfigurationService = class ConfigurationService {
     constructor() {
         this.defaults = {};
-        this.get = (/**
-         * @param {?} key
-         * @return {?}
-         */
-        (key) => this.defaults[key]);
-        this.set = (/**
-         * @param {?} key
-         * @param {?} value
-         * @return {?}
-         */
-        (key, value) => { this.defaults[key] = value; });
+        this.get = (key) => this.defaults[key];
+        this.set = (key, value) => { this.defaults[key] = value; };
     }
-}
-ConfigurationService.decorators = [
-    { type: Injectable, args: [{
-                providedIn: 'root',
-            },] }
-];
-/** @nocollapse */ ConfigurationService.ngInjectableDef = ɵɵdefineInjectable({ factory: function ConfigurationService_Factory() { return new ConfigurationService(); }, token: ConfigurationService, providedIn: "root" });
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    ConfigurationService.prototype.defaults;
-    /** @type {?} */
-    ConfigurationService.prototype.get;
-    /** @type {?} */
-    ConfigurationService.prototype.set;
-}
+};
+ConfigurationService.ɵprov = ɵɵdefineInjectable({ factory: function ConfigurationService_Factory() { return new ConfigurationService(); }, token: ConfigurationService, providedIn: "root" });
+ConfigurationService = __decorate([
+    Injectable({
+        providedIn: 'root',
+    })
+], ConfigurationService);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class LayoutsConfigurationService {
-    /**
-     * @param {?} config
-     */
+let LayoutsConfigurationService = class LayoutsConfigurationService {
     constructor(config) {
         this.config = config;
         this.defaults = {};
-        this.get = (/**
-         * @param {?} key
-         * @return {?}
-         */
-        (key) => this.defaults[key]);
-        this.set = (/**
-         * @param {?} key
-         * @param {?} value
-         * @return {?}
-         */
-        (key, value) => { this.defaults[key] = value; });
+        this.get = (key) => this.defaults[key];
+        this.set = (key, value) => { this.defaults[key] = value; };
         if (this.config.layouts) {
-            Object.keys(this.config.layouts).forEach((/**
-             * @param {?} key
-             * @return {?}
-             */
-            (key) => {
+            Object.keys(this.config.layouts).forEach((key) => {
                 this.set(key, this.config.layouts[key]);
-            }));
+            });
         }
     }
-}
-LayoutsConfigurationService.decorators = [
-    { type: Injectable, args: [{
-                providedIn: 'root',
-            },] }
-];
-/** @nocollapse */
+};
 LayoutsConfigurationService.ctorParameters = () => [
     { type: undefined, decorators: [{ type: Inject, args: ['config',] }] }
 ];
-/** @nocollapse */ LayoutsConfigurationService.ngInjectableDef = ɵɵdefineInjectable({ factory: function LayoutsConfigurationService_Factory() { return new LayoutsConfigurationService(ɵɵinject("config")); }, token: LayoutsConfigurationService, providedIn: "root" });
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    LayoutsConfigurationService.prototype.defaults;
-    /** @type {?} */
-    LayoutsConfigurationService.prototype.get;
-    /** @type {?} */
-    LayoutsConfigurationService.prototype.set;
-    /**
-     * @type {?}
-     * @private
-     */
-    LayoutsConfigurationService.prototype.config;
-}
+LayoutsConfigurationService.ɵprov = ɵɵdefineInjectable({ factory: function LayoutsConfigurationService_Factory() { return new LayoutsConfigurationService(ɵɵinject("config")); }, token: LayoutsConfigurationService, providedIn: "root" });
+LayoutsConfigurationService = __decorate([
+    Injectable({
+        providedIn: 'root',
+    }),
+    __param(0, Inject('config')),
+    __metadata("design:paramtypes", [Object])
+], LayoutsConfigurationService);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class MainStateService {
+let MainStateService = class MainStateService {
     constructor() {
         // custom streams
         this.custom = {};
@@ -127,56 +65,18 @@ class MainStateService {
             breadcrumbs: new ReplaySubject(),
             filters: new ReplaySubject(),
         };
-        this.get$ = (/**
-         * @param {?} key
-         * @return {?}
-         */
-        (key) => this._get('default', key));
-        this.getCustom$ = (/**
-         * @param {?} key
-         * @return {?}
-         */
-        (key) => this._get('custom', key));
-        this.update = (/**
-         * @param {?} key
-         * @param {?} newValue
-         * @return {?}
-         */
-        (key, newValue) => this._update('default', key, newValue));
-        this.updateCustom = (/**
-         * @param {?} key
-         * @param {?} newValue
-         * @return {?}
-         */
-        (key, newValue) => this._update('custom', key, newValue));
-        this.has = (/**
-         * @param {?} key
-         * @return {?}
-         */
-        (key) => !!this.default[key]);
-        this.hasCustom = (/**
-         * @param {?} key
-         * @return {?}
-         */
-        (key) => !!this.custom[key]);
+        this.get$ = (key) => this._get('default', key);
+        this.getCustom$ = (key) => this._get('custom', key);
+        this.update = (key, newValue) => this._update('default', key, newValue);
+        this.updateCustom = (key, newValue) => this._update('custom', key, newValue);
+        this.has = (key) => !!this.default[key];
+        this.hasCustom = (key) => !!this.custom[key];
     }
-    /**
-     * @param {?} key
-     * @param {?} stream$
-     * @return {?}
-     */
     addCustom(key, stream$) {
         if (this.custom[key])
             throw Error(`custom stream ${key} exists!`);
         this.custom[key] = stream$;
     }
-    /**
-     * @private
-     * @param {?} type
-     * @param {?} key
-     * @param {?} newValue
-     * @return {?}
-     */
     _update(type, key, newValue) {
         if (!this[type])
             throw Error(`${type} stream group does not exists!`);
@@ -184,12 +84,6 @@ class MainStateService {
             throw Error(`${type} stream ${key} does not exists!`);
         this[type][key].next(newValue);
     }
-    /**
-     * @private
-     * @param {?} type
-     * @param {?} key
-     * @return {?}
-     */
     _get(type, key) {
         if (!this[type])
             throw Error(`${type} stream group does not exists!`);
@@ -197,58 +91,20 @@ class MainStateService {
             throw Error(`${type} stream ${key} does not exists!`);
         return this[type][key];
     }
-}
-MainStateService.decorators = [
-    { type: Injectable, args: [{
-                providedIn: 'root',
-            },] }
-];
-/** @nocollapse */ MainStateService.ngInjectableDef = ɵɵdefineInjectable({ factory: function MainStateService_Factory() { return new MainStateService(); }, token: MainStateService, providedIn: "root" });
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    MainStateService.prototype.custom;
-    /**
-     * @type {?}
-     * @private
-     */
-    MainStateService.prototype.default;
-    /** @type {?} */
-    MainStateService.prototype.get$;
-    /** @type {?} */
-    MainStateService.prototype.getCustom$;
-    /** @type {?} */
-    MainStateService.prototype.update;
-    /** @type {?} */
-    MainStateService.prototype.updateCustom;
-    /** @type {?} */
-    MainStateService.prototype.has;
-    /** @type {?} */
-    MainStateService.prototype.hasCustom;
-}
+};
+MainStateService.ɵprov = ɵɵdefineInjectable({ factory: function MainStateService_Factory() { return new MainStateService(); }, token: MainStateService, providedIn: "root" });
+MainStateService = __decorate([
+    Injectable({
+        providedIn: 'root',
+    })
+], MainStateService);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class ApolloProvider {
-    /**
-     * @param {?} http
-     */
+let ApolloProvider = class ApolloProvider {
     constructor(http) {
         this.http = http;
     }
-    /**
-     * @param {?} providerConfig
-     * @param {?} requestId
-     * @param {?} options
-     * @return {?}
-     */
     request$(providerConfig, requestId, options) {
         const { params, method, httpOptions } = options;
-        /** @type {?} */
         let query;
         if (providerConfig.config && providerConfig.config[requestId]) {
             query = providerConfig.config[requestId];
@@ -261,14 +117,12 @@ class ApolloProvider {
             throw Error(`No config found for requestId '${requestId}'`);
         }
         if (params) {
-            /** @type {?} */
             const paramsStr = this.makeParamsStr(params);
             queryBody = queryBody.replace('__PARAMS__', paramsStr);
         }
         else {
             queryBody = queryBody.replace('(__PARAMS__)', '');
         }
-        /** @type {?} */
         let source$;
         if (method && method === 'GET') {
             source$ = this.http.get(providerConfig.baseUrl);
@@ -276,35 +130,15 @@ class ApolloProvider {
         else {
             source$ = this.http.post(providerConfig.baseUrl, { query: queryBody }, httpOptions);
         }
-        return source$.pipe(map((/**
-         * @param {?} response
-         * @return {?}
-         */
-        (response) => response.data[queryName])));
+        return source$.pipe(map((response) => response.data[queryName]));
     }
-    /**
-     * @private
-     * @param {?} params
-     * @return {?}
-     */
     makeParamsStr(params) {
-        /** @type {?} */
         const paramsStr = [];
-        Object.keys(params).forEach((/**
-         * @param {?} key
-         * @return {?}
-         */
-        (key) => {
+        Object.keys(params).forEach((key) => {
             if (Array.isArray(params[key])) {
-                /** @type {?} */
                 const arrStr = [];
-                params[key].forEach((/**
-                 * @param {?} val
-                 * @return {?}
-                 */
-                (val) => {
+                params[key].forEach((val) => {
                     if (typeof val === 'object') {
-                        /** @type {?} */
                         const subParamsStr = this.makeParamsStr(val);
                         arrStr.push(`{ ${subParamsStr} }`);
                     }
@@ -314,11 +148,10 @@ class ApolloProvider {
                     else {
                         arrStr.push(`"${val}"`);
                     }
-                }));
+                });
                 paramsStr.push(`${key}: [${arrStr.join(',')}]`);
             }
             else if (typeof params[key] === 'object' && params[key]) {
-                /** @type {?} */
                 const subParamsStr = this.makeParamsStr(params[key]);
                 paramsStr.push(`${key}: { ${subParamsStr} }`);
             }
@@ -331,49 +164,28 @@ class ApolloProvider {
             else {
                 paramsStr.push(`${key}: "${params[key]}"`);
             }
-        }));
+        });
         return paramsStr.join(' ');
     }
-}
-ApolloProvider.decorators = [
-    { type: Injectable, args: [{
-                providedIn: 'root',
-            },] }
-];
-/** @nocollapse */
+};
 ApolloProvider.ctorParameters = () => [
     { type: HttpClient }
 ];
-/** @nocollapse */ ApolloProvider.ngInjectableDef = ɵɵdefineInjectable({ factory: function ApolloProvider_Factory() { return new ApolloProvider(ɵɵinject(HttpClient)); }, token: ApolloProvider, providedIn: "root" });
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    ApolloProvider.prototype.http;
-}
+ApolloProvider.ɵprov = ɵɵdefineInjectable({ factory: function ApolloProvider_Factory() { return new ApolloProvider(ɵɵinject(HttpClient)); }, token: ApolloProvider, providedIn: "root" });
+ApolloProvider = __decorate([
+    Injectable({
+        providedIn: 'root',
+    }),
+    __metadata("design:paramtypes", [HttpClient])
+], ApolloProvider);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class RestProvider {
-    /**
-     * @param {?} http
-     */
+let RestProvider = class RestProvider {
     constructor(http) {
         this.http = http;
     }
-    /**
-     * @param {?} providerConfig
-     * @param {?} requestId
-     * @param {?=} options
-     * @return {?}
-     */
     request$(providerConfig, requestId, options = {}) {
         const { params, httpOptions, urlParams = '', } = options;
         let { method } = options;
-        /** @type {?} */
         let point;
         // default method
         if (!method) {
@@ -394,35 +206,19 @@ class RestProvider {
         }
         throw Error(`Rest method ${method} not supported`);
     }
-}
-RestProvider.decorators = [
-    { type: Injectable, args: [{
-                providedIn: 'root',
-            },] }
-];
-/** @nocollapse */
+};
 RestProvider.ctorParameters = () => [
     { type: HttpClient }
 ];
-/** @nocollapse */ RestProvider.ngInjectableDef = ɵɵdefineInjectable({ factory: function RestProvider_Factory() { return new RestProvider(ɵɵinject(HttpClient)); }, token: RestProvider, providedIn: "root" });
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    RestProvider.prototype.http;
-}
+RestProvider.ɵprov = ɵɵdefineInjectable({ factory: function RestProvider_Factory() { return new RestProvider(ɵɵinject(HttpClient)); }, token: RestProvider, providedIn: "root" });
+RestProvider = __decorate([
+    Injectable({
+        providedIn: 'root',
+    }),
+    __metadata("design:paramtypes", [HttpClient])
+], RestProvider);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class CommunicationService {
-    /**
-     * @param {?} config
-     * @param {?} apollo
-     * @param {?} rest
-     */
+let CommunicationService = class CommunicationService {
     constructor(config, apollo, rest) {
         this.config = config;
         this.apollo = apollo;
@@ -435,39 +231,21 @@ class CommunicationService {
             throw Error('No communications.defaultProvider setted in config');
         }
     }
-    /**
-     * @param {?} requestId
-     * @param {?=} options
-     * @param {?=} provider
-     * @return {?}
-     */
     request$(requestId, options = {}, provider) {
-        /** @type {?} */
         const activeProvider = provider || this.defaultProvider;
-        /** @type {?} */
         const activeProviderConfig = this.communicationConfig.providers[activeProvider];
         if (!activeProviderConfig) {
             throw Error(`There is no config for "${activeProvider}" provider`);
         }
         // provider.type control for retrocompatibility
-        /** @type {?} */
         const activeProviderType = activeProviderConfig.type || activeProvider;
         if (!this[activeProviderType]) {
             throw Error(`There is no "${activeProviderType}" provider type`);
         }
         const { onError } = options;
         return this[activeProviderType].request$(activeProviderConfig, requestId, options)
-            .pipe(catchError((/**
-         * @param {?} error
-         * @return {?}
-         */
-        (error) => this.handleError(error, onError))));
+            .pipe(catchError((error) => this.handleError(error, onError)));
     }
-    /**
-     * @param {?} error
-     * @param {?} onError
-     * @return {?}
-     */
     handleError(error, onError) {
         if (onError) {
             onError(error);
@@ -477,78 +255,34 @@ class CommunicationService {
         }
         return empty();
     }
-}
-CommunicationService.decorators = [
-    { type: Injectable, args: [{
-                providedIn: 'root',
-            },] }
-];
-/** @nocollapse */
+};
 CommunicationService.ctorParameters = () => [
     { type: ConfigurationService },
     { type: ApolloProvider },
     { type: RestProvider }
 ];
-/** @nocollapse */ CommunicationService.ngInjectableDef = ɵɵdefineInjectable({ factory: function CommunicationService_Factory() { return new CommunicationService(ɵɵinject(ConfigurationService), ɵɵinject(ApolloProvider), ɵɵinject(RestProvider)); }, token: CommunicationService, providedIn: "root" });
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    CommunicationService.prototype.defaultProvider;
-    /**
-     * @type {?}
-     * @private
-     */
-    CommunicationService.prototype.communicationConfig;
-    /**
-     * @type {?}
-     * @private
-     */
-    CommunicationService.prototype.config;
-    /**
-     * @type {?}
-     * @private
-     */
-    CommunicationService.prototype.apollo;
-    /**
-     * @type {?}
-     * @private
-     */
-    CommunicationService.prototype.rest;
-}
+CommunicationService.ɵprov = ɵɵdefineInjectable({ factory: function CommunicationService_Factory() { return new CommunicationService(ɵɵinject(ConfigurationService), ɵɵinject(ApolloProvider), ɵɵinject(RestProvider)); }, token: CommunicationService, providedIn: "root" });
+CommunicationService = __decorate([
+    Injectable({
+        providedIn: 'root',
+    }),
+    __metadata("design:paramtypes", [ConfigurationService,
+        ApolloProvider,
+        RestProvider])
+], CommunicationService);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @abstract
- */
 class AbstractLayout {
-    /**
-     * @param {?} config
-     */
     constructor(config) {
         this.config = config;
         this.widgets = this.config.widgets;
         this.lb = new LayoutBuilder(this.config.layoutId);
     }
-    /**
-     * @protected
-     * @return {?}
-     */
     onInit() {
         // on ready
-        this.lb.ready$.subscribe((/**
-         * @return {?}
-         */
-        () => {
+        this.lb.ready$.subscribe(() => {
             this.lb.eventHandler.emitInner('init', this.initPayload());
-        }));
-        /** @type {?} */
+        });
         const LayoutDS = this.config.layoutDS;
-        /** @type {?} */
         const LayoutEH = this.config.layoutEH;
         this.lb.init({
             widgetsConfig: this.widgets,
@@ -558,44 +292,12 @@ class AbstractLayout {
             eventHandler: new LayoutEH(),
         });
     }
-    /**
-     * @protected
-     * @return {?}
-     */
     onDestroy() {
         this.lb.eventHandler.emitInner('destroy');
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @protected
-     */
-    AbstractLayout.prototype.config;
-    /**
-     * @type {?}
-     * @protected
-     */
-    AbstractLayout.prototype.widgets;
-    /** @type {?} */
-    AbstractLayout.prototype.lb;
-    /**
-     * @abstract
-     * @protected
-     * @return {?}
-     */
-    AbstractLayout.prototype.initPayload = function () { };
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MainLayoutDS extends LayoutDataSource {
-    /**
-     * @param {?} __0
-     * @return {?}
-     */
     onInit({ configuration, mainState, router, options, titleService, route, }) {
         this.configuration = configuration;
         this.mainState = mainState;
@@ -611,26 +313,10 @@ class MainLayoutDS extends LayoutDataSource {
             this.one('footer').update({ items: this.configuration.get('footer') });
         }
         // main state updates
-        this.mainState.get$('headTitle').subscribe((/**
-         * @param {?} val
-         * @return {?}
-         */
-        (val) => this.titleService.setTitle(val)));
-        this.mainState.get$('pageTitle').subscribe((/**
-         * @param {?} val
-         * @return {?}
-         */
-        (val) => { this.pageTitle = val; }));
-        this.mainState.get$('subnav').subscribe((/**
-         * @param {?} val
-         * @return {?}
-         */
-        (val) => this.one('subnav').update(val)));
-        this.mainState.get$('breadcrumbs').subscribe((/**
-         * @param {?} val
-         * @return {?}
-         */
-        (val) => this.one('breadcrumbs').update(val)));
+        this.mainState.get$('headTitle').subscribe((val) => this.titleService.setTitle(val));
+        this.mainState.get$('pageTitle').subscribe((val) => { this.pageTitle = val; });
+        this.mainState.get$('subnav').subscribe((val) => this.one('subnav').update(val));
+        this.mainState.get$('breadcrumbs').subscribe((val) => this.one('breadcrumbs').update(val));
         // mainState test
         /* this.mainState.addCustom('customNav', new Subject());
         this.mainState.get$('pageTitle').subscribe(val => console.log('pageTitle', val));
@@ -650,10 +336,6 @@ class MainLayoutDS extends LayoutDataSource {
         }, 5000); */
     }
     // navigate emitter (click) handler
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     onNavigate(payload) {
         // router navigation
         if (payload.handler === 'router') {
@@ -676,125 +358,44 @@ class MainLayoutDS extends LayoutDataSource {
         }
     }
     // links routerLink change handler
-    /**
-     * @return {?}
-     */
     onRouterChanged() {
         hideAll();
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _onRouterNavigate() {
         // hide tippy
         hideAll();
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @protected
-     */
-    MainLayoutDS.prototype.configuration;
-    /**
-     * @type {?}
-     * @protected
-     */
-    MainLayoutDS.prototype.mainState;
-    /**
-     * @type {?}
-     * @protected
-     */
-    MainLayoutDS.prototype.router;
-    /**
-     * @type {?}
-     * @protected
-     */
-    MainLayoutDS.prototype.route;
-    /**
-     * @type {?}
-     * @protected
-     */
-    MainLayoutDS.prototype.titleService;
-    /** @type {?} */
-    MainLayoutDS.prototype.options;
-    /** @type {?} */
-    MainLayoutDS.prototype.pageTitle;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class JsonConfigService {
-    /**
-     * @param {?} http
-     * @param {?} config
-     */
+let JsonConfigService = class JsonConfigService {
     constructor(http, config) {
         this.http = http;
         this.config = config;
     }
-    /**
-     * @param {?} path
-     * @param {?=} staticConfig
-     * @return {?}
-     */
     load(path, staticConfig) {
-        return this.http.get(path).pipe(catchError((/**
-         * @return {?}
-         */
-        () => of({}))), tap((/**
-         * @param {?} response
-         * @return {?}
-         */
-        (response) => this._handleResponse(response, staticConfig)))).toPromise();
+        return this.http.get(path).pipe(catchError(() => of({})), tap((response) => this._handleResponse(response, staticConfig))).toPromise();
     }
-    /**
-     * @private
-     * @param {?} response
-     * @param {?} staticConfig
-     * @return {?}
-     */
     _handleResponse(response, staticConfig) {
         // set config defaults
         if (staticConfig) {
-            Object.keys(staticConfig).forEach((/**
-             * @param {?} key
-             * @return {?}
-             */
-            (key) => this.config.set(key, staticConfig[key])));
+            Object.keys(staticConfig).forEach((key) => this.config.set(key, staticConfig[key]));
         }
         // set loaded json config
         if (response) {
-            Object.keys(response).forEach((/**
-             * @param {?} key
-             * @return {?}
-             */
-            (key) => this.config.set(key, response[key])));
+            Object.keys(response).forEach((key) => this.config.set(key, response[key]));
             // config keys colors
             if (response['config-keys']) {
-                /** @type {?} */
                 const headTag = document.querySelector('head');
-                /** @type {?} */
                 const styleElement = document.createElement('style');
-                /** @type {?} */
                 const styles = [];
-                Object.keys(response['config-keys']).forEach((/**
-                 * @param {?} key
-                 * @return {?}
-                 */
-                (key) => {
-                    /** @type {?} */
+                Object.keys(response['config-keys']).forEach((key) => {
                     const configKey = response['config-keys'][key] || {};
-                    /** @type {?} */
                     const className = configKey['class-name'];
                     if (configKey.color && configKey.color.hex) {
                         // add css class
                         styles.push(`--color-${className}: ${configKey.color.hex};`);
                     }
-                }));
+                });
                 if (styles.length) {
                     styles.unshift(':root {');
                     styles.push('}');
@@ -804,225 +405,54 @@ class JsonConfigService {
             }
         }
     }
-}
-JsonConfigService.decorators = [
-    { type: Injectable, args: [{
-                providedIn: 'root',
-            },] }
-];
-/** @nocollapse */
+};
 JsonConfigService.ctorParameters = () => [
     { type: HttpClient },
     { type: ConfigurationService }
 ];
-/** @nocollapse */ JsonConfigService.ngInjectableDef = ɵɵdefineInjectable({ factory: function JsonConfigService_Factory() { return new JsonConfigService(ɵɵinject(HttpClient), ɵɵinject(ConfigurationService)); }, token: JsonConfigService, providedIn: "root" });
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    JsonConfigService.prototype.http;
-    /**
-     * @type {?}
-     * @private
-     */
-    JsonConfigService.prototype.config;
-}
+JsonConfigService.ɵprov = ɵɵdefineInjectable({ factory: function JsonConfigService_Factory() { return new JsonConfigService(ɵɵinject(HttpClient), ɵɵinject(ConfigurationService)); }, token: JsonConfigService, providedIn: "root" });
+JsonConfigService = __decorate([
+    Injectable({
+        providedIn: 'root',
+    }),
+    __metadata("design:paramtypes", [HttpClient,
+        ConfigurationService])
+], JsonConfigService);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @record
- */
-function FacetInputData() { }
-if (false) {
-    /** @type {?} */
-    FacetInputData.prototype.value;
-    /** @type {?} */
-    FacetInputData.prototype.label;
-    /** @type {?} */
-    FacetInputData.prototype.counter;
-    /** @type {?|undefined} */
-    FacetInputData.prototype.hidden;
-    /** @type {?|undefined} */
-    FacetInputData.prototype.options;
-}
-/**
- * @abstract
- */
 class FacetInput {
-    /**
-     * @param {?} config
-     */
     constructor(config) {
         this.isEmpty = false;
-        this.update = (/**
-         * @return {?}
-         */
-        () => { this.output = this.transform(); });
-        this.getId = (/**
-         * @return {?}
-         */
-        () => this.id);
-        this.getData = (/**
-         * @return {?}
-         */
-        () => this.data);
-        this.getConfig = (/**
-         * @return {?}
-         */
-        () => this.config);
-        this.getFacetId = (/**
-         * @return {?}
-         */
-        () => this.config.facetId);
-        this.getInputIndex = (/**
-         * @return {?}
-         */
-        () => this.config.inputIndex);
-        this.getSectionIndex = (/**
-         * @return {?}
-         */
-        () => this.config.sectionIndex);
-        this.getContext = (/**
-         * @return {?}
-         */
-        () => this.config.filterConfig.context || 'external');
-        this.getTarget = (/**
-         * @return {?}
-         */
-        () => this.config.filterConfig.target || null);
-        this.getSearchIn = (/**
-         * @return {?}
-         */
-        () => this.config.filterConfig.searchIn || null);
-        this.getType = (/**
-         * @return {?}
-         */
-        () => this.config.type);
-        this.getOutput = (/**
-         * @return {?}
-         */
-        () => this.output);
-        this.setIsEmpty = (/**
-         * @param {?} empty
-         * @return {?}
-         */
-        (empty) => {
+        this.update = () => { this.output = this.transform(); };
+        this.getId = () => this.id;
+        this.getData = () => this.data;
+        this.getConfig = () => this.config;
+        this.getFacetId = () => this.config.facetId;
+        this.getInputIndex = () => this.config.inputIndex;
+        this.getSectionIndex = () => this.config.sectionIndex;
+        this.getContext = () => this.config.filterConfig.context || 'external';
+        this.getTarget = () => this.config.filterConfig.target || null;
+        this.getSearchIn = () => this.config.filterConfig.searchIn || null;
+        this.getType = () => this.config.type;
+        this.getOutput = () => this.output;
+        this.setIsEmpty = (empty) => {
             this.isEmpty = empty;
-        });
-        this.setData = (/**
-         * @param {?} newData
-         * @return {?}
-         */
-        (newData) => { this.data = newData; });
+        };
+        this.setData = (newData) => { this.data = newData; };
         this.config = config;
         this._setId();
         FacetInput.index += 1;
     }
-    /**
-     * @return {?}
-     */
     clear() { return null; }
-    /**
-     * @private
-     * @return {?}
-     */
     _setId() {
         this.id = `facet-input-${this.getType()}-${FacetInput.index}`;
     }
 }
 FacetInput.index = 0;
-if (false) {
-    /** @type {?} */
-    FacetInput.index;
-    /**
-     * @type {?}
-     * @private
-     */
-    FacetInput.prototype.id;
-    /**
-     * @type {?}
-     * @protected
-     */
-    FacetInput.prototype.config;
-    /**
-     * @type {?}
-     * @protected
-     */
-    FacetInput.prototype.output;
-    /**
-     * @type {?}
-     * @protected
-     */
-    FacetInput.prototype.data;
-    /**
-     * @type {?}
-     * @protected
-     */
-    FacetInput.prototype.isEmpty;
-    /** @type {?} */
-    FacetInput.prototype.update;
-    /** @type {?} */
-    FacetInput.prototype.getId;
-    /** @type {?} */
-    FacetInput.prototype.getData;
-    /** @type {?} */
-    FacetInput.prototype.getConfig;
-    /** @type {?} */
-    FacetInput.prototype.getFacetId;
-    /** @type {?} */
-    FacetInput.prototype.getInputIndex;
-    /** @type {?} */
-    FacetInput.prototype.getSectionIndex;
-    /** @type {?} */
-    FacetInput.prototype.getContext;
-    /** @type {?} */
-    FacetInput.prototype.getTarget;
-    /** @type {?} */
-    FacetInput.prototype.getSearchIn;
-    /** @type {?} */
-    FacetInput.prototype.getType;
-    /** @type {?} */
-    FacetInput.prototype.getOutput;
-    /** @type {?} */
-    FacetInput.prototype.setIsEmpty;
-    /** @type {?} */
-    FacetInput.prototype.setData;
-    /**
-     * @abstract
-     * @param {?} facetValue
-     * @return {?}
-     */
-    FacetInput.prototype.setActive = function (facetValue) { };
-    /**
-     * @abstract
-     * @protected
-     * @return {?}
-     */
-    FacetInput.prototype.transform = function () { };
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class FacetInputCheckbox extends FacetInput {
-    /**
-     * @protected
-     * @return {?}
-     */
     transform() {
-        /** @type {?} */
         const facetId = this.getFacetId();
-        return this.data.map((/**
-         * @param {?} __0
-         * @param {?} index
-         * @return {?}
-         */
-        ({ label, value }, index) => ({
+        return this.data.map(({ label, value }, index) => ({
             type: 'checkbox',
             id: `${this.getId()}-${index}`,
             label,
@@ -1032,19 +462,11 @@ class FacetInputCheckbox extends FacetInput {
                 value: `${value}`,
             },
             _meta: { facetId, value: `${value}` },
-        })));
+        }));
     }
-    /**
-     * @param {?} facetValue
-     * @return {?}
-     */
     setActive(facetValue) {
         const { isArray } = this.config.filterConfig;
-        this.output.forEach((/**
-         * @param {?} config
-         * @return {?}
-         */
-        (config) => {
+        this.output.forEach((config) => {
             if (isArray && Array.isArray(facetValue) && facetValue.indexOf(config._meta.value) !== -1) {
                 config.checked = true;
             }
@@ -1054,51 +476,27 @@ class FacetInputCheckbox extends FacetInput {
             else {
                 config.checked = false;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
+// eslint-disable-next-line import/no-extraneous-dependencies
 const domParser = new DOMParser();
 var helpers = {
-    /**
-     * @param {?} key
-     * @param {?=} label
-     * @return {?}
-     */
     prettifySnakeCase(key, label) {
         if (typeof label === 'string') {
             return label;
         }
-        return (key || '').split('_').map((/**
-         * @param {?} word
-         * @param {?} index
-         * @return {?}
-         */
-        (word, index) => (index === 0 ? this.ucFirst(word) : word))).join(' ');
+        return (key || '').split('_').map((word, index) => (index === 0 ? this.ucFirst(word) : word)).join(' ');
     },
-    /**
-     * @param {?} str
-     * @return {?}
-     */
     ucFirst(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     },
-    /**
-     * @param {?} str
-     * @return {?}
-     */
     slugify(str) {
         if (!str) {
             return '';
         }
-        /** @type {?} */
         const parsedDoc = domParser.parseFromString(str, 'text/html');
-        /** @type {?} */
         let parsedString = parsedDoc.body.textContent || '';
         // custom replacements
         parsedString = parsedString.replace(/\//g, '-');
@@ -1107,16 +505,9 @@ var helpers = {
             lower: true
         });
     },
-    /**
-     * @return {?}
-     */
     browserIsIE() {
         return window.navigator.userAgent.match(/(MSIE|Trident)/);
     },
-    /**
-     * @param {?} str
-     * @return {?}
-     */
     escapeDoubleQuotes(str) {
         if (str.search(/\\?(")([\w\s]+)\\?(")/g) >= 0) {
             // match piece of string between double quotes
@@ -1124,28 +515,14 @@ var helpers = {
         }
         return str.replace(/\\([\s\S])|(")/g, '\\\\\\$1$2'); // thanks @slevithan!
     },
-    /**
-     * @param {?} str
-     * @return {?}
-     */
     unescapeDoubleQuotes(str) {
         return (str && str !== '') ? str.replace(/\\*(")/g, '$1') : str; // thanks @slevithan!
     }
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class FacetInputText extends FacetInput {
-    /**
-     * @protected
-     * @return {?}
-     */
     transform() {
-        /** @type {?} */
         const facetId = this.getFacetId();
-        /** @type {?} */
         const payload = {
             facetId,
             source: 'input-text',
@@ -1157,38 +534,23 @@ class FacetInputText extends FacetInput {
             disabled: this.config.disabled,
             placeholder: this.config.placeholder,
             icon: this.config.icon,
-            inputPayload: Object.assign({}, payload, { trigger: 'input' }),
-            enterPayload: Object.assign({}, payload, { trigger: 'enter' }),
-            iconPayload: Object.assign({}, payload, { trigger: 'icon' }),
+            inputPayload: Object.assign(Object.assign({}, payload), { trigger: 'input' }),
+            enterPayload: Object.assign(Object.assign({}, payload), { trigger: 'enter' }),
+            iconPayload: Object.assign(Object.assign({}, payload), { trigger: 'icon' }),
             _meta: { facetId },
         };
     }
-    /**
-     * @param {?} facetValue
-     * @return {?}
-     */
     setActive(facetValue) {
         this.output.value = helpers.unescapeDoubleQuotes(facetValue) || null;
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
+/* eslint-disable */
 const RESULTS_LIMIT = 1000;
 class FacetInputLink extends FacetInput {
-    /**
-     * @protected
-     * @return {?}
-     */
     transform() {
-        /** @type {?} */
         const facetId = this.getFacetId();
-        /** @type {?} */
         const results = [];
-        /** @type {?} */
         let resultsCounter = 0;
         for (const itemData of this.data) {
             const { label, counter, hidden } = itemData;
@@ -1203,7 +565,6 @@ class FacetInputLink extends FacetInput {
             // normalize value
             value = `${value}`;
             options = options || {};
-            /** @type {?} */
             const classes = [];
             if (options.classes) {
                 classes.push(options.classes);
@@ -1227,49 +588,43 @@ class FacetInputLink extends FacetInput {
             });
         }
         /* const results: any[] = this.data.map(({ label, value, counter, hidden, options }) => {
-              if (hidden) {
-                return;
-              }
-        
-              resultsCounter += 1;
-              // normalize value
-              value = '' + value;
-              options = options || {};
-        
-              const classes = [];
-              if (options.classes) { classes.push(options.classes); }
-              if (this._isActive(this.facetValue, value)) { classes.push('is-active'); }
-        
-              return {
-                type: 'link',
-                id: this.getId(),
-                text: label,
-                counter,
-                payload: {
-                  facetId,
-                  source: 'input-link',
-                  value
-                },
-                icon: options.icon || null,
-                classes: classes.join(' '),
-                _meta: { facetId, value }
-              };
-            });
-             */
-        // empty state control
-        /** @type {?} */
-        const itemEmpty = results.filter((/**
-         * @param {?} item
-         * @return {?}
+          if (hidden) {
+            return;
+          }
+    
+          resultsCounter += 1;
+          // normalize value
+          value = '' + value;
+          options = options || {};
+    
+          const classes = [];
+          if (options.classes) { classes.push(options.classes); }
+          if (this._isActive(this.facetValue, value)) { classes.push('is-active'); }
+    
+          return {
+            type: 'link',
+            id: this.getId(),
+            text: label,
+            counter,
+            payload: {
+              facetId,
+              source: 'input-link',
+              value
+            },
+            icon: options.icon || null,
+            classes: classes.join(' '),
+            _meta: { facetId, value }
+          };
+        });
          */
-        (item) => item.id === 'empty'))[0];
+        // empty state control
+        const itemEmpty = results.filter((item) => item.id === 'empty')[0];
         if (this.isEmpty) {
             if (itemEmpty) {
                 itemEmpty.classes = 'empty-text-link';
             }
             else {
                 const { label } = this.getConfig().emptyState;
-                /** @type {?} */
                 const emptyId = 'empty-link';
                 results.push({
                     type: 'link',
@@ -1285,85 +640,42 @@ class FacetInputLink extends FacetInput {
         }
         return results;
     }
-    /**
-     * @param {?} facetValue
-     * @return {?}
-     */
     setActive(facetValue) {
-        this.output.forEach((/**
-         * @param {?} config
-         * @return {?}
-         */
-        (config) => {
-            /** @type {?} */
+        this.output.forEach((config) => {
             const isActive = this._isActive(facetValue, config._meta.value);
-            /** @type {?} */
             let classes = config.classes ? config.classes.split(' ') : [];
             if (!isActive) {
-                classes = classes.filter((/**
-                 * @param {?} className
-                 * @return {?}
-                 */
-                (className) => className !== 'is-active'));
+                classes = classes.filter((className) => className !== 'is-active');
             }
             else if (classes.indexOf('is-active') === -1) {
                 classes.push('is-active');
             }
             config.classes = classes.join(' ');
-        }));
+        });
     }
-    /**
-     * @private
-     * @param {?} facetValue
-     * @param {?} value
-     * @return {?}
-     */
     _isActive(facetValue, value) {
         this.facetValue = facetValue;
         return ((Array.isArray(facetValue) && facetValue.indexOf(value) !== -1)
             || (facetValue === value));
     }
-    /**
-     * @return {?}
-     */
     clear() {
         this.facetValue = [];
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    FacetInputLink.prototype.facetValue;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class FacetInputSelect extends FacetInput {
-    /**
-     * @protected
-     * @return {?}
-     */
     transform() {
-        /** @type {?} */
         const facetId = this.getFacetId();
         return {
             type: 'select',
             id: this.getId(),
             label: this.config.label,
             disabled: this.config.disabled,
-            options: this.data ? this.data.map((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ value, label }) => ({
+            options: this.data ? this.data.map(({ value, label }) => ({
                 // normalize value
                 value: `${value}`,
                 label,
-            }))) : [],
+            })) : [],
             payload: {
                 facetId,
                 source: 'input-select',
@@ -1371,42 +683,19 @@ class FacetInputSelect extends FacetInput {
             _meta: { facetId },
         };
     }
-    /**
-     * @param {?} facetValue
-     * @return {?}
-     */
     setActive(facetValue) {
         this.output.options
-            .filter((/**
-         * @param {?} option
-         * @return {?}
-         */
-        (option) => option.value === facetValue))
-            .forEach((/**
-         * @param {?} option
-         * @return {?}
-         */
-        (option) => { option.selected = true; }));
+            .filter((option) => option.value === facetValue)
+            .forEach((option) => { option.selected = true; });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const INPUTS_MAP = {
     checkbox: FacetInputCheckbox,
     text: FacetInputText,
     link: FacetInputLink,
     select: FacetInputSelect,
 };
-/** @type {?} */
 const FILTERS_MAP = {
     '=': '_filterDataEquals',
     '>': '_filterDataGreaterThan',
@@ -1416,105 +705,21 @@ const FILTERS_MAP = {
     '<>': '_filterDataNotEqual',
     LIKE: '_filterDataLike',
 };
-/**
- * @record
- */
-function SearchConfig() { }
-if (false) {
-    /** @type {?} */
-    SearchConfig.prototype.totalCount;
-    /** @type {?} */
-    SearchConfig.prototype.facets;
-    /** @type {?} */
-    SearchConfig.prototype.page;
-    /** @type {?} */
-    SearchConfig.prototype.results;
-    /** @type {?} */
-    SearchConfig.prototype.fields;
-}
-/**
- * @record
- */
-function Facet() { }
-if (false) {
-    /** @type {?} */
-    Facet.prototype.id;
-    /** @type {?} */
-    Facet.prototype.type;
-    /** @type {?} */
-    Facet.prototype.operator;
-    /** @type {?|undefined} */
-    Facet.prototype.hasStaticData;
-    /** @type {?|undefined} */
-    Facet.prototype.searchData;
-    /** @type {?|undefined} */
-    Facet.prototype.data;
-}
-/**
- * @record
- */
-function Filter() { }
-if (false) {
-    /** @type {?} */
-    Filter.prototype.facetId;
-    /** @type {?} */
-    Filter.prototype.value;
-    /** @type {?} */
-    Filter.prototype.searchIn;
-    /** @type {?|undefined} */
-    Filter.prototype.isArray;
-    /** @type {?|undefined} */
-    Filter.prototype.context;
-    /** @type {?|undefined} */
-    Filter.prototype.target;
-}
 class SearchModel {
-    /**
-     * @param {?} id
-     * @param {?} config
-     */
     constructor(id, config) {
         this._filters = [];
         this._facets = [];
         this._inputs = [];
         this._results$ = new Subject();
-        this.getId = (/**
-         * @return {?}
-         */
-        () => this._id);
-        this.getFilters = (/**
-         * @return {?}
-         */
-        () => this._filters);
-        this.getFacets = (/**
-         * @return {?}
-         */
-        () => this._facets);
-        this.getInputs = (/**
-         * @return {?}
-         */
-        () => this._inputs);
-        this.getConfig = (/**
-         * @return {?}
-         */
-        () => this._config);
-        this.getTotalCount = (/**
-         * @return {?}
-         */
-        () => this._totalCount);
-        this.getFields = (/**
-         * @return {?}
-         */
-        () => this._config.fields);
-        this.getResults$ = (/**
-         * @return {?}
-         */
-        () => this._results$);
-        this.setResults = (/**
-         * @param {?} results
-         * @return {?}
-         */
-        (results) => this._results$.next(results));
+        this.getId = () => this._id;
+        this.getFilters = () => this._filters;
+        this.getFacets = () => this._facets;
+        this.getInputs = () => this._inputs;
+        this.getConfig = () => this._config;
+        this.getTotalCount = () => this._totalCount;
+        this.getFields = () => this._config.fields;
+        this.getResults$ = () => this._results$;
+        this.setResults = (results) => this._results$.next(results);
         this._id = id;
         this._config = config;
         this._setFilters();
@@ -1530,26 +735,11 @@ class SearchModel {
             SearchService.queryParams = null;
         }
     }
-    /**
-     * @param {?} facetId
-     * @param {?} value
-     * @param {?=} remove
-     * @return {?}
-     */
     updateFilter(facetId, value, remove) {
-        /** @type {?} */
         const selectedFilters = this.getFiltersByFacetId(facetId);
-        selectedFilters.forEach((/**
-         * @param {?} filter
-         * @return {?}
-         */
-        (filter) => {
+        selectedFilters.forEach((filter) => {
             if (Array.isArray(filter.value) && remove) {
-                filter.value = filter.value.filter((/**
-                 * @param {?} item
-                 * @return {?}
-                 */
-                (item) => item !== value));
+                filter.value = filter.value.filter((item) => item !== value);
             }
             else if (Array.isArray(filter.value)
                 && filter.value.indexOf(value) === -1) {
@@ -1558,330 +748,143 @@ class SearchModel {
             else {
                 filter.value = !remove ? helpers.escapeDoubleQuotes(value) : null;
             }
-        }));
+        });
     }
-    /**
-     * @return {?}
-     */
     clear() {
         this.updateFiltersFromQueryParams({}, true);
         this._clearInputs();
     }
-    /**
-     * @param {?} queryParams
-     * @param {?=} clearAll
-     * @return {?}
-     */
     updateFiltersFromQueryParams(queryParams, clearAll = false) {
-        this._facets.forEach((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ id }) => {
-            /** @type {?} */
+        this._facets.forEach(({ id }) => {
             const selectedFilters = this.getFiltersByFacetId(id);
-            /** @type {?} */
             const value = queryParams[id];
-            /** @type {?} */
             const isInternal = this.getInputByFacetId(id).getContext() === 'internal';
             if (isInternal && !clearAll) {
                 return;
             }
-            selectedFilters.forEach((/**
-             * @param {?} filter
-             * @return {?}
-             */
-            (filter) => {
+            selectedFilters.forEach((filter) => {
                 if (filter.isArray) {
                     filter.value = value ? value.split(',') : [];
                 }
                 else {
                     filter.value = value || null;
                 }
-            }));
-        }));
+            });
+        });
     }
-    /**
-     * @return {?}
-     */
     updateInputsFromFilters() {
-        this._filters.forEach((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ facetId, value }) => {
+        this._filters.forEach(({ facetId, value }) => {
             this.getInputByFacetId(facetId).setActive(value);
-        }));
+        });
     }
-    /**
-     * @param {?} facets
-     * @return {?}
-     */
     updateFacets(facets) {
-        facets.forEach((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ id, data }) => this.updateFacet(id, data)));
+        facets.forEach(({ id, data }) => this.updateFacet(id, data));
         this._setInputsData();
     }
-    /**
-     * @param {?} totalCount
-     * @return {?}
-     */
     updateTotalCount(totalCount) {
         this._totalCount = totalCount;
     }
-    /**
-     * @param {?} facetId
-     * @param {?} data
-     * @return {?}
-     */
     updateFacet(facetId, data) {
-        /** @type {?} */
-        const selectedFacets = this._facets.filter((/**
-         * @param {?} facet
-         * @return {?}
-         */
-        (facet) => facet.id === facetId));
+        const selectedFacets = this._facets.filter((facet) => facet.id === facetId);
         if (!selectedFacets.length) {
             throw Error(`Facet with id '${facetId}' does not exists`);
         }
-        selectedFacets.forEach((/**
-         * @param {?} facet
-         * @return {?}
-         */
-        (facet) => { facet.data = data; }));
+        selectedFacets.forEach((facet) => { facet.data = data; });
     }
-    /**
-     * @return {?}
-     */
     reset() {
-        this._filters.forEach((/**
-         * @param {?} filter
-         * @return {?}
-         */
-        (filter) => { filter.value = null; }));
+        this._filters.forEach((filter) => { filter.value = null; });
     }
-    /**
-     * @return {?}
-     */
     getRequestParams() {
         return {
             facets: this._getRequestFacets(),
             page: this._page,
             results: this._config.results,
             filters: this._filters
-                .filter((/**
-             * @param {?} filter
-             * @return {?}
-             */
-            (filter) => filter.context !== 'internal'))
-                .map((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ facetId, value, searchIn }) => ({ facetId, value, searchIn }))),
+                .filter((filter) => filter.context !== 'internal')
+                .map(({ facetId, value, searchIn }) => ({ facetId, value, searchIn })),
         };
     }
-    /**
-     * @return {?}
-     */
     getInternalFilters() {
         return this._filters
-            .filter((/**
-         * @param {?} filter
-         * @return {?}
-         */
-        (filter) => (filter.context === 'internal'
+            .filter((filter) => (filter.context === 'internal'
             && ((Array.isArray(filter.value) && filter.value.length)
-                || (!Array.isArray(filter.value) && filter.value)))))
-            .map((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ facetId, value, searchIn }) => ({ facetId, value, searchIn })));
+                || (!Array.isArray(filter.value) && filter.value))))
+            .map(({ facetId, value, searchIn }) => ({ facetId, value, searchIn }));
     }
-    /**
-     * @param {?} filters
-     * @return {?}
-     */
     filtersAsQueryParams(filters) {
-        /** @type {?} */
         const queryParams = {};
-        filters.forEach((/**
-         * @param {?} filter
-         * @return {?}
-         */
-        (filter) => {
+        filters.forEach((filter) => {
             queryParams[filter.facetId] = Array.isArray(filter.value)
                 ? filter.value.join(',')
                 : filter.value;
-        }));
+        });
         return queryParams;
     }
-    /**
-     * @param {?} facetId
-     * @return {?}
-     */
     getFiltersByFacetId(facetId) {
-        return this._filters.filter((/**
-         * @param {?} filter
-         * @return {?}
-         */
-        (filter) => filter.facetId === facetId));
+        return this._filters.filter((filter) => filter.facetId === facetId);
     }
-    /**
-     * @param {?} facetId
-     * @return {?}
-     */
     getInputByFacetId(facetId) {
-        return this._inputs.filter((/**
-         * @param {?} input
-         * @return {?}
-         */
-        (input) => input.getFacetId() === facetId))[0];
+        return this._inputs.filter((input) => input.getFacetId() === facetId)[0];
     }
-    /**
-     * @param {?} facetId
-     * @param {?} data
-     * @return {?}
-     */
     setInputData(facetId, data) {
         this.getInputByFacetId(facetId).setData(data);
     }
-    /**
-     * @param {?} target
-     * @return {?}
-     */
     filterTarget(target) {
-        /** @type {?} */
-        const inputs = this._inputs.filter((/**
-         * @param {?} input
-         * @return {?}
-         */
-        (input) => input.getTarget() === target));
-        /** @type {?} */
+        const inputs = this._inputs.filter((input) => input.getTarget() === target);
         const targetInput = this.getInputByFacetId(target);
-        /** @type {?} */
-        const facet = this._facets.filter((/**
-         * @param {?} f
-         * @return {?}
-         */
-        (f) => f.id === target))[0];
-        /** @type {?} */
+        const facet = this._facets.filter((f) => f.id === target)[0];
         const facetData = facet.data;
-        /** @type {?} */
         const searchIns = [];
-        inputs.forEach((/**
-         * @param {?} input
-         * @return {?}
-         */
-        (input) => {
-            /** @type {?} */
+        inputs.forEach((input) => {
             const filter = this.getFiltersByFacetId(input.getFacetId())[0];
-            /** @type {?} */
             const searchIn = input.getSearchIn();
             const { value } = filter;
             searchIns.push([searchIn, value]);
-        }));
+        });
         // filter
-        facetData.forEach((/**
-         * @param {?} item
-         * @return {?}
-         */
-        (item) => this._filterData(searchIns, item)));
+        facetData.forEach((item) => this._filterData(searchIns, item));
         // update
         targetInput.setData(facetData);
         if (targetInput.getConfig().emptyState) {
-            /** @type {?} */
-            const isEmpty = !facetData.filter((/**
-             * @param {?} data
-             * @return {?}
-             */
-            (data) => !data.hidden)).length;
+            const isEmpty = !facetData.filter((data) => !data.hidden).length;
             targetInput.setIsEmpty(isEmpty);
         }
         targetInput.update();
     }
-    /**
-     * @param {?} orderBy
-     * @return {?}
-     */
     setSearchConfigOrderBy(orderBy) {
         this._config.results.order.key = orderBy;
     }
-    /**
-     * @param {?} direction
-     * @return {?}
-     */
     setSearchConfigDirection(direction) {
         this._config.results.order.direction = direction;
     }
-    /**
-     * @param {?} type
-     * @return {?}
-     */
     setSearchConfigType(type) {
         this._config.results.order.type = type;
     }
-    /**
-     * @param {?} offset
-     * @return {?}
-     */
     setPageConfigOffset(offset) {
         this._config.page.offset = offset;
     }
-    /**
-     * @param {?} limit
-     * @return {?}
-     */
     setPageConfigLimit(limit) {
         this._config.page.limit = limit;
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _clearInputs() {
         // do nothing
     }
-    /**
-     * @private
-     * @param {?} searchIns
-     * @param {?} item
-     * @return {?}
-     */
     _filterData(searchIns, item) {
         // reset
         item.hidden = false;
-        searchIns.forEach((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ([searchIn, value]) => {
-            searchIn.forEach((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ key, operator }) => {
+        searchIns.forEach(([searchIn, value]) => {
+            searchIn.forEach(({ key, operator }) => {
                 if (item.hidden) {
                     return;
                 }
-                /** @type {?} */
                 let refValue = get(item, key, null);
                 if (key.indexOf('searchData') !== -1 && Array.isArray(item.searchData)) {
-                    /** @type {?} */
                     const searchDataKey = key.replace('searchData.', '');
-                    item.searchData.forEach((/**
-                     * @param {?} __0
-                     * @return {?}
-                     */
-                    ({ key: dataKey, value: dataValue }) => {
+                    item.searchData.forEach(({ key: dataKey, value: dataValue }) => {
                         if (dataKey === searchDataKey) {
                             refValue = dataValue;
                         }
-                    }));
+                    });
                 }
                 if (refValue === null) {
                     item.hidden = true;
@@ -1892,29 +895,18 @@ class SearchModel {
                 else {
                     console.warn(`SearchIn: operator ${operator} not supported`);
                 }
-            }));
-        }));
+            });
+        });
     }
-    /**
-     * @private
-     * @param {?} value
-     * @param {?} refValue
-     * @return {?}
-     */
     _filterDataEquals(value, refValue) {
         if (Array.isArray(refValue)) {
             if (Array.isArray(value)) {
-                /** @type {?} */
                 let inArray = value.length === 0;
-                refValue.forEach((/**
-                 * @param {?} rv
-                 * @return {?}
-                 */
-                (rv) => {
+                refValue.forEach((rv) => {
                     if (value.indexOf(rv) !== -1) {
                         inArray = true;
                     }
-                }));
+                });
                 return !(inArray);
             }
             return !(value && refValue.indexOf(value) !== -1);
@@ -1924,172 +916,77 @@ class SearchModel {
         }
         return !(value && value === refValue);
     }
-    /**
-     * @private
-     * @param {?} value
-     * @param {?} refValue
-     * @return {?}
-     */
     _filterDataGreaterThan(value, refValue) {
         if (!Array.isArray(value)) {
             return !(value && value > refValue);
         }
         return false;
     }
-    /**
-     * @private
-     * @param {?} value
-     * @param {?} refValue
-     * @return {?}
-     */
     _filterDataLessThan(value, refValue) {
         if (!Array.isArray(value)) {
             return !(value && value < refValue);
         }
         return false;
     }
-    /**
-     * @private
-     * @param {?} value
-     * @param {?} refValue
-     * @return {?}
-     */
     _filterDataGreaterOrEquals(value, refValue) {
         if (!Array.isArray(value)) {
             return !(value && value >= refValue);
         }
         return false;
     }
-    /**
-     * @private
-     * @param {?} value
-     * @param {?} refValue
-     * @return {?}
-     */
     _filterDataLessOrEquals(value, refValue) {
         if (!Array.isArray(value)) {
             return !(value && value <= refValue);
         }
         return false;
     }
-    /**
-     * @private
-     * @param {?} value
-     * @param {?} refValue
-     * @return {?}
-     */
     _filterDataNotEqual(value, refValue) {
         if (!Array.isArray(value)) {
             return !(value && value !== refValue);
         }
         return false;
     }
-    /**
-     * @private
-     * @param {?} value
-     * @param {?} refValue
-     * @return {?}
-     */
     _filterDataLike(value, refValue) {
         if (value
             && typeof value === 'string'
             && typeof refValue === 'string') {
-            /** @type {?} */
             const haystack = refValue.toLowerCase();
-            /** @type {?} */
             const needle = value.toLocaleLowerCase();
             return !(haystack.indexOf(needle) !== -1);
         }
         return false;
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _setFilters() {
-        this._config.fields.forEach((/**
-         * @param {?} field
-         * @return {?}
-         */
-        (field) => {
-            field.inputs.forEach((/**
-             * @param {?} input
-             * @return {?}
-             */
-            (input) => this._filters.push(Object.assign({}, input.filterConfig, { facetId: input.facetId, value: input.filterConfig.isArray ? [] : null }))));
-        }));
+        this._config.fields.forEach((field) => {
+            field.inputs.forEach((input) => this._filters.push(Object.assign(Object.assign({}, input.filterConfig), { facetId: input.facetId, value: input.filterConfig.isArray ? [] : null })));
+        });
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _setFacets() {
         this._facets = this._config.facets;
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _setPage() {
         this._page = this._config.page;
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _setTotalCount() {
         this._totalCount = this._config.totalCount;
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _setInputs() {
-        this._config.fields.forEach((/**
-         * @param {?} sectionConfig
-         * @param {?} sectionIndex
-         * @return {?}
-         */
-        (sectionConfig, sectionIndex) => {
-            sectionConfig.inputs.forEach((/**
-             * @param {?} inputConfig
-             * @param {?} inputIndex
-             * @return {?}
-             */
-            (inputConfig, inputIndex) => {
-                /** @type {?} */
+        this._config.fields.forEach((sectionConfig, sectionIndex) => {
+            sectionConfig.inputs.forEach((inputConfig, inputIndex) => {
                 const InputModel = INPUTS_MAP[inputConfig.type];
                 if (!InputModel) {
                     throw Error(`Input type ${inputConfig.type} not supported`);
                 }
-                this._inputs.push(new InputModel(Object.assign({}, inputConfig, { inputIndex, sectionIndex })));
-            }));
-        }));
+                this._inputs.push(new InputModel(Object.assign(Object.assign({}, inputConfig), { inputIndex, sectionIndex })));
+            });
+        });
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _setInputsData() {
-        this._facets.forEach((/**
-         * @param {?} facet
-         * @return {?}
-         */
-        (facet) => this.setInputData(facet.id, facet.data)));
+        this._facets.forEach((facet) => this.setInputData(facet.id, facet.data));
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _getRequestFacets() {
-        /** @type {?} */
         const results = [];
-        this._facets.forEach((/**
-         * @param {?} f
-         * @return {?}
-         */
-        (f) => {
-            /** @type {?} */
+        this._facets.forEach((f) => {
             const facetConfig = Object.assign({}, f);
             if (!f.hasStaticData) {
                 delete facetConfig.data;
@@ -2098,156 +995,50 @@ class SearchModel {
             // searchData control
             if (Array.isArray(facetConfig.data)) {
                 facetConfig.data
-                    .filter((/**
-                 * @param {?} dataItem
-                 * @return {?}
-                 */
-                (dataItem) => typeof dataItem.searchData !== 'undefined'))
-                    .forEach((/**
-                 * @param {?} dataItem
-                 * @return {?}
-                 */
-                (dataItem) => {
+                    .filter((dataItem) => typeof dataItem.searchData !== 'undefined')
+                    .forEach((dataItem) => {
                     delete dataItem.searchData;
-                }));
+                });
             }
             results.push(facetConfig);
-        }));
+        });
         return results;
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchModel.prototype._id;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchModel.prototype._filters;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchModel.prototype._facets;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchModel.prototype._inputs;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchModel.prototype._page;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchModel.prototype._totalCount;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchModel.prototype._config;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchModel.prototype._results$;
-    /** @type {?} */
-    SearchModel.prototype.getId;
-    /** @type {?} */
-    SearchModel.prototype.getFilters;
-    /** @type {?} */
-    SearchModel.prototype.getFacets;
-    /** @type {?} */
-    SearchModel.prototype.getInputs;
-    /** @type {?} */
-    SearchModel.prototype.getConfig;
-    /** @type {?} */
-    SearchModel.prototype.getTotalCount;
-    /** @type {?} */
-    SearchModel.prototype.getFields;
-    /** @type {?} */
-    SearchModel.prototype.getResults$;
-    /** @type {?} */
-    SearchModel.prototype.setResults;
-}
-class SearchService {
+let SearchService = class SearchService {
     constructor() {
         this._models = {};
     }
-    /**
-     * @param {?} id
-     * @param {?} config
-     * @return {?}
-     */
     add(id, config) {
         if (this._models[id]) {
             throw Error(`Search model '${id}' already exists!`);
         }
         this._models[id] = new SearchModel(id, config);
     }
-    /**
-     * @param {?} id
-     * @return {?}
-     */
     remove(id) {
         if (this._models[id]) {
             delete this._models[id];
         }
     }
-    /**
-     * @param {?} id
-     * @return {?}
-     */
     model(id) {
         return this._models[id] || null;
     }
-}
+};
 SearchService.queryParams = null;
-SearchService.decorators = [
-    { type: Injectable, args: [{
-                providedIn: 'root',
-            },] }
-];
-/** @nocollapse */ SearchService.ngInjectableDef = ɵɵdefineInjectable({ factory: function SearchService_Factory() { return new SearchService(); }, token: SearchService, providedIn: "root" });
-if (false) {
-    /** @type {?} */
-    SearchService.queryParams;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchService.prototype._models;
-}
+SearchService.ɵprov = ɵɵdefineInjectable({ factory: function SearchService_Factory() { return new SearchService(); }, token: SearchService, providedIn: "root" });
+SearchService = __decorate([
+    Injectable({
+        providedIn: 'root',
+    })
+], SearchService);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MainLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.destroyed$ = new Subject();
     }
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'main-layout.init':
                     this.dataSource.onInit(payload);
@@ -2263,13 +1054,9 @@ class MainLayoutEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
         // listen to global events
-        EventHandler.globalEvents$.pipe(takeUntil(this.destroyed$)).subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        EventHandler.globalEvents$.pipe(takeUntil(this.destroyed$)).subscribe(({ type, payload }) => {
             switch (type) {
                 case 'global.navigate':
                     this.dataSource.onNavigate(payload);
@@ -2277,140 +1064,57 @@ class MainLayoutEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _listenRouterChanges() {
-        this.route.queryParams.pipe(filter((/**
-         * @param {?} params
-         * @return {?}
-         */
-        (params) => {
+        this.route.queryParams.pipe(filter((params) => {
             if (Object.keys(params).length)
                 return true;
             return false;
-        }))).subscribe((/**
-         * @param {?} params
-         * @return {?}
-         */
-        (params) => {
+        })).subscribe((params) => {
             this.emitGlobal('queryparams', params);
             // to use in searchs
             SearchService.queryParams = params;
-        }));
+        });
         // router changed
-        this.router.events.pipe(filter((/**
-         * @param {?} event
-         * @return {?}
-         */
-        (event) => event instanceof NavigationStart))).subscribe((/**
-         * @return {?}
-         */
-        () => {
+        this.router.events.pipe(filter((event) => event instanceof NavigationStart)).subscribe(() => {
             window.scrollTo(0, 0);
             this.dataSource.onRouterChanged();
-        }));
+        });
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _listenMainStateChanges() {
         this.mainState.addCustom('currentNav', new Subject());
-        this.mainState.getCustom$('currentNav').subscribe((/**
-         * @param {?} val
-         * @return {?}
-         */
-        (val) => {
+        this.mainState.getCustom$('currentNav').subscribe((val) => {
             this.emitOuter('currentnavchange', val);
-        }));
+        });
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    MainLayoutEH.prototype.destroyed$;
-    /**
-     * @type {?}
-     * @private
-     */
-    MainLayoutEH.prototype.route;
-    /**
-     * @type {?}
-     * @private
-     */
-    MainLayoutEH.prototype.router;
-    /**
-     * @type {?}
-     * @private
-     */
-    MainLayoutEH.prototype.mainState;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class HeaderDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         return data.items;
     }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     onCurrentNavChange(payload) {
-        this.output.nav.items.forEach((/**
-         * @param {?} item
-         * @return {?}
-         */
-        (item) => {
+        this.output.nav.items.forEach((item) => {
             if (item._meta.id === payload) {
                 item.classes = 'is-current';
             }
             else {
                 item.classes = '';
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class SubnavDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         return {
             classes: 'main-subnav',
             items: data,
         };
     }
-    /**
-     * @param {?} id
-     * @return {?}
-     */
     setActive(id) {
-        this.output.items.forEach((/**
-         * @param {?} item
-         * @return {?}
-         */
-        (item) => {
+        this.output.items.forEach((item) => {
             if (item._meta.id === id) {
                 item.classes = 'is-current';
                 item._meta.isActive = true;
@@ -2419,154 +1123,69 @@ class SubnavDS extends DataSource {
                 item.classes = '';
                 item._meta.isActive = false;
             }
-        }));
+        });
     }
-    /**
-     * @return {?}
-     */
     getActive() {
-        return this.output.items.filter((/**
-         * @param {?} item
-         * @return {?}
-         */
-        (item) => item._meta.isActive))[0] || null;
+        return this.output.items.filter((item) => item._meta.isActive)[0] || null;
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class BreadcrumbsDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         return data;
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class FacetsDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} __0
-     * @return {?}
-     */
     transform({ fields }) {
         const { searchModel } = this.options;
         this.searchModel = searchModel;
         return fields;
     }
 }
-if (false) {
-    /** @type {?} */
-    FacetsDS.prototype.searchModel;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const HEADER_ICON_OPEN = 'n7-icon-angle-down';
-/** @type {?} */
 const HEADER_ICON_CLOSE = 'n7-icon-angle-right';
 class FacetsWrapperDS extends DataSource {
     constructor() {
         super(...arguments);
-        this.getRequestParams = (/**
-         * @return {?}
-         */
-        () => this.searchModel.getRequestParams());
-        this.filtersAsQueryParams = (/**
-         * @param {?} filters
-         * @return {?}
-         */
-        (filters) => this.searchModel.filtersAsQueryParams(filters));
-        this.updateFiltersFromQueryParams = (/**
-         * @param {?} queryParams
-         * @return {?}
-         */
-        (queryParams) => {
+        this.getRequestParams = () => this.searchModel.getRequestParams();
+        this.filtersAsQueryParams = (filters) => this.searchModel.filtersAsQueryParams(filters);
+        this.updateFiltersFromQueryParams = (queryParams) => {
             this.searchModel.updateFiltersFromQueryParams(queryParams);
-        });
-        this.getInputByFacetId = (/**
-         * @param {?} facetId
-         * @return {?}
-         */
-        (facetId) => this.searchModel.getInputByFacetId(facetId));
-        this.filterTarget = (/**
-         * @param {?} target
-         * @return {?}
-         */
-        (target) => {
+        };
+        this.getInputByFacetId = (facetId) => this.searchModel.getInputByFacetId(facetId);
+        this.filterTarget = (target) => {
             this.searchModel.filterTarget(target);
-        });
-        this.updateInputsFromFilters = (/**
-         * @return {?}
-         */
-        () => {
+        };
+        this.updateInputsFromFilters = () => {
             this.searchModel.updateInputsFromFilters();
-        });
+        };
     }
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         if (!this.searchModel) {
             this.searchModel = data.searchModel;
         }
-        /** @type {?} */
         const id = this.searchModel.getId();
-        /** @type {?} */
         const fields = this.searchModel.getFields();
-        /** @type {?} */
         const groups = [];
-        fields.forEach((/**
-         * @param {?} fieldConfig
-         * @param {?} fieldIndex
-         * @return {?}
-         */
-        (fieldConfig, fieldIndex) => {
-            /** @type {?} */
+        fields.forEach((fieldConfig, fieldIndex) => {
             const groupId = `group-${id}-${fieldIndex}`;
             // header config
-            /** @type {?} */
             const header = this._headerConfig(fieldConfig.header, groupId);
             // inputs config
-            /** @type {?} */
             const sections = [];
             this.searchModel.getInputs()
-                .filter((/**
-             * @param {?} input
-             * @return {?}
-             */
-            (input) => input.getSectionIndex() === fieldIndex))
-                .map((/**
-             * @param {?} input
-             * @return {?}
-             */
-            (input) => {
+                .filter((input) => input.getSectionIndex() === fieldIndex)
+                .map((input) => {
                 input.update();
                 return {
                     facetId: input.getFacetId(),
                     type: input.getType(),
                     output: input.getOutput(),
                 };
-            }))
-                .forEach((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ type, output, facetId }) => {
+            })
+                .forEach(({ type, output, facetId }) => {
                 sections.push({
                     classes: this._getSectionClasses(type),
                     inputs: Array.isArray(output) ? output : [output],
@@ -2574,7 +1193,7 @@ class FacetsWrapperDS extends DataSource {
                         facetId,
                     },
                 });
-            }));
+            });
             groups.push({
                 header,
                 facet: { sections },
@@ -2584,41 +1203,25 @@ class FacetsWrapperDS extends DataSource {
                     groupId,
                 },
             });
-        }));
+        });
         return {
             groups,
             classes: `n7-facets-wrapper__${this.searchModel.getId()}`,
         };
     }
-    /**
-     * @param {?} __0
-     * @return {?}
-     */
     toggleGroup({ eventPayload }) {
-        this.output.groups.forEach((/**
-         * @param {?} group
-         * @return {?}
-         */
-        (group) => {
+        this.output.groups.forEach((group) => {
             if (group._meta.groupId === eventPayload.groupId) {
                 group.isOpen = !group.isOpen;
                 group.header.iconRight = group.isOpen ? HEADER_ICON_OPEN : HEADER_ICON_CLOSE;
             }
-        }));
+        });
     }
-    /**
-     * @param {?} __0
-     * @return {?}
-     */
     onFacetChange({ eventPayload }) {
         const { facetId, source, trigger } = eventPayload.inputPayload;
-        /** @type {?} */
         const filter = this.searchModel.getFiltersByFacetId(facetId)[0] || { value: null };
-        /** @type {?} */
         const filterValue = filter.value;
-        /** @type {?} */
         let remove = false;
-        /** @type {?} */
         let value = eventPayload.inputPayload.value || eventPayload.value;
         // normalize
         value = `${value}`;
@@ -2636,97 +1239,39 @@ class FacetsWrapperDS extends DataSource {
         this.searchModel.updateFilter(facetId, value, remove);
         this.searchModel.updateInputsFromFilters();
     }
-    /**
-     * @param {?} target
-     * @return {?}
-     */
     updateFilteredTarget(target) {
-        /** @type {?} */
         const input = this.searchModel.getInputByFacetId(target);
         this.output.groups
-            .map((/**
-         * @param {?} group
-         * @return {?}
-         */
-        (group) => group.facet))
-            .map((/**
-         * @param {?} facet
-         * @return {?}
-         */
-        (facet) => facet.sections))
-            .forEach((/**
-         * @param {?} sections
-         * @return {?}
-         */
-        (sections) => {
-            sections.forEach((/**
-             * @param {?} section
-             * @return {?}
-             */
-            (section) => {
+            .map((group) => group.facet)
+            .map((facet) => facet.sections)
+            .forEach((sections) => {
+            sections.forEach((section) => {
                 if (section._meta.facetId === target) {
-                    /** @type {?} */
                     const inputOutput = input.getOutput();
                     section.inputs = Array.isArray(inputOutput) ? inputOutput : [inputOutput];
                 }
-            }));
-        }));
+            });
+        });
     }
-    /**
-     * @return {?}
-     */
     updateInputLinks() {
-        /** @type {?} */
         const linksFacetIds = this.searchModel.getInputs()
-            .filter((/**
-         * @param {?} input
-         * @return {?}
-         */
-        (input) => input.getType() === 'link'))
-            .map((/**
-         * @param {?} input
-         * @return {?}
-         */
-        (input) => input.getFacetId()));
+            .filter((input) => input.getType() === 'link')
+            .map((input) => input.getFacetId());
         this.output.groups
-            .map((/**
-         * @param {?} group
-         * @return {?}
-         */
-        (group) => group.facet))
-            .map((/**
-         * @param {?} facet
-         * @return {?}
-         */
-        (facet) => facet.sections))
-            .forEach((/**
-         * @param {?} sections
-         * @return {?}
-         */
-        (sections) => {
-            sections.forEach((/**
-             * @param {?} section
-             * @return {?}
-             */
-            (section) => {
+            .map((group) => group.facet)
+            .map((facet) => facet.sections)
+            .forEach((sections) => {
+            sections.forEach((section) => {
                 if (linksFacetIds.indexOf(section._meta.facetId) !== -1) {
-                    /** @type {?} */
                     const input = this.searchModel.getInputByFacetId(section._meta.facetId);
                     input.update();
-                    /** @type {?} */
                     const inputOutput = input.getOutput();
                     section.inputs = Array.isArray(inputOutput) ? inputOutput : [inputOutput];
                 }
-            }));
-        }));
+            });
+        });
     }
-    /**
-     * @private
-     * @param {?} type
-     * @return {?}
-     */
     _getSectionClasses(type) {
-        /** @type {?} */
         const classesMap = {
             text: 'text',
             checkbox: 'checkboxes',
@@ -2735,12 +1280,6 @@ class FacetsWrapperDS extends DataSource {
         };
         return `n7-facet__section-input-${classesMap[type]}`;
     }
-    /**
-     * @private
-     * @param {?} header
-     * @param {?} groupId
-     * @return {?}
-     */
     _headerConfig(header, groupId) {
         return header ? {
             text: header.label,
@@ -2757,33 +1296,8 @@ class FacetsWrapperDS extends DataSource {
         } : null;
     }
 }
-if (false) {
-    /** @type {?} */
-    FacetsWrapperDS.prototype.searchModel;
-    /** @type {?} */
-    FacetsWrapperDS.prototype.getRequestParams;
-    /** @type {?} */
-    FacetsWrapperDS.prototype.filtersAsQueryParams;
-    /** @type {?} */
-    FacetsWrapperDS.prototype.updateFiltersFromQueryParams;
-    /** @type {?} */
-    FacetsWrapperDS.prototype.getInputByFacetId;
-    /** @type {?} */
-    FacetsWrapperDS.prototype.filterTarget;
-    /** @type {?} */
-    FacetsWrapperDS.prototype.updateInputsFromFilters;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class FooterDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         if (!data) {
             return null;
@@ -2792,44 +1306,26 @@ class FooterDS extends DataSource {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class SmartPaginationDS extends DataSource {
     constructor() {
         super(...arguments);
-        this.paginationBuilder = (/**
-         * @param {?} tp
-         * @param {?} cp
-         * @param {?} pl
-         * @param {?} m
-         * @param {?} href
-         * @param {?} qp
-         * @return {?}
-         */
-        (tp, cp, pl, m, href, qp) => {
-            /** @type {?} */
+        this.paginationBuilder = (tp, cp, pl, m, href, qp) => {
             const result = [];
             /*
-                  tp - total pages
-                  cp - current page
-                  pl - page limit
-                  m - pagination mode (href or payloads)
-                  href - href for anchor wrapper
-                  qp - query params for pagination
-                */
-            /** @type {?} */
+              tp - total pages
+              cp - current page
+              pl - page limit
+              m - pagination mode (href or payloads)
+              href - href for anchor wrapper
+              qp - query params for pagination
+            */
             let limit = pl;
             if (tp <= limit) {
                 limit = tp - 1;
             }
             if (limit) {
-                /** @type {?} */
-                let lp;
-                // last page
-                /** @type {?} */
-                let fp;
+                let lp; // last page
+                let fp; // first page
                 if (cp > Math.floor(limit / 2)) {
                     if (tp === 2) {
                         lp = tp;
@@ -2893,13 +1389,8 @@ class SmartPaginationDS extends DataSource {
                     anchor: cp !== tp ? this._getPaginationAnchor(tp, m, href, qp) : null,
                 },
             };
-        });
+        };
     }
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         const { totalPages, currentPage, pageLimit, sizes, } = data;
         const { mode, href, queryParams } = this.options;
@@ -2916,26 +1407,14 @@ class SmartPaginationDS extends DataSource {
             links,
             select: sizes ? {
                 label: 'Numero di risultati',
-                options: sizes.list.map((/**
-                 * @param {?} s
-                 * @return {?}
-                 */
-                (s) => ({
+                options: sizes.list.map((s) => ({
                     text: s,
                     selected: s === sizes.active,
-                }))),
+                })),
                 payload: 'select-size',
             } : null,
         };
     }
-    /**
-     * @private
-     * @param {?} page
-     * @param {?} mode
-     * @param {?} href
-     * @param {?} queryParams
-     * @return {?}
-     */
     _getPaginationAnchor(page, mode, href, queryParams) {
         switch (mode) {
             case 'payload':
@@ -2945,7 +1424,7 @@ class SmartPaginationDS extends DataSource {
             case 'href':
                 return {
                     href: queryParams ? href : href + page,
-                    queryParams: queryParams ? Object.assign({}, queryParams, { page }) : null,
+                    queryParams: queryParams ? Object.assign(Object.assign({}, queryParams), { page }) : null,
                 };
             default:
                 break;
@@ -2953,20 +1432,9 @@ class SmartPaginationDS extends DataSource {
         return {};
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    SmartPaginationDS.prototype.paginationBuilder;
-}
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 
 var DS = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     HeaderDS: HeaderDS,
     SubnavDS: SubnavDS,
     BreadcrumbsDS: BreadcrumbsDS,
@@ -2976,20 +1444,9 @@ var DS = /*#__PURE__*/Object.freeze({
     SmartPaginationDS: SmartPaginationDS
 });
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class HeaderEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.outerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'main-layout.currentnavchange':
                     this.dataSource.onCurrentNavChange(payload);
@@ -2997,24 +1454,13 @@ class HeaderEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class SubnavEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'subnav.click':
                     // navigate control
@@ -3027,24 +1473,13 @@ class SubnavEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class BreadcrumbsEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'breadcrumbs.click':
                     // navigate control
@@ -3057,14 +1492,10 @@ class BreadcrumbsEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class FacetsWrapperEH extends EventHandler {
     constructor() {
         super(...arguments);
@@ -3072,16 +1503,9 @@ class FacetsWrapperEH extends EventHandler {
         this.internalFacetsChange$ = new Subject();
         this.externalFacetsChange$ = new Subject();
     }
-    /**
-     * @return {?}
-     */
     listen() {
         // listen to inner (widget) events
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'facets-wrapper.facet':
                     {
@@ -3090,9 +1514,7 @@ class FacetsWrapperEH extends EventHandler {
                             return;
                         }
                         const { facetId } = payload.eventPayload.inputPayload;
-                        /** @type {?} */
                         const input = this.dataSource.getInputByFacetId(facetId);
-                        /** @type {?} */
                         const context = input.getContext();
                         this._facetsChanged = true;
                         // update
@@ -3113,70 +1535,42 @@ class FacetsWrapperEH extends EventHandler {
                 default:
                     break;
             }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
             if (type.indexOf('queryparamschange') !== -1 && this.dataSource.searchModel) {
                 this.dataSource.updateFiltersFromQueryParams(payload);
                 this.dataSource.updateInputsFromFilters();
             }
-        }));
+        });
         // listen to global events
-        EventHandler.globalEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        EventHandler.globalEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'global.searchresponse':
                     if (this.dataSource.searchModel && this.dataSource.searchModel.getId() === payload) {
                         this.dataSource.updateInputLinks();
-                        /** @type {?} */
                         const internalFilters = this.dataSource.searchModel.getInternalFilters();
-                        internalFilters.forEach((/**
-                         * @param {?} filter
-                         * @return {?}
-                         */
-                        (filter) => {
-                            /** @type {?} */
+                        internalFilters.forEach((filter) => {
                             const input = this.dataSource.searchModel.getInputByFacetId(filter.facetId);
-                            /** @type {?} */
                             const target = input.getTarget();
                             this.dataSource.filterTarget(target);
                             this.dataSource.updateFilteredTarget(target);
-                        }));
+                        });
                     }
                     break;
                 default:
                     break;
             }
-        }));
+        });
         // internal facets change
-        this.internalFacetsChange$.pipe(debounceTime(500)).subscribe((/**
-         * @param {?} target
-         * @return {?}
-         */
-        (target) => {
+        this.internalFacetsChange$.pipe(debounceTime(500)).subscribe((target) => {
             this.dataSource.filterTarget(target);
             this.dataSource.updateFilteredTarget(target);
-        }));
+        });
         // internal facets change
-        this.externalFacetsChange$.pipe(debounceTime(500)).subscribe((/**
-         * @return {?}
-         */
-        () => {
-            /** @type {?} */
+        this.externalFacetsChange$.pipe(debounceTime(500)).subscribe(() => {
             const requestParams = this.dataSource.getRequestParams();
-            /** @type {?} */
             const queryParams = this.dataSource.filtersAsQueryParams(requestParams.filters);
-            Object.keys(queryParams).forEach((/**
-             * @param {?} key
-             * @return {?}
-             */
-            (key) => { queryParams[key] = queryParams[key] || null; }));
+            Object.keys(queryParams).forEach((key) => { queryParams[key] = queryParams[key] || null; });
             // signal
             this.emitOuter('facetschange');
             // reset page
@@ -3187,54 +1581,19 @@ class FacetsWrapperEH extends EventHandler {
                 path: [],
                 queryParams,
             });
-        }));
+        });
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    FacetsWrapperEH.prototype._facetsChanged;
-    /**
-     * @type {?}
-     * @private
-     */
-    FacetsWrapperEH.prototype.internalFacetsChange$;
-    /**
-     * @type {?}
-     * @private
-     */
-    FacetsWrapperEH.prototype.externalFacetsChange$;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class FooterEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
         // no events
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class SmartPaginationEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'n7-smart-pagination.change':
                     this.emitOuter('change', payload);
@@ -3246,16 +1605,12 @@ class SmartPaginationEH extends EventHandler {
                     console.warn('unhandled inner event of type', type);
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
 var EH = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     HeaderEH: HeaderEH,
     SubnavEH: SubnavEH,
     BreadcrumbsEH: BreadcrumbsEH,
@@ -3264,11 +1619,6 @@ var EH = /*#__PURE__*/Object.freeze({
     SmartPaginationEH: SmartPaginationEH
 });
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const MainLayoutConfig = {
     layoutId: 'main-layout',
     widgets: [{
@@ -3289,19 +1639,7 @@ const MainLayoutConfig = {
     },
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class MainLayoutComponent extends AbstractLayout {
-    /**
-     * @param {?} router
-     * @param {?} route
-     * @param {?} configuration
-     * @param {?} layoutsConfiguration
-     * @param {?} mainState
-     * @param {?} titleService
-     */
+let MainLayoutComponent = class MainLayoutComponent extends AbstractLayout {
     constructor(router, route, configuration, layoutsConfiguration, mainState, titleService) {
         super(layoutsConfiguration.get('MainLayoutConfig') || MainLayoutConfig);
         this.router = router;
@@ -3311,10 +1649,6 @@ class MainLayoutComponent extends AbstractLayout {
         this.mainState = mainState;
         this.titleService = titleService;
     }
-    /**
-     * @protected
-     * @return {?}
-     */
     initPayload() {
         return {
             configuration: this.configuration,
@@ -3325,26 +1659,13 @@ class MainLayoutComponent extends AbstractLayout {
             options: this.config.options || {},
         };
     }
-    /**
-     * @return {?}
-     */
     ngOnInit() {
         this.onInit();
     }
-    /**
-     * @return {?}
-     */
     ngOnDestroy() {
         this.onDestroy();
     }
-}
-MainLayoutComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'main-layout',
-                template: "<div class=\"n7-main-layout\" id=\"main-layout\">\n    <div class=\"n7-page-content\">\n        <n7-header\n            [data]=\"lb.widgets['header'].ds.out$ | async\"\n            [emit]=\"lb.widgets['header'].emit\">\n        </n7-header>\n        <main class=\"n7-content\">\n            <div class=\"n7-top-page-bar\">\n                <div class=\"n7-top-page-bar__main\"></div>\n            </div>\n            <div class=\"n7-alert-bar\">\n                <!--<n7-alert\n                [attr.id]=\"'main-layout-alert'\"\n                [data]=\"lb.dataSource.alertData$ | async\"\n                [emit]=\"lb.dataSource.closeAlert.bind(lb.dataSource)\"></n7-alert>-->\n            </div>\n            <ng-content></ng-content>\n        </main>\n    </div>\n    <n7-footer\n        [data]=\"lb.widgets['footer'].ds.out$ | async\" \n        [emit]=\"lb.widgets['footer'].emit\">\n    </n7-footer>\n</div>\n"
-            }] }
-];
-/** @nocollapse */
+};
 MainLayoutComponent.ctorParameters = () => [
     { type: Router },
     { type: ActivatedRoute },
@@ -3353,75 +1674,32 @@ MainLayoutComponent.ctorParameters = () => [
     { type: MainStateService },
     { type: Title }
 ];
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    MainLayoutComponent.prototype.router;
-    /**
-     * @type {?}
-     * @private
-     */
-    MainLayoutComponent.prototype.route;
-    /**
-     * @type {?}
-     * @private
-     */
-    MainLayoutComponent.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    MainLayoutComponent.prototype.layoutsConfiguration;
-    /**
-     * @type {?}
-     * @private
-     */
-    MainLayoutComponent.prototype.mainState;
-    /**
-     * @type {?}
-     * @private
-     */
-    MainLayoutComponent.prototype.titleService;
-}
+MainLayoutComponent = __decorate([
+    Component({
+        selector: 'main-layout',
+        template: "<div class=\"n7-main-layout\" id=\"main-layout\">\n    <div class=\"n7-page-content\">\n        <n7-header\n            [data]=\"lb.widgets['header'].ds.out$ | async\"\n            [emit]=\"lb.widgets['header'].emit\">\n        </n7-header>\n        <main class=\"n7-content\">\n            <div class=\"n7-top-page-bar\">\n                <div class=\"n7-top-page-bar__main\"></div>\n            </div>\n            <div class=\"n7-alert-bar\">\n                <!--<n7-alert\n                [attr.id]=\"'main-layout-alert'\"\n                [data]=\"lb.dataSource.alertData$ | async\"\n                [emit]=\"lb.dataSource.closeAlert.bind(lb.dataSource)\"></n7-alert>-->\n            </div>\n            <ng-content></ng-content>\n        </main>\n    </div>\n    <n7-footer\n        [data]=\"lb.widgets['footer'].ds.out$ | async\" \n        [emit]=\"lb.widgets['footer'].emit\">\n    </n7-footer>\n</div>\n"
+    }),
+    __metadata("design:paramtypes", [Router,
+        ActivatedRoute,
+        ConfigurationService,
+        LayoutsConfigurationService,
+        MainStateService,
+        Title])
+], MainLayoutComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class Page404LayoutDS extends LayoutDataSource {
-    /**
-     * @param {?} __0
-     * @return {?}
-     */
     onInit({ options }) {
         this.options = options;
     }
 }
-if (false) {
-    /** @type {?} */
-    Page404LayoutDS.prototype.options;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class Page404LayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.destroyed$ = new Subject();
     }
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'n7-page404-layout.init':
                     this.dataSource.onInit(payload);
@@ -3432,7 +1710,7 @@ class Page404LayoutEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
         // listen to global events
         /* EventHandler.globalEvents$.pipe(
           takeUntil(this.destroyed$)
@@ -3448,19 +1726,7 @@ class Page404LayoutEH extends EventHandler {
         }); */
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    Page404LayoutEH.prototype.destroyed$;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const Page404LayoutConfig = {
     layoutId: 'n7-page404-layout',
     widgets: [],
@@ -3473,152 +1739,99 @@ const Page404LayoutConfig = {
     },
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class Page404LayoutComponent extends AbstractLayout {
-    /**
-     * @param {?} layoutsConfiguration
-     */
+let Page404LayoutComponent = class Page404LayoutComponent extends AbstractLayout {
     constructor(layoutsConfiguration) {
         super(layoutsConfiguration.get('Page404LayoutConfig') || Page404LayoutConfig);
     }
-    /**
-     * @protected
-     * @return {?}
-     */
     initPayload() {
         return {
             options: this.config.options || {},
         };
     }
-    /**
-     * @return {?}
-     */
     ngOnInit() {
         this.onInit();
     }
-    /**
-     * @return {?}
-     */
     ngOnDestroy() {
         this.onDestroy();
     }
-}
-Page404LayoutComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'n7-page404-layout',
-                template: "<div class=\"n7-page404-layout\">\n    404 - Resource not found\n</div>"
-            }] }
-];
-/** @nocollapse */
+};
 Page404LayoutComponent.ctorParameters = () => [
     { type: LayoutsConfigurationService }
 ];
+Page404LayoutComponent = __decorate([
+    Component({
+        selector: 'n7-page404-layout',
+        template: "<div class=\"n7-page404-layout\">\n    404 - Resource not found\n</div>"
+    }),
+    __metadata("design:paramtypes", [LayoutsConfigurationService])
+], Page404LayoutComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class FacetsWrapperComponent {
-    /**
-     * @param {?} eventType
-     * @param {?} eventPayload
-     * @return {?}
-     */
+let FacetsWrapperComponent = class FacetsWrapperComponent {
     headerEmit(eventType, eventPayload) {
         if (!this.emit) {
             return;
         }
         this.emit('facetheader', { eventType, eventPayload });
     }
-    /**
-     * @param {?} eventType
-     * @param {?} eventPayload
-     * @return {?}
-     */
     facetEmit(eventType, eventPayload) {
         if (!this.emit) {
             return;
         }
         this.emit('facet', { eventType, eventPayload });
     }
-}
-FacetsWrapperComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'n7-facets-wrapper',
-                template: "<div *ngIf=\"data\" class=\"n7-facets-wrapper {{ data.classes || '' }}\">\n    <div *ngFor=\"let group of data.groups\" class=\"n7-facets-wrapper__group {{ group.classes || '' }}\">\n        <n7-facet-header\n            [data]=\"group.header\"\n            [emit]=\"headerEmit.bind(this)\"\n        ></n7-facet-header>\n\n        <n7-facet\n            *ngIf=\"group.isOpen\"\n            [data]=\"group.facet\"\n            [emit]=\"facetEmit.bind(this)\"\n        ></n7-facet>\n    </div>\n</div>"
-            }] }
-];
-FacetsWrapperComponent.propDecorators = {
-    data: [{ type: Input }],
-    emit: [{ type: Input }]
 };
-if (false) {
-    /** @type {?} */
-    FacetsWrapperComponent.prototype.data;
-    /** @type {?} */
-    FacetsWrapperComponent.prototype.emit;
-}
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], FacetsWrapperComponent.prototype, "data", void 0);
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], FacetsWrapperComponent.prototype, "emit", void 0);
+FacetsWrapperComponent = __decorate([
+    Component({
+        selector: 'n7-facets-wrapper',
+        template: "<div *ngIf=\"data\" class=\"n7-facets-wrapper {{ data.classes || '' }}\">\n    <div *ngFor=\"let group of data.groups\" class=\"n7-facets-wrapper__group {{ group.classes || '' }}\">\n        <n7-facet-header\n            [data]=\"group.header\"\n            [emit]=\"headerEmit.bind(this)\"\n        ></n7-facet-header>\n\n        <n7-facet\n            *ngIf=\"group.isOpen\"\n            [data]=\"group.facet\"\n            [emit]=\"facetEmit.bind(this)\"\n        ></n7-facet>\n    </div>\n</div>"
+    })
+], FacetsWrapperComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class SmartPaginationComponent {
+let SmartPaginationComponent = class SmartPaginationComponent {
     constructor() {
         this.handlePaginationEvent.bind(this);
     }
-    /**
-     * @param {?} type
-     * @param {?} payload
-     * @return {?}
-     */
     handlePaginationEvent(type, payload) {
         if (!this.emit)
             return;
         this.emit('change', payload);
     }
-}
-SmartPaginationComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'n7-smart-pagination',
-                template: "<div class=\"n7-smart-pagination\" *ngIf=\"data\">\n  <n7-pagination\n    [data]=\"data\"\n    [emit]=\"emit\">\n  </n7-pagination>\n</div>"
-            }] }
-];
-/** @nocollapse */
-SmartPaginationComponent.ctorParameters = () => [];
-SmartPaginationComponent.propDecorators = {
-    data: [{ type: Input }],
-    emit: [{ type: Input }]
 };
-if (false) {
-    /** @type {?} */
-    SmartPaginationComponent.prototype.data;
-    /** @type {?} */
-    SmartPaginationComponent.prototype.emit;
-}
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], SmartPaginationComponent.prototype, "data", void 0);
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], SmartPaginationComponent.prototype, "emit", void 0);
+SmartPaginationComponent = __decorate([
+    Component({
+        selector: 'n7-smart-pagination',
+        template: "<div class=\"n7-smart-pagination\" *ngIf=\"data\">\n  <n7-pagination\n    [data]=\"data\"\n    [emit]=\"emit\">\n  </n7-pagination>\n</div>"
+    }),
+    __metadata("design:paramtypes", [])
+], SmartPaginationComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
+var N7BoilerplateCommonModule_1;
 const COMPONENTS = [
     MainLayoutComponent,
     Page404LayoutComponent,
     FacetsWrapperComponent,
     SmartPaginationComponent,
 ];
-class N7BoilerplateCommonModule {
-    /**
-     * @param {?} config
-     * @return {?}
-     */
+let N7BoilerplateCommonModule = N7BoilerplateCommonModule_1 = class N7BoilerplateCommonModule {
     static forRoot(config) {
         return {
-            ngModule: N7BoilerplateCommonModule,
+            ngModule: N7BoilerplateCommonModule_1,
             providers: [
                 MainStateService,
                 ConfigurationService,
@@ -3628,147 +1841,65 @@ class N7BoilerplateCommonModule {
             ],
         };
     }
-}
-N7BoilerplateCommonModule.decorators = [
-    { type: NgModule, args: [{
-                declarations: COMPONENTS,
-                imports: [
-                    CommonModule,
-                    HttpClientModule,
-                    DvComponentsLibModule,
-                ],
-                providers: [],
-                entryComponents: COMPONENTS,
-                exports: COMPONENTS,
-            },] }
-];
+};
+N7BoilerplateCommonModule = N7BoilerplateCommonModule_1 = __decorate([
+    NgModule({
+        declarations: COMPONENTS,
+        imports: [
+            CommonModule,
+            HttpClientModule,
+            DvComponentsLibModule,
+        ],
+        providers: [],
+        entryComponents: COMPONENTS,
+        exports: COMPONENTS,
+    })
+], N7BoilerplateCommonModule);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-const metadataIsEmpty = (/**
- * @param {?} value
- * @return {?}
- */
-(value) => (!value || value === 'null'));
+const metadataIsEmpty = (value) => (!value || value === 'null');
 const ɵ0 = metadataIsEmpty;
-/** @type {?} */
-const isLink = (/**
- * @param {?} fields
- * @return {?}
- */
-(fields) => !!fields.filter((/**
- * @param {?} __0
- * @return {?}
- */
-({ key }) => key === 'isLink')).length);
+const isLink = (fields) => !!fields.filter(({ key }) => key === 'isLink').length;
 const ɵ1 = isLink;
-/** @type {?} */
-const isRepeater = (/**
- * @param {?} fields
- * @return {?}
- */
-(fields) => Array.isArray(fields));
+const isRepeater = (fields) => Array.isArray(fields);
 const ɵ2 = isRepeater;
-/** @type {?} */
-const getLink = (/**
- * @param {?} fields
- * @param {?} paths
- * @return {?}
- */
-(fields, paths) => {
-    /** @type {?} */
+const getLink = (fields, paths) => {
     const schedaTypes = ['oggetto-culturale', 'aggregazione-logica'];
-    /** @type {?} */
-    const label = fields.find((/**
-     * @param {?} __0
-     * @return {?}
-     */
-    ({ key }) => key === 'label')).value;
-    /** @type {?} */
+    const label = fields.find(({ key }) => key === 'label').value;
     const slug = helpers.slugify(label);
-    /** @type {?} */
-    const id = fields.find((/**
-     * @param {?} __0
-     * @return {?}
-     */
-    ({ key }) => key === 'id')).value;
-    /** @type {?} */
-    const type = fields.find((/**
-     * @param {?} __0
-     * @return {?}
-     */
-    ({ key }) => key === 'type')).value;
-    /** @type {?} */
+    const id = fields.find(({ key }) => key === 'id').value;
+    const type = fields.find(({ key }) => key === 'type').value;
     let basePath = paths.entitaBasePath;
     if (schedaTypes.includes(type)) {
         basePath = paths.schedaBasePath;
     }
     return `<a href="${basePath}${id}/${slug}">${label}</a>`;
-});
+};
 const ɵ3 = getLink;
-/** @type {?} */
-const getRepeater = (/**
- * @param {?} fields
- * @param {?} labels
- * @param {?} metadataToShow
- * @param {?} type
- * @return {?}
- */
-(fields, labels, metadataToShow, type) => {
-    /** @type {?} */
+const getRepeater = (fields, labels, metadataToShow, type) => {
     const html = [];
     fields
-        .filter((/**
-     * @param {?} __0
-     * @return {?}
-     */
-    ({ key, value }) => metadataToShow.includes(key) && !metadataIsEmpty(value)))
-        .map((/**
-     * @param {?} __0
-     * @return {?}
-     */
-    ({ key, value }) => ({
+        .filter(({ key, value }) => metadataToShow.includes(key) && !metadataIsEmpty(value))
+        .map(({ key, value }) => ({
         key,
         value,
         order: metadataToShow.indexOf(key),
         label: helpers.prettifySnakeCase(key, labels[`${type}.${key}`])
-    })))
-        .sort((/**
-     * @param {?} a
-     * @param {?} b
-     * @return {?}
-     */
-    (a, b) => a.order - b.order))
-        .forEach((/**
-     * @param {?} __0
-     * @return {?}
-     */
-    ({ label, value }) => {
+    }))
+        .sort((a, b) => a.order - b.order)
+        .forEach(({ label, value }) => {
         html.push(`<dt>${label}</dt>`);
         html.push(`<dd>${value}</dd>`);
-    }));
+    });
     return html.length
         ? `<dl>${html.join('')}</dl>`
         : null;
-});
+};
 const ɵ4 = getRepeater;
 var metadataHelper = {
-    normalize: (/**
-     * @param {?} __0
-     * @return {?}
-     */
-    ({ fields: data, paths, labels, metadataToShow, type }) => {
-        /** @type {?} */
+    normalize: ({ fields: data, paths, labels, metadataToShow, type }) => {
         const result = [];
         if (Array.isArray(data)) {
-            data.forEach((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ key, value, label, fields }) => {
+            data.forEach(({ key, value, label, fields }) => {
                 // link & repeater control
                 if (fields && Array.isArray(fields)) {
                     if (isLink(fields)) {
@@ -3782,72 +1913,43 @@ var metadataHelper = {
                 else {
                     result.push({ key, value });
                 }
-            }));
+            });
         }
         return result
-            .filter((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ key, value }) => metadataToShow.includes(key) && !metadataIsEmpty(value)))
-            .map((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ key, value }) => ({
+            .filter(({ key, value }) => metadataToShow.includes(key) && !metadataIsEmpty(value))
+            .map(({ key, value }) => ({
             key,
             value,
             order: metadataToShow.indexOf(key),
             label: helpers.prettifySnakeCase(key, labels[`${type}.${key}`]),
-        })))
-            .sort((/**
-         * @param {?} a
-         * @param {?} b
-         * @return {?}
-         */
-        (a, b) => a.order - b.order));
-    })
+        }))
+            .sort((a, b) => a.order - b.order);
+    }
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwEntitaLayoutDS extends LayoutDataSource {
     constructor() {
         super(...arguments);
         this.hasMetadataFields = false;
-        // selected nav item
         this.navHeader = {}; // nav-header (custom) data
-        // pagination value (url param)
         this.pageSize = 10; // linked objects page size
-        // linked objects page size
         // ===== BUBBLE CHART =====
         this.bubblesSize = 10; // related entities (bubbles) page size
-        this.updateComponent = (/**
-         * @param {?} id
-         * @param {?} data
-         * @param {?=} options
-         * @return {?}
-         */
-        (id, data, options) => {
+        this.updateComponent = (id, data, options) => {
             if (options) {
                 this.one(id).updateOptions(options);
             }
             this.one(id).update(data);
-        });
+        };
         // DEPRECATED
         /* getNavigation(id) {
-            // Requests data from communication provider
-            return this.communication.request$('getEntityDetails', {
-              onError: (error) => console.error(error),
-              params: { entityId: id, entitiesListSize: this.bubblesSize },
-            });
-          } */
-        this.drawPagination = (/**
-         * @return {?}
-         */
-        () => {
+          // Requests data from communication provider
+          return this.communication.request$('getEntityDetails', {
+            onError: (error) => console.error(error),
+            params: { entityId: id, entitiesListSize: this.bubblesSize },
+          });
+        } */
+        this.drawPagination = () => {
             if (!this.myResponse.relatedItems)
                 return;
             const { href, queryParams } = this._getPaginationParams();
@@ -3865,11 +1967,8 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                     active: this.pageSize,
                 },
             });
-        });
-        this.handlePageNavigation = (/**
-         * @return {?}
-         */
-        () => {
+        };
+        this.handlePageNavigation = () => {
             /*
               Updates selected tab on tab change
             */
@@ -3887,12 +1986,8 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                 size: this.pageSize,
             });
             this.one('aw-linked-objects').update({ items: this.myResponse.relatedItems });
-        });
-        this.handleNavUpdate = (/**
-         * @param {?} tab
-         * @return {?}
-         */
-        (tab) => {
+        };
+        this.handleNavUpdate = (tab) => {
             this.selectedTab = tab;
             this.updateWidgets(this.myResponse);
             if (tab === 'oggetti-collegati') {
@@ -3915,17 +2010,10 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                 this.one('aw-linked-objects').update({ items: this.myResponse.relatedItems });
             }
             if ((tab === 'overview' || tab === 'entita-collegate') && this.myResponse.relatedEntities) {
-                setTimeout((/**
-                 * @return {?}
-                 */
-                () => { this.updateBubbes(this.myResponse.relatedEntities); }), 800);
+                setTimeout(() => { this.updateBubbes(this.myResponse.relatedEntities); }, 800);
             }
-        });
+        };
     }
-    /**
-     * @param {?} __0
-     * @return {?}
-     */
     onInit({ configuration, mainState, router, route, location, options, titleService, communication, }) {
         this.route = route;
         this.communication = communication;
@@ -3956,47 +2044,26 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         // one tab control
         this.oneTabControl();
     }
-    /**
-     * @return {?}
-     */
     oneTabControl() {
-        /** @type {?} */
         const navDS = this.getWidgetDataSource('aw-entita-nav');
         navDS.out$
-            .pipe(filter((/**
-         * @param {?} output
-         * @return {?}
-         */
-        (output) => !!output)))
-            .subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ items }) => {
+            .pipe(filter((output) => !!output))
+            .subscribe(({ items }) => {
             if (items.length === 1) {
                 this.router.navigate([items[0].anchor.href], { replaceUrl: true });
             }
-        }));
+        });
     }
-    /**
-     * @param {?} data
-     * @return {?}
-     */
     updateWidgets(data) {
         /*
-              Updates the widgets on this layout, based on route
-            */
-        /** @type {?} */
+          Updates the widgets on this layout, based on route
+        */
         const selected = this.selectedTab;
-        Object.keys(data).forEach((/**
-         * @param {?} k
-         * @return {?}
-         */
-        (k) => {
+        Object.keys(data).forEach((k) => {
             if (Array.isArray(data[k]) && data[k].length === 0) {
                 data[k] = null;
             }
-        }));
+        });
         this.one('aw-entita-nav').update({
             data,
             selected,
@@ -4005,22 +2072,12 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         this.updateComponent('aw-entita-metadata-viewer', this.getFields(this.myResponse));
         this.drawPagination();
     }
-    /**
-     * @param {?} data
-     * @return {?}
-     */
     updateBubbes(data) {
         /*
           Helper function to update the graph
         */
         this.one('aw-bubble-chart').update(data);
     }
-    /**
-     * @param {?} id
-     * @param {?} slug
-     * @param {?} tab
-     * @return {?}
-     */
     loadItem(id, slug, tab) {
         /*
           Loads the data for the selected nav item, into the adjacent text block.
@@ -4030,19 +2087,11 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             this.currentSlug = slug; // store selected item from url
             this.selectedTab = tab; // store selected tab from url
             return this.communication.request$('getEntityDetails', {
-                onError: (/**
-                 * @param {?} error
-                 * @return {?}
-                 */
-                (error) => console.error(error)),
+                onError: (error) => console.error(error),
                 params: { entityId: id, entitiesListSize: this.bubblesSize },
             }).pipe(
             // global metadata tab control
-            tap((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ fields, typeOfEntity }) => {
+            tap(({ fields, typeOfEntity }) => {
                 this.hasMetadataFields = !!metadataHelper.normalize({
                     fields,
                     paths: this.configuration.get('paths'),
@@ -4050,22 +2099,16 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                     metadataToShow: get(this.configuration.get('entita-layout'), 'metadata-to-show', []),
                     type: typeOfEntity
                 }).length;
-            })));
+            }));
         }
         this.pageTitle = 'Entità Test';
         return of(null);
     }
-    /**
-     * @param {?} res
-     * @return {?}
-     */
     loadContent(res) {
-        /** @type {?} */
         const config = this.configuration.get('config-keys')[res.typeOfEntity];
         // console.log('(entita) Apollo responded with: ', { res })
         this.myResponse = res;
         this.navHeader = {
-            // always render nav header
             icon: config ? config.icon : '',
             text: this.myResponse.label,
             color: config['class-name'],
@@ -4093,24 +2136,16 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                 context: 'entita',
             });
         }
-        res.relatedItems.forEach((/**
-         * @param {?} el
-         * @return {?}
-         */
-        (el) => {
+        res.relatedItems.forEach((el) => {
             el.relationName = res.label.length > 30
                 ? `${res.label.substr(0, 30)}... `
                 : res.label;
-        }));
+        });
         this.one('aw-linked-objects').update({ items: res.relatedItems });
         this.drawPagination();
         // update head title
         this.mainState.update('headTitle', `Arianna4View - Entità - ${this.myResponse.label}`);
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _getPaginationParams() {
         return {
             href: [
@@ -4124,9 +2159,6 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             },
         };
     }
-    /**
-     * @return {?}
-     */
     getNavBasePath() {
         return [
             this.configuration.get('paths').entitaBasePath,
@@ -4134,17 +2166,10 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             this.currentSlug,
         ].join('');
     }
-    /**
-     * @param {?} response
-     * @return {?}
-     */
     getFields(response) {
         const { fields, typeOfEntity } = response;
-        /** @type {?} */
         const paths = this.configuration.get('paths');
-        /** @type {?} */
         const labels = this.configuration.get('labels');
-        /** @type {?} */
         let metadataToShow = get(this.configuration.get('entita-layout'), 'metadata-to-show', []);
         if (this.selectedTab === 'overview') {
             metadataToShow = get(this.configuration.get('entita-layout'), 'overview.campi', []);
@@ -4158,102 +2183,18 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         });
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @protected
-     */
-    AwEntitaLayoutDS.prototype.configuration;
-    /**
-     * @type {?}
-     * @protected
-     */
-    AwEntitaLayoutDS.prototype.mainState;
-    /**
-     * @type {?}
-     * @protected
-     */
-    AwEntitaLayoutDS.prototype.router;
-    /**
-     * @type {?}
-     * @protected
-     */
-    AwEntitaLayoutDS.prototype.location;
-    /**
-     * @type {?}
-     * @protected
-     */
-    AwEntitaLayoutDS.prototype.titleService;
-    /**
-     * @type {?}
-     * @protected
-     */
-    AwEntitaLayoutDS.prototype.route;
-    /** @type {?} */
-    AwEntitaLayoutDS.prototype.options;
-    /** @type {?} */
-    AwEntitaLayoutDS.prototype.pageTitle;
-    /** @type {?} */
-    AwEntitaLayoutDS.prototype.hasMetadataFields;
-    /** @type {?} */
-    AwEntitaLayoutDS.prototype.myResponse;
-    /** @type {?} */
-    AwEntitaLayoutDS.prototype.selectedTab;
-    /** @type {?} */
-    AwEntitaLayoutDS.prototype.navHeader;
-    /** @type {?} */
-    AwEntitaLayoutDS.prototype.currentId;
-    /** @type {?} */
-    AwEntitaLayoutDS.prototype.currentSlug;
-    /** @type {?} */
-    AwEntitaLayoutDS.prototype.currentPage;
-    /** @type {?} */
-    AwEntitaLayoutDS.prototype.pageSize;
-    /** @type {?} */
-    AwEntitaLayoutDS.prototype.bubblesSize;
-    /** @type {?} */
-    AwEntitaLayoutDS.prototype.bubblesEnabled;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwEntitaLayoutDS.prototype.communication;
-    /** @type {?} */
-    AwEntitaLayoutDS.prototype.updateComponent;
-    /** @type {?} */
-    AwEntitaLayoutDS.prototype.drawPagination;
-    /** @type {?} */
-    AwEntitaLayoutDS.prototype.handlePageNavigation;
-    /** @type {?} */
-    AwEntitaLayoutDS.prototype.handleNavUpdate;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwEntitaLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.destroyed$ = new Subject();
-        this.handlePageSizeChange = (/**
-         * @param {?} v
-         * @return {?}
-         */
-        (v) => {
+        this.handlePageSizeChange = (v) => {
             this.dataSource.pageSize = v;
             this.dataSource.handleNavUpdate('oggetti-collegati');
-        });
+        };
     }
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-entita-layout.init':
                     this.dataSource.onInit(payload);
@@ -4274,12 +2215,8 @@ class AwEntitaLayoutEH extends EventHandler {
                 default:
                     break;
             }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-bubble-chart.d3end': // bounce the event, from bubble-chart to chart-tippy
                     this.emitOuter('d3end', payload);
@@ -4294,8 +2231,6 @@ class AwEntitaLayoutEH extends EventHandler {
                     { // changed page size value (pagination)
                         this.dataSource.pageSize = payload;
                         this.dataSource.currentPage = 1; // reset page
-                        // reset page
-                        /** @type {?} */
                         const options = {
                             context: this.dataSource.selectedTab,
                             config: this.dataSource.configuration,
@@ -4331,37 +2266,21 @@ class AwEntitaLayoutEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
     /**
      * Listens to routing events of this layout.
-     * @private
-     * @param {?=} selectedItem
-     * @param {?=} forceReload
-     * @return {?}
      */
     listenRoute(selectedItem = '', forceReload = false) {
         // listen for "page" query param changes
-        this.route.queryParams.pipe(map((/**
-         * @param {?} params
-         * @return {?}
-         */
-        (params) => params.page))).subscribe((/**
-         * @param {?} page
-         * @return {?}
-         */
-        (page) => {
+        this.route.queryParams.pipe(map((params) => params.page)).subscribe((page) => {
             if (this.dataSource.currentPage !== page) {
                 this.dataSource.currentPage = page;
                 this.dataSource.handlePageNavigation();
             }
-        }));
+        });
         // get URL parameters with angular's paramMap
-        this.route.paramMap.subscribe((/**
-         * @param {?} params
-         * @return {?}
-         */
-        (params) => {
+        this.route.paramMap.subscribe((params) => {
             // look for id
             if (params.get('id')) {
                 if (this.dataSource.currentId === params.get('id') && !forceReload) {
@@ -4372,75 +2291,31 @@ class AwEntitaLayoutEH extends EventHandler {
                 }
                 // get item from response with id === id and return as promise
                 this.dataSource.loadItem(params.get('id'), params.get('slug'), params.get('tab'))
-                    .subscribe((/**
-                 * @param {?} res
-                 * @return {?}
-                 */
-                (res) => {
+                    .subscribe((res) => {
                     if (res) {
                         this.dataSource.loadContent(res);
                         // remove the entity of this page
-                        /** @type {?} */
-                        const entities = res.relatedEntities.filter((/**
-                         * @param {?} entity
-                         * @return {?}
-                         */
-                        (entity) => entity.id !== params.get('id')));
+                        const entities = res.relatedEntities.filter((entity) => entity.id !== params.get('id'));
                         this.dataSource.updateWidgets(res);
                         if (selectedItem) {
                             this.emitOuter('selectItem', selectedItem);
                         }
                         this.emitOuter('filterbubbleresponse', entities);
                     }
-                }));
+                });
             }
             else {
                 this.dataSource.loadItem();
             }
-        }));
+        });
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwEntitaLayoutEH.prototype.destroyed$;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwEntitaLayoutEH.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwEntitaLayoutEH.prototype.route;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwEntitaLayoutEH.prototype.entityId;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwEntitaLayoutEH.prototype.handlePageSizeChange;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwLinkedObjectsDS extends DataSource {
     constructor() {
         super(...arguments);
         this.loadingData = false;
-        this.checkForMore = (/**
-         * @param {?=} force
-         * @return {?}
-         */
-        (force) => {
+        this.checkForMore = (force) => {
             /*
               Checks if it is possible to load more item previews.
               Can receive a boolean argument to force the button to be
@@ -4460,61 +2335,38 @@ class AwLinkedObjectsDS extends DataSource {
             else {
                 this.loadedData.actions[1].disabled = false;
             }
-        });
-        this.handleIncomingData = (/**
-         * @param {?} incomingData
-         * @return {?}
-         */
-        (incomingData) => {
+        };
+        this.handleIncomingData = (incomingData) => {
             /*
               Called by infinite scroller, adds the incoming
               data to the linked objects component.
             */
             this.currentPage += 1;
-            /** @type {?} */
             const newData = this.unpackData(incomingData.itemsPagination);
             this.loadedData.result = this.loadedData.result.concat(newData.result);
             this.checkForMore();
             this.loadedData.isLoading = false;
-        });
-        this.unpackData = (/**
-         * @param {?} data
-         * @return {?}
-         */
-        (data) => {
+        };
+        this.unpackData = (data) => {
             /*
-                  Dynamically returns the data object for each HTML component
-                  data: {
-                    previews: [ breadcrumbs: { items[] }, classes, image, metadata, payload, title ],
-                    pagination: { first, last, links, next, prev, select }
-                  }
-                */
-            const { config } = this.options;
-            // app-config.json
-            /** @type {?} */
-            const paths = config.get('item-preview');
-            // item preview dynamic paths
-            const { totalCount } = data;
-            // total amount of items available on backend
-            /** @type {?} */
-            const page = this.currentPage;
-            // current page (if using pagination)
-            const { context } = this;
-            // parent layout name
-            /** @type {?} */
-            const size = this.pageSize;
-            // items per page (if using pagination)
-            /** @type {?} */
+              Dynamically returns the data object for each HTML component
+              data: {
+                previews: [ breadcrumbs: { items[] }, classes, image, metadata, payload, title ],
+                pagination: { first, last, links, next, prev, select }
+              }
+            */
+            const { config } = this.options; // app-config.json
+            const paths = config.get('item-preview'); // item preview dynamic paths
+            const { totalCount } = data; // total amount of items available on backend
+            const page = this.currentPage; // current page (if using pagination)
+            const { context } = this; // parent layout name
+            const size = this.pageSize; // items per page (if using pagination)
             const labels = config.get('labels');
             const { dynamicPagination } = this.options;
-            /** @type {?} */
             const keys = config ? config.get('config-keys') : {};
-            /** @type {?} */
             let lengthLimit;
-            /** @type {?} */
             let resultsLimit;
-            /** @type {?} */
-            let d = data.items ? data.items : data.relatedItems;
+            let d = data.items ? data.items : data.relatedItems; // items to iterate over
             if (config) {
                 // dynamic search for max-item-length
                 if (config.get(`${context}-layout`)) {
@@ -4529,41 +2381,21 @@ class AwLinkedObjectsDS extends DataSource {
             else if (size) {
                 d = d.slice(0, size);
             }
-            /** @type {?} */
             const result = [];
-            /** @type {?} */
-            const enabledKeys = paths.metadata.info.selection.map((/**
-             * @param {?} info
-             * @return {?}
-             */
-            (info) => info.key));
-            d.forEach((/**
-             * @param {?} el
-             * @return {?}
-             */
-            (el) => {
-                /** @type {?} */
+            const enabledKeys = paths.metadata.info.selection.map((info) => info.key);
+            d.forEach((el) => {
                 const itemData = el.item ? el.item : el;
-                /** @type {?} */
                 const infoData = get(el, paths.metadata.info.data, itemData.fields);
-                /** @type {?} */
                 const infoDataItems = infoData
-                    ? infoData.filter((/**
-                     * @param {?} info
-                     * @return {?}
-                     */
-                    (info) => enabledKeys.indexOf(info.key) !== -1))
+                    ? infoData.filter((info) => enabledKeys.indexOf(info.key) !== -1)
                     : [];
-                /** @type {?} */
                 const toeData = get(el, paths.metadata.toe.data, itemData.relatedTypesOfEntity);
-                /** @type {?} */
                 const breadcrumbs = get(el, paths.metadata.breadcrumbs.data, itemData.breadcrumbs);
                 if (['entita', 'search', 'gallery'].includes(context)) {
                     if (itemData.typeOfEntity && itemData.typeOfEntity !== '') {
                         infoDataItems.push({ key: 'Tipo di entità', value: keys[itemData.typeOfEntity]['singular-label'] });
                     }
                 }
-                /** @type {?} */
                 let classes = ['entita', 'search', 'oggetti-collegati'].includes(context) ? 'is-fullwidth' : '';
                 classes += itemData.typeOfEntity ? ` is-${config.get('config-keys')[itemData.typeOfEntity]['class-name']}` : ' is-oggetto-culturale';
                 // gallery classes
@@ -4571,24 +2403,18 @@ class AwLinkedObjectsDS extends DataSource {
                     classes += ' is-vertical has-image';
                 }
                 // consider the lenght of <em> tags to exclude from count
-                /** @type {?} */
                 const highlights = get(el, paths.title, itemData.label).match(/<em>/g) ? get(el, paths.title, itemData.label).match(/<em>/g).length * 9 : 0;
-                /** @type {?} */
                 const itemTitle = +paths.title.maxLength
                     && get(el, paths.title, itemData.label).length > +paths.title.maxLength + highlights
                     ? `${get(el, paths.title, itemData.label).slice(0, +paths.title.maxLength + highlights)}…`
                     : get(el, paths.title, itemData.label);
-                /** @type {?} */
                 const itemId = get(el, paths.payload, itemData.id);
-                /** @type {?} */
                 const itemType = itemData.typeOfEntity;
-                /** @type {?} */
                 const itemHref = [
                     itemType ? config.get('paths').entitaBasePath : config.get('paths').schedaBasePath,
                     itemId,
                     helpers.slugify(itemTitle),
                 ].join('/');
-                /** @type {?} */
                 let text;
                 if (!paths.text) {
                     text = null;
@@ -4600,7 +2426,6 @@ class AwLinkedObjectsDS extends DataSource {
                 else {
                     text = get(el, paths.text.data, itemData.text);
                 }
-                /** @type {?} */
                 const item = {
                     text,
                     classes,
@@ -4618,44 +2443,29 @@ class AwLinkedObjectsDS extends DataSource {
                 if (infoDataItems.length) {
                     item.metadata.push({
                         classes: 'aw-item-preview_metadata',
-                        items: infoDataItems.map((/**
-                         * @param {?} infoDItem
-                         * @return {?}
-                         */
-                        (infoDItem) => ({
+                        items: infoDataItems.map((infoDItem) => ({
                             label: helpers.prettifySnakeCase(infoDItem.key, labels[infoDItem.key]),
                             value: infoDItem.value,
-                        }))),
+                        })),
                     });
                 }
                 if (toeData) {
                     item.metadata.push({
                         classes: 'aw-item-preview-entities',
-                        items: toeData.map((/**
-                         * @param {?} toe
-                         * @return {?}
-                         */
-                        (toe) => ({
-                            // persona: 6, Organizz: 12, Luoghi: 2, Concetti: 32
+                        items: toeData.map((toe) => ({
                             value: get(toe, paths.metadata.toe.value, toe.count),
                             // icon: 'n7-icon-bell' // TODO: link icon to config key
                             icon: keys[get(toe, paths.metadata.toe.icon, toe.type)]
                                 ? keys[get(toe, paths.metadata.toe.icon, toe.type)].icon
                                 : '',
                             classes: `color-${keys[get(toe, paths.metadata.toe.icon, toe.type)]['class-name']}`,
-                        }))),
+                        })),
                     });
                 }
                 // breadcrumbs
                 if (breadcrumbs) {
                     item.breadcrumbs = {
-                        // n7-breadcrumbs uses this as it's own data
-                        items: get(el, paths.metadata.breadcrumbs.data, el.item.breadcrumbs).map((/**
-                         * @param {?} crumb
-                         * @return {?}
-                         */
-                        (crumb) => {
-                            /** @type {?} */
+                        items: get(el, paths.metadata.breadcrumbs.data, el.item.breadcrumbs).map((crumb) => {
                             const label = get(crumb, paths.metadata.breadcrumbs.label, crumb.label);
                             return {
                                 label,
@@ -4663,13 +2473,12 @@ class AwLinkedObjectsDS extends DataSource {
                                     href: itemHref,
                                 },
                             };
-                        })),
+                        }),
                     };
                 }
                 result.push(item);
-            }));
+            });
             if (context === 'home') {
-                /** @type {?} */
                 const actions = [
                     {
                         label: `Mostra Tutti (${totalCount})`,
@@ -4688,14 +2497,8 @@ class AwLinkedObjectsDS extends DataSource {
                 };
             }
             return { previews: result };
-        });
+        };
     }
-    // use dynamic object paths from config
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         this.paths = this.options.config.get('item-preview');
         this.pageSize = this.options.size;
@@ -4717,47 +2520,11 @@ class AwLinkedObjectsDS extends DataSource {
         return this.loadedData;
     }
 }
-if (false) {
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.currentPage;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.totalPages;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.totalObjects;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.pageSize;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.context;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.loadedData;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.loadingData;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.paths;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.checkForMore;
-    /** @type {?} */
-    AwLinkedObjectsDS.prototype.handleIncomingData;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwLinkedObjectsDS.prototype.unpackData;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwAutocompleteWrapperDS extends DataSource$1 {
     constructor() {
         super(...arguments);
-        this.stringTrim = (/**
-         * @param {?} string
-         * @param {?} limit
-         * @return {?}
-         */
-        (string, limit) => {
+        this.stringTrim = (string, limit) => {
             /*
               Slices the string and adds trailing ellipsis
               TODO: Do not cut the string in the middle of an HTML tag!
@@ -4766,35 +2533,19 @@ class AwAutocompleteWrapperDS extends DataSource$1 {
                 return `${string.slice(0, limit)}…`;
             }
             return string;
-        });
+        };
     }
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         const { response } = data;
         if (!response) {
             return { suggestion: [], loading: true };
         }
-        /** @type {?} */
         const suggestion = [];
         const { config } = this.options;
-        /** @type {?} */
         const maxLength = (config.get('home-layout')['max-item-length'] || 20);
-        /** @type {?} */
-        const fResults = response.results.filter((/**
-         * @param {?} el
-         * @return {?}
-         */
-        (el) => typeof el.entity === 'object'));
+        const fResults = response.results.filter((el) => typeof el.entity === 'object');
         // eslint-disable-next-line consistent-return
-        fResults.forEach((/**
-         * @param {?} el
-         * @return {?}
-         */
-        (el) => {
+        fResults.forEach((el) => {
             if (el.entity.id === 'fallback') { // build and return fallback data
                 suggestion.push({
                     text: el.entity.label,
@@ -4802,7 +2553,6 @@ class AwAutocompleteWrapperDS extends DataSource$1 {
                 });
                 return { suggestion };
             }
-            /** @type {?} */
             const text = this.stringTrim(el.entity.label, maxLength);
             suggestion.push({
                 text,
@@ -4810,47 +2560,26 @@ class AwAutocompleteWrapperDS extends DataSource$1 {
                     payload: el.entity.id,
                 },
             });
-        }));
+        });
         return { suggestion };
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwAutocompleteWrapperDS.prototype.stringTrim;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwBubbleChartDS extends DataSource {
     constructor() {
         super(...arguments);
         this.chartData = []; // data rendered into the graph
-        // data rendered into the graph
         this.draw = null; // exposed component draw function to update the view
-        // exposed component draw function to update the view
         this.selected = []; // list of selected bubbles
-        // list of selected bubbles
         this.filters = []; // list of active filters to show only some TypeOfEntity(s)
-        // list of active filters to show only some TypeOfEntity(s)
         this.closedEyes = []; // array of the activated eye filters
-        // array of the activated eye filters
         this.tippyList = []; // list of tippy instances
-        this.updateChart = (/**
-         * @param {?} res
-         * @return {?}
-         */
-        (res) => {
+        this.updateChart = (res) => {
             /*
-                  Redraws the graph with the incoming data.
-                  "res" should be Apollo's "response.entitiesData".
-                  When res is passed as null, the chart is rendered with the previous data.
-                */
-            /** @type {?} */
+              Redraws the graph with the incoming data.
+              "res" should be Apollo's "response.entitiesData".
+              When res is passed as null, the chart is rendered with the previous data.
+            */
             let response = res;
             if (res === null) {
                 response = this.chartData;
@@ -4859,11 +2588,7 @@ class AwBubbleChartDS extends DataSource {
                 this.chartData = res;
             }
             if (this.filters.length > 0) { // apply filters to the response
-                response = this.chartData.filter((/**
-                 * @param {?} el
-                 * @return {?}
-                 */
-                (el) => !this.filters.includes(el.entity.typeOfEntity.replace(/ /g, '-'))));
+                response = this.chartData.filter((el) => !this.filters.includes(el.entity.typeOfEntity.replace(/ /g, '-')));
             }
             if (!this.draw) {
                 this.update(this.smartSlice(response)); // component self-update
@@ -4874,29 +2599,18 @@ class AwBubbleChartDS extends DataSource {
                 this.output.smallView.data = this.smartSlice(response, this.options.smallChartSize);
                 this.draw();
             }
-        });
-        this.smartSlice = (/**
-         * @param {?} d
-         * @param {?=} length
-         * @return {?}
-         */
-        (d, length) => {
-            /** @type {?} */
+        };
+        this.smartSlice = (d, length) => {
             const l = length || this.options.limit;
             if (l && l < d.length) {
                 return d.slice(0, l);
             }
             return d;
-        });
-        this.handleBubbleClick = (/**
-         * @param {?} payload
-         * @return {?}
-         */
-        (payload) => {
+        };
+        this.handleBubbleClick = (payload) => {
             /*
-                  Toggles the selection of the clicked bubble.
-                */
-            /** @type {?} */
+              Toggles the selection of the clicked bubble.
+            */
             const id = payload;
             if (this.selected.includes(id)) {
                 this.selected.splice(this.selected.indexOf(id), 1); // remove selection
@@ -4904,39 +2618,21 @@ class AwBubbleChartDS extends DataSource {
             else {
                 this.selected.push(id); // add selection
             }
-        });
+        };
     }
-    // list of tippy instances
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         const { config, smallChartSize } = this.options;
         const { fontRendering, transition, shuffle } = config.get('bubble-chart');
-        /** @type {?} */
         const domain = [];
-        /** @type {?} */
         const range = [];
-        /** @type {?} */
         const colorConfig = config.get('config-keys');
-        Object.keys(colorConfig).forEach((/**
-         * @param {?} k
-         * @return {?}
-         */
-        (k) => {
+        Object.keys(colorConfig).forEach((k) => {
             domain.push(k.replace(/-/g, ' '));
             range.push(((colorConfig[k] || {}).color || {}).hex);
-        }));
-        /** @type {?} */
+        });
         const commonParams = {
             containerId: 'bubbleChartContainer',
-            setDraw: (/**
-             * @param {?} draw
-             * @return {?}
-             */
-            (draw) => { this.draw = draw; }),
+            setDraw: (draw) => { this.draw = draw; },
             colorMatch: { domain, range },
             selected: this.selected,
             sizeRange: [0.5, 500],
@@ -4951,51 +2647,17 @@ class AwBubbleChartDS extends DataSource {
         The default stream is for the normal visualization,
         "smallView" is used for a compressed view of the same data.
         */
-        return Object.assign({}, commonParams, { anchorData: { href: '/placeholder/' }, data: this.smartSlice(data), smallView: Object.assign({}, commonParams, { data: this.smartSlice(data, smallChartSize) }) });
+        return Object.assign(Object.assign({}, commonParams), { anchorData: { href: '/placeholder/' }, data: this.smartSlice(data), smallView: Object.assign(Object.assign({}, commonParams), { data: this.smartSlice(data, smallChartSize) }) });
     }
 }
-if (false) {
-    /** @type {?} */
-    AwBubbleChartDS.prototype.chartData;
-    /** @type {?} */
-    AwBubbleChartDS.prototype.draw;
-    /** @type {?} */
-    AwBubbleChartDS.prototype.selected;
-    /** @type {?} */
-    AwBubbleChartDS.prototype.filters;
-    /** @type {?} */
-    AwBubbleChartDS.prototype.closedEyes;
-    /** @type {?} */
-    AwBubbleChartDS.prototype.tippyList;
-    /** @type {?} */
-    AwBubbleChartDS.prototype.updateChart;
-    /** @type {?} */
-    AwBubbleChartDS.prototype.smartSlice;
-    /** @type {?} */
-    AwBubbleChartDS.prototype.handleBubbleClick;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwChartTippyDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         // ====== DATA ======
         const { bubbles, selected } = data;
         const { basePath, selectable } = this.options;
         // ==================
-        /** @type {?} */
-        const templates = bubbles.map((/**
-         * @param {?} b
-         * @return {?}
-         */
-        (b) => {
+        const templates = bubbles.map((b) => {
             const { count, entity } = b;
             const { id, label, relation, relationName } = entity;
             return {
@@ -5012,25 +2674,16 @@ class AwChartTippyDS extends DataSource {
                     value: relation,
                 }
             };
-        }));
+        });
         return templates;
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwHeroDS extends DataSource {
     constructor() {
         super(...arguments);
         this.currentInputValue = '';
     }
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         const { title, text, button, backgroundImage, input, } = data;
         return {
@@ -5050,88 +2703,47 @@ class AwHeroDS extends DataSource {
         };
     }
 }
-if (false) {
-    /** @type {?} */
-    AwHeroDS.prototype.currentInputValue;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwTableDS extends DataSource {
-    /**
-     * @protected
-     * @return {?}
-     */
     transform() {
         return TABLE_MOCK;
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwHomeHeroPatrimonioDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         return data;
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwHomeFacetsWrapperDS extends DataSource {
     constructor() {
         super(...arguments);
         this.autoComplete = {}; // autocomplete data for each facet
-        // autocomplete data for each facet
         this.lockedFacets = {}; // locked means that the eye cannot be closed
-        // locked means that the eye cannot be closed
         // store the last response so the component can be rendered again with the same data
         this.lastData = {};
         this.closedEyes = []; // list of closed eyes
-        // list of closed eyes
         this.openTippy = ''; // tipe of entity of the currently open tippy
-        this.tippyMaker = (/**
-         * @param {?} id
-         * @return {?}
-         */
-        (id) => {
+        this.tippyMaker = (id) => {
             /*
-                  Builds or updates Tippy for the input in use (id)
-                */
-            /** @type {?} */
+              Builds or updates Tippy for the input in use (id)
+            */
             const newId = id.replace(/ /g, '-');
             // create data for this facet
             if (!this.autoComplete[newId]) {
                 this.autoComplete[newId] = {
                     tippy: undefined,
-                    // tippy data / config
                     open: true,
                 };
-                /** @type {?} */
                 const ac = this.autoComplete[newId];
-                /** @type {?} */
-                const getContent = (/**
-                 * @return {?}
-                 */
-                () => {
-                    /** @type {?} */
+                const getContent = () => {
                     const contentNode = document.getElementsByClassName('aw-simple-autocomplete__template')[0];
                     contentNode.setAttribute('style', 'display: block');
                     return contentNode;
-                });
+                };
                 if (!ac.tippy) {
                     // target the correct this.autoComplete[id] input class
-                    /** @type {?} */
                     const target = document.getElementsByClassName(newId)[1];
                     ac.tippy = tippy(target, {
                         content: getContent(),
@@ -5146,62 +2758,36 @@ class AwHomeFacetsWrapperDS extends DataSource {
                     }); // attach tippy to input type text
                 }
             }
-            /** @type {?} */
             const ac = this.autoComplete[newId];
             if (ac.tippy) {
                 ac.tippy.show();
             }
-        });
-        this.tippyClose = (/**
-         * @param {?} id
-         * @return {?}
-         */
-        (id) => {
-            /** @type {?} */
+        };
+        this.tippyClose = (id) => {
             const newId = id.replace(/ /g, '-');
             if (this.autoComplete[newId]) {
-                /** @type {?} */
                 const ac = this.autoComplete[newId];
                 if (ac.tippy) {
                     ac.tippy.hide();
                 }
             }
-        });
+        };
     }
-    // tipe of entity of the currently open tippy
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         this.lastData = data;
-        /** @type {?} */
         const headers = [];
-        /** @type {?} */
         const inputs = [];
-        /** @type {?} */
         const facetData = data;
-        const { lockedFacets } = this;
-        // locked means that the eye cannot be closed
-        const { closedEyes } = this;
+        const { lockedFacets } = this; // locked means that the eye cannot be closed
+        const { closedEyes } = this; // list of closed eyes
         // when facet data changes, destroy every tippy and reset autocomplete data.
-        Object.keys(this.autoComplete).forEach((/**
-         * @param {?} id
-         * @return {?}
-         */
-        (id) => {
+        Object.keys(this.autoComplete).forEach((id) => {
             if (this.autoComplete[id] && this.autoComplete[id].tippy) {
                 this.autoComplete[id].tippy.destroy(); // destroy
             }
-        }));
+        });
         this.autoComplete = {}; // reset data
-        facetData.forEach((/**
-         * @param {?} facet
-         * @param {?} j
-         * @return {?}
-         */
-        (facet, j) => {
+        facetData.forEach((facet, j) => {
             /*
              For each facet on back-end, push a header-component
              and a facet-component (search input only) to each array.
@@ -5221,26 +2807,16 @@ class AwHomeFacetsWrapperDS extends DataSource {
              to the lockedFacets array of the last
              enabled facet.
             */
-            Object.keys(lockedFacets).forEach((/**
-             * @param {?} key
-             * @return {?}
-             */
-            (key) => {
+            Object.keys(lockedFacets).forEach((key) => {
                 // clear all locked facets arrays from "LOCK_LAST" values (reset all locks)
-                /** @type {?} */
                 const index = lockedFacets[key].indexOf('LOCK_LAST');
                 if (index >= 0) {
                     lockedFacets[key].splice(index, 1);
                 }
-            }));
+            });
             if (closedEyes) {
                 if (closedEyes.length === facetData.length - 1) {
-                    /** @type {?} */
-                    const lastFacet = facetData.find((/**
-                     * @param {?} f
-                     * @return {?}
-                     */
-                    (f) => !closedEyes.includes(f.type.replace(/ /g, '-'))));
+                    const lastFacet = facetData.find((f) => !closedEyes.includes(f.type.replace(/ /g, '-')));
                     if (lastFacet) {
                         if (closedEyes[lastFacet.type]) {
                             lockedFacets[lastFacet.type].push('LOCK_LAST');
@@ -5269,9 +2845,7 @@ class AwHomeFacetsWrapperDS extends DataSource {
             else {
                 facet.locked = false;
             }
-            /** @type {?} */
             const headerClasses = [];
-            /** @type {?} */
             const iconClasses = [facet.icon];
             if (!facet.enabled) {
                 headerClasses.push('is-disabled');
@@ -5312,83 +2886,30 @@ class AwHomeFacetsWrapperDS extends DataSource {
                     },
                 ],
             });
-        }));
+        });
         // zipping arrays to render widgets with separate data (see home-layout.html)
-        return headers.map((/**
-         * @param {?} h
-         * @param {?} i
-         * @return {?}
-         */
-        (h, i) => ({ header: h, input: inputs[i] })));
+        return headers.map((h, i) => ({ header: h, input: inputs[i] }));
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeFacetsWrapperDS.prototype.autoComplete;
-    /** @type {?} */
-    AwHomeFacetsWrapperDS.prototype.lockedFacets;
-    /** @type {?} */
-    AwHomeFacetsWrapperDS.prototype.lastData;
-    /** @type {?} */
-    AwHomeFacetsWrapperDS.prototype.closedEyes;
-    /** @type {?} */
-    AwHomeFacetsWrapperDS.prototype.openTippy;
-    /** @type {?} */
-    AwHomeFacetsWrapperDS.prototype.tippyMaker;
-    /** @type {?} */
-    AwHomeFacetsWrapperDS.prototype.tippyClose;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwHomeItemTagsWrapperDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         return data;
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwHomeAutocompleteDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         const { response, query } = data;
         const { results, totalCount } = response;
         const { keys, config, paths } = this.options;
-        /** @type {?} */
         const labels = this.options.labels || {};
-        /** @type {?} */
         const itemIds = [];
-        /** @type {?} */
         const groups = {};
-        results.forEach((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ item, entity }) => {
-            /** @type {?} */
+        results.forEach(({ item, entity }) => {
             const groupId = entity ? entity.typeOfEntity : item.document_type;
-            /** @type {?} */
             const groupConfig = keys[groupId];
-            /** @type {?} */
             const mainMetadata = groupConfig['main-metadata'];
-            /** @type {?} */
             const currentItem = item || entity;
             if (!groups[groupId]) {
                 const { label, icon } = groupConfig;
@@ -5401,18 +2922,13 @@ class AwHomeAutocompleteDS extends DataSource {
                 };
             }
             if (itemIds.indexOf(currentItem.id) === -1) {
-                /** @type {?} */
                 const metadata = [];
                 if (currentItem.fields) {
-                    currentItem.fields.forEach((/**
-                     * @param {?} __0
-                     * @return {?}
-                     */
-                    ({ key, value }) => {
+                    currentItem.fields.forEach(({ key, value }) => {
                         if (mainMetadata && key === mainMetadata) {
                             metadata.push({ key: helpers.prettifySnakeCase(key, labels[key]), value });
                         }
-                    }));
+                    });
                 }
                 groups[groupId].items.push({
                     title: currentItem.label,
@@ -5422,20 +2938,15 @@ class AwHomeAutocompleteDS extends DataSource {
                     },
                 });
             }
-        }));
-        /** @type {?} */
-        const grouplist = Object.keys(groups).map((/**
-         * @param {?} key
-         * @return {?}
-         */
-        (key) => ({
+        });
+        const grouplist = Object.keys(groups).map((key) => ({
             group: {
                 title: groups[key].title,
                 icon: groups[key].icon,
                 classes: groups[key].classes,
             },
             items: groups[key].items,
-        })));
+        }));
         return {
             results: grouplist,
             actions: grouplist.length > 0 ? {
@@ -5455,7 +2966,6 @@ class AwHomeAutocompleteDS extends DataSource {
                         href: paths.searchBasePath,
                         queryParams: {
                             query,
-                            // Query string
                             'query-all': 1,
                         },
                     },
@@ -5466,23 +2976,13 @@ class AwHomeAutocompleteDS extends DataSource {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwEntitaNavDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} param
-     * @return {?}
-     */
     transform(param) {
         if (!param) {
             return null;
         }
         const { data } = param;
         const { selected } = param;
-        /** @type {?} */
         const navigation = { items: [], payload: 'entita-nav' };
         const { hasMetadataFields } = this.options;
         navigation.items.push({
@@ -5538,20 +3038,11 @@ class AwEntitaNavDS extends DataSource {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwEntitaMetadataViewerDS extends DataSource {
     constructor() {
         super(...arguments);
         this.hasFields = false;
     }
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         this.hasFields = !!(Array.isArray(data) && data.length);
         return {
@@ -5561,74 +3052,31 @@ class AwEntitaMetadataViewerDS extends DataSource {
         };
     }
 }
-if (false) {
-    /** @type {?} */
-    AwEntitaMetadataViewerDS.prototype.hasFields;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwTreeDS extends DataSource$1 {
     constructor() {
         super(...arguments);
-        this.transform = (/**
-         * @param {?} data
-         * @return {?}
-         */
-        (data) => data);
-        this._getCachedData = (/**
-         * @return {?}
-         */
-        () => AwTreeDS.dataCache[this.rootId]);
-        this._normalize = (/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ id, label, icon, img, branches, document_type: type, document_classification: classification }) => {
-            /** @type {?} */
+        this.transform = (data) => data;
+        this._getCachedData = () => AwTreeDS.dataCache[this.rootId];
+        this._normalize = ({ id, label, icon, img, branches, document_type: type, document_classification: classification }) => {
             const hasBranches = !!(Array.isArray(branches) && branches.length);
             this._getCachedData().flatData[id] = {
                 id, label, icon, img, hasBranches, type, classification
             };
             if (hasBranches) {
-                branches.forEach((/**
-                 * @param {?} data
-                 * @return {?}
-                 */
-                (data) => {
+                branches.forEach((data) => {
                     this._getCachedData().flatIds.push([id, data.id]);
                     this._normalize(data);
-                }));
+                });
             }
-        });
-        this._getParent = (/**
-         * @param {?} id
-         * @return {?}
-         */
-        (id) => this._getCachedData().flatIds
-            .filter((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ([, childId]) => childId === id))
-            .map((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ([parentId]) => parentId))[0] || null);
-        this._getTreePath = (/**
-         * @param {?} id
-         * @return {?}
-         */
-        (id) => {
-            /** @type {?} */
+        };
+        this._getParent = (id) => this._getCachedData().flatIds
+            .filter(([, childId]) => childId === id)
+            .map(([parentId]) => parentId)[0] || null;
+        this._getTreePath = (id) => {
             const ids = [id];
-            /** @type {?} */
             let currentId = id;
             while (currentId) {
-                /** @type {?} */
                 const parentId = this._getParent(currentId);
                 if (parentId) {
                     ids.push(parentId);
@@ -5636,76 +3084,41 @@ class AwTreeDS extends DataSource$1 {
                 currentId = parentId;
             }
             return ids.reverse();
-        });
-        this._getTree = (/**
-         * @param {?} path
-         * @return {?}
-         */
-        (path) => {
-            /** @type {?} */
+        };
+        this._getTree = (path) => {
             const tree = {};
-            /** @type {?} */
             let counter = 0;
-            /** @type {?} */
-            const loadItems = (/**
-             * @param {?} id
-             * @param {?} source
-             * @return {?}
-             */
-            (id, source) => {
+            const loadItems = (id, source) => {
                 counter += 1;
-                /** @type {?} */
                 const nextParent = path[counter];
                 source.items = [];
                 this._getCachedData().flatIds
-                    .filter((/**
-                 * @param {?} __0
-                 * @return {?}
-                 */
-                ([parentId]) => parentId === id))
-                    .forEach((/**
-                 * @param {?} __0
-                 * @param {?} index
-                 * @return {?}
-                 */
-                ([, childId], index) => {
-                    /** @type {?} */
+                    .filter(([parentId]) => parentId === id)
+                    .forEach(([, childId], index) => {
                     const inPath = childId === nextParent;
-                    /** @type {?} */
                     const item = this._getTreeItem(childId, inPath);
                     source.items.push(item);
                     if (inPath) {
                         loadItems(childId, source.items[index]);
                     }
-                }));
-            });
+                });
+            };
             // init
             loadItems(path[0], tree);
             return tree;
-        });
-        this._getTreeItem = (/**
-         * @param {?} id
-         * @param {?} inPath
-         * @return {?}
-         */
-        (id, inPath) => {
+        };
+        this._getTreeItem = (id, inPath) => {
             const { label, img, hasBranches, type, classification } = this._getCachedData().flatData[id];
-            /** @type {?} */
             const defaultIcon = (this.options.config[type] || { icon: null }).icon;
-            /** @type {?} */
             let specificIcon = '';
-            /** @type {?} */
             const lastSegment = /.*\.(\w+)$/;
             if (classification && lastSegment.test(classification)) {
-                /** @type {?} */
                 const classID = classification
                     .match(lastSegment)[1] // get classification characters
-                    .toUpperCase();
+                    .toUpperCase(); // normalize
                 specificIcon = this.options.config[type].classifications[classID].icon;
             }
-            /** @type {?} */
             const arrowIcons = inPath ? 'n7-icon-angle-down' : 'n7-icon-angle-right';
-            /** @type {?} */
             const classes = [];
             if (inPath) {
                 classes.push('is-expanded');
@@ -5730,12 +3143,8 @@ class AwTreeDS extends DataSource$1 {
                     href: `${this.basePath}/${id}/${helpers.slugify(label)}`,
                 },
             };
-        });
+        };
     }
-    /**
-     * @param {?} data
-     * @return {?}
-     */
     load(data) {
         const { tree, basePath } = data;
         this.rootId = tree.id;
@@ -5746,23 +3155,15 @@ class AwTreeDS extends DataSource$1 {
             this._normalize(tree);
         }
     }
-    /**
-     * @param {?} id
-     * @return {?}
-     */
     build(id) {
-        /** @type {?} */
         const path = this._getTreePath(id);
-        /** @type {?} */
         const oldPath = this._getTreePath(this.currentId);
-        /** @type {?} */
         const oldPathIndex = oldPath.indexOf(id);
         if (oldPathIndex > 0) {
             path.splice(oldPathIndex);
             this.currentId = null;
         }
         else if (this.currentId === id) {
-            /** @type {?} */
             const idIndex = path.indexOf(this.currentId);
             path.splice(idIndex);
             this.currentId = null;
@@ -5770,45 +3171,24 @@ class AwTreeDS extends DataSource$1 {
         else {
             this.currentId = id;
         }
-        /** @type {?} */
         const tree = this._getTree(path);
         this.update(tree);
     }
-    /**
-     * @param {?} id
-     * @return {?}
-     */
     setActive(id) {
         this.activeId = id;
     }
-    /**
-     * @return {?}
-     */
     highlightActive() {
-        /** @type {?} */
-        const control = (/**
-         * @param {?} items
-         * @return {?}
-         */
-        (items) => {
-            items.forEach((/**
-             * @param {?} item
-             * @return {?}
-             */
-            (item) => {
-                /** @type {?} */
+        const control = (items) => {
+            items.forEach((item) => {
                 const founded = item.meta === this.activeId;
-                /** @type {?} */
                 const hasActive = item.classes.indexOf('is-active') !== -1;
                 // clear is-active
                 if (hasActive && !founded) {
-                    /** @type {?} */
                     const currentClasses = item.classes.split(' ');
                     currentClasses.splice(currentClasses.indexOf('is-active'), 1);
                     item.classes = currentClasses.join(' ');
                 }
                 if (founded) {
-                    /** @type {?} */
                     const currentClasses = item.classes.split(' ');
                     if (currentClasses.indexOf('is-active') === -1) {
                         currentClasses.push('is-active');
@@ -5818,82 +3198,14 @@ class AwTreeDS extends DataSource$1 {
                 if (Array.isArray(item.items) && item.items.length) {
                     control(item.items);
                 }
-            }));
-        });
+            });
+        };
         control(this.output.items);
     }
 }
 AwTreeDS.dataCache = {};
-if (false) {
-    /** @type {?} */
-    AwTreeDS.dataCache;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwTreeDS.prototype.basePath;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwTreeDS.prototype.rootId;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwTreeDS.prototype.currentId;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwTreeDS.prototype.activeId;
-    /**
-     * @type {?}
-     * @protected
-     */
-    AwTreeDS.prototype.transform;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwTreeDS.prototype._getCachedData;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwTreeDS.prototype._normalize;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwTreeDS.prototype._getParent;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwTreeDS.prototype._getTreePath;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwTreeDS.prototype._getTree;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwTreeDS.prototype._getTreeItem;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwSidebarHeaderDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         return {
             iconLeft: 'n7-icon-tree-icon',
@@ -5903,11 +3215,7 @@ class AwSidebarHeaderDS extends DataSource {
             payload: 'header',
         };
     }
-    /**
-     * @return {?}
-     */
     toggleSidebar() {
-        /** @type {?} */
         const sidebarData = this.output;
         if (sidebarData.classes === 'is-expanded') {
             sidebarData.classes = 'is-collapsed';
@@ -5920,24 +3228,12 @@ class AwSidebarHeaderDS extends DataSource {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwSchedaBreadcrumbsDS extends DataSource {
     constructor() {
         super(...arguments);
-        this.transform = (/**
-         * @param {?} data
-         * @return {?}
-         */
-        (data) => data);
+        this.transform = (data) => data;
     }
-    /**
-     * @return {?}
-     */
     toggleSidebar() {
-        /** @type {?} */
         const sidebarData = this.output;
         if (sidebarData.classes === 'is-expanded') {
             sidebarData.classes = 'is-collapsed';
@@ -5948,24 +3244,8 @@ class AwSchedaBreadcrumbsDS extends DataSource {
         this.update(sidebarData);
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @protected
-     */
-    AwSchedaBreadcrumbsDS.prototype.transform;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwSchedaMetadataDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         return {
             group: [{
@@ -5975,18 +3255,8 @@ class AwSchedaMetadataDS extends DataSource {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwSchedaImageDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
-        /** @type {?} */
         const tileSources = this.getTileSources(data.images);
         return {
             images: [],
@@ -5998,90 +3268,42 @@ class AwSchedaImageDS extends DataSource {
                 autoHideControls: false,
                 showNavigator: false,
             },
-            _setViewer: (/**
-             * @param {?} viewer
-             * @return {?}
-             */
-            (viewer) => {
+            _setViewer: (viewer) => {
                 this.instance = viewer;
-            }),
+            },
         };
     }
-    /**
-     * @return {?}
-     */
     hasInstance() {
         return !!this.instance;
     }
-    /**
-     * @param {?} data
-     * @return {?}
-     */
     updateImages(data) {
         if (!this.instance)
             return;
         // reset
         this.instance.world.removeAll();
-        setTimeout((/**
-         * @return {?}
-         */
-        () => {
-            /** @type {?} */
+        setTimeout(() => {
             const images = this.getTileSources(data.images);
             console.warn('images', images.length, images);
             this.instance.open(images);
-        }));
+        });
     }
-    /**
-     * @private
-     * @param {?} images
-     * @return {?}
-     */
     getTileSources(images) {
         // FIXME: togliere replace
-        return images.map((/**
-         * @param {?} img
-         * @return {?}
-         */
-        (img) => img.replace('FIF', 'Deepzoom').replace('.tif', '.tif.dzi')));
+        return images.map((img) => img.replace('FIF', 'Deepzoom').replace('.tif', '.tif.dzi'));
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaImageDS.prototype.instance;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwSchedaInnerTitleDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         return data;
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwSearchLayoutTabsDS extends DataSource {
     constructor() {
         super(...arguments);
         this.selected = 'list';
     }
-    /**
-     * @protected
-     * @return {?}
-     */
     transform() {
         return {
             items: [{
@@ -6099,37 +3321,15 @@ class AwSearchLayoutTabsDS extends DataSource {
                 }],
         };
     }
-    /**
-     * @param {?} tabId
-     * @return {?}
-     */
     setSelected(tabId) {
         this.selected = tabId;
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutTabsDS.prototype.selected;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwGalleryResultsDS extends DataSource {
     constructor() {
         super(...arguments);
-        this.addPagination = (/**
-         * @param {?} page
-         * @param {?} totalPages
-         * @param {?} size
-         * @return {?}
-         */
-        (page, totalPages, size) => {
-            /** @type {?} */
+        this.addPagination = (page, totalPages, size) => {
             const sizeOptions = [12, 24, 48];
             this.pagination = {
                 first: { payload: `goto-${1}`, classes: page === 1 ? 'is-disabled' : '' },
@@ -6139,40 +3339,27 @@ class AwGalleryResultsDS extends DataSource {
                 links: this.makePagination(totalPages, page),
                 select: {
                     label: 'Numero di risultati',
-                    options: sizeOptions.map((/**
-                     * @param {?} o
-                     * @return {?}
-                     */
-                    (o) => ({
+                    options: sizeOptions.map((o) => ({
                         text: o,
                         selected: o === size,
-                    }))),
+                    })),
                     payload: 'select-size'
                 },
             };
-        });
-        this.makePagination = (/**
-         * @param {?} totalPages
-         * @param {?} currentPage
-         * @return {?}
-         */
-        (totalPages, currentPage) => {
+        };
+        this.makePagination = (totalPages, currentPage) => {
             /*
-                  Called by this.unpackData() when this.options.page is defined.
-                  Returns the data for <n7-pagination> component.
-                */
-            /** @type {?} */
+              Called by this.unpackData() when this.options.page is defined.
+              Returns the data for <n7-pagination> component.
+            */
             const result = [];
-            /** @type {?} */
             let limit = 5 - 1;
             if (totalPages <= limit) {
                 limit = totalPages - 1;
             }
             // always push the first page
             if (limit) {
-                /** @type {?} */
                 let lastPage;
-                /** @type {?} */
                 let firstPage;
                 if (currentPage > Math.floor(limit / 2)) {
                     if (totalPages === 2) {
@@ -6217,13 +3404,8 @@ class AwGalleryResultsDS extends DataSource {
                 }
             }
             return result;
-        });
+        };
     }
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         if (!data)
             return null;
@@ -6237,13 +3419,7 @@ class AwGalleryResultsDS extends DataSource {
             pagination: this.pagination
         };
     }
-    /**
-     * @param {?} a
-     * @param {?} size
-     * @return {?}
-     */
     chunks(a, size) {
-        /** @type {?} */
         const results = [];
         while (a.length) {
             results.push(a.splice(0, size));
@@ -6251,24 +3427,11 @@ class AwGalleryResultsDS extends DataSource {
         return results;
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryResultsDS.prototype.pagination;
-    /** @type {?} */
-    AwGalleryResultsDS.prototype.addPagination;
-    /** @type {?} */
-    AwGalleryResultsDS.prototype.makePagination;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
+// Any
 
 var DS$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     AwLinkedObjectsDS: AwLinkedObjectsDS,
     AwAutocompleteWrapperDS: AwAutocompleteWrapperDS,
     AwBubbleChartDS: AwBubbleChartDS,
@@ -6291,20 +3454,9 @@ var DS$1 = /*#__PURE__*/Object.freeze({
     AwGalleryResultsDS: AwGalleryResultsDS
 });
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwHeroEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-hero.click':
                     if (payload === 'cerca' && this.dataSource.currentInputValue) {
@@ -6322,28 +3474,19 @@ class AwHeroEH extends EventHandler {
                     console.warn('(hero) unhandled event of type', type);
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwHomeFacetsWrapperEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.changedInput$ = new Subject();
-        this.handleEyeClick = (/**
-         * @param {?} type
-         * @return {?}
-         */
-        (type) => {
+        this.handleEyeClick = (type) => {
             /*
               Toggles the status of the selected eye, then reloads the component.
             */
             if (this.dataSource.closedEyes) {
-                /** @type {?} */
                 const i = this.dataSource.closedEyes.indexOf(type);
                 if (i >= 0) { // if the eye was closed
                     this.dataSource.closedEyes.splice(i, 1); // open the eye
@@ -6356,12 +3499,8 @@ class AwHomeFacetsWrapperEH extends EventHandler {
                 this.dataSource.closedEyes = [type];
             }
             this.dataSource.update(this.dataSource.lastData); // reload the component with the same data
-        });
-        this.updateFilters = (/**
-         * @param {?} selectedBubble
-         * @return {?}
-         */
-        (selectedBubble) => {
+        };
+        this.updateFilters = (selectedBubble) => {
             /*
               Adds (or removes) the ID of the selected bubble from the array of that type of entity.
               Example:
@@ -6371,13 +3510,11 @@ class AwHomeFacetsWrapperEH extends EventHandler {
                 • lockedFacets = { "org":[ "0263a407-d0dd" ] }
             */
             selectedBubble.entity.id.replace(/ /g, '-'); // fix for space in ID
-            // fix for space in ID
-            const { id, typeOfEntity } = selectedBubble.entity;
+            const { id, typeOfEntity } = selectedBubble.entity; // payload is the selected bubble
             if (!this.dataSource.lockedFacets[typeOfEntity]) {
                 this.dataSource.lockedFacets[typeOfEntity] = [];
             }
             if (this.dataSource.lockedFacets[typeOfEntity].includes(id)) {
-                /** @type {?} */
                 const i = this.dataSource.lockedFacets[typeOfEntity].indexOf(id);
                 this.dataSource.lockedFacets[typeOfEntity].splice(i, 1);
             }
@@ -6385,24 +3522,13 @@ class AwHomeFacetsWrapperEH extends EventHandler {
                 this.dataSource.lockedFacets[typeOfEntity].push(id);
             }
             this.dataSource.update(this.dataSource.lastData); // reload the component with the same data
-        });
+        };
     }
-    /**
-     * @return {?}
-     */
     listen() {
-        this.changedInput$.pipe(debounceTime(500)).subscribe((/**
-         * @param {?} payload
-         * @return {?}
-         */
-        (payload) => {
+        this.changedInput$.pipe(debounceTime(500)).subscribe((payload) => {
             this.emitOuter('change', payload);
-        }));
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        });
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 // toggle visibility from facet header
                 case 'aw-home-facets-wrapper.click':
@@ -6425,12 +3551,8 @@ class AwHomeFacetsWrapperEH extends EventHandler {
                     console.warn('unhandled inner event of type:', type);
                     break;
             }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-home-layout.facetswrapperrequest': // incoming autocomplete response
                     this.dataSource.tippyMaker(payload.facetId.inputPayload);
@@ -6445,15 +3567,11 @@ class AwHomeFacetsWrapperEH extends EventHandler {
                     this.updateFilters(payload);
                     break;
                 case 'aw-home-layout.tagclick':
-                    Object.keys(this.dataSource.lockedFacets).forEach((/**
-                     * @param {?} key
-                     * @return {?}
-                     */
-                    (key) => {
+                    Object.keys(this.dataSource.lockedFacets).forEach((key) => {
                         if (this.dataSource.lockedFacets[key].includes(payload)) {
                             this.dataSource.lockedFacets[key].splice(this.dataSource.lockedFacets[key].indexOf(payload), 1);
                         }
-                    }));
+                    });
                     this.dataSource.update(this.dataSource.lastData);
                     break;
                 case 'aw-home-layout.clearselection':
@@ -6478,48 +3596,19 @@ class AwHomeFacetsWrapperEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeFacetsWrapperEH.prototype.changedInput$;
-    /** @type {?} */
-    AwHomeFacetsWrapperEH.prototype.handleEyeClick;
-    /** @type {?} */
-    AwHomeFacetsWrapperEH.prototype.updateFilters;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwHomeHeroPatrimonioEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
         // no events
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwHomeItemTagsWrapperEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} event
-         * @return {?}
-         */
-        (event) => {
+        this.innerEvents$.subscribe((event) => {
             switch (event.type) {
                 case 'aw-home-item-tags-wrapper.click':
                     this.emitOuter('click', event.payload);
@@ -6527,27 +3616,16 @@ class AwHomeItemTagsWrapperEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
         /* this.outerEvents$.subscribe(event => {
     
         }); */
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwHomeAutocompleteEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-home-autocomplete.click':
                     this.emitOuter('click', payload);
@@ -6555,24 +3633,13 @@ class AwHomeAutocompleteEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwEntitaNavEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-entita-nav.click':
                     this.emitOuter('click', payload);
@@ -6581,7 +3648,7 @@ class AwEntitaNavEH extends EventHandler {
                     console.warn('unhandled event type');
                     break;
             }
-        }));
+        });
         /*
     
         this.outerEvents$.subscribe(event => {
@@ -6591,94 +3658,48 @@ class AwEntitaNavEH extends EventHandler {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwSchedaSidebarEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             if (type === 'aw-sidebar-header.click') {
                 this.dataSource.toggleSidebar();
                 this.emitOuter(type, payload);
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwSidebarHeaderEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             if (type === 'aw-sidebar-header.click') {
                 this.dataSource.toggleSidebar();
                 this.emitOuter('click', payload);
             }
-        }));
+        });
         /* this.outerEvents$.subscribe(event => {
     
         }); */
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwTreeEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.targetOffset = new ReplaySubject();
         this.targetIsOpen = false;
-        this.scrollOpenedIntoView = (/**
-         * @return {?}
-         */
-        () => {
+        this.scrollOpenedIntoView = () => {
             this.dataSource.out$
-                .pipe(filter((/**
-             * @param {?} data
-             * @return {?}
-             */
-            (data) => !!data)), first(), withLatestFrom(this.targetOffset)).subscribe((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ([, offset]) => {
-                setTimeout((/**
-                 * @return {?}
-                 */
-                () => {
-                    /** @type {?} */
-                    const wrapperEl = (/** @type {?} */ (document.querySelector('.aw-scheda__tree-content')));
-                    /** @type {?} */
+                .pipe(filter((data) => !!data), first(), withLatestFrom(this.targetOffset)).subscribe(([, offset]) => {
+                setTimeout(() => {
+                    const wrapperEl = document.querySelector('.aw-scheda__tree-content');
                     const expandedNode = document.getElementsByClassName('n7-tree__item is-expanded');
-                    /** @type {?} */
                     const lastExpandedNode = expandedNode.length
                         ? expandedNode[expandedNode.length - 1]
                         : null;
                     if (lastExpandedNode) {
-                        /** @type {?} */
-                        const scrollTreeEl = (/** @type {?} */ (document.querySelector('.n7-tree')));
-                        /** @type {?} */
+                        const scrollTreeEl = document.querySelector('.n7-tree');
                         const wrapperElRect = wrapperEl.getBoundingClientRect();
-                        /** @type {?} */
                         const offsetToAdjust = offset - wrapperElRect.top;
                         scrollTreeEl.style.marginBottom = '1000px';
                         lastExpandedNode.scrollIntoView();
@@ -6686,72 +3707,45 @@ class AwTreeEH extends EventHandler {
                         window.scrollTo(0, 0);
                         scrollTreeEl.style.marginBottom = '0px';
                     }
-                }), 200);
-            }));
-        });
-        this.scrollLeafIntoView = (/**
-         * @return {?}
-         */
-        () => {
-            /** @type {?} */
+                }, 200);
+            });
+        };
+        this.scrollLeafIntoView = () => {
             const treeNode = document.querySelector('div.aw-scheda__tree');
-            setTimeout((/**
-             * @return {?}
-             */
-            () => {
-                /** @type {?} */
+            setTimeout(() => {
                 const leafNode = treeNode.querySelector('.is-active');
                 if (leafNode && !this.isInViewport(leafNode)) {
                     leafNode.scrollIntoView();
                     window.scrollTo(0, 0);
                 }
-            }), 200);
-        });
-        this.isInViewport = (/**
-         * @param {?} elem
-         * @return {?}
-         */
-        (elem) => {
-            /** @type {?} */
+            }, 200);
+        };
+        this.isInViewport = (elem) => {
             const bounding = elem.getBoundingClientRect();
             return (bounding.top >= 0
                 && bounding.left >= 0
                 && bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight)
                 && bounding.right <= (window.innerWidth || document.documentElement.clientWidth));
-        });
+        };
     }
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-tree.click':
                     if (payload.source === 'toggle') {
-                        setTimeout((/**
-                         * @return {?}
-                         */
-                        () => {
+                        setTimeout(() => {
                             this.dataSource.build(payload.id);
                             if (this.targetIsOpen) {
                                 this.scrollOpenedIntoView();
                             }
-                        }));
+                        });
                     }
                     break;
                 default:
                     break;
             }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-sidebar-header.click':
                     this.dataSource.toggleSidebar();
@@ -6764,7 +3758,6 @@ class AwTreeEH extends EventHandler {
                         if (payload.currentItem) {
                             this.dataSource.setActive(payload.currentItem);
                         }
-                        /** @type {?} */
                         const currentId = payload.currentItem || payload.tree.id;
                         this.dataSource.load(payload);
                         this.dataSource.build(currentId);
@@ -6781,21 +3774,13 @@ class AwTreeEH extends EventHandler {
                     break;
                 case 'aw-scheda-layout.viewleaf':
                     this.dataSource.out$
-                        .pipe(filter((/**
-                     * @param {?} data
-                     * @return {?}
-                     */
-                    (data) => !!data)), first()).subscribe((/**
-                     * @return {?}
-                     */
-                    () => {
+                        .pipe(filter((data) => !!data), first()).subscribe(() => {
                         this.scrollLeafIntoView();
-                    }));
+                    });
                     break;
                 case 'aw-scheda-layout.treeposition':
                     {
                         const { target } = payload;
-                        /** @type {?} */
                         const targetRect = target.getBoundingClientRect();
                         this.targetIsOpen = target.className.indexOf('n7-icon-angle-right') !== -1;
                         this.targetOffset.next(targetRect.top);
@@ -6804,64 +3789,19 @@ class AwTreeEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwTreeEH.prototype.targetOffset;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwTreeEH.prototype.targetIsOpen;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwTreeEH.prototype.scrollOpenedIntoView;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwTreeEH.prototype.scrollLeafIntoView;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwTreeEH.prototype.isInViewport;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwSearchLayoutTabsEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
         // TODO
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwGalleryResultsEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-gallery-results.change':
                     this.emitOuter('change', +payload.value);
@@ -6873,7 +3813,6 @@ class AwGalleryResultsEH extends EventHandler {
                             this.emitOuter('pagination', payload);
                         }
                         else if (payload.startsWith('goto')) {
-                            /** @type {?} */
                             const targetPage = +payload.replace('goto-', '');
                             // kill impossible page navigations
                             if (targetPage > this.dataSource.totalPages)
@@ -6891,26 +3830,17 @@ class AwGalleryResultsEH extends EventHandler {
                     console.warn('(gallery-results) unhandled inner event of type', type);
                     break;
             }
-        }));
+        });
         // this.outerEvents$.subscribe(({ type, payload }) => {
         // });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwLinkedObjectsEH extends EventHandler {
     constructor() {
         super(...arguments);
-        this.handleScroll = (/**
-         * @param {?} target
-         * @return {?}
-         */
-        (target) => {
+        this.handleScroll = (target) => {
             const { totalObjects, loadedData } = this.dataSource;
-            /** @type {?} */
             const loadedTotal = Array.isArray(loadedData.result) ? loadedData.result.length : 0;
             if (loadedTotal >= totalObjects) {
                 return;
@@ -6926,17 +3856,10 @@ class AwLinkedObjectsEH extends EventHandler {
                     currentPage: this.dataSource.currentPage,
                 });
             }
-        });
+        };
     }
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-linked-objects.change': // changed page size value (pagination)
                     this.emitOuter('change', +payload.value);
@@ -6945,12 +3868,8 @@ class AwLinkedObjectsEH extends EventHandler {
                     console.warn('unhandled event type: ', type, ' with payload: ', payload);
                     break;
             }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-home-layout.viewmore':
                     // ask home-layout for more data
@@ -6972,28 +3891,13 @@ class AwLinkedObjectsEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
 }
-if (false) {
-    /** @type {?} */
-    AwLinkedObjectsEH.prototype.handleScroll;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwAutocompleteWrapperEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-autocomplete-wrapper.click':
                     if (payload !== 'fallback-simple-autocomplete') { // if this is the fallback item, kill the event.
@@ -7004,35 +3908,23 @@ class AwAutocompleteWrapperEH extends EventHandler {
                     console.warn('unhandled event of type:', type);
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwBubbleChartEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.initialLoad = false;
-        this.toggleSelection = (/**
-         * @param {?} id
-         * @return {?}
-         */
-        (id) => {
+        this.toggleSelection = (id) => {
             /*
               Expects the ID of a bubble.
               Updates the graph with a new request
             */
             this.dataSource.handleBubbleClick(id);
             this.emitOuter('selection', this.dataSource.selected);
-        });
-        this.toggleFilter = (/**
-         * @param {?} f
-         * @return {?}
-         */
-        (f) => {
+        };
+        this.toggleFilter = (f) => {
             /*
               Toggle the clicked eye-filter in the filteres array and
               redraw the graph.
@@ -7044,40 +3936,23 @@ class AwBubbleChartEH extends EventHandler {
                 this.dataSource.filters.push(f);
             }
             this.dataSource.updateChart(null); // null means "reuse the last response"
-        });
+        };
     }
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-bubble-chart.click':
                     if (this.dataSource.options.selectable !== false) {
                         this.toggleSelection(payload);
                     }
-                    this.emitOuter('lockfilter', this.dataSource.chartData.find((/**
-                     * @param {?} el
-                     * @return {?}
-                     */
-                    (el) => payload === el.entity.id)));
+                    this.emitOuter('lockfilter', this.dataSource.chartData.find((el) => payload === el.entity.id));
                     break;
                 case 'aw-bubble-chart.d3end':
                     { // end of d3.js draw()
-                        // end of d3.js draw()
-                        /** @type {?} */
                         let filteredChartData;
                         // apply filters to the data before adding tooltips
                         if (this.dataSource.filters.length > 0) {
-                            filteredChartData = this.dataSource.chartData.filter((/**
-                             * @param {?} el
-                             * @return {?}
-                             */
-                            (el) => !this.dataSource.filters.includes(el.entity.typeOfEntity.replace(/ /g, '-'))));
+                            filteredChartData = this.dataSource.chartData.filter((el) => !this.dataSource.filters.includes(el.entity.typeOfEntity.replace(/ /g, '-')));
                         }
                         else {
                             filteredChartData = this.dataSource.chartData;
@@ -7092,23 +3967,14 @@ class AwBubbleChartEH extends EventHandler {
                     console.warn('unhandled inner event of type', type, 'with payload', payload);
                     break;
             }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-home-layout.select':
                     {
                         const { id } = payload;
                         this.toggleSelection(id);
-                        /** @type {?} */
-                        const foundBubble = this.dataSource.chartData.find((/**
-                         * @param {?} el
-                         * @return {?}
-                         */
-                        (el) => id === el.entity.id));
+                        const foundBubble = this.dataSource.chartData.find((el) => id === el.entity.id);
                         if (foundBubble) {
                             this.emitOuter('lockfilter', foundBubble);
                         }
@@ -7140,26 +4006,11 @@ class AwBubbleChartEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
 }
-if (false) {
-    /** @type {?} */
-    AwBubbleChartEH.prototype.initialLoad;
-    /** @type {?} */
-    AwBubbleChartEH.prototype.toggleSelection;
-    /** @type {?} */
-    AwBubbleChartEH.prototype.toggleFilter;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwTableEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
         /*
         this.innerEvents$.subscribe(event => {
@@ -7173,40 +4024,22 @@ class AwTableEH extends EventHandler {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwChartTippyEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.tippyList = []; // array of tippy instances
-        this.tippyMaker = (/**
-         * @param {?} bubbles
-         * @return {?}
-         */
-        (bubbles) => {
+        this.tippyMaker = (bubbles) => {
             /*
               Destroys every existing tooltip,
               then creates a new Tippy instance for each bubble.
             */
             // flush existing tooltips
-            this.tippyList.forEach((/**
-             * @param {?} t
-             * @return {?}
-             */
-            (t) => { if (t) {
+            this.tippyList.forEach((t) => { if (t) {
                 t.destroy();
-            } }));
+            } });
             this.tippyList = [];
             // create new tooltips
-            bubbles.forEach((/**
-             * @param {?} b
-             * @return {?}
-             */
-            (b) => {
-                // give a tooltip to each bubble
-                /** @type {?} */
+            bubbles.forEach((b) => {
                 const target = document.getElementById(`g_${b.entity.id}`);
                 if (target) {
                     this.tippyList.push(// add this tippy to the array of instances
@@ -7214,7 +4047,6 @@ class AwChartTippyEH extends EventHandler {
                         content: document.getElementById(`template__${b.entity.id}`),
                         interactive: true,
                         appendTo: document.body,
-                        // suppress interactive warning
                         arrow: true,
                         flip: false,
                         theme: 'light-border no-padding',
@@ -7223,19 +4055,11 @@ class AwChartTippyEH extends EventHandler {
                         updateDuration: 400,
                     }));
                 }
-            }));
-        });
+            });
+        };
     }
-    // array of tippy instances
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-chart-tippy.select':
                     this.emitOuter('select', payload);
@@ -7244,46 +4068,28 @@ class AwChartTippyEH extends EventHandler {
                     console.warn('(chart-tippy) unhandled inner event of type', type);
                     break;
             }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-home-layout.d3end':
                 case 'aw-entita-layout.d3end':
                 case 'aw-scheda-layout.d3end':
                     this.dataSource.update(payload); // creating DOM Elements (templates)
-                    setTimeout((/**
-                     * @return {?}
-                     */
-                    () => {
+                    setTimeout(() => {
                         this.tippyMaker(payload.bubbles); // assign templates to the bubbles
-                    }));
+                    });
                     break;
                 default:
                     break;
             }
-        }));
+        });
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwChartTippyEH.prototype.tippyList;
-    /** @type {?} */
-    AwChartTippyEH.prototype.tippyMaker;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
+// Home Layout
 
 var EH$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     AwHeroEH: AwHeroEH,
     AwHomeFacetsWrapperEH: AwHomeFacetsWrapperEH,
     AwHomeHeroPatrimonioEH: AwHomeHeroPatrimonioEH,
@@ -7302,11 +4108,6 @@ var EH$1 = /*#__PURE__*/Object.freeze({
     AwChartTippyEH: AwChartTippyEH
 });
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const AwEntitaLayoutConfig = {
     layoutId: 'aw-entita-layout',
     widgets: [
@@ -7330,21 +4131,7 @@ const AwEntitaLayoutConfig = {
     },
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwEntitaLayoutComponent extends AbstractLayout {
-    /**
-     * @param {?} router
-     * @param {?} route
-     * @param {?} location
-     * @param {?} configuration
-     * @param {?} layoutsConfiguration
-     * @param {?} communication
-     * @param {?} mainState
-     * @param {?} titleService
-     */
+let AwEntitaLayoutComponent = class AwEntitaLayoutComponent extends AbstractLayout {
     constructor(router, route, location, configuration, layoutsConfiguration, communication, mainState, titleService) {
         super(layoutsConfiguration.get('AwEntitaLayoutConfig') || AwEntitaLayoutConfig);
         this.router = router;
@@ -7357,13 +4144,9 @@ class AwEntitaLayoutComponent extends AbstractLayout {
         this.titleService = titleService;
     }
     /*
-        Optional variables that can be accessed from the layout's logic.
-        If removed, they must also be removed from the layout's DataSource file,
-        and from this file imports.
-       */
-    /**
-     * @protected
-     * @return {?}
+      Optional variables that can be accessed from the layout's logic.
+      If removed, they must also be removed from the layout's DataSource file,
+      and from this file imports.
      */
     initPayload() {
         return {
@@ -7377,26 +4160,13 @@ class AwEntitaLayoutComponent extends AbstractLayout {
             options: this.config.options || {},
         };
     }
-    /**
-     * @return {?}
-     */
     ngOnInit() {
         this.onInit();
     }
-    /**
-     * @return {?}
-     */
     ngOnDestroy() {
         this.onDestroy();
     }
-}
-AwEntitaLayoutComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'aw-entita-layout',
-                template: "<div class=\"aw-entity n7-side-auto-padding\" *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-title-wrapper-loading\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\"\n            class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-nav-loading\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2]\"\n            [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-nav'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <!-- lb.dataSource.selectedTab -->\n    <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content-loading\">\n        <div class=\"aw-entity__content-loading-title\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\"></n7-content-placeholder>\n        </div>\n\n        <div class=\"aw-entity__content-loading-items\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n            [data]=\"{\n                blocks: [\n                {\n                    classes: 'entity-placeholder-item-preview'\n                }\n                ]\n            }\"></n7-content-placeholder>\n        </div>\n    </div>\n\n    <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content\">\n        <section>\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\n                class=\"aw-entity__content-section\" [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <a *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/wiki']\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                    <a *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/maxxi']\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n            </div>\n\n            <ng-container \n                *ngIf=\"(\n                    lb.widgets['aw-entita-metadata-viewer'].ds.hasFields && \n                    ['overview', 'campi'].indexOf(lb.dataSource.selectedTab) !== -1\n                )\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n                    <div class=\"aw-entity__content-section-header\">\n                        <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                        <a \n                        *ngIf=\"lb.dataSource.selectedTab !== 'campi'\"\n                        class=\"n7-btn n7-btn-light\" \n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/campi']\">\n                            TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\n                        </a>\n                    </div>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async \">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews && lb.dataSource.myResponse.relatedItems\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <a *ngIf=\"lb.dataSource.selectedTab === 'overview' \"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/oggetti-collegati/']\"\n                        [queryParams]=\"{ page: 1 }\" class=\"n7-btn n7-btn-light\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <div class=\"aw-entity__content-item-previews\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <div class=\"aw-entity__content-item-preview-wrapper\">\n                            <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                            </n7-smart-breadcrumbs>\n                            <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                            <!-- relation -->\n                            <div class=\"aw-entity__relation\" *ngIf=\"preview.relation.value\">\n                                <p class=\"aw-entity__relation-description\">Relazione con \n                                <span class=\"aw-entity__relation-key\">{{preview.relation.key}}</span>:\n                                <span class=\"aw-entity__relation-value\"> {{preview.relation.value}}</span>\n                                </p>\n                            </div>\n                        </div>\n                    </ng-container>\n                </div>\n                <n7-smart-pagination \n                    *ngIf=\"lb.dataSource.selectedTab === 'oggetti-collegati'\"\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview aw-bubble-chart__{{lb.dataSource.selectedTab}}\"\n                *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.myResponse.relatedEntities\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <a *ngIf=\"lb.dataSource.selectedTab == 'overview'\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/entita-collegate']\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <!-- Small Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper-small\" *ngIf=\"lb.dataSource.selectedTab == 'overview'\">\n                    <aw-bubble-chart-wrapper>\n                        <!-- Tippy template moved to end of HTML -->\n                        <n7-bubble-chart [data]=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.smallView\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n                <!-- Big Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper\" *ngIf=\"lb.dataSource.selectedTab == 'entita-collegate'\">\n                    <aw-bubble-chart-wrapper>\n                        <!-- Tippy template moved to end of HTML -->\n                        <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                *ngIf=\"lb.dataSource.myResponse.extraTab\" [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n                *ngIf=\"lb.dataSource.myResponse.wikiTab\" [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{ lb.dataSource.myResponse.wikiTab.url }}\n                </a>\n            </div>\n        </section>\n    </div>\n    <!-- Template for bubble chart tooltips -->\n    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\" [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n    </aw-chart-tippy>\n</div>\n"
-            }] }
-];
-/** @nocollapse */
+};
 AwEntitaLayoutComponent.ctorParameters = () => [
     { type: Router },
     { type: ActivatedRoute },
@@ -7407,53 +4177,21 @@ AwEntitaLayoutComponent.ctorParameters = () => [
     { type: MainStateService },
     { type: Title }
 ];
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwEntitaLayoutComponent.prototype.router;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwEntitaLayoutComponent.prototype.route;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwEntitaLayoutComponent.prototype.location;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwEntitaLayoutComponent.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwEntitaLayoutComponent.prototype.layoutsConfiguration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwEntitaLayoutComponent.prototype.communication;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwEntitaLayoutComponent.prototype.mainState;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwEntitaLayoutComponent.prototype.titleService;
-}
+AwEntitaLayoutComponent = __decorate([
+    Component({
+        selector: 'aw-entita-layout',
+        template: "<div class=\"aw-entity n7-side-auto-padding\" *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-title-wrapper-loading\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\"\n            class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-nav-loading\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2]\"\n            [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-nav'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <!-- lb.dataSource.selectedTab -->\n    <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content-loading\">\n        <div class=\"aw-entity__content-loading-title\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\"></n7-content-placeholder>\n        </div>\n\n        <div class=\"aw-entity__content-loading-items\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n            [data]=\"{\n                blocks: [\n                {\n                    classes: 'entity-placeholder-item-preview'\n                }\n                ]\n            }\"></n7-content-placeholder>\n        </div>\n    </div>\n\n    <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content\">\n        <section>\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\n                class=\"aw-entity__content-section\" [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <a *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/wiki']\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                    <a *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/maxxi']\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n            </div>\n\n            <ng-container \n                *ngIf=\"(\n                    lb.widgets['aw-entita-metadata-viewer'].ds.hasFields && \n                    ['overview', 'campi'].indexOf(lb.dataSource.selectedTab) !== -1\n                )\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n                    <div class=\"aw-entity__content-section-header\">\n                        <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                        <a \n                        *ngIf=\"lb.dataSource.selectedTab !== 'campi'\"\n                        class=\"n7-btn n7-btn-light\" \n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/campi']\">\n                            TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\n                        </a>\n                    </div>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async \">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews && lb.dataSource.myResponse.relatedItems\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <a *ngIf=\"lb.dataSource.selectedTab === 'overview' \"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/oggetti-collegati/']\"\n                        [queryParams]=\"{ page: 1 }\" class=\"n7-btn n7-btn-light\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <div class=\"aw-entity__content-item-previews\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <div class=\"aw-entity__content-item-preview-wrapper\">\n                            <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                            </n7-smart-breadcrumbs>\n                            <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                            <!-- relation -->\n                            <div class=\"aw-entity__relation\" *ngIf=\"preview.relation.value\">\n                                <p class=\"aw-entity__relation-description\">Relazione con \n                                <span class=\"aw-entity__relation-key\">{{preview.relation.key}}</span>:\n                                <span class=\"aw-entity__relation-value\"> {{preview.relation.value}}</span>\n                                </p>\n                            </div>\n                        </div>\n                    </ng-container>\n                </div>\n                <n7-smart-pagination \n                    *ngIf=\"lb.dataSource.selectedTab === 'oggetti-collegati'\"\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview aw-bubble-chart__{{lb.dataSource.selectedTab}}\"\n                *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.myResponse.relatedEntities\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <a *ngIf=\"lb.dataSource.selectedTab == 'overview'\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/entita-collegate']\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <!-- Small Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper-small\" *ngIf=\"lb.dataSource.selectedTab == 'overview'\">\n                    <aw-bubble-chart-wrapper>\n                        <!-- Tippy template moved to end of HTML -->\n                        <n7-bubble-chart [data]=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.smallView\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n                <!-- Big Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper\" *ngIf=\"lb.dataSource.selectedTab == 'entita-collegate'\">\n                    <aw-bubble-chart-wrapper>\n                        <!-- Tippy template moved to end of HTML -->\n                        <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                *ngIf=\"lb.dataSource.myResponse.extraTab\" [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n                *ngIf=\"lb.dataSource.myResponse.wikiTab\" [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{ lb.dataSource.myResponse.wikiTab.url }}\n                </a>\n            </div>\n        </section>\n    </div>\n    <!-- Template for bubble chart tooltips -->\n    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\" [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n    </aw-chart-tippy>\n</div>\n"
+    }),
+    __metadata("design:paramtypes", [Router,
+        ActivatedRoute,
+        Location,
+        ConfigurationService,
+        LayoutsConfigurationService,
+        CommunicationService,
+        MainStateService,
+        Title])
+], AwEntitaLayoutComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwHomeLayoutDS extends LayoutDataSource {
     constructor() {
         super(...arguments);
@@ -7470,27 +4208,16 @@ class AwHomeLayoutDS extends LayoutDataSource {
         this.resultsListIsLoading = false;
         // ===== BUBBLE CHART =====
         this.bubblesEnabled = false; // true if this Arianna Web project has the bubble chart module
-        // true if this Arianna Web project has the bubble chart module
         this.selectedBubbles = []; // array of IDs
-        this.updateComponent = (/**
-         * @param {?} id
-         * @param {?} data
-         * @param {?=} options
-         * @return {?}
-         */
-        (id, data, options) => {
+        this.updateComponent = (id, data, options) => {
             // update components from EH
             if (options) {
                 this.one(id).updateOptions(options);
             }
             this.one(id).update(data);
-        });
+        };
     }
     // ========================
-    /**
-     * @param {?} __0
-     * @return {?}
-     */
     onInit({ communication, mainState, configuration, tippy, }) {
         this.communication = communication;
         this.configuration = configuration;
@@ -7519,80 +4246,44 @@ class AwHomeLayoutDS extends LayoutDataSource {
             selectable: true,
         });
     }
-    /**
-     * @return {?}
-     */
     onDestroy() {
         this.destroyed$.next();
     }
-    /**
-     * @param {?} query
-     * @param {?} params
-     * @return {?}
-     */
     makeRequest$(query, params) {
         // make request from EH
         return this.communication.request$(query, {
-            onError: (/**
-             * @param {?} error
-             * @return {?}
-             */
-            (error) => console.error(error)),
+            onError: (error) => console.error(error),
             params,
         });
     }
-    /**
-     * @return {?}
-     */
     initialFilterRequest() {
         return this.communication.request$('globalFilter', {
-            onError: (/**
-             * @param {?} error
-             * @return {?}
-             */
-            (error) => console.error(error)),
+            onError: (error) => console.error(error),
             params: {
                 entitiesListSize: this.configuration.get('bubble-chart').bubbleLimit,
             },
         });
     }
-    /**
-     * @param {?} response
-     * @return {?}
-     */
     parseInitialRequest(response) {
         this.firstBubbleResponse = response.entitiesData;
-        /** @type {?} */
         const facetData = [];
-        response.typeOfEntityData.forEach((/**
-         * @param {?} toe
-         * @return {?}
-         */
-        (toe) => {
-            /** @type {?} */
+        response.typeOfEntityData.forEach((toe) => {
             const TOEconfigData = this.configuration.get('config-keys')[toe.type];
-            facetData.push(Object.assign({}, toe, { enabled: true, locked: false }, TOEconfigData));
-        }));
+            facetData.push(Object.assign(Object.assign(Object.assign({}, toe), { enabled: true, locked: false }), TOEconfigData));
+        });
         this.one('aw-home-facets-wrapper').update(facetData);
     }
-    /**
-     * @param {?} response
-     * @return {?}
-     */
     renderPreviewsFromApolloQuery(response) {
         if (!response || !response.itemsPagination) {
             return;
         }
-        /** @type {?} */
         let numOfItems = response.itemsPagination.totalCount;
         if (numOfItems > 0) {
-            /** @type {?} */
             let numOfThousand = 0;
             while (numOfItems > 999) {
                 numOfItems -= 1000;
                 numOfThousand += 1;
             }
-            /** @type {?} */
             let numOfItemsTmpStr = `${numOfItems}`;
             if (numOfItems < 10)
                 numOfItemsTmpStr = `00${numOfItems}`;
@@ -7612,62 +4303,32 @@ class AwHomeLayoutDS extends LayoutDataSource {
         });
         this.one('aw-linked-objects').update(response.itemsPagination);
         // scroll control
-        setTimeout((/**
-         * @return {?}
-         */
-        () => {
+        setTimeout(() => {
             this._scrollBackgroundControl();
-        }));
+        });
     }
-    /**
-     * @param {?=} onlyBubbles
-     * @return {?}
-     */
     updateTags(onlyBubbles) {
         if (!onlyBubbles) {
             this.renderItemTags();
         }
     }
-    /**
-     * @param {?} change
-     * @return {?}
-     */
     handleFacetSearchChange(change) {
-        /** @type {?} */
         const payload = change.inputPayload;
         const { value } = change;
         // store the entered text in facetInputs
         this.facetInputs[payload] = value;
     }
-    /**
-     * @return {?}
-     */
     renderItemTags() {
         /*
-                  Try to build an item tag for each selected query looking at the data from the
-                  first response. If the needed bubble data cannot be found, ask the backend
-                  for that bubble's data.
-              */
-        /** @type {?} */
-        const queryList = [];
-        // list of pending queries
-        /** @type {?} */
-        const tagsData = [];
-        this.selectedBubbles.forEach((/**
-         * @param {?} b
-         * @return {?}
-         */
-        (b) => {
-            // try to get the data of each selected bubble
-            /** @type {?} */
-            const theBubble = this.firstBubbleResponse.find((/**
-             * @param {?} el
-             * @return {?}
-             */
-            (el) => el.entity.id === b));
+              Try to build an item tag for each selected query looking at the data from the
+              first response. If the needed bubble data cannot be found, ask the backend
+              for that bubble's data.
+          */
+        const queryList = []; // list of pending queries
+        const tagsData = []; // list of tags data built from query
+        this.selectedBubbles.forEach((b) => {
+            const theBubble = this.firstBubbleResponse.find((el) => el.entity.id === b);
             if (theBubble) { // if a bubble was found
-                // if a bubble was found
-                /** @type {?} */
                 const bubbleConfig = this.configuration.get('config-keys')[theBubble.entity.typeOfEntity];
                 tagsData.push({
                     label: theBubble.entity.label,
@@ -7677,24 +4338,13 @@ class AwHomeLayoutDS extends LayoutDataSource {
                 });
             }
             else { // if the bubble was not found, make a query
-                // if the bubble was not found, make a query
-                /** @type {?} */
                 const params = { entityId: b, entitiesListSize: 1 };
                 queryList.push(this.makeRequest$('getMissingBubble', params));
             }
-        }));
+        });
         if (queryList.length > 0) { // if there are pending bubble queries
-            forkJoin(queryList).subscribe((/**
-             * @param {?} forkres
-             * @return {?}
-             */
-            (forkres) => {
-                forkres.forEach((/**
-                 * @param {?} r
-                 * @return {?}
-                 */
-                (r) => {
-                    /** @type {?} */
+            forkJoin(queryList).subscribe((forkres) => {
+                forkres.forEach((r) => {
                     const bubbleConfig = this.configuration.get('config-keys')[r.typeOfEntity];
                     tagsData.push({
                         label: r.label,
@@ -7702,21 +4352,16 @@ class AwHomeLayoutDS extends LayoutDataSource {
                         payload: r.id,
                         classes: `tag-${bubbleConfig['class-name']}`,
                     });
-                }));
+                });
                 this.one('aw-home-item-tags-wrapper').update(tagsData);
-            }));
+            });
         }
         else {
             this.one('aw-home-item-tags-wrapper').update(tagsData);
         }
     }
-    /**
-     * @param {?} value
-     * @return {?}
-     */
     onHeroChange(value) {
         if (value) {
-            /** @type {?} */
             const escapedValue = helpers.escapeDoubleQuotes(value);
             this.autocompleteChanged$.next(escapedValue);
             this.homeAutocompleteIsLoading = true;
@@ -7729,45 +4374,23 @@ class AwHomeLayoutDS extends LayoutDataSource {
             this._toggleAutocompletePopover();
         }
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _scrollBackgroundControl() {
-        /** @type {?} */
         const node = document.getElementById('bubble-results-list');
         if (!node)
             return;
-        /** @type {?} */
         const source$ = fromEvent(node, 'scroll');
         // height control
-        setTimeout((/**
-         * @return {?}
-         */
-        () => {
+        setTimeout(() => {
             this._setHasScrollBackground(node);
-        }), 500);
+        }, 500);
         // scroll listen
-        source$.pipe(debounceTime(50)).subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ target }) => {
+        source$.pipe(debounceTime(50)).subscribe(({ target }) => {
             this._setHasScrollBackground(target);
-        }));
+        });
     }
-    /**
-     * @private
-     * @param {?} target
-     * @return {?}
-     */
     _setHasScrollBackground(target) {
         this.hasScrollBackground = target ? (target.scrollHeight > (target.scrollTop + target.clientHeight)) : false;
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _listenAutoCompleteChanges() {
         this.one('aw-home-autocomplete').updateOptions({
             keys: this.configuration.get('config-keys'),
@@ -7775,41 +4398,24 @@ class AwHomeLayoutDS extends LayoutDataSource {
             labels: this.configuration.get('labels'),
             paths: this.configuration.get('paths'),
         });
-        this.autocompleteChanged$.pipe(debounceTime(500), takeUntil(this.destroyed$)).subscribe((/**
-         * @param {?} value
-         * @return {?}
-         */
-        (value) => {
+        this.autocompleteChanged$.pipe(debounceTime(500), takeUntil(this.destroyed$)).subscribe((value) => {
             this.communication.request$('autoComplete', {
-                onError: (/**
-                 * @param {?} error
-                 * @return {?}
-                 */
-                (error) => console.error(error)),
+                onError: (error) => console.error(error),
                 params: {
                     input: value,
                     itemsPagination: { offset: 0, limit: this.configuration.get('home-layout')['results-limit'] },
                 },
-            }).subscribe((/**
-             * @param {?} response
-             * @return {?}
-             */
-            (response) => {
+            }).subscribe((response) => {
                 this.homeAutocompleteIsLoading = false;
                 this.one('aw-home-autocomplete').update({
                     response,
                     query: value,
                 });
-            }));
-        }));
+            });
+        });
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _toggleAutocompletePopover() {
         if (!this.autocompletePopover) {
-            /** @type {?} */
             const template = document.getElementById('aw-home-advanced-autocomplete-popover');
             template.style.display = 'block';
             const [popOver] = this.tippy('.aw-home__top-hero .n7-hero__input', {
@@ -7822,10 +4428,7 @@ class AwHomeLayoutDS extends LayoutDataSource {
                 theme: 'light-border',
                 placement: 'bottom-start',
                 maxWidth: '100%',
-                onHidden: (/**
-                 * @return {?}
-                 */
-                () => { this.autocompletePopoverOpen = false; }),
+                onHidden: () => { this.autocompletePopoverOpen = false; },
             });
             this.autocompletePopover = popOver;
         }
@@ -7838,116 +4441,22 @@ class AwHomeLayoutDS extends LayoutDataSource {
         this.autocompletePopoverOpen = !this.autocompletePopoverOpen;
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.communication;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.mainState;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.tippy;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.facetInputs;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.autocompletePopover;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.autocompletePopoverOpen;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.autocompleteChanged$;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.numOfItemsStr;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.currentHoverEntity;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.hasScrollBackground;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.resultsLimit;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.selectedEntitiesIds;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.outerLinks;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.outerLinksTitle;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.homeAutocompleteQuery;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutDS.prototype.destroyed$;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.homeAutocompleteIsLoading;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.resultsListIsLoading;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.bubblesEnabled;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.selectedBubbles;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.lastBubbleResponse;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.firstBubbleResponse;
-    /** @type {?} */
-    AwHomeLayoutDS.prototype.updateComponent;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwHomeLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.destroyed$ = new Subject();
-        this.handleSimpleAutocompleteClick = (/**
-         * @param {?} payload
-         * @return {?}
-         */
-        (payload) => {
+        this.handleSimpleAutocompleteClick = (payload) => {
             this.emitOuter('facetclick', payload);
-        });
-        this.handleChartSelection = (/**
-         * @param {?} payload
-         * @return {?}
-         */
-        (payload) => {
-            /** @type {?} */
+        };
+        this.handleChartSelection = (payload) => {
             const selectedEntitiesIds = payload;
             this.dataSource.selectedBubbles = payload;
             this.dataSource.resultsListIsLoading = true;
             this.dataSource.makeRequest$('globalFilter', {
                 selectedEntitiesIds,
                 entitiesListSize: this.configuration.get('bubble-chart').bubbleLimit,
-            }).subscribe((/**
-             * @param {?} res
-             * @return {?}
-             */
-            (res) => {
+            }).subscribe((res) => {
                 this.dataSource.resultsListIsLoading = false;
                 if (res && res.entitiesData.length > 0) {
                     // if some linked objects exist for the selected entities:
@@ -7958,48 +4467,26 @@ class AwHomeLayoutEH extends EventHandler {
                 }
                 else {
                     // if the backend returns an empty list of results:
-                    /** @type {?} */
                     const queryList = [];
-                    this.dataSource.selectedBubbles.forEach((/**
-                     * @param {?} b
-                     * @return {?}
-                     */
-                    (b) => {
-                        /** @type {?} */
+                    this.dataSource.selectedBubbles.forEach((b) => {
                         const params = { entityId: b, entitiesListSize: 1 };
                         queryList.push(// make a query for each selected bubble
                         this.dataSource.makeRequest$('getMissingBubble', params));
-                    }));
+                    });
                     // await for every missing bubble and build a custom response
-                    forkJoin(queryList).subscribe((/**
-                     * @param {?} forkres
-                     * @return {?}
-                     */
-                    (forkres) => {
-                        /** @type {?} */
+                    forkJoin(queryList).subscribe((forkres) => {
                         const customBubbles = [];
-                        forkres.forEach((/**
-                         * @param {?} r
-                         * @return {?}
-                         */
-                        (r) => { customBubbles.push({ count: 0, entity: r }); }));
+                        forkres.forEach((r) => { customBubbles.push({ count: 0, entity: r }); });
                         this.emitOuter('filterbubbleresponse', customBubbles);
                         this.dataSource.renderPreviewsFromApolloQuery(res);
                         this.dataSource.renderItemTags();
-                    }));
+                    });
                 }
-            }));
-        });
+            });
+        };
     }
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-home-layout.init':
                     this.dataSource.onInit(payload);
@@ -8017,9 +4504,7 @@ class AwHomeLayoutEH extends EventHandler {
                     break;
                 case 'aw-home-layout.bubbleresultsviewallclick':
                     {
-                        /** @type {?} */
                         const entityLinks = this.dataSource.selectedBubbles.join(',');
-                        /** @type {?} */
                         const basePath = this.configuration.get('paths').searchBasePath;
                         this.emitGlobal('navigate', {
                             handler: 'router',
@@ -8035,12 +4520,8 @@ class AwHomeLayoutEH extends EventHandler {
                     console.warn('(home) unhandled inner event of type: ', type);
                     break;
             }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-bubble-chart.d3end': // bounce the event, from bubble-chart to chart-tippy
                     this.emitOuter('d3end', payload);
@@ -8050,7 +4531,6 @@ class AwHomeLayoutEH extends EventHandler {
                     break;
                 case 'aw-hero.enter':
                     {
-                        /** @type {?} */
                         const query = payload.value;
                         this.emitGlobal('navigate', {
                             handler: 'router',
@@ -8075,7 +4555,6 @@ class AwHomeLayoutEH extends EventHandler {
                         this.emitOuter('facetswrapperrequest', { facetId: payload });
                         // clear autocomplete results
                         this.dataSource.updateComponent('aw-autocomplete-wrapper', { key: payload.value, response: null });
-                        /** @type {?} */
                         const params = {
                             input: payload.value,
                             typeOfEntity: payload.inputPayload.replace(/-search/g, '').replace(/-/g, ' '),
@@ -8083,13 +4562,8 @@ class AwHomeLayoutEH extends EventHandler {
                                 offset: 0, limit: this.configuration.get('home-layout')['results-limit'],
                             },
                         };
-                        this.dataSource.makeRequest$('autoComplete', params).subscribe((/**
-                         * @param {?} response
-                         * @return {?}
-                         */
-                        (response) => {
+                        this.dataSource.makeRequest$('autoComplete', params).subscribe((response) => {
                             if (response.results.length < 1) {
-                                /** @type {?} */
                                 const fallback = {
                                     totalcount: 0,
                                     results: [
@@ -8113,7 +4587,7 @@ class AwHomeLayoutEH extends EventHandler {
                                 { key: payload.value, response }, // DATA
                                 { config: this.configuration });
                             }
-                        }));
+                        });
                     }
                     break;
                 case 'aw-home-item-tags-wrapper.click':
@@ -8122,7 +4596,6 @@ class AwHomeLayoutEH extends EventHandler {
                 case 'aw-linked-objects.datarequest':
                     {
                         const { currentPage } = payload;
-                        /** @type {?} */
                         const params = {
                             selectedEntitiesIds: this.dataSource.selectedBubbles,
                             itemsPagination: {
@@ -8130,18 +4603,14 @@ class AwHomeLayoutEH extends EventHandler {
                                 limit: this.dataSource.resultsLimit,
                             },
                         };
-                        this.dataSource.makeRequest$('globalFilter', params).subscribe((/**
-                         * @param {?} res
-                         * @return {?}
-                         */
-                        (res) => {
+                        this.dataSource.makeRequest$('globalFilter', params).subscribe((res) => {
                             if (res) {
                                 this.emitOuter('dataresponse', { res });
                             }
                             else {
                                 console.warn('Unable to fetch additional data.');
                             }
-                        }));
+                        });
                     }
                     break;
                 case 'aw-autocomplete-wrapper.clickresult':
@@ -8150,7 +4619,6 @@ class AwHomeLayoutEH extends EventHandler {
                 case 'aw-home-autocomplete.click':
                     {
                         const { source, type: payloadType } = payload;
-                        /** @type {?} */
                         let basePath;
                         if (source === 'item') {
                             if (payloadType === 'oggetto-culturale') {
@@ -8165,7 +4633,6 @@ class AwHomeLayoutEH extends EventHandler {
                             });
                         }
                         else if (source === 'showMore') {
-                            /** @type {?} */
                             const query = this.dataSource.homeAutocompleteQuery;
                             basePath = this.configuration.get('paths').searchBasePath;
                             this.emitGlobal('navigate', {
@@ -8196,18 +4663,10 @@ class AwHomeLayoutEH extends EventHandler {
                     // console.warn('(home) unhandled outer event of type', type)
                     break;
             }
-        }));
+        });
     }
-    /**
-     * @private
-     * @return {?}
-     */
     loadFilters() {
-        this.dataSource.initialFilterRequest().subscribe((/**
-         * @param {?} response
-         * @return {?}
-         */
-        (response) => {
+        this.dataSource.initialFilterRequest().subscribe((response) => {
             // console.log('(home) Apollo responded with:', response)
             if (!response) {
                 return;
@@ -8216,44 +4675,13 @@ class AwHomeLayoutEH extends EventHandler {
             if (this.dataSource.bubblesEnabled) {
                 this.emitOuter('filterbubbleresponse', response.entitiesData);
             }
-        }));
+        });
     }
-    /**
-     * @param {?} type
-     * @param {?} payload
-     * @return {?}
-     */
     outerLinkClick(type, payload) {
         window.open(payload, '_blank');
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutEH.prototype.destroyed$;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutEH.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutEH.prototype.route;
-    /** @type {?} */
-    AwHomeLayoutEH.prototype.handleSimpleAutocompleteClick;
-    /** @type {?} */
-    AwHomeLayoutEH.prototype.handleChartSelection;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const AwHomeLayoutConfig = {
     layoutId: 'aw-home-layout',
     widgets: [{
@@ -8284,18 +4712,7 @@ const AwHomeLayoutConfig = {
     },
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwHomeLayoutComponent extends AbstractLayout {
-    /**
-     * @param {?} layoutsConfiguration
-     * @param {?} router
-     * @param {?} configuration
-     * @param {?} communication
-     * @param {?} mainState
-     */
+let AwHomeLayoutComponent = class AwHomeLayoutComponent extends AbstractLayout {
     constructor(layoutsConfiguration, router, configuration, communication, mainState) {
         super(layoutsConfiguration.get('AwHomeLayoutConfig') || AwHomeLayoutConfig);
         this.router = router;
@@ -8303,10 +4720,6 @@ class AwHomeLayoutComponent extends AbstractLayout {
         this.communication = communication;
         this.mainState = mainState;
     }
-    /**
-     * @protected
-     * @return {?}
-     */
     initPayload() {
         return {
             configuration: this.configuration,
@@ -8317,26 +4730,13 @@ class AwHomeLayoutComponent extends AbstractLayout {
             tippy,
         };
     }
-    /**
-     * @return {?}
-     */
     ngOnInit() {
         this.onInit();
     }
-    /**
-     * @return {?}
-     */
     ngOnDestroy() {
         this.onDestroy();
     }
-}
-AwHomeLayoutComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'aw-home-layout',
-                template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper n7-side-auto-padding\"\n        [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length > 0 }\" *ngIf=\"lb.dataSource.bubblesEnabled\">\n        <div class=\"aw-home__facets-wrapper-loading\" *ngIf=\"!(lb.widgets['aw-home-facets-wrapper'].ds.out$ | async)\">\n            <n7-content-placeholder *ngFor=\"let i of [0,1,2,3]\" [data]=\"{\n                blocks: [{\n                    classes: 'facet-placeholder-header'\n                }, {\n                    classes: 'facet-placeholder-input'\n                }] \n            }\"></n7-content-placeholder>\n        </div>\n        <div class=\"aw-home__facets-wrapper\" *ngIf=\"!!(lb.widgets['aw-home-facets-wrapper'].ds.out$ | async)\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div class=\"aw-home__bubble-chart-wrapper-loading\" *ngIf=\"!(lb.widgets['aw-bubble-chart'].ds.out$ | async)\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [\n                    {\n                        classes: 'facet-placeholder-item-1'\n                    }\n                ]\n            }\"></n7-content-placeholder>\n        </div>\n        <div class=\"aw-home__bubble-chart-wrapper\" *ngIf=\"!!(lb.widgets['aw-bubble-chart'].ds.out$ | async)\"\n            [style.overflow]=\"lb.dataSource.loadingBubbles ? 'visible' : 'hidden'\">\n            <aw-bubble-chart-wrapper>\n                <aw-chart-tippy \n                    [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                </aw-chart-tippy>\n                <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n\n        <!-- Linked objects -->\n        <ng-container *ngIf=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.selected.length > 0;\">\n            <div class=\"aw-home__bubble-results\" id=\"home-bubble-results\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\" class=\"aw-home__bubble-results-title-wrapper\">\n                    <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">\n                            {{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span>\n                    </h1>\n                </div>\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list-wrapper\">\n                    <div class=\"aw-home__bubble-results-list-loading\" *ngIf=\"lb.dataSource.resultsListIsLoading\">\n                        <n7-content-placeholder \n                            *ngFor=\"let i of [1, 2, 3, 4, 5]\"\n                            [data]=\"{\n                                blocks: [{\n                                    classes: 'search-result-placeholder-title'\n                                }, {\n                                    classes: 'search-result-placeholder-metadata'\n                                }]\n                        }\"></n7-content-placeholder>\n                    </div>\n                    <div *ngIf=\"!lb.dataSource.resultsListIsLoading\" class=\"aw-home__bubble-results-list\"\n                        [attr.id]=\"'bubble-results-list'\" (scroll)=\"lb.eventHandler.emitOuter('scroll', $event.target)\">\n\n                        <div class=\"aw-home__bubble-results-fallback\"\n                            *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length < 1;\">\n                            <p class=\"aw-home__bubble-results-fallback-text\">\n                                {{ (lb.widgets['aw-linked-objects'].ds.out$ | async)?.fallback }}\n                            </p>\n                            <button class=\"n7-btn aw-home__bubble-results-reset\"\n                                (click)=\"lb.eventHandler.emitInner('clearselection')\">\n                                Resetta la ricerca\n                            </button>\n                        </div>\n\n                        <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.result\">\n                            <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                            </n7-smart-breadcrumbs>\n                            <n7-item-preview [data]=\"preview\"\n                                                [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n                        <!-- <ng-container\n                            *ngFor=\"let widgetData of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.result;\">\n                            <n7-item-preview [data]=\"widgetData\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container> -->\n\n                        <ng-container *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.isLoading\">\n                            <div class=\"aw-home__bubble-results-list-loader\">\n                                <n7-loader [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.loaderData\">\n                                </n7-loader>\n                            </div>\n                        </ng-container>\n                    </div>\n                    <div [ngClass]=\"{ 'is-visible' : lb.dataSource.hasScrollBackground }\"\n                        class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                </div>\n                <!-- aw-linked-objects__actions -->\n                <ng-container\n                    *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length > 0 && !lb.dataSource.resultsListIsLoading\">\n                    <div *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.actions as action\"\n                        class=\"aw-home__bubble-results-list-actions\">\n                        <button (click)=\"lb.eventHandler.emitInner('bubbleresultsviewallclick')\"\n                            class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\">\n                            {{action[0].label}}\n                        </button>\n                    </div>\n                </ng-container>\n\n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Outer links -->\n    <div *ngIf=\"lb.dataSource.outerLinks && lb.dataSource.outerLinks.length > 0\" class=\"aw-home__outer-links\">\n        <section class=\"aw-home__outer-links-wrapper n7-side-auto-padding\">\n            <h2 class=\"aw-home__outer-links-title\" *ngIf=\"lb.dataSource.outerLinksTitle\">\n                {{ lb.dataSource.outerLinksTitle }}\n            </h2>\n            <div class=\"aw-home__outer-links-items\">\n                <!-- Item preview -->\n                <n7-item-preview *ngFor=\"let outerLink of lb.dataSource.outerLinks\" [data]=\"outerLink\"\n                    [emit]=\"lb.eventHandler.outerLinkClick.bind(lb.eventHandler)\">\n                </n7-item-preview>\n                <!-- END // Item preview -->\n            </div>\n        </section>\n    </div>\n    <!-- END // Outer links -->\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Adavanced autocomplete popover  -->\n    <div class=\"aw-home__advanced-autocomplete\" id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <div class=\"aw-home__advanced-autocomplete-loader\" *ngIf=\"lb.dataSource.homeAutocompleteIsLoading\">\n            <n7-loader [data]=\"{}\"></n7-loader>\n        </div>\n        <n7-advanced-autocomplete *ngIf=\"!lb.dataSource.homeAutocompleteIsLoading\"\n            [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n\n    <!-- Simple autocomplete popover. DO NOT CHANGE parent div class! -->\n    <!-- Creating one template for each facet -->\n    <div *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\"\n        class=\"aw-home__simple-autocomplete aw-simple-autocomplete__template\" style=\"display: none;\">\n        <div class=\"aw-home__simple-autocomplete-content aw-simple-autocomplete__tippy-wrapper\">\n            <div class=\"aw-home__simple-autocomplete-loader aw-simple-autocomplete__tippy-wrapper-loader\"\n                *ngIf=\"(lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async)?.loading\">\n                <n7-loader [data]=\"{}\"></n7-loader>\n            </div>\n            <n7-simple-autocomplete *ngIf=\"!(lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async)?.loading\"\n                [data]=\"lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-autocomplete-wrapper'].emit\">\n            </n7-simple-autocomplete>\n        </div>\n    </div>\n</div>\n"
-            }] }
-];
-/** @nocollapse */
+};
 AwHomeLayoutComponent.ctorParameters = () => [
     { type: LayoutsConfigurationService },
     { type: Router },
@@ -8344,33 +4744,18 @@ AwHomeLayoutComponent.ctorParameters = () => [
     { type: CommunicationService },
     { type: MainStateService }
 ];
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutComponent.prototype.router;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutComponent.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutComponent.prototype.communication;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwHomeLayoutComponent.prototype.mainState;
-}
+AwHomeLayoutComponent = __decorate([
+    Component({
+        selector: 'aw-home-layout',
+        template: "<div class=\"aw-home\" *ngIf=\"lb.dataSource\">\n    <!-- Hero section at the top of the page -->\n    <div class=\"aw-home__top-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-hero'].ds.out$ | async\" [emit]=\"lb.widgets['aw-hero'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Bubble chart -->\n    <div class=\"aw-home__bubble-wrapper n7-side-auto-padding\"\n        [ngClass]=\"{ 'has-results' : lb.dataSource.selectedBubbles.length > 0 }\" *ngIf=\"lb.dataSource.bubblesEnabled\">\n        <div class=\"aw-home__facets-wrapper-loading\" *ngIf=\"!(lb.widgets['aw-home-facets-wrapper'].ds.out$ | async)\">\n            <n7-content-placeholder *ngFor=\"let i of [0,1,2,3]\" [data]=\"{\n                blocks: [{\n                    classes: 'facet-placeholder-header'\n                }, {\n                    classes: 'facet-placeholder-input'\n                }] \n            }\"></n7-content-placeholder>\n        </div>\n        <div class=\"aw-home__facets-wrapper\" *ngIf=\"!!(lb.widgets['aw-home-facets-wrapper'].ds.out$ | async)\">\n            <span class=\"aw-home__facet\"\n                *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\">\n                <n7-facet-header [data]=\"widgetData.header\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet-header>\n                <n7-facet [data]=\"widgetData.input\" [emit]=\"lb.widgets['aw-home-facets-wrapper'].emit\">\n                </n7-facet>\n            </span>\n        </div>\n\n        <div class=\"aw-home__bubble-chart-wrapper-loading\" *ngIf=\"!(lb.widgets['aw-bubble-chart'].ds.out$ | async)\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [\n                    {\n                        classes: 'facet-placeholder-item-1'\n                    }\n                ]\n            }\"></n7-content-placeholder>\n        </div>\n        <div class=\"aw-home__bubble-chart-wrapper\" *ngIf=\"!!(lb.widgets['aw-bubble-chart'].ds.out$ | async)\"\n            [style.overflow]=\"lb.dataSource.loadingBubbles ? 'visible' : 'hidden'\">\n            <aw-bubble-chart-wrapper>\n                <aw-chart-tippy \n                    [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                </aw-chart-tippy>\n                <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                </n7-bubble-chart>\n            </aw-bubble-chart-wrapper>\n        </div>\n\n        <!-- Linked objects -->\n        <ng-container *ngIf=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.selected.length > 0;\">\n            <div class=\"aw-home__bubble-results\" id=\"home-bubble-results\">\n                <div *ngIf=\"lb.dataSource.numOfItemsStr\" class=\"aw-home__bubble-results-title-wrapper\">\n                    <h1 class=\"aw-home__bubble-results-title\"><strong class=\"aw-home__bubble-results-title-counter\">\n                            {{ lb.dataSource.numOfItemsStr }}</strong> <span> Oggetti culturali</span>\n                    </h1>\n                </div>\n                <div class=\"aw-home__bubble-tags-wrapper\">\n                    <h3 class=\"aw-home__bubble-tags-title\">Collegati a </h3>\n                    <ng-container *ngFor=\"let widgetData of lb.widgets['aw-home-item-tags-wrapper'].ds.out$ | async;\">\n                        <n7-tag [data]=\"widgetData\" [emit]=\"lb.widgets['aw-home-item-tags-wrapper'].emit\">\n                        </n7-tag>\n                        <br>\n                    </ng-container>\n                </div>\n                <div class=\"aw-home__bubble-results-list-wrapper\">\n                    <div class=\"aw-home__bubble-results-list-loading\" *ngIf=\"lb.dataSource.resultsListIsLoading\">\n                        <n7-content-placeholder \n                            *ngFor=\"let i of [1, 2, 3, 4, 5]\"\n                            [data]=\"{\n                                blocks: [{\n                                    classes: 'search-result-placeholder-title'\n                                }, {\n                                    classes: 'search-result-placeholder-metadata'\n                                }]\n                        }\"></n7-content-placeholder>\n                    </div>\n                    <div *ngIf=\"!lb.dataSource.resultsListIsLoading\" class=\"aw-home__bubble-results-list\"\n                        [attr.id]=\"'bubble-results-list'\" (scroll)=\"lb.eventHandler.emitOuter('scroll', $event.target)\">\n\n                        <div class=\"aw-home__bubble-results-fallback\"\n                            *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length < 1;\">\n                            <p class=\"aw-home__bubble-results-fallback-text\">\n                                {{ (lb.widgets['aw-linked-objects'].ds.out$ | async)?.fallback }}\n                            </p>\n                            <button class=\"n7-btn aw-home__bubble-results-reset\"\n                                (click)=\"lb.eventHandler.emitInner('clearselection')\">\n                                Resetta la ricerca\n                            </button>\n                        </div>\n\n                        <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.result\">\n                            <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                            </n7-smart-breadcrumbs>\n                            <n7-item-preview [data]=\"preview\"\n                                                [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n                        <!-- <ng-container\n                            *ngFor=\"let widgetData of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.result;\">\n                            <n7-item-preview [data]=\"widgetData\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                        </ng-container> -->\n\n                        <ng-container *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.isLoading\">\n                            <div class=\"aw-home__bubble-results-list-loader\">\n                                <n7-loader [data]=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.loaderData\">\n                                </n7-loader>\n                            </div>\n                        </ng-container>\n                    </div>\n                    <div [ngClass]=\"{ 'is-visible' : lb.dataSource.hasScrollBackground }\"\n                        class=\"aw-home__bubble-results-list-wrapper-with-scroll\"></div>\n                </div>\n                <!-- aw-linked-objects__actions -->\n                <ng-container\n                    *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.result.length > 0 && !lb.dataSource.resultsListIsLoading\">\n                    <div *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.actions as action\"\n                        class=\"aw-home__bubble-results-list-actions\">\n                        <button (click)=\"lb.eventHandler.emitInner('bubbleresultsviewallclick')\"\n                            class=\"n7-btn n7-btn-light n7-btn-l aw-home__bubble-results-list-view-all\">\n                            {{action[0].label}}\n                        </button>\n                    </div>\n                </ng-container>\n\n            </div>\n        </ng-container>\n    </div>\n\n    <!-- Outer links -->\n    <div *ngIf=\"lb.dataSource.outerLinks && lb.dataSource.outerLinks.length > 0\" class=\"aw-home__outer-links\">\n        <section class=\"aw-home__outer-links-wrapper n7-side-auto-padding\">\n            <h2 class=\"aw-home__outer-links-title\" *ngIf=\"lb.dataSource.outerLinksTitle\">\n                {{ lb.dataSource.outerLinksTitle }}\n            </h2>\n            <div class=\"aw-home__outer-links-items\">\n                <!-- Item preview -->\n                <n7-item-preview *ngFor=\"let outerLink of lb.dataSource.outerLinks\" [data]=\"outerLink\"\n                    [emit]=\"lb.eventHandler.outerLinkClick.bind(lb.eventHandler)\">\n                </n7-item-preview>\n                <!-- END // Item preview -->\n            </div>\n        </section>\n    </div>\n    <!-- END // Outer links -->\n\n    <!-- Hero section at the bottom of the page -->\n    <div class=\"aw-home__bottom-hero\">\n        <n7-hero [data]=\"lb.widgets['aw-home-hero-patrimonio'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-hero-patrimonio'].emit\">\n        </n7-hero>\n    </div>\n\n    <!-- Adavanced autocomplete popover  -->\n    <div class=\"aw-home__advanced-autocomplete\" id=\"aw-home-advanced-autocomplete-popover\" style=\"display: none;\">\n        <div class=\"aw-home__advanced-autocomplete-loader\" *ngIf=\"lb.dataSource.homeAutocompleteIsLoading\">\n            <n7-loader [data]=\"{}\"></n7-loader>\n        </div>\n        <n7-advanced-autocomplete *ngIf=\"!lb.dataSource.homeAutocompleteIsLoading\"\n            [data]=\"lb.widgets['aw-home-autocomplete'].ds.out$ | async\"\n            [emit]=\"lb.widgets['aw-home-autocomplete'].emit\">\n        </n7-advanced-autocomplete>\n    </div>\n\n    <!-- Simple autocomplete popover. DO NOT CHANGE parent div class! -->\n    <!-- Creating one template for each facet -->\n    <div *ngFor=\"let widgetData of lb.widgets['aw-home-facets-wrapper'].ds.out$ | async;\"\n        class=\"aw-home__simple-autocomplete aw-simple-autocomplete__template\" style=\"display: none;\">\n        <div class=\"aw-home__simple-autocomplete-content aw-simple-autocomplete__tippy-wrapper\">\n            <div class=\"aw-home__simple-autocomplete-loader aw-simple-autocomplete__tippy-wrapper-loader\"\n                *ngIf=\"(lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async)?.loading\">\n                <n7-loader [data]=\"{}\"></n7-loader>\n            </div>\n            <n7-simple-autocomplete *ngIf=\"!(lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async)?.loading\"\n                [data]=\"lb.widgets['aw-autocomplete-wrapper'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-autocomplete-wrapper'].emit\">\n            </n7-simple-autocomplete>\n        </div>\n    </div>\n</div>\n"
+    }),
+    __metadata("design:paramtypes", [LayoutsConfigurationService,
+        Router,
+        ConfigurationService,
+        CommunicationService,
+        MainStateService])
+], AwHomeLayoutComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwSchedaLayoutDS extends LayoutDataSource {
     constructor() {
         super(...arguments);
@@ -8381,15 +4766,8 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         this.treeMaxHeight = '100%';
         this.contentIsLoading = false;
         this.currentId = null;
-        this.getTree = (/**
-         * @return {?}
-         */
-        () => AwSchedaLayoutDS.tree);
+        this.getTree = () => AwSchedaLayoutDS.tree;
     }
-    /**
-     * @param {?} __0
-     * @return {?}
-     */
     onInit({ configuration, mainState, router, options, titleService, communication, }) {
         this.configuration = configuration;
         this.mainState = mainState;
@@ -8420,73 +4798,36 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         // sidebar sticky control
         this._sidebarStickyControl();
     }
-    /**
-     * @return {?}
-     */
     onDestroy() {
         this.destroyed$.next();
     }
-    /**
-     * @return {?}
-     */
     getMetadataSectionTitle() {
-        /** @type {?} */
         const layoutConfig = this.configuration.get('scheda-layout');
-        /** @type {?} */
         const metadataConfig = layoutConfig.metadata || {};
         return metadataConfig.title || null;
     }
-    /**
-     * @param {?} id
-     * @return {?}
-     */
     getNavigation(id) {
         if (AwSchedaLayoutDS.tree) {
             return of(AwSchedaLayoutDS.tree);
         }
         return this.communication.request$('getTree', {
-            onError: (/**
-             * @param {?} error
-             * @return {?}
-             */
-            (error) => console.error(error)),
+            onError: (error) => console.error(error),
             params: { treeId: id },
         });
     }
-    /**
-     * @param {?} tree
-     * @return {?}
-     */
     setTree(tree) {
         AwSchedaLayoutDS.tree = tree;
     }
-    /**
-     * @param {?} text
-     * @return {?}
-     */
     updateNavigation(text) {
         this.one('aw-sidebar-header').update({ text });
     }
-    /**
-     * @param {?} id
-     * @return {?}
-     */
     loadItem(id) {
-        /** @type {?} */
         const maxSimilarItems = this.configuration.get('scheda-layout')['related-items']['max-related-items'];
         return this.communication.request$('getNode', {
-            onError: (/**
-             * @param {?} error
-             * @return {?}
-             */
-            (error) => console.error(error)),
+            onError: (error) => console.error(error),
             params: { id, maxSimilarItems },
         });
     }
-    /**
-     * @param {?} response
-     * @return {?}
-     */
     loadContent(response) {
         if (response) {
             this.hasMetadata = Array.isArray(response.fields) && response.fields.length;
@@ -8495,7 +4836,6 @@ class AwSchedaLayoutDS extends LayoutDataSource {
             this.hasBubbles = Array.isArray(response.relatedEntities) && response.relatedEntities.length;
             this.hasImage = !!response.image;
             this.contentParts = [];
-            /** @type {?} */
             const content = { content: null };
             if (response.text) {
                 content.content = response.text;
@@ -8503,7 +4843,6 @@ class AwSchedaLayoutDS extends LayoutDataSource {
             this.contentParts.push(content);
             // image viewer
             if (response.images) {
-                /** @type {?} */
                 const viewerDataSource = this.getWidgetDataSource('aw-scheda-image');
                 if (!viewerDataSource.hasInstance()) {
                     this.one('aw-scheda-image').update(response);
@@ -8512,7 +4851,6 @@ class AwSchedaLayoutDS extends LayoutDataSource {
                     viewerDataSource.updateImages(response);
                 }
             }
-            /** @type {?} */
             const titleObj = {
                 icon: response.icon,
                 title: {
@@ -8527,16 +4865,11 @@ class AwSchedaLayoutDS extends LayoutDataSource {
             this.one('aw-scheda-inner-title').update(titleObj);
             this.one('aw-scheda-metadata').update(this.getFields(response));
             // Breadcrumb section
-            /** @type {?} */
             const breadcrumbs = {
                 items: [],
             };
             if (response.breadcrumbs) {
-                response.breadcrumbs.forEach((/**
-                 * @param {?} element
-                 * @return {?}
-                 */
-                (element) => {
+                response.breadcrumbs.forEach((element) => {
                     breadcrumbs.items.push({
                         label: element.label,
                         anchor: {
@@ -8547,7 +4880,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
                             ].join(''),
                         },
                     });
-                }));
+                });
                 this.one('aw-scheda-breadcrumbs').update(breadcrumbs);
             }
             // update head title
@@ -8558,43 +4891,24 @@ class AwSchedaLayoutDS extends LayoutDataSource {
             this.one('aw-linked-objects').update(response);
         }
         // control sticky
-        setTimeout((/**
-         * @return {?}
-         */
-        () => {
+        setTimeout(() => {
             this.stickyControlTrigger$.next();
-        }));
+        });
     }
-    /**
-     * @return {?}
-     */
     collapseSidebar() {
         this.sidebarCollapsed = !this.sidebarCollapsed;
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _sidebarStickyControl() {
         // no sticky for Internet Explorer
         if (helpers.browserIsIE()) {
             return;
         }
-        /** @type {?} */
         const source$ = fromEvent(window, 'scroll');
-        merge(source$, this.stickyControlTrigger$).pipe(takeUntil(this.destroyed$)).subscribe((/**
-         * @return {?}
-         */
-        () => {
-            /** @type {?} */
+        merge(source$, this.stickyControlTrigger$).pipe(takeUntil(this.destroyed$)).subscribe(() => {
             const windowTop = window.pageYOffset;
-            /** @type {?} */
             const windowBottom = window.scrollY + window.innerHeight;
-            /** @type {?} */
-            const wrapper = (/** @type {?} */ (document.getElementsByClassName('sticky-parent')[0]));
-            /** @type {?} */
+            const wrapper = document.getElementsByClassName('sticky-parent')[0];
             const wrapperTop = wrapper.offsetTop;
-            /** @type {?} */
             const wrapperBottom = wrapperTop + wrapper.clientHeight;
             this.sidebarIsSticky = wrapperTop <= windowTop;
             // tree height control
@@ -8610,19 +4924,12 @@ class AwSchedaLayoutDS extends LayoutDataSource {
             else {
                 this.treeMaxHeight = `${wrapperBottom - wrapperTop - 50}px`;
             }
-        }));
+        });
     }
-    /**
-     * @param {?} response
-     * @return {?}
-     */
     getFields(response) {
         const { fields, document_type: documenType } = response;
-        /** @type {?} */
         const paths = this.configuration.get('paths');
-        /** @type {?} */
         const labels = this.configuration.get('labels');
-        /** @type {?} */
         let metadataToShow = get(this.configuration.get('scheda-layout'), 'metadata-to-show', {});
         metadataToShow = metadataToShow[documenType] || [];
         return metadataHelper.normalize({
@@ -8635,113 +4942,20 @@ class AwSchedaLayoutDS extends LayoutDataSource {
     }
 }
 AwSchedaLayoutDS.tree = null;
-if (false) {
-    /** @type {?} */
-    AwSchedaLayoutDS.tree;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutDS.prototype.destroyed$;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutDS.prototype.stickyControlTrigger$;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutDS.prototype.communication;
-    /**
-     * @type {?}
-     * @protected
-     */
-    AwSchedaLayoutDS.prototype.configuration;
-    /**
-     * @type {?}
-     * @protected
-     */
-    AwSchedaLayoutDS.prototype.mainState;
-    /**
-     * @type {?}
-     * @protected
-     */
-    AwSchedaLayoutDS.prototype.router;
-    /**
-     * @type {?}
-     * @protected
-     */
-    AwSchedaLayoutDS.prototype.titleService;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.options;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.pageTitle;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.hasBreadcrumb;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.contentParts;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.tree;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.sidebarCollapsed;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.bubbleChartSectionTitle;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.similarItemsSectionTitle;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.metadataSectionTitle;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.hasMetadata;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.hasBubbles;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.bubblesEnabled;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.hasSimilarItems;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.hasImage;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.imageViewerIstance;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.sidebarIsSticky;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.treeMaxHeight;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.contentIsLoading;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.currentId;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.emptyLabel;
-    /** @type {?} */
-    AwSchedaLayoutDS.prototype.getTree;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwSchedaLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.destroyed$ = new Subject();
     }
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-scheda-layout.init':
                     {
                         this.dataSource.onInit(payload);
                         this.configuration = payload.configuration;
                         this.route = payload.route;
-                        /** @type {?} */
                         const paramId = this.route.snapshot.params.id || '';
                         if (paramId) {
                             this.dataSource.currentId = paramId;
@@ -8758,12 +4972,8 @@ class AwSchedaLayoutEH extends EventHandler {
                 default:
                     break;
             }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-bubble-chart.d3end': // bounce the event, from bubble-chart to chart-tippy
                     this.emitOuter('d3end', payload);
@@ -8788,19 +4998,10 @@ class AwSchedaLayoutEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
-    /**
-     * @private
-     * @return {?}
-     */
     listenRoute() {
-        this.route.paramMap.subscribe((/**
-         * @param {?} params
-         * @return {?}
-         */
-        (params) => {
-            /** @type {?} */
+        this.route.paramMap.subscribe((params) => {
             const paramId = params.get('id');
             if (paramId) {
                 if (paramId) {
@@ -8808,45 +5009,28 @@ class AwSchedaLayoutEH extends EventHandler {
                     this.emitOuter('routechanged', paramId);
                 }
                 this.dataSource.contentIsLoading = true;
-                this.dataSource.loadItem(paramId).subscribe((/**
-                 * @param {?} response
-                 * @return {?}
-                 */
-                (response) => {
+                this.dataSource.loadItem(paramId).subscribe((response) => {
                     this.dataSource.contentIsLoading = false;
                     if (response) {
                         this.dataSource.loadContent(response);
                         if (Array.isArray(response.relatedEntities) && response.relatedEntities.length) {
                             if (this.dataSource.bubblesEnabled) {
-                                response.relatedEntities.forEach((/**
-                                 * @param {?} el
-                                 * @return {?}
-                                 */
-                                (el) => {
+                                response.relatedEntities.forEach((el) => {
                                     el.entity.relationName = response.label.length > 30
                                         ? `${response.label.substr(0, 30)}... `
                                         : response.label;
-                                }));
+                                });
                                 this.emitOuter('filterbubbleresponse', response.relatedEntities);
                             }
                         }
                     }
-                }));
+                });
             }
-        }));
+        });
     }
-    /**
-     * @private
-     * @param {?} selectedItem
-     * @return {?}
-     */
     loadNavigation(selectedItem) {
         this.dataSource.updateNavigation('Loading...');
-        this.dataSource.getNavigation('patrimonio').subscribe((/**
-         * @param {?} response
-         * @return {?}
-         */
-        (response) => {
+        this.dataSource.getNavigation('patrimonio').subscribe((response) => {
             if (response) {
                 this.dataSource.setTree(response);
                 this.dataSource.updateNavigation(this.dataSource.getTree().label);
@@ -8856,32 +5040,10 @@ class AwSchedaLayoutEH extends EventHandler {
                     basePath: this.configuration.get('paths').schedaBasePath,
                 });
             }
-        }));
+        });
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutEH.prototype.destroyed$;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutEH.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutEH.prototype.route;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const AwPatrimonioLayoutConfig = {
     layoutId: 'aw-scheda-layout',
     /**
@@ -8908,20 +5070,7 @@ const AwPatrimonioLayoutConfig = {
     },
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwSchedaLayoutComponent extends AbstractLayout {
-    /**
-     * @param {?} router
-     * @param {?} route
-     * @param {?} configuration
-     * @param {?} layoutsConfiguration
-     * @param {?} mainState
-     * @param {?} titleService
-     * @param {?} communication
-     */
+let AwSchedaLayoutComponent = class AwSchedaLayoutComponent extends AbstractLayout {
     constructor(router, route, configuration, layoutsConfiguration, mainState, titleService, communication) {
         super(layoutsConfiguration.get('AwPatrimonioLayoutConfig') || AwPatrimonioLayoutConfig);
         this.router = router;
@@ -8936,8 +5085,6 @@ class AwSchedaLayoutComponent extends AbstractLayout {
      * Optional variables that can be accessed from the layout's logic.
      * If removed, they must also be removed from the layout's DataSource file,
      * and from this file imports.
-     * @protected
-     * @return {?}
      */
     initPayload() {
         return {
@@ -8950,26 +5097,13 @@ class AwSchedaLayoutComponent extends AbstractLayout {
             options: this.config.options || {},
         };
     }
-    /**
-     * @return {?}
-     */
     ngOnInit() {
         this.onInit();
     }
-    /**
-     * @return {?}
-     */
     ngOnDestroy() {
         this.onDestroy();
     }
-}
-AwSchedaLayoutComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'aw-scheda-layout',
-                template: "<div class=\"aw-scheda\"\n     id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                               [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n            <div class=\"aw-scheda__tree-content-loading\"\n                 *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                        [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n            </div>\n            <div class=\"aw-scheda__tree-content\"\n                 (click)=\"lb.eventHandler.emitOuter('treeposition', $event)\"\n                 [ngStyle]=\"{\n                    'max-height': lb.dataSource.treeMaxHeight,\n                    'overflow': 'auto'\n                }\">\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                         [emit]=\"lb.widgets['aw-tree'].emit\"\n                         *ngIf=\"!lb.dataSource.sidebarCollapsed\">\n                </n7-tree>\n            </div>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper-loading\"\n             [hidden]=\"!lb.dataSource.contentIsLoading\">\n            <!--\n                <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'content-placeholder-title'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }]\n            }\"></n7-content-placeholder>\n            -->\n        </div>\n        <div class=\"aw-scheda__scheda-wrapper\"\n             [hidden]=\"lb.dataSource.contentIsLoading\">\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                                  [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                                  [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\"\n                 class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n\n            <div *ngIf=\"!lb.dataSource.currentId\"\n                 class=\"aw-scheda__intro-text\"\n                 [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <section class=\"aw-scheda__section aw-scheda__image-viewer\"\n                     [hidden]=\"!lb.dataSource.hasImage\">\n                <n7-image-viewer [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n                </n7-image-viewer>\n            </section>\n\n            <section class=\"aw-scheda__section aw-scheda__description\"\n                     *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__section aw-scheda__metadata\"\n            *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\"\n                *ngIf=\"lb.dataSource.metadataSectionTitle\"> \n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section class=\"aw-scheda__section aw-scheda__bubble-chart\"\n                     *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\n                <div *ngIf=\"lb.dataSource.hasBubbles\"\n                     class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <aw-bubble-chart-wrapper>\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                    </aw-chart-tippy>\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </section>\n\n            <section *ngIf=\"lb.dataSource.hasSimilarItems && lb.dataSource.hasBubbles\"\n                     id=\"related-item-container\"\n                     class=\"aw-scheda__section aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.similarItemsSectionTitle}}\n                </div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview [data]=\"preview\"\n                                         [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n            </section>\n        </div>\n    </div>\n</div>\n"
-            }] }
-];
-/** @nocollapse */
+};
 AwSchedaLayoutComponent.ctorParameters = () => [
     { type: Router },
     { type: ActivatedRoute },
@@ -8979,48 +5113,20 @@ AwSchedaLayoutComponent.ctorParameters = () => [
     { type: Title },
     { type: CommunicationService }
 ];
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutComponent.prototype.router;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutComponent.prototype.route;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutComponent.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutComponent.prototype.layoutsConfiguration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutComponent.prototype.mainState;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutComponent.prototype.titleService;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSchedaLayoutComponent.prototype.communication;
-}
+AwSchedaLayoutComponent = __decorate([
+    Component({
+        selector: 'aw-scheda-layout',
+        template: "<div class=\"aw-scheda\"\n     id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                               [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n            <div class=\"aw-scheda__tree-content-loading\"\n                 *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                        [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n            </div>\n            <div class=\"aw-scheda__tree-content\"\n                 (click)=\"lb.eventHandler.emitOuter('treeposition', $event)\"\n                 [ngStyle]=\"{\n                    'max-height': lb.dataSource.treeMaxHeight,\n                    'overflow': 'auto'\n                }\">\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                         [emit]=\"lb.widgets['aw-tree'].emit\"\n                         *ngIf=\"!lb.dataSource.sidebarCollapsed\">\n                </n7-tree>\n            </div>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper-loading\"\n             [hidden]=\"!lb.dataSource.contentIsLoading\">\n            <!--\n                <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'content-placeholder-title'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }]\n            }\"></n7-content-placeholder>\n            -->\n        </div>\n        <div class=\"aw-scheda__scheda-wrapper\"\n             [hidden]=\"lb.dataSource.contentIsLoading\">\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                                  [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                                  [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\"\n                 class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n\n            <div *ngIf=\"!lb.dataSource.currentId\"\n                 class=\"aw-scheda__intro-text\"\n                 [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <section class=\"aw-scheda__section aw-scheda__image-viewer\"\n                     [hidden]=\"!lb.dataSource.hasImage\">\n                <n7-image-viewer [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n                </n7-image-viewer>\n            </section>\n\n            <section class=\"aw-scheda__section aw-scheda__description\"\n                     *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__section aw-scheda__metadata\"\n            *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\"\n                *ngIf=\"lb.dataSource.metadataSectionTitle\"> \n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section class=\"aw-scheda__section aw-scheda__bubble-chart\"\n                     *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\n                <div *ngIf=\"lb.dataSource.hasBubbles\"\n                     class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <aw-bubble-chart-wrapper>\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                    </aw-chart-tippy>\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </section>\n\n            <section *ngIf=\"lb.dataSource.hasSimilarItems && lb.dataSource.hasBubbles\"\n                     id=\"related-item-container\"\n                     class=\"aw-scheda__section aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.similarItemsSectionTitle}}\n                </div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview [data]=\"preview\"\n                                         [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n            </section>\n        </div>\n    </div>\n</div>\n"
+    }),
+    __metadata("design:paramtypes", [Router,
+        ActivatedRoute,
+        ConfigurationService,
+        LayoutsConfigurationService,
+        MainStateService,
+        Title,
+        CommunicationService])
+], AwSchedaLayoutComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 var facetsConfig = {
     totalCount: 0,
     facets: [
@@ -9167,11 +5273,8 @@ var facetsConfig = {
     ],
     results: {
         order: {
-            // Default Sorting Method
             type: 'text',
-            // score | text | date
             key: 'label_sort',
-            // docPath, elastic key, ecc
             direction: 'ASC' // ASC | DESC
         },
         fields: [
@@ -9185,44 +5288,27 @@ var facetsConfig = {
     page: { offset: 0, limit: 10 },
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const SEARCH_MODEL_ID = 'aw-search-layout';
 class AwSearchLayoutDS extends LayoutDataSource {
     constructor() {
         super(...arguments);
         this.destroyed$ = new Subject();
         this.resetButtonEnabled = true;
-        /**
-         * Pagination value (url parameter)
-         */
+        /** Pagination value (url parameter) */
         this.currentPage = 1;
-        /**
-         * Linked objects page size
-         */
+        /** Linked objects page size */
         this.pageSize = 10;
         this.sidebarIsSticky = false;
         this.isFirstLoading = true;
         this.resultsLoading = false;
-        /**
-         * True when the user has input a text string
-         */
+        /** True when the user has input a text string */
         this.isSearchingText = new BehaviorSubject(false);
-        /**
-         * Current order method
-         */
+        /** Current order method */
         this.orderBy = 'label_sort';
-        /**
-         * Current order direction
-         */
+        /** Current order direction */
         this.orderDirection = 'ASC';
         this.orderByLabel = 'Ordina per';
-        /**
-         * Options used to render the HTMLSelect
-         */
+        /** Options used to render the HTMLSelect */
         this.orderByOptions = [
             {
                 value: '_score_DESC',
@@ -9241,10 +5327,7 @@ class AwSearchLayoutDS extends LayoutDataSource {
                 selected: false
             }
         ];
-        this.drawPagination = (/**
-         * @return {?}
-         */
-        () => {
+        this.drawPagination = () => {
             const { href, queryParams } = this._getPaginationParams();
             this.one('n7-smart-pagination').updateOptions({
                 mode: 'href',
@@ -9260,16 +5343,9 @@ class AwSearchLayoutDS extends LayoutDataSource {
                     active: this.pageSize,
                 },
             });
-        });
-        this.getSearchModelId = (/**
-         * @return {?}
-         */
-        () => SEARCH_MODEL_ID);
+        };
+        this.getSearchModelId = () => SEARCH_MODEL_ID;
     }
-    /**
-     * @param {?} __0
-     * @return {?}
-     */
     onInit({ configuration, mainState, options, communication, search, }) {
         this.configuration = configuration;
         this.mainState = mainState;
@@ -9296,16 +5372,10 @@ class AwSearchLayoutDS extends LayoutDataSource {
         this.mainState.updateCustom('currentNav', 'ricerca');
         this.mainState.update('headTitle', 'Arianna4View - Ricerca');
     }
-    /**
-     * @return {?}
-     */
     onDestroy() {
         this.destroyed$.next();
         SearchService.queryParams = null;
     }
-    /**
-     * @return {?}
-     */
     onSearchResponse() {
         this.resetButtonEnabled = true;
         if (this.isFirstLoading) {
@@ -9316,22 +5386,14 @@ class AwSearchLayoutDS extends LayoutDataSource {
     }
     /**
      * Handles changes of the HTMLSelect order control
-     * @param {?} payload _score_DESC, label_sort_ASC, label_sort_DESC
-     * @return {?}
+     * @param payload _score_DESC, label_sort_ASC, label_sort_DESC
      */
     onOrderByChange(payload) {
-        /** @type {?} */
         const orderBy = payload.substring(0, payload.lastIndexOf('_'));
-        /** @type {?} */
         const direction = payload.substring(payload.lastIndexOf('_') + 1);
-        /** @type {?} */
         let type = '';
         // set selected
-        this.orderByOptions.forEach((/**
-         * @param {?} option
-         * @return {?}
-         */
-        (option) => {
+        this.orderByOptions.forEach((option) => {
             if (option.value === payload) {
                 option.selected = true;
                 type = option.type;
@@ -9339,88 +5401,51 @@ class AwSearchLayoutDS extends LayoutDataSource {
             else {
                 option.selected = false;
             }
-        }));
+        });
         this.orderBy = orderBy;
         this.orderDirection = direction;
         this.searchModel.setSearchConfigOrderBy(orderBy);
         this.searchModel.setSearchConfigDirection(direction);
         this.searchModel.setSearchConfigType(type);
     }
-    /**
-     * @param {?} size
-     * @return {?}
-     */
     onPageSizeChange(size) {
         this.pageSize = size;
         return this._updateSearchPage(this.currentPage);
     }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     onPaginationChange(payload) {
-        /** @type {?} */
         const page = payload.replace('page-', '');
         return this._updateSearchPage(page);
     }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     onPaginationGoToChange(payload) {
-        /** @type {?} */
         const page = payload.replace('goto-', '');
         return this._updateSearchPage(page);
     }
-    /**
-     * @return {?}
-     */
     resetPagination() {
         this._updateSearchPage(1);
     }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     onResultsLimitChange(payload) {
         this.setLimit(payload);
         // reset page & offset
         this.currentPage = 1;
         this.searchModel.setPageConfigOffset(0);
     }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     setLimit(payload) {
         this.pageSize = payload;
         this.searchModel.setPageConfigLimit(payload);
         this.searchModel.setPageConfigOffset((this.currentPage - 1) * this.pageSize);
     }
-    /**
-     * @return {?}
-     */
     doSearchRequest$() {
-        /** @type {?} */
         const requestParams = this.searchModel.getRequestParams();
-        /** @type {?} */
         const requestPayload = {
-            searchParameters: Object.assign({ totalCount: 100 }, requestParams),
+            searchParameters: Object.assign({ 
+                // FIXME: togliere totalCount
+                totalCount: 100 }, requestParams),
         };
         return this.communication.request$('search', {
-            onError: (/**
-             * @param {?} error
-             * @return {?}
-             */
-            (error) => console.error(error)),
+            onError: (error) => console.error(error),
             params: requestPayload,
-        }).pipe(tap((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ totalCount, results, facets }) => {
+        }).pipe(tap(({ totalCount, results, facets }) => {
             this.totalCount = totalCount;
-            /** @type {?} */
             let resultsTitleIndex = 0;
             // results title
             if (this.totalCount > 1) {
@@ -9449,79 +5474,35 @@ class AwSearchLayoutDS extends LayoutDataSource {
             });
             this.drawPagination();
             this.one('aw-linked-objects').update({ items: this._normalizeItems(results.items) });
-        })));
+        }));
     }
-    /**
-     * @private
-     * @param {?} page
-     * @return {?}
-     */
     _updateSearchPage(page) {
         if (+page === this.currentPage) {
             return of(false);
         }
         this.currentPage = +page;
-        /** @type {?} */
         const searchConfig = this.searchModel.getConfig();
-        /** @type {?} */
         const pageConfig = searchConfig.page;
         const { limit } = pageConfig;
-        /** @type {?} */
         const newOffset = (this.currentPage - 1) * limit;
         this.searchModel.setPageConfigOffset(newOffset);
         return of(true);
     }
-    /**
-     * @private
-     * @param {?} facets
-     * @return {?}
-     */
     _addFacetsLabels(facets) {
         facets
-            .filter((/**
-         * @param {?} f
-         * @return {?}
-         */
-        (f) => Array.isArray(f.data)))
-            .forEach((/**
-         * @param {?} f
-         * @return {?}
-         */
-        (f) => {
-            f.data.forEach((/**
-             * @param {?} dataItem
-             * @return {?}
-             */
-            (dataItem) => {
-                /** @type {?} */
+            .filter((f) => Array.isArray(f.data))
+            .forEach((f) => {
+            f.data.forEach((dataItem) => {
                 const key = dataItem.label;
                 dataItem.label = helpers.prettifySnakeCase(key, this.prettifyLabels[key]);
-            }));
-        }));
+            });
+        });
     }
-    /**
-     * @private
-     * @param {?} facets
-     * @return {?}
-     */
     _addFacetsOptions(facets) {
         facets
-            .filter((/**
-         * @param {?} f
-         * @return {?}
-         */
-        (f) => f.id === 'query-links'))
-            .forEach((/**
-         * @param {?} f
-         * @return {?}
-         */
-        (f) => {
-            f.data.forEach((/**
-             * @param {?} dataItem
-             * @return {?}
-             */
-            (dataItem) => {
-                /** @type {?} */
+            .filter((f) => f.id === 'query-links')
+            .forEach((f) => {
+            f.data.forEach((dataItem) => {
                 const config = this.configKeys[dataItem.value];
                 if (config) {
                     dataItem.options = {
@@ -9529,59 +5510,29 @@ class AwSearchLayoutDS extends LayoutDataSource {
                         classes: `color-${config['class-name']}`,
                     };
                 }
-            }));
-        }));
+            });
+        });
     }
-    /**
-     * @private
-     * @param {?} items
-     * @return {?}
-     */
     _normalizeItems(items) {
-        return items.map((/**
-         * @param {?} singleItem
-         * @return {?}
-         */
-        (singleItem) => ({ item: Object.assign({}, singleItem) })));
+        return items.map((singleItem) => ({ item: Object.assign({}, singleItem) }));
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _sidebarStickyControl() {
         // no sticky for Internet Explorer
         if (helpers.browserIsIE()) {
             return;
         }
-        /** @type {?} */
         const source$ = fromEvent(window, 'scroll');
-        source$.pipe(takeUntil(this.destroyed$)).subscribe((/**
-         * @return {?}
-         */
-        () => {
-            /** @type {?} */
+        source$.pipe(takeUntil(this.destroyed$)).subscribe(() => {
             const windowOffsetTop = window.pageYOffset;
-            /** @type {?} */
-            const stickyParent = (/** @type {?} */ (document.getElementsByClassName('sticky-parent')[0]));
-            /** @type {?} */
+            const stickyParent = document.getElementsByClassName('sticky-parent')[0];
             const wrapperOffsetTop = stickyParent ? stickyParent.offsetTop : 0;
             this.sidebarIsSticky = wrapperOffsetTop <= windowOffsetTop;
-        }));
+        });
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _getPaginationParams() {
-        /** @type {?} */
         const requestParams = this.searchModel.getRequestParams();
-        /** @type {?} */
         const queryParams = this.searchModel.filtersAsQueryParams(requestParams.filters);
-        Object.keys(queryParams).forEach((/**
-         * @param {?} key
-         * @return {?}
-         */
-        (key) => { queryParams[key] = queryParams[key] || null; }));
+        Object.keys(queryParams).forEach((key) => { queryParams[key] = queryParams[key] || null; });
         // aditional params
         queryParams.orderby = this.orderBy;
         queryParams.orderdirection = this.orderDirection;
@@ -9593,144 +5544,23 @@ class AwSearchLayoutDS extends LayoutDataSource {
         };
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutDS.prototype.destroyed$;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutDS.prototype.communication;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutDS.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutDS.prototype.mainState;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutDS.prototype.search;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutDS.prototype.searchModel;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutDS.prototype.prettifyLabels;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutDS.prototype.configKeys;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutDS.prototype.fallback;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutDS.prototype.resetButtonEnabled;
-    /** @type {?} */
-    AwSearchLayoutDS.prototype.pageTitle;
-    /** @type {?} */
-    AwSearchLayoutDS.prototype.resultsTitle;
-    /** @type {?} */
-    AwSearchLayoutDS.prototype.totalCount;
-    /**
-     * Pagination value (url parameter)
-     * @type {?}
-     */
-    AwSearchLayoutDS.prototype.currentPage;
-    /**
-     * Linked objects page size
-     * @type {?}
-     */
-    AwSearchLayoutDS.prototype.pageSize;
-    /** @type {?} */
-    AwSearchLayoutDS.prototype.sidebarIsSticky;
-    /** @type {?} */
-    AwSearchLayoutDS.prototype.isFirstLoading;
-    /** @type {?} */
-    AwSearchLayoutDS.prototype.resultsLoading;
-    /**
-     * True when the user has input a text string
-     * @type {?}
-     */
-    AwSearchLayoutDS.prototype.isSearchingText;
-    /**
-     * Current order method
-     * @type {?}
-     */
-    AwSearchLayoutDS.prototype.orderBy;
-    /**
-     * Current order direction
-     * @type {?}
-     */
-    AwSearchLayoutDS.prototype.orderDirection;
-    /** @type {?} */
-    AwSearchLayoutDS.prototype.options;
-    /** @type {?} */
-    AwSearchLayoutDS.prototype.orderByLabel;
-    /**
-     * Options used to render the HTMLSelect
-     * @type {?}
-     */
-    AwSearchLayoutDS.prototype.orderByOptions;
-    /** @type {?} */
-    AwSearchLayoutDS.prototype.drawPagination;
-    /** @type {?} */
-    AwSearchLayoutDS.prototype.getSearchModelId;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwSearchLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.destroyed$ = new Subject();
-        /**
-         * Emits when any of the search-facets are changed
-         */
+        /** Emits when any of the search-facets are changed */
         this.facetsChange$ = new Subject();
-        /**
-         * Emits when the pagination element
-         * or the select-sort element are changed
-         */
+        /** Emits when the pagination element
+         * or the select-sort element are changed */
         this.additionalParamsChange$ = new Subject();
-        /**
-         * Last queried text, used to check if the text has changed
-         */
+        /** Last queried text, used to check if the text has changed */
         this.previousText = '';
-        /**
-         * Is true when the search is triggered with a new text-string
-         */
+        /** Is true when the search is triggered with a new text-string */
         this.textHasChanged = false;
     }
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-search-layout.init':
                     {
@@ -9743,13 +5573,10 @@ class AwSearchLayoutEH extends EventHandler {
                         const { value: textInput } = this.dataSource.searchModel.getFiltersByFacetId('query')[0];
                         if ((textInput || '').length > 0) {
                             this.dataSource.isSearchingText.next(true);
-                            setTimeout((/**
-                             * @return {?}
-                             */
-                            () => {
+                            setTimeout(() => {
                                 this.dataSource.onOrderByChange('_score_DESC');
                                 this.additionalParamsChange$.next(); // emit from observable stream
-                            }), 100);
+                            }, 100);
                         }
                     }
                     break;
@@ -9771,12 +5598,8 @@ class AwSearchLayoutEH extends EventHandler {
                     console.warn('(search) unhandled inner event of type', type);
                     break;
             }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'facets-wrapper.facetschange':
                     {
@@ -9785,12 +5608,7 @@ class AwSearchLayoutEH extends EventHandler {
                         // Checks if <input type=text>'s value has changed
                         this.textHasChanged = !!(textInput && (textInput !== this.previousText));
                         this.previousText = textInput;
-                        /** @type {?} */
-                        const activeOrder = this.dataSource.orderByOptions.filter((/**
-                         * @param {?} d
-                         * @return {?}
-                         */
-                        (d) => d.selected))[0].value;
+                        const activeOrder = this.dataSource.orderByOptions.filter((d) => d.selected)[0].value;
                         if (this.textHasChanged && (textInput || '').length > 0) {
                             // Add sort by score option
                             this.dataSource.isSearchingText.next(true);
@@ -9798,13 +5616,10 @@ class AwSearchLayoutEH extends EventHandler {
                         else if ((textInput || '').length === 0 && /score/i.test(activeOrder)) {
                             // Remove sort by score option
                             this.dataSource.isSearchingText.next(false);
-                            setTimeout((/**
-                             * @return {?}
-                             */
-                            () => {
+                            setTimeout(() => {
                                 this.dataSource.onOrderByChange('label_sort_ASC');
                                 this.additionalParamsChange$.next(); // emit from observable stream
-                            }), 100);
+                            }, 100);
                         }
                     }
                     break;
@@ -9815,55 +5630,36 @@ class AwSearchLayoutEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
     /**
      * Handles changes to any of the search-facets
-     * @private
-     * @return {?}
      */
     _listenToFacetsChange() {
-        this.facetsChange$.pipe(debounceTime(500)).subscribe((/**
-         * @return {?}
-         */
-        () => {
+        this.facetsChange$.pipe(debounceTime(500)).subscribe(() => {
             this.dataSource.resultsLoading = true;
             if (this.textHasChanged) {
                 this.additionalParamsChange$.next();
                 this.textHasChanged = false; // reset
             }
             else {
-                this.dataSource.doSearchRequest$().subscribe((/**
-                 * @return {?}
-                 */
-                () => {
+                this.dataSource.doSearchRequest$().subscribe(() => {
                     this.dataSource.resultsLoading = false;
                     this.dataSource.onSearchResponse();
                     this.emitGlobal('searchresponse', this.dataSource.getSearchModelId());
-                }));
+                });
             }
-        }));
+        });
     }
     /**
      * Handles changes happening on pagination and select elements.
-     * @private
-     * @return {?}
      */
     _listenToAdditionalParamsChange() {
-        this.additionalParamsChange$.subscribe((/**
-         * @return {?}
-         */
-        () => {
+        this.additionalParamsChange$.subscribe(() => {
             const { searchModel } = this.dataSource;
-            /** @type {?} */
             const requestParams = searchModel.getRequestParams();
-            /** @type {?} */
             const queryParams = searchModel.filtersAsQueryParams(requestParams.filters);
-            Object.keys(queryParams).forEach((/**
-             * @param {?} key
-             * @return {?}
-             */
-            (key) => { queryParams[key] = queryParams[key] || null; }));
+            Object.keys(queryParams).forEach((key) => { queryParams[key] = queryParams[key] || null; });
             // aditional params
             queryParams.orderby = this.dataSource.orderBy;
             queryParams.orderdirection = this.dataSource.orderDirection;
@@ -9879,19 +5675,11 @@ class AwSearchLayoutEH extends EventHandler {
                 path: [],
                 queryParams,
             });
-        }));
+        });
     }
-    /**
-     * URL changes
-     * @private
-     * @return {?}
-     */
+    /** URL changes */
     _listenToRouterChanges() {
-        this.route.queryParams.pipe(takeUntil(this.destroyed$)).subscribe((/**
-         * @param {?} params
-         * @return {?}
-         */
-        (params) => {
+        this.route.queryParams.pipe(takeUntil(this.destroyed$)).subscribe((params) => {
             this.emitOuter('queryparamschange', params);
             // aditional params control
             if (params.orderby && params.orderdirection) {
@@ -9904,57 +5692,10 @@ class AwSearchLayoutEH extends EventHandler {
                 this.dataSource.setLimit(+params.limit);
             }
             this.facetsChange$.next();
-        }));
+        });
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutEH.prototype.destroyed$;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutEH.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutEH.prototype.route;
-    /**
-     * Emits when any of the search-facets are changed
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutEH.prototype.facetsChange$;
-    /**
-     * Emits when the pagination element
-     * or the select-sort element are changed
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutEH.prototype.additionalParamsChange$;
-    /**
-     * Last queried text, used to check if the text has changed
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutEH.prototype.previousText;
-    /**
-     * Is true when the search is triggered with a new text-string
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutEH.prototype.textHasChanged;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const AwSearchLayoutConfig = {
     layoutId: 'aw-search-layout',
     /**
@@ -9980,19 +5721,7 @@ const AwSearchLayoutConfig = {
     },
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwSearchLayoutComponent extends AbstractLayout {
-    /**
-     * @param {?} configuration
-     * @param {?} layoutsConfiguration
-     * @param {?} mainState
-     * @param {?} communication
-     * @param {?} search
-     * @param {?} route
-     */
+let AwSearchLayoutComponent = class AwSearchLayoutComponent extends AbstractLayout {
     constructor(configuration, layoutsConfiguration, mainState, communication, search, route) {
         super(layoutsConfiguration.get('AwSearchLayoutConfig') || AwSearchLayoutConfig);
         this.configuration = configuration;
@@ -10006,8 +5735,6 @@ class AwSearchLayoutComponent extends AbstractLayout {
      * Optional variables that can be accessed from the layout's logic.
      * If removed, they must also be removed from the layout's DataSource file,
      * and from this file imports.
-     * @protected
-     * @return {?}
      */
     initPayload() {
         return {
@@ -10019,26 +5746,13 @@ class AwSearchLayoutComponent extends AbstractLayout {
             options: this.config.options || {},
         };
     }
-    /**
-     * @return {?}
-     */
     ngOnInit() {
         this.onInit();
     }
-    /**
-     * @return {?}
-     */
     ngOnDestroy() {
         this.onDestroy();
     }
-}
-AwSearchLayoutComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'aw-search-layout',
-                template: "<div class=\"aw-search n7-side-auto-padding\"\n     id=\"search-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n        <!--\n        <div class=\"aw-search__header-right\">\n            <n7-nav\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\n            </n7-nav>\n        </div>\n        -->\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                                   [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\"\n                        class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                           for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                            id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\"\n                                [value]=\"option.value\"\n                                [selected]=\"option.selected\"\n                                [hidden]=\"option.type === 'score' && lb.dataSource.isSearchingText.value === false\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\"\n                                        [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper\">\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                    <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                    </n7-smart-breadcrumbs>\n                    <n7-item-preview [data]=\"preview\"\n                                     [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\"\n                                class=\"n7-btn aw-search__fallback-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>\n"
-            }] }
-];
-/** @nocollapse */
+};
 AwSearchLayoutComponent.ctorParameters = () => [
     { type: ConfigurationService },
     { type: LayoutsConfigurationService },
@@ -10047,43 +5761,19 @@ AwSearchLayoutComponent.ctorParameters = () => [
     { type: SearchService },
     { type: ActivatedRoute }
 ];
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutComponent.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutComponent.prototype.layoutsConfiguration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutComponent.prototype.mainState;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutComponent.prototype.communication;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutComponent.prototype.search;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwSearchLayoutComponent.prototype.route;
-}
+AwSearchLayoutComponent = __decorate([
+    Component({
+        selector: 'aw-search-layout',
+        template: "<div class=\"aw-search n7-side-auto-padding\"\n     id=\"search-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n        <!--\n        <div class=\"aw-search__header-right\">\n            <n7-nav\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\n            </n7-nav>\n        </div>\n        -->\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                                   [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\"\n                        class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                           for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                            id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\"\n                                [value]=\"option.value\"\n                                [selected]=\"option.selected\"\n                                [hidden]=\"option.type === 'score' && lb.dataSource.isSearchingText.value === false\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\"\n                                        [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper\">\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                    <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                    </n7-smart-breadcrumbs>\n                    <n7-item-preview [data]=\"preview\"\n                                     [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\"\n                                class=\"n7-btn aw-search__fallback-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>\n"
+    }),
+    __metadata("design:paramtypes", [ConfigurationService,
+        LayoutsConfigurationService,
+        MainStateService,
+        CommunicationService,
+        SearchService,
+        ActivatedRoute])
+], AwSearchLayoutComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 var facetsConfig$1 = {
     totalCount: 0,
     facets: [
@@ -10214,9 +5904,7 @@ var facetsConfig$1 = {
     results: {
         order: {
             type: 'score',
-            // score | text | date
             key: '_score',
-            // docPath, elastic key, ecc
             direction: 'DESC' // ASC | DESC
         },
         fields: [
@@ -10230,11 +5918,6 @@ var facetsConfig$1 = {
     page: { offset: 0, limit: 12 }
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const SEARCH_MODEL_ID$1 = 'aw-gallery-layout';
 class AwGalleryLayoutDS extends LayoutDataSource {
     constructor() {
@@ -10242,23 +5925,15 @@ class AwGalleryLayoutDS extends LayoutDataSource {
         this.destroyed$ = new Subject();
         this.resetButtonEnabled = true;
         this.currentPage = 1; // pagination value (url param)
-        // pagination value (url param)
         this.pageSize = 12; // linked objects page size
-        // linked objects page size
         this.sidebarIsSticky = false;
         this.isFirstLoading = true;
         this.resultsLoading = false;
-        /**
-         * True when the user has input a text string
-         */
+        /** True when the user has input a text string */
         this.isSearchingText = new BehaviorSubject(false);
-        /**
-         * Current order method
-         */
+        /** Current order method */
         this.orderBy = 'label_sort';
-        /**
-         * Current order direction
-         */
+        /** Current order direction */
         this.orderDirection = 'ASC';
         this.orderByLabel = 'Ordina per';
         this.orderByOptions = [
@@ -10281,10 +5956,7 @@ class AwGalleryLayoutDS extends LayoutDataSource {
                 selected: false
             }
         ];
-        this.drawPagination = (/**
-         * @return {?}
-         */
-        () => {
+        this.drawPagination = () => {
             const { href, queryParams } = this._getPaginationParams();
             this.one('n7-smart-pagination').updateOptions({
                 mode: 'href',
@@ -10300,16 +5972,9 @@ class AwGalleryLayoutDS extends LayoutDataSource {
                     active: this.pageSize,
                 },
             });
-        });
-        this.getSearchModelId = (/**
-         * @return {?}
-         */
-        () => SEARCH_MODEL_ID$1);
+        };
+        this.getSearchModelId = () => SEARCH_MODEL_ID$1;
     }
-    /**
-     * @param {?} __0
-     * @return {?}
-     */
     onInit({ configuration, mainState, options, communication, search, }) {
         this.configuration = configuration;
         this.mainState = mainState;
@@ -10337,16 +6002,10 @@ class AwGalleryLayoutDS extends LayoutDataSource {
         this.mainState.updateCustom('currentNav', 'galleria');
         this.mainState.update('headTitle', 'Arianna4View - Galleria');
     }
-    /**
-     * @return {?}
-     */
     onDestroy() {
         this.destroyed$.next();
         SearchService.queryParams = null;
     }
-    /**
-     * @return {?}
-     */
     onSearchResponse() {
         this.resetButtonEnabled = true;
         if (this.isFirstLoading) {
@@ -10356,23 +6015,15 @@ class AwGalleryLayoutDS extends LayoutDataSource {
         }
     }
     /**
-     * Handles changes of the HTMLSelect order control
-     * @param {?} payload _score_DESC, label_sort_ASC, label_sort_DESC
-     * @return {?}
-     */
+    * Handles changes of the HTMLSelect order control
+    * @param payload _score_DESC, label_sort_ASC, label_sort_DESC
+    */
     onOrderByChange(payload) {
-        /** @type {?} */
         const orderBy = payload.substring(0, payload.lastIndexOf('_'));
-        /** @type {?} */
         const direction = payload.substring(payload.lastIndexOf('_') + 1);
-        /** @type {?} */
         let type = '';
         // set selected
-        this.orderByOptions.forEach((/**
-         * @param {?} option
-         * @return {?}
-         */
-        (option) => {
+        this.orderByOptions.forEach((option) => {
             if (option.value === payload) {
                 option.selected = true;
                 type = option.type;
@@ -10380,88 +6031,51 @@ class AwGalleryLayoutDS extends LayoutDataSource {
             else {
                 option.selected = false;
             }
-        }));
+        });
         this.orderBy = orderBy;
         this.orderDirection = direction;
         this.searchModel.setSearchConfigOrderBy(orderBy);
         this.searchModel.setSearchConfigDirection(direction);
         this.searchModel.setSearchConfigType(type);
     }
-    /**
-     * @param {?} size
-     * @return {?}
-     */
     onPageSizeChange(size) {
         this.pageSize = size;
         return this._updateSearchPage(this.currentPage);
     }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     onPaginationChange(payload) {
-        /** @type {?} */
         const page = payload.replace('page-', '');
         return this._updateSearchPage(page);
     }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     onPaginationGoToChange(payload) {
-        /** @type {?} */
         const page = payload.replace('goto-', '');
         return this._updateSearchPage(page);
     }
-    /**
-     * @return {?}
-     */
     resetPagination() {
         this._updateSearchPage(1);
     }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     onResultsLimitChange(payload) {
         this.setLimit(payload);
         // reset page & offset
         this.currentPage = 1;
         this.searchModel.setPageConfigOffset(0);
     }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     setLimit(payload) {
         this.pageSize = payload;
         this.searchModel.setPageConfigLimit(payload);
         this.searchModel.setPageConfigOffset((this.currentPage - 1) * this.pageSize);
     }
-    /**
-     * @return {?}
-     */
     doSearchRequest$() {
-        /** @type {?} */
         const requestParams = this.searchModel.getRequestParams();
-        /** @type {?} */
         const requestPayload = {
-            searchParameters: Object.assign({ totalCount: 100, gallery: true }, requestParams),
+            searchParameters: Object.assign({ 
+                // FIXME: togliere totalCount
+                totalCount: 100, gallery: true }, requestParams),
         };
         return this.communication.request$('search', {
-            onError: (/**
-             * @param {?} error
-             * @return {?}
-             */
-            (error) => console.error(error)),
+            onError: (error) => console.error(error),
             params: requestPayload,
-        }).pipe(tap((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ totalCount, results, facets }) => {
+        }).pipe(tap(({ totalCount, results, facets }) => {
             this.totalCount = totalCount;
-            /** @type {?} */
             let resultsTitleIndex = 0;
             // results title
             if (this.totalCount > 1) {
@@ -10490,79 +6104,35 @@ class AwGalleryLayoutDS extends LayoutDataSource {
             });
             this.drawPagination();
             this.one('aw-linked-objects').update({ items: this._normalizeItems(results.items) });
-        })));
+        }));
     }
-    /**
-     * @private
-     * @param {?} page
-     * @return {?}
-     */
     _updateSearchPage(page) {
         if (+page === this.currentPage) {
             return of(false);
         }
         this.currentPage = +page;
-        /** @type {?} */
         const searchConfig = this.searchModel.getConfig();
-        /** @type {?} */
         const pageConfig = searchConfig.page;
         const { limit } = pageConfig;
-        /** @type {?} */
         const newOffset = (this.currentPage - 1) * limit;
         this.searchModel.setPageConfigOffset(newOffset);
         return of(true);
     }
-    /**
-     * @private
-     * @param {?} facets
-     * @return {?}
-     */
     _addFacetsLabels(facets) {
         facets
-            .filter((/**
-         * @param {?} f
-         * @return {?}
-         */
-        (f) => Array.isArray(f.data)))
-            .forEach((/**
-         * @param {?} f
-         * @return {?}
-         */
-        (f) => {
-            f.data.forEach((/**
-             * @param {?} dataItem
-             * @return {?}
-             */
-            (dataItem) => {
-                /** @type {?} */
+            .filter((f) => Array.isArray(f.data))
+            .forEach((f) => {
+            f.data.forEach((dataItem) => {
                 const key = dataItem.label;
                 dataItem.label = helpers.prettifySnakeCase(key, this.prettifyLabels[key]);
-            }));
-        }));
+            });
+        });
     }
-    /**
-     * @private
-     * @param {?} facets
-     * @return {?}
-     */
     _addFacetsOptions(facets) {
         facets
-            .filter((/**
-         * @param {?} f
-         * @return {?}
-         */
-        (f) => f.id === 'query-links'))
-            .forEach((/**
-         * @param {?} f
-         * @return {?}
-         */
-        (f) => {
-            f.data.forEach((/**
-             * @param {?} dataItem
-             * @return {?}
-             */
-            (dataItem) => {
-                /** @type {?} */
+            .filter((f) => f.id === 'query-links')
+            .forEach((f) => {
+            f.data.forEach((dataItem) => {
                 const config = this.configKeys[dataItem.value];
                 if (config) {
                     dataItem.options = {
@@ -10570,59 +6140,29 @@ class AwGalleryLayoutDS extends LayoutDataSource {
                         classes: `color-${config['class-name']}`,
                     };
                 }
-            }));
-        }));
+            });
+        });
     }
-    /**
-     * @private
-     * @param {?} items
-     * @return {?}
-     */
     _normalizeItems(items) {
-        return items.map((/**
-         * @param {?} singleItem
-         * @return {?}
-         */
-        (singleItem) => ({ item: Object.assign({}, singleItem) })));
+        return items.map((singleItem) => ({ item: Object.assign({}, singleItem) }));
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _sidebarStickyControl() {
         // no sticky for Internet Explorer
         if (helpers.browserIsIE()) {
             return;
         }
-        /** @type {?} */
         const source$ = fromEvent(window, 'scroll');
-        source$.pipe(takeUntil(this.destroyed$)).subscribe((/**
-         * @return {?}
-         */
-        () => {
-            /** @type {?} */
+        source$.pipe(takeUntil(this.destroyed$)).subscribe(() => {
             const windowOffsetTop = window.pageYOffset;
-            /** @type {?} */
-            const stickyParent = (/** @type {?} */ (document.getElementsByClassName('sticky-parent')[0]));
-            /** @type {?} */
+            const stickyParent = document.getElementsByClassName('sticky-parent')[0];
             const wrapperOffsetTop = stickyParent ? stickyParent.offsetTop : 0;
             this.sidebarIsSticky = wrapperOffsetTop <= windowOffsetTop;
-        }));
+        });
     }
-    /**
-     * @private
-     * @return {?}
-     */
     _getPaginationParams() {
-        /** @type {?} */
         const requestParams = this.searchModel.getRequestParams();
-        /** @type {?} */
         const queryParams = this.searchModel.filtersAsQueryParams(requestParams.filters);
-        Object.keys(queryParams).forEach((/**
-         * @param {?} key
-         * @return {?}
-         */
-        (key) => { queryParams[key] = queryParams[key] || null; }));
+        Object.keys(queryParams).forEach((key) => { queryParams[key] = queryParams[key] || null; });
         // aditional params
         queryParams.orderby = this.orderBy;
         queryParams.orderdirection = this.orderDirection;
@@ -10634,135 +6174,23 @@ class AwGalleryLayoutDS extends LayoutDataSource {
         };
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutDS.prototype.destroyed$;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutDS.prototype.communication;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutDS.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutDS.prototype.mainState;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutDS.prototype.search;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutDS.prototype.searchModel;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutDS.prototype.prettifyLabels;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutDS.prototype.configKeys;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutDS.prototype.fallback;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutDS.prototype.resetButtonEnabled;
-    /** @type {?} */
-    AwGalleryLayoutDS.prototype.pageTitle;
-    /** @type {?} */
-    AwGalleryLayoutDS.prototype.resultsTitle;
-    /** @type {?} */
-    AwGalleryLayoutDS.prototype.totalCount;
-    /** @type {?} */
-    AwGalleryLayoutDS.prototype.currentPage;
-    /** @type {?} */
-    AwGalleryLayoutDS.prototype.pageSize;
-    /** @type {?} */
-    AwGalleryLayoutDS.prototype.sidebarIsSticky;
-    /** @type {?} */
-    AwGalleryLayoutDS.prototype.isFirstLoading;
-    /** @type {?} */
-    AwGalleryLayoutDS.prototype.resultsLoading;
-    /**
-     * True when the user has input a text string
-     * @type {?}
-     */
-    AwGalleryLayoutDS.prototype.isSearchingText;
-    /**
-     * Current order method
-     * @type {?}
-     */
-    AwGalleryLayoutDS.prototype.orderBy;
-    /**
-     * Current order direction
-     * @type {?}
-     */
-    AwGalleryLayoutDS.prototype.orderDirection;
-    /** @type {?} */
-    AwGalleryLayoutDS.prototype.options;
-    /** @type {?} */
-    AwGalleryLayoutDS.prototype.orderByLabel;
-    /** @type {?} */
-    AwGalleryLayoutDS.prototype.orderByOptions;
-    /** @type {?} */
-    AwGalleryLayoutDS.prototype.drawPagination;
-    /** @type {?} */
-    AwGalleryLayoutDS.prototype.getSearchModelId;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class AwGalleryLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.destroyed$ = new Subject();
-        /**
-         * Emits when any of the gallery-facets are changed
-         */
+        /** Emits when any of the gallery-facets are changed */
         this.facetsChange$ = new Subject();
-        /**
-         * Emits when the pagination element
-         * or the select-sort element are changed
-         */
+        /** Emits when the pagination element
+         * or the select-sort element are changed */
         this.additionalParamsChange$ = new Subject();
-        /**
-         * Last queried text, used to check if the text has changed
-         */
+        /** Last queried text, used to check if the text has changed */
         this.previousText = '';
-        /**
-         * Is true when the search is triggered with a new text-string
-         */
+        /** Is true when the search is triggered with a new text-string */
         this.textHasChanged = false;
     }
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-gallery-layout.init':
                     {
@@ -10775,13 +6203,10 @@ class AwGalleryLayoutEH extends EventHandler {
                         const { value: textInput } = this.dataSource.searchModel.getFiltersByFacetId('query')[0];
                         if ((textInput || '').length > 0) {
                             this.dataSource.isSearchingText.next(true);
-                            setTimeout((/**
-                             * @return {?}
-                             */
-                            () => {
+                            setTimeout(() => {
                                 this.dataSource.onOrderByChange('_score_DESC');
                                 this.additionalParamsChange$.next(); // emit from observable stream
-                            }), 100);
+                            }, 100);
                         }
                     }
                     break;
@@ -10803,12 +6228,8 @@ class AwGalleryLayoutEH extends EventHandler {
                     console.warn('(search) unhandled inner event of type', type);
                     break;
             }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'facets-wrapper.facetschange':
                     {
@@ -10817,12 +6238,7 @@ class AwGalleryLayoutEH extends EventHandler {
                         // Checks if <input type=text>'s value has changed
                         this.textHasChanged = !!(textInput && (textInput !== this.previousText));
                         this.previousText = textInput;
-                        /** @type {?} */
-                        const activeOrder = this.dataSource.orderByOptions.filter((/**
-                         * @param {?} d
-                         * @return {?}
-                         */
-                        (d) => d.selected))[0].value;
+                        const activeOrder = this.dataSource.orderByOptions.filter((d) => d.selected)[0].value;
                         if (this.textHasChanged && (textInput || '').length > 0) {
                             // Add sort by score option
                             this.dataSource.isSearchingText.next(true);
@@ -10830,13 +6246,10 @@ class AwGalleryLayoutEH extends EventHandler {
                         else if ((textInput || '').length === 0 && /score/i.test(activeOrder)) {
                             // Remove sort by score option
                             this.dataSource.isSearchingText.next(false);
-                            setTimeout((/**
-                             * @return {?}
-                             */
-                            () => {
+                            setTimeout(() => {
                                 this.dataSource.onOrderByChange('label_sort_ASC');
                                 this.additionalParamsChange$.next(); // emit from observable stream
-                            }), 100);
+                            }, 100);
                         }
                     }
                     break;
@@ -10847,55 +6260,36 @@ class AwGalleryLayoutEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
     /**
      * Handles changes to any of the search-facets
-     * @private
-     * @return {?}
      */
     _listenToFacetsChange() {
-        this.facetsChange$.pipe(debounceTime(500)).subscribe((/**
-         * @return {?}
-         */
-        () => {
+        this.facetsChange$.pipe(debounceTime(500)).subscribe(() => {
             this.dataSource.resultsLoading = true;
             if (this.textHasChanged) {
                 this.additionalParamsChange$.next();
                 this.textHasChanged = false; // reset
             }
             else {
-                this.dataSource.doSearchRequest$().subscribe((/**
-                 * @return {?}
-                 */
-                () => {
+                this.dataSource.doSearchRequest$().subscribe(() => {
                     this.dataSource.resultsLoading = false;
                     this.dataSource.onSearchResponse();
                     this.emitGlobal('searchresponse', this.dataSource.getSearchModelId());
-                }));
+                });
             }
-        }));
+        });
     }
     /**
      * Handles changes happening on pagination and select elements.
-     * @private
-     * @return {?}
      */
     _listenToAdditionalParamsChange() {
-        this.additionalParamsChange$.subscribe((/**
-         * @return {?}
-         */
-        () => {
+        this.additionalParamsChange$.subscribe(() => {
             const { searchModel } = this.dataSource;
-            /** @type {?} */
             const requestParams = searchModel.getRequestParams();
-            /** @type {?} */
             const queryParams = searchModel.filtersAsQueryParams(requestParams.filters);
-            Object.keys(queryParams).forEach((/**
-             * @param {?} key
-             * @return {?}
-             */
-            (key) => { queryParams[key] = queryParams[key] || null; }));
+            Object.keys(queryParams).forEach((key) => { queryParams[key] = queryParams[key] || null; });
             // aditional params
             queryParams.orderby = this.dataSource.orderBy;
             queryParams.orderdirection = this.dataSource.orderDirection;
@@ -10911,19 +6305,11 @@ class AwGalleryLayoutEH extends EventHandler {
                 path: [],
                 queryParams,
             });
-        }));
+        });
     }
-    /**
-     * URL changes
-     * @private
-     * @return {?}
-     */
+    /** URL changes */
     _listenToRouterChanges() {
-        this.route.queryParams.pipe(takeUntil(this.destroyed$)).subscribe((/**
-         * @param {?} params
-         * @return {?}
-         */
-        (params) => {
+        this.route.queryParams.pipe(takeUntil(this.destroyed$)).subscribe((params) => {
             this.emitOuter('queryparamschange', params);
             // aditional params control
             if (params.orderby && params.orderdirection) {
@@ -10936,57 +6322,10 @@ class AwGalleryLayoutEH extends EventHandler {
                 this.dataSource.setLimit(+params.limit);
             }
             this.facetsChange$.next();
-        }));
+        });
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutEH.prototype.destroyed$;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutEH.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutEH.prototype.route;
-    /**
-     * Emits when any of the gallery-facets are changed
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutEH.prototype.facetsChange$;
-    /**
-     * Emits when the pagination element
-     * or the select-sort element are changed
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutEH.prototype.additionalParamsChange$;
-    /**
-     * Last queried text, used to check if the text has changed
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutEH.prototype.previousText;
-    /**
-     * Is true when the search is triggered with a new text-string
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutEH.prototype.textHasChanged;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const AwGalleryLayoutConfig = {
     layoutId: 'aw-gallery-layout',
     /**
@@ -11012,21 +6351,7 @@ const AwGalleryLayoutConfig = {
     },
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class AwGalleryLayoutComponent extends AbstractLayout {
-    /**
-     * @param {?} router
-     * @param {?} configuration
-     * @param {?} titleService
-     * @param {?} layoutsConfiguration
-     * @param {?} mainState
-     * @param {?} communication
-     * @param {?} search
-     * @param {?} route
-     */
+let AwGalleryLayoutComponent = class AwGalleryLayoutComponent extends AbstractLayout {
     constructor(router, configuration, titleService, layoutsConfiguration, mainState, communication, search, route) {
         super(AwGalleryLayoutConfig);
         this.router = router;
@@ -11038,10 +6363,6 @@ class AwGalleryLayoutComponent extends AbstractLayout {
         this.search = search;
         this.route = route;
     }
-    /**
-     * @protected
-     * @return {?}
-     */
     initPayload() {
         return {
             configuration: this.configuration,
@@ -11054,26 +6375,13 @@ class AwGalleryLayoutComponent extends AbstractLayout {
             search: this.search,
         };
     }
-    /**
-     * @return {?}
-     */
     ngOnInit() {
         this.onInit();
     }
-    /**
-     * @return {?}
-     */
     ngOnDestroy() {
         this.onDestroy();
     }
-}
-AwGalleryLayoutComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'aw-gallery-layout',
-                template: "<div class=\"aw-search aw-gallery n7-side-auto-padding\"\n     id=\"gallery-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                                   [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\"\n                        class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                           for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                            id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\"\n                                [value]=\"option.value\"\n                                [selected]=\"option.selected\"\n                                [hidden]=\"option.type === 'score' && lb.dataSource.isSearchingText.value === false\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\"\n                                        [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper\">\n                <div class=\"n7-grid-3\">\n                    <div *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\"\n                                         [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\"\n                                class=\"n7-btn aw-search__fallback-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>\n"
-            }] }
-];
-/** @nocollapse */
+};
 AwGalleryLayoutComponent.ctorParameters = () => [
     { type: Router },
     { type: ConfigurationService },
@@ -11084,231 +6392,103 @@ AwGalleryLayoutComponent.ctorParameters = () => [
     { type: SearchService },
     { type: ActivatedRoute }
 ];
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutComponent.prototype.router;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutComponent.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutComponent.prototype.titleService;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutComponent.prototype.layoutsConfiguration;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutComponent.prototype.mainState;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutComponent.prototype.communication;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutComponent.prototype.search;
-    /**
-     * @type {?}
-     * @private
-     */
-    AwGalleryLayoutComponent.prototype.route;
-}
+AwGalleryLayoutComponent = __decorate([
+    Component({
+        selector: 'aw-gallery-layout',
+        template: "<div class=\"aw-search aw-gallery n7-side-auto-padding\"\n     id=\"gallery-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                                   [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\"\n                        class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                           for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                            id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\"\n                                [value]=\"option.value\"\n                                [selected]=\"option.selected\"\n                                [hidden]=\"option.type === 'score' && lb.dataSource.isSearchingText.value === false\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\"\n                                        [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper\">\n                <div class=\"n7-grid-3\">\n                    <div *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\"\n                                         [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\"\n                                class=\"n7-btn aw-search__fallback-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>\n"
+    }),
+    __metadata("design:paramtypes", [Router,
+        ConfigurationService,
+        Title,
+        LayoutsConfigurationService,
+        MainStateService,
+        CommunicationService,
+        SearchService,
+        ActivatedRoute])
+], AwGalleryLayoutComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class ChartTippyComponent {
-    /**
-     * @param {?} type
-     * @param {?} payload
-     * @return {?}
-     */
+//---------------------------
+let ChartTippyComponent = class ChartTippyComponent {
     onClick(type, payload) {
         this.emit(type, payload);
     }
-}
-ChartTippyComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'aw-chart-tippy',
-                template: "<div *ngIf=\"data\" style=\"display: none;\">\n  <div *ngFor=\"let d of data\" id=\"template__{{d.id}}\" class=\"bubble-chart__tippy-template\">\n    <div id=\"bubble-popup-menu\" class=\"aw-bubble-popup-menu\">\n      <h2 class=\"aw-bubble-popup-menu__title\">{{ d.title }}</h2>\n      <p class=\"aw-bubble-popup-menu__text\">\n        {{ d.text }}\n      </p>\n\n      <div *ngIf=\"d.relation.value\" class=\"aw-bubble-popup-menu__relation\">\n        <p class=\"aw-bubble-popup-menu__relation-description\">Relazione con \n          <span class=\"aw-bubble-popup-menu__relation-key\">{{d.relation.key}}</span>: \n          <span class=\"aw-bubble-popup-menu__relation-label\"> {{d.relation.value}}</span>\n        </p>\n      </div>\n\n      <div class=\"aw-bubble-popup-menu__actions\">\n        <n7-anchor-wrapper [classes]=\"'aw-bubble-popup-menu__link'\" [data]=\"d.anchorData\">\n          Vai alla scheda\n        </n7-anchor-wrapper>\n        <span *ngIf=\"d.selectable\" class=\"aw-bubble-popup-menu__link\" (click)=\"onClick('select', {id: d.id})\">\n          {{ d.isSelected ? 'Deseleziona' : 'Seleziona'}}\n        </span>\n      </div>\n    </div>\n  </div>\n</div>"
-            }] }
-];
-ChartTippyComponent.propDecorators = {
-    data: [{ type: Input }],
-    emit: [{ type: Input }],
-    anchorData: [{ type: Input }]
 };
-if (false) {
-    /** @type {?} */
-    ChartTippyComponent.prototype.data;
-    /** @type {?} */
-    ChartTippyComponent.prototype.emit;
-    /** @type {?} */
-    ChartTippyComponent.prototype.anchorData;
-}
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], ChartTippyComponent.prototype, "data", void 0);
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], ChartTippyComponent.prototype, "emit", void 0);
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], ChartTippyComponent.prototype, "anchorData", void 0);
+ChartTippyComponent = __decorate([
+    Component({
+        selector: 'aw-chart-tippy',
+        template: "<div *ngIf=\"data\" style=\"display: none;\">\n  <div *ngFor=\"let d of data\" id=\"template__{{d.id}}\" class=\"bubble-chart__tippy-template\">\n    <div id=\"bubble-popup-menu\" class=\"aw-bubble-popup-menu\">\n      <h2 class=\"aw-bubble-popup-menu__title\">{{ d.title }}</h2>\n      <p class=\"aw-bubble-popup-menu__text\">\n        {{ d.text }}\n      </p>\n\n      <div *ngIf=\"d.relation.value\" class=\"aw-bubble-popup-menu__relation\">\n        <p class=\"aw-bubble-popup-menu__relation-description\">Relazione con \n          <span class=\"aw-bubble-popup-menu__relation-key\">{{d.relation.key}}</span>: \n          <span class=\"aw-bubble-popup-menu__relation-label\"> {{d.relation.value}}</span>\n        </p>\n      </div>\n\n      <div class=\"aw-bubble-popup-menu__actions\">\n        <n7-anchor-wrapper [classes]=\"'aw-bubble-popup-menu__link'\" [data]=\"d.anchorData\">\n          Vai alla scheda\n        </n7-anchor-wrapper>\n        <span *ngIf=\"d.selectable\" class=\"aw-bubble-popup-menu__link\" (click)=\"onClick('select', {id: d.id})\">\n          {{ d.isSelected ? 'Deseleziona' : 'Seleziona'}}\n        </span>\n      </div>\n    </div>\n  </div>\n</div>"
+    })
+], ChartTippyComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class BubbleChartWrapperComponent {
-    /**
-     * @param {?} type
-     * @param {?} payload
-     * @return {?}
-     */
+//---------------------------
+let BubbleChartWrapperComponent = class BubbleChartWrapperComponent {
     onClick(type, payload) {
         this.emit(type, payload);
     }
-}
-BubbleChartWrapperComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'aw-bubble-chart-wrapper',
-                template: "<div class=\"aw-bubble-chart-wrapper\">\n    <ng-content></ng-content>\n</div>"
-            }] }
-];
-BubbleChartWrapperComponent.propDecorators = {
-    emit: [{ type: Input }],
-    container: [{ type: Input }],
-    buttons: [{ type: Input }]
 };
-if (false) {
-    /** @type {?} */
-    BubbleChartWrapperComponent.prototype.emit;
-    /** @type {?} */
-    BubbleChartWrapperComponent.prototype.container;
-    /** @type {?} */
-    BubbleChartWrapperComponent.prototype.buttons;
-}
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], BubbleChartWrapperComponent.prototype, "emit", void 0);
+__decorate([
+    Input(),
+    __metadata("design:type", String)
+], BubbleChartWrapperComponent.prototype, "container", void 0);
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], BubbleChartWrapperComponent.prototype, "buttons", void 0);
+BubbleChartWrapperComponent = __decorate([
+    Component({
+        selector: 'aw-bubble-chart-wrapper',
+        template: "<div class=\"aw-bubble-chart-wrapper\">\n    <ng-content></ng-content>\n</div>"
+    })
+], BubbleChartWrapperComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * Interface for a single BreadcrumbsComponent's "Item"
- *
- * \@property label (required)
- * \@property payload (required)
- * \@property classes (optional)
- * \@property _meta (optional)
- *
- * @record
- */
-function SmartBreadcrumbsItem() { }
-if (false) {
-    /**
-     * item's label
-     * @type {?}
-     */
-    SmartBreadcrumbsItem.prototype.label;
-    /**
-     * action click's payload
-     * @type {?}
-     */
-    SmartBreadcrumbsItem.prototype.payload;
-    /**
-     * additional html classes
-     * @type {?|undefined}
-     */
-    SmartBreadcrumbsItem.prototype.classes;
-    /**
-     * additional info useful for the component's logic
-     * @type {?|undefined}
-     */
-    SmartBreadcrumbsItem.prototype._meta;
-}
-/**
- * Interface for BreadcrumbsComponent's "Data"
- *
- * \@property items (required)
- * \@property classes (optional)
- *
- * @record
- */
-function SmartBreadcrumbsData() { }
-if (false) {
-    /**
-     * each item renders a breadcrumb level
-     * @type {?}
-     */
-    SmartBreadcrumbsData.prototype.items;
-    /**
-     * additional html classes
-     * @type {?|undefined}
-     */
-    SmartBreadcrumbsData.prototype.classes;
-}
-class SmartBreadcrumbsComponent {
+//---------------------------
+let SmartBreadcrumbsComponent = class SmartBreadcrumbsComponent {
     constructor() {
         /**
          * Builds tippy data for a node.
          */
-        this.tippyBuilder = (/**
-         * @param {?} node
-         * @param {?} content
-         * @return {?}
-         */
-        (node, content) => tippy(node, {
+        this.tippyBuilder = (node, content) => tippy(node, {
             content,
             interactive: true,
             arrow: true,
             theme: 'light-border no-padding',
             appendTo: document.body,
-        }));
-        this.getWidths = (/**
-         * @param {?} parent
-         * @param {?} child
-         * @return {?}
-         */
-        (parent, child) => {
-            /** @type {?} */
+        });
+        this.getWidths = (parent, child) => {
             const pw = parent.nativeElement.clientWidth;
-            /** @type {?} */
             const cw = child.nativeElement.clientWidth;
-            /** @type {?} */
             const pp = this.getSidePadding(parent.nativeElement);
             return { parentWidth: pw - pp, childWidth: cw };
-        });
-        this.getSidePadding = (/**
-         * @param {?} node
-         * @return {?}
-         */
-        (node) => (
+        };
+        this.getSidePadding = (node) => (
         // returns an integer representing the sum of left and right paddings
         (+window.getComputedStyle(node, null).getPropertyValue('padding-left').match(/\d+/)[0])
-            + (+window.getComputedStyle(node, null).getPropertyValue('padding-right').match(/\d+/)[0])));
+            + (+window.getComputedStyle(node, null).getPropertyValue('padding-right').match(/\d+/)[0]));
     }
-    /**
-     * @return {?}
-     */
     ngAfterViewInit() {
         if (this.bcdiv && this.bcol) {
             let { parentWidth, childWidth } = this.getWidths(this.bcdiv, this.bcol);
-            /** @type {?} */
             const liArray = this.bcol.nativeElement.children;
             if (parentWidth === childWidth) { // collapse condition
-                // collapse condition
-                /** @type {?} */
-                let i = 1;
+                let i = 1; // Skip element in position 0
                 while (parentWidth === childWidth && i < liArray.length - 1) { // Skip last element
-                    // Skip last element
-                    /** @type {?} */
-                    const tippyData = document.createElement('ol');
+                    const tippyData = document.createElement('ol'); // initialize tippy data
                     tippyData.className = 'n7-smart-breadcrumbs__tippy-content';
                     tippyData.appendChild(liArray[i].cloneNode(true)); // add <li> to tippy data (<ol>)
                     liArray[i].children[0].innerText = '…'; // convert to ellipsis
@@ -11321,52 +6501,35 @@ class SmartBreadcrumbsComponent {
             }
         }
     }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     onClick(payload) {
         if (!this.emit)
             return;
         this.emit('click', payload);
     }
-}
-SmartBreadcrumbsComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'n7-smart-breadcrumbs',
-                template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\n    <nav class=\"n7-breadcrumbs__nav\">\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\n                <n7-anchor-wrapper [classes]=\"item.classes\"\n                [data]=\"item.anchor\"\n                (clicked)=\"onClick($event)\">\n                    {{ item.label }}\n                </n7-anchor-wrapper>\n            </li>\n        </ol>\n    </nav>\n</div>"
-            }] }
-];
-SmartBreadcrumbsComponent.propDecorators = {
-    data: [{ type: Input }],
-    emit: [{ type: Input }],
-    bcol: [{ type: ViewChild, args: ['bcol', { read: ElementRef, static: false },] }],
-    bcdiv: [{ type: ViewChild, args: ['bcdiv', { read: ElementRef, static: false },] }]
 };
-if (false) {
-    /** @type {?} */
-    SmartBreadcrumbsComponent.prototype.data;
-    /** @type {?} */
-    SmartBreadcrumbsComponent.prototype.emit;
-    /** @type {?} */
-    SmartBreadcrumbsComponent.prototype.bcol;
-    /** @type {?} */
-    SmartBreadcrumbsComponent.prototype.bcdiv;
-    /**
-     * Builds tippy data for a node.
-     * @type {?}
-     */
-    SmartBreadcrumbsComponent.prototype.tippyBuilder;
-    /** @type {?} */
-    SmartBreadcrumbsComponent.prototype.getWidths;
-    /** @type {?} */
-    SmartBreadcrumbsComponent.prototype.getSidePadding;
-}
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], SmartBreadcrumbsComponent.prototype, "data", void 0);
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], SmartBreadcrumbsComponent.prototype, "emit", void 0);
+__decorate([
+    ViewChild('bcol', { read: ElementRef }),
+    __metadata("design:type", ElementRef)
+], SmartBreadcrumbsComponent.prototype, "bcol", void 0);
+__decorate([
+    ViewChild('bcdiv', { read: ElementRef }),
+    __metadata("design:type", ElementRef)
+], SmartBreadcrumbsComponent.prototype, "bcdiv", void 0);
+SmartBreadcrumbsComponent = __decorate([
+    Component({
+        selector: 'n7-smart-breadcrumbs',
+        template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\n    <nav class=\"n7-breadcrumbs__nav\">\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\n                <n7-anchor-wrapper [classes]=\"item.classes\"\n                [data]=\"item.anchor\"\n                (clicked)=\"onClick($event)\">\n                    {{ item.label }}\n                </n7-anchor-wrapper>\n            </li>\n        </ol>\n    </nav>\n</div>"
+    })
+], SmartBreadcrumbsComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 var apolloConfig = {
     getLastPosts: {
         queryName: 'getLastPosts',
@@ -11911,11 +7074,6 @@ var apolloConfig = {
     },
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const COMPONENTS$1 = [
     AwEntitaLayoutComponent,
     AwHomeLayoutComponent,
@@ -11926,160 +7084,78 @@ const COMPONENTS$1 = [
     ChartTippyComponent,
     SmartBreadcrumbsComponent,
 ];
-class N7BoilerplateAriannaWebModule {
-    /**
-     * @param {?} initStatus
-     * @param {?} config
-     */
+let N7BoilerplateAriannaWebModule = class N7BoilerplateAriannaWebModule {
     constructor(initStatus, config) {
         // add apollo config on app init
         // note: this is just for arianna* sites!
-        initStatus.donePromise.then((/**
-         * @return {?}
-         */
-        () => {
-            /** @type {?} */
+        initStatus.donePromise.then(() => {
             const communication = config.get('communication');
             const { defaultProvider } = communication;
             communication.providers[defaultProvider].config = apolloConfig;
             config.set('communication', communication);
-        }));
+        });
     }
-}
-N7BoilerplateAriannaWebModule.decorators = [
-    { type: NgModule, args: [{
-                declarations: COMPONENTS$1,
-                imports: [
-                    CommonModule,
-                    RouterModule,
-                    DvComponentsLibModule,
-                    N7BoilerplateCommonModule,
-                ],
-                entryComponents: COMPONENTS$1,
-                exports: COMPONENTS$1,
-            },] }
-];
-/** @nocollapse */
+};
 N7BoilerplateAriannaWebModule.ctorParameters = () => [
     { type: ApplicationInitStatus },
     { type: ConfigurationService }
 ];
+N7BoilerplateAriannaWebModule = __decorate([
+    NgModule({
+        declarations: COMPONENTS$1,
+        imports: [
+            CommonModule,
+            RouterModule,
+            DvComponentsLibModule,
+            N7BoilerplateCommonModule,
+        ],
+        entryComponents: COMPONENTS$1,
+        exports: COMPONENTS$1,
+    }),
+    __metadata("design:paramtypes", [ApplicationInitStatus,
+        ConfigurationService])
+], N7BoilerplateAriannaWebModule);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @record
- */
-function DataWidgetWrapperData() { }
-if (false) {
-    /** @type {?|undefined} */
-    DataWidgetWrapperData.prototype.classes;
-}
-class DataWidgetWrapperComponent {
-}
-DataWidgetWrapperComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'dv-data-widget-wrapper',
-                template: "<div class=\"dv-data-widget-wrapper {{ data && data.classes || '' }}\">\n    <ng-content></ng-content>\n</div>"
-            }] }
-];
-DataWidgetWrapperComponent.propDecorators = {
-    data: [{ type: Input }]
+let DataWidgetWrapperComponent = class DataWidgetWrapperComponent {
 };
-if (false) {
-    /** @type {?} */
-    DataWidgetWrapperComponent.prototype.data;
-}
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], DataWidgetWrapperComponent.prototype, "data", void 0);
+DataWidgetWrapperComponent = __decorate([
+    Component({
+        selector: 'dv-data-widget-wrapper',
+        template: "<div class=\"dv-data-widget-wrapper {{ data && data.classes || '' }}\">\n    <ng-content></ng-content>\n</div>"
+    })
+], DataWidgetWrapperComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @record
- */
-function DatepickerWrapperData() { }
-if (false) {
-    /** @type {?} */
-    DatepickerWrapperData.prototype.select;
-    /** @type {?} */
-    DatepickerWrapperData.prototype.datepicker;
-    /** @type {?|undefined} */
-    DatepickerWrapperData.prototype.payload;
-}
-/**
- * @record
- */
-function Select() { }
-if (false) {
-    /** @type {?} */
-    Select.prototype.id;
-    /** @type {?} */
-    Select.prototype.hidden;
-    /** @type {?|undefined} */
-    Select.prototype.icon;
-    /** @type {?} */
-    Select.prototype.label;
-    /** @type {?} */
-    Select.prototype.items;
-    /** @type {?|undefined} */
-    Select.prototype.classes;
-}
-/**
- * @record
- */
-function DropdownItems() { }
-if (false) {
-    /** @type {?} */
-    DropdownItems.prototype.text;
-    /** @type {?} */
-    DropdownItems.prototype.payload;
-    /** @type {?|undefined} */
-    DropdownItems.prototype.classes;
-}
-class DatepickerWrapperComponent {
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
+let DatepickerWrapperComponent = class DatepickerWrapperComponent {
     onClick(payload) {
         if (!this.emit)
             return;
         this.emit('click', payload);
     }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     toggleDropDown(payload) {
         if (!this.emit)
             return;
         this.emit('toggle', payload);
     }
-}
-DatepickerWrapperComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'dv-datepicker-wrapper',
-                template: "<div *ngIf=\"data\" class=\"dv-datepicker-wrapper {{ data.select.classes || '' }}\">\n    <div class=\"dv-datepicker-wrapper__label\" (click)=\"toggleDropDown(data.payload)\">\n        <input type=\"text\" [value]=\"data.select.label\" [readOnly]=\"true\"/>\n        <span class=\"{{data.select.icon}}\"></span>\n    </div>\n    <div class=\"dv-datepicker-wrapper__dropdown\" [hidden]=\"data.select.hidden\">\n        <ul class=\"dv-datepicker-wrapper__dropdown-list\">\n            <li class=\"dv-datepicker-wrapper__dropdown-list-option {{ opt.classes || '' }}\" *ngFor=\"let opt of data.select.items\" (click)=\"onClick(opt.payload)\">{{opt.text}}</li>\n        </ul>\n    </div>\n    <n7-datepicker\n        [data]=\"data.datepicker.data\"\n        [emit]=\"emit\">\n    </n7-datepicker>\n</div>\n"
-            }] }
-];
-DatepickerWrapperComponent.propDecorators = {
-    data: [{ type: Input }],
-    emit: [{ type: Input }]
 };
-if (false) {
-    /** @type {?} */
-    DatepickerWrapperComponent.prototype.data;
-    /** @type {?} */
-    DatepickerWrapperComponent.prototype.emit;
-}
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], DatepickerWrapperComponent.prototype, "data", void 0);
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], DatepickerWrapperComponent.prototype, "emit", void 0);
+DatepickerWrapperComponent = __decorate([
+    Component({
+        selector: 'dv-datepicker-wrapper',
+        template: "<div *ngIf=\"data\" class=\"dv-datepicker-wrapper {{ data.select.classes || '' }}\">\n    <div class=\"dv-datepicker-wrapper__label\" (click)=\"toggleDropDown(data.payload)\">\n        <input type=\"text\" [value]=\"data.select.label\" [readOnly]=\"true\"/>\n        <span class=\"{{data.select.icon}}\"></span>\n    </div>\n    <div class=\"dv-datepicker-wrapper__dropdown\" [hidden]=\"data.select.hidden\">\n        <ul class=\"dv-datepicker-wrapper__dropdown-list\">\n            <li class=\"dv-datepicker-wrapper__dropdown-list-option {{ opt.classes || '' }}\" *ngFor=\"let opt of data.select.items\" (click)=\"onClick(opt.payload)\">{{opt.text}}</li>\n        </ul>\n    </div>\n    <n7-datepicker\n        [data]=\"data.datepicker.data\"\n        [emit]=\"emit\">\n    </n7-datepicker>\n</div>\n"
+    })
+], DatepickerWrapperComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class DvExampleLayoutDS extends LayoutDataSource {
     constructor() {
         super(...arguments);
@@ -12118,60 +7194,21 @@ class DvExampleLayoutDS extends LayoutDataSource {
             },
         };
     }
-    /**
-     * @return {?}
-     */
     onInit() {
         this.one('dv-datepicker-wrapper').update(this.datePickerExternalData);
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    DvExampleLayoutDS.prototype.Items;
-    /**
-     * @type {?}
-     * @private
-     */
-    DvExampleLayoutDS.prototype.datepickerOptions;
-    /**
-     * @type {?}
-     * @private
-     */
-    DvExampleLayoutDS.prototype.datePickerExternalData;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
+/* eslint-disable */
 class DvExampleLayoutEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             this.dataSource.onInit();
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class DvDataWidgetDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         if (!data) {
             return null;
@@ -12180,20 +7217,11 @@ class DvDataWidgetDS extends DataSource {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class DvDatepickerWrapperDS extends DataSource {
     constructor() {
         super(...arguments);
         this._datepicker = null;
     }
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         if (!data) {
             return null;
@@ -12214,48 +7242,25 @@ class DvDatepickerWrapperDS extends DataSource {
                 data: {
                     id: data.datepicker.id,
                     libOptions: data.datepicker.libOptions,
-                    getInstance: (/**
-                     * @param {?} datepicker
-                     * @return {?}
-                     */
-                    (datepicker) => { this._datepicker = datepicker; }),
+                    getInstance: (datepicker) => { this._datepicker = datepicker; },
                 },
             },
         };
     }
-    /**
-     * @return {?}
-     */
     openDatepicker() {
-        setTimeout((/**
-         * @return {?}
-         */
-        () => this._datepicker.open()));
+        setTimeout(() => this._datepicker.open());
         this.output.select.hidden = true;
         this.output.datepicker.hidden = false;
     }
-    /**
-     * @return {?}
-     */
     closeDatepicker() {
-        setTimeout((/**
-         * @return {?}
-         */
-        () => this._datepicker.close()));
+        setTimeout(() => this._datepicker.close());
         this.output.select.hidden = true;
         this.output.datepicker.hidden = true;
     }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     setLabel(payload) {
         this.output.select.label = payload;
         this.output.datepicker.hidden = true;
     }
-    /**
-     * @return {?}
-     */
     toggleDropDown() {
         if (this.output.select.hidden === false) {
             this.output.select.hidden = true;
@@ -12265,23 +7270,8 @@ class DvDatepickerWrapperDS extends DataSource {
         }
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @protected
-     */
-    DvDatepickerWrapperDS.prototype._datepicker;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class DvGraphDS extends DataSource {
-    /**
-     * @protected
-     * @return {?}
-     */
     transform() {
         return {
             containerId: 'test-Chart',
@@ -12365,15 +7355,7 @@ class DvGraphDS extends DataSource {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class DvInnerTitleDS extends DataSource {
-    /**
-     * @protected
-     * @return {?}
-     */
     transform() {
         return {
             title: {
@@ -12390,26 +7372,16 @@ class DvInnerTitleDS extends DataSource {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class DvWidgetDS extends DataSource {
-    /**
-     * @protected
-     * @return {?}
-     */
     transform() {
         return DATA_WIDGET_MOCK;
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
+// Data Widget
 
 var DS$2 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     DvDataWidgetDS: DvDataWidgetDS,
     DvDatepickerWrapperDS: DvDatepickerWrapperDS,
     DvGraphDS: DvGraphDS,
@@ -12417,20 +7389,9 @@ var DS$2 = /*#__PURE__*/Object.freeze({
     DvWidgetDS: DvWidgetDS
 });
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class DvDatepickerWrapperEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'dv-datepicker-wrapper.click':
                     this.dataSource.setLabel(payload);
@@ -12450,30 +7411,23 @@ class DvDatepickerWrapperEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
+// Data Widget
 
 var EH$2 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     DvDatepickerWrapperEH: DvDatepickerWrapperEH
 });
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const DvExampleLayoutConfig = {
     layoutId: 'dv-example-layout',
     /**
      * Array of components you want to use
      * in this leyout
-     */
+    */
     widgets: [
         { id: 'dv-inner-title', hasStaticData: true },
         { id: 'dv-widget', hasStaticData: true },
@@ -12489,105 +7443,64 @@ const DvExampleLayoutConfig = {
     },
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class DvExampleLayoutComponent extends AbstractLayout {
+let DvExampleLayoutComponent = class DvExampleLayoutComponent extends AbstractLayout {
     constructor() {
         super(DvExampleLayoutConfig);
     }
-    /**
-     * @return {?}
-     */
     initPayload() {
         return {};
     }
-    /**
-     * @return {?}
-     */
     ngOnInit() {
         this.onInit();
     }
-    /**
-     * @return {?}
-     */
     ngOnDestroy() {
         this.onDestroy();
     }
-}
-DvExampleLayoutComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'dv-example-layout',
-                template: "<div class=\"dv-example-layout\" id=\"example-layout\">\n\n    <!-- Data widget wrapper with not-fixed height, two rows -->\n    <dv-data-widget-wrapper>\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-chart\n                    [data]=\"lb.widgets['dv-graph'].ds.out$ | async\">\n                </n7-chart>\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n\n    <!-- Data widget wrapper with fixed height, two rows -->\n    <dv-data-widget-wrapper [data]=\"{ classes: 'dv-data-widget-wrapper-fixed-height' }\">\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                Row content\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n\n    <!-- Data widget wrapper with fixed height, one row -->\n    <dv-data-widget-wrapper [data]=\"{ classes: 'dv-data-widget-wrapper-fixed-height' }\">\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n    \n    <dv-datepicker-wrapper \n        [data]=\"lb.widgets['dv-datepicker-wrapper'].ds.out$ | async\"\n        [emit]=\"lb.widgets['dv-datepicker-wrapper'].emit\">\n    </dv-datepicker-wrapper>\n</div>"
-            }] }
-];
-/** @nocollapse */
-DvExampleLayoutComponent.ctorParameters = () => [];
+};
+DvExampleLayoutComponent = __decorate([
+    Component({
+        selector: 'dv-example-layout',
+        template: "<div class=\"dv-example-layout\" id=\"example-layout\">\n\n    <!-- Data widget wrapper with not-fixed height, two rows -->\n    <dv-data-widget-wrapper>\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-chart\n                    [data]=\"lb.widgets['dv-graph'].ds.out$ | async\">\n                </n7-chart>\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n\n    <!-- Data widget wrapper with fixed height, two rows -->\n    <dv-data-widget-wrapper [data]=\"{ classes: 'dv-data-widget-wrapper-fixed-height' }\">\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                Row content\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n\n    <!-- Data widget wrapper with fixed height, one row -->\n    <dv-data-widget-wrapper [data]=\"{ classes: 'dv-data-widget-wrapper-fixed-height' }\">\n        <div class=\"dv-data-widget-wrapper__title\">\n            <n7-inner-title\n                [data]=\"lb.widgets['dv-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        <div class=\"dv-data-widget-wrapper__content\">\n            <div class=\"dv-data-widget-wrapper__content-row\">\n                <n7-data-widget\n                    [data]=\"lb.widgets['dv-widget'].ds.out$ | async\">\n                </n7-data-widget>\n            </div>\n        </div>\n    </dv-data-widget-wrapper>\n    \n    <dv-datepicker-wrapper \n        [data]=\"lb.widgets['dv-datepicker-wrapper'].ds.out$ | async\"\n        [emit]=\"lb.widgets['dv-datepicker-wrapper'].emit\">\n    </dv-datepicker-wrapper>\n</div>"
+    }),
+    __metadata("design:paramtypes", [])
+], DvExampleLayoutComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const COMPONENTS$2 = [
     DataWidgetWrapperComponent,
     DatepickerWrapperComponent,
     DvExampleLayoutComponent,
 ];
-class N7BoilerplateDataVizModule {
-}
-N7BoilerplateDataVizModule.decorators = [
-    { type: NgModule, args: [{
-                declarations: COMPONENTS$2,
-                imports: [
-                    CommonModule,
-                    DvComponentsLibModule,
-                    N7BoilerplateCommonModule,
-                ],
-                providers: [],
-                exports: COMPONENTS$2,
-            },] }
-];
+let N7BoilerplateDataVizModule = class N7BoilerplateDataVizModule {
+};
+N7BoilerplateDataVizModule = __decorate([
+    NgModule({
+        declarations: COMPONENTS$2,
+        imports: [
+            CommonModule,
+            DvComponentsLibModule,
+            N7BoilerplateCommonModule,
+        ],
+        providers: [],
+        exports: COMPONENTS$2,
+    })
+], N7BoilerplateDataVizModule);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class EscapeHtmlPipe {
-    /**
-     * @param {?} sanitizer
-     */
+let EscapeHtmlPipe = class EscapeHtmlPipe {
     constructor(sanitizer) {
         this.sanitizer = sanitizer;
     }
-    /**
-     * @param {?} content
-     * @return {?}
-     */
     transform(content) {
         return this.sanitizer.bypassSecurityTrustHtml(content);
     }
-}
-EscapeHtmlPipe.decorators = [
-    { type: Pipe, args: [{ name: 'keepHtml', pure: false },] }
-];
-/** @nocollapse */
+};
 EscapeHtmlPipe.ctorParameters = () => [
     { type: DomSanitizer }
 ];
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    EscapeHtmlPipe.prototype.sanitizer;
-}
+EscapeHtmlPipe = __decorate([
+    Pipe({ name: 'keepHtml', pure: false }),
+    __metadata("design:paramtypes", [DomSanitizer])
+], EscapeHtmlPipe);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 var homeMock = {
     'slider-1': CAROUSEL_MOCK,
     'collection-1': {
@@ -12675,15 +7588,7 @@ var homeMock = {
     }
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrHomeLayoutDS extends LayoutDataSource {
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     onInit(payload) {
         this.configuration = payload.configuration;
         this.communication = payload.communication;
@@ -12691,45 +7596,24 @@ class MrHomeLayoutDS extends LayoutDataSource {
         this.pageConfig = this.configuration.get(this.configId) || {};
         this.doRequest();
     }
-    /**
-     * @return {?}
-     */
     doRequest() {
         const { sections } = this.pageConfig;
         if (sections) {
             // FIXME: collegare API
             this.communication.request$('home', {
                 method: 'POST',
-                params: sections.map((/**
-                 * @param {?} __0
-                 * @return {?}
-                 */
-                ({ id }) => id))
-            }).subscribe((/**
-             * @param {?} response
-             * @return {?}
-             */
-            (response) => {
+                params: sections.map(({ id }) => id)
+            }).subscribe((response) => {
                 this.initSections(response);
-            }));
+            });
             this.initSections(homeMock);
         }
     }
-    /**
-     * @param {?} response
-     * @return {?}
-     */
     initSections(response) {
         const { sections } = this.pageConfig;
         if (sections) {
-            sections.forEach((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ id }) => {
-                /** @type {?} */
+            sections.forEach(({ id }) => {
                 const widgetDataSource = this.getWidgetDataSource(id);
-                /** @type {?} */
                 const responseData = response[id];
                 // set id
                 widgetDataSource.id = id;
@@ -12737,47 +7621,14 @@ class MrHomeLayoutDS extends LayoutDataSource {
                 if (responseData) {
                     this.one(id).update(responseData);
                 }
-            }));
+            });
         }
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    MrHomeLayoutDS.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrHomeLayoutDS.prototype.communication;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrHomeLayoutDS.prototype.configId;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrHomeLayoutDS.prototype.pageConfig;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrHomeLayoutEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'mr-home-layout.init':
                     this.dataSource.onInit(payload);
@@ -12785,24 +7636,16 @@ class MrHomeLayoutEH extends EventHandler {
                 default:
                     break;
             }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type }) => {
+        });
+        this.outerEvents$.subscribe(({ type }) => {
             switch (type) {
                 default:
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrItemPreviewsDS extends DataSource {
     constructor() {
         super(...arguments);
@@ -12912,34 +7755,13 @@ class MrItemPreviewsDS extends DataSource {
         };
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         return this.mock[this.options.source];
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    MrItemPreviewsDS.prototype.mock;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrInnerTitleDS extends DataSource {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         const { title, subtitle, button } = data;
         return {
@@ -12966,21 +7788,10 @@ class MrInnerTitleDS extends DataSource {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrHeroDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         const { classes, background } = this.options;
-        /** @type {?} */
         let back;
-        /** @type {?} */
         let image;
         if (background) {
             back = data.image;
@@ -12990,49 +7801,22 @@ class MrHeroDS extends DataSource {
             image = data.image;
             back = false;
         }
-        return Object.assign({}, data, { classes, backgroundImage: back, image: image || '' });
+        return Object.assign(Object.assign({}, data), { classes, backgroundImage: back, image: image || '' });
     }
 }
-if (false) {
-    /** @type {?} */
-    MrHeroDS.prototype.id;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrFiltersDS extends DataSource {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         return data;
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrNavDS extends DataSource {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
-        /** @type {?} */
         const items = [];
-        data.nav.forEach((/**
-         * @param {?} el
-         * @return {?}
-         */
-        (el) => {
+        data.nav.forEach((el) => {
             items.push({
                 text: el.title,
                 anchor: {
@@ -13041,38 +7825,21 @@ class MrNavDS extends DataSource {
                     payload: el.id
                 }
             });
-        }));
+        });
         return {
             items,
         };
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrSearchResultsDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         const { results } = data;
         return results;
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrSearchPageTitleDS extends DataSource {
-    /**
-     * @protected
-     * @return {?}
-     */
     transform() {
         const { title } = this.options.config;
         return {
@@ -13085,16 +7852,7 @@ class MrSearchPageTitleDS extends DataSource {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrSearchResultsTitleDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         const { totalResultsText, sort } = this.options.config;
         const { totalCount, sort: currentSort } = data;
@@ -13110,15 +7868,11 @@ class MrSearchResultsTitleDS extends DataSource {
             actions: {
                 select: {
                     label: sort.label,
-                    options: sort.options.map((/**
-                     * @param {?} __0
-                     * @return {?}
-                     */
-                    ({ label, value, selected }) => ({
+                    options: sort.options.map(({ label, value, selected }) => ({
                         value,
                         selected: currentSort ? value === currentSort : selected,
                         text: label
-                    }))),
+                    })),
                     payload: 'sort'
                 }
             }
@@ -13126,54 +7880,22 @@ class MrSearchResultsTitleDS extends DataSource {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrSearchTagsDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         const { state, linksResponse, facetsConfig } = data;
         const { inputs: linkInputs } = linksResponse;
-        /** @type {?} */
         const tags = [];
         // inputs config
-        facetsConfig.sections.forEach((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ inputs }) => {
+        facetsConfig.sections.forEach(({ inputs }) => {
             inputs
-                .filter((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ queryParam }) => queryParam))
-                .forEach((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ id }) => {
+                .filter(({ queryParam }) => queryParam)
+                .forEach(({ id }) => {
                 if (state[id]) {
-                    /** @type {?} */
                     const values = Array.isArray(state[id]) ? state[id] : [state[id]];
-                    values.forEach((/**
-                     * @param {?} value
-                     * @return {?}
-                     */
-                    (value) => {
-                        /** @type {?} */
+                    values.forEach((value) => {
                         let text = value;
                         if (linkInputs[id]) {
-                            text = linkInputs[id].find((/**
-                             * @param {?} __0
-                             * @return {?}
-                             */
-                            ({ payload }) => payload === value)).text;
+                            text = linkInputs[id].find(({ payload }) => payload === value).text;
                         }
                         tags.push({
                             text,
@@ -13183,20 +7905,16 @@ class MrSearchTagsDS extends DataSource {
                                 value
                             }
                         });
-                    }));
+                    });
                 }
-            }));
-        }));
+            });
+        });
         return tags;
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
 var DS$3 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     MrItemPreviewsDS: MrItemPreviewsDS,
     MrInnerTitleDS: MrInnerTitleDS,
     MrHeroDS: MrHeroDS,
@@ -13208,46 +7926,21 @@ var DS$3 = /*#__PURE__*/Object.freeze({
     MrSearchTagsDS: MrSearchTagsDS
 });
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrDummyEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
         // TODO
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrFiltersEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
         // TODO
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrNavEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'dv-nav.click':
                     this.emitOuter('navclick', payload);
@@ -13256,24 +7949,13 @@ class MrNavEH extends EventHandler {
                     console.warn('unhandled event of type', type);
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrSearchTagsEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'mr-search-tags.click':
                     this.emitOuter('click', payload);
@@ -13281,24 +7963,13 @@ class MrSearchTagsEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrSearchResultsTitleEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'mr-search-results-title.change':
                     this.emitOuter('change', payload);
@@ -13306,16 +7977,12 @@ class MrSearchResultsTitleEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
 var EH$3 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     MrDummyEH: MrDummyEH,
     MrFiltersEH: MrFiltersEH,
     MrNavEH: MrNavEH,
@@ -13323,11 +7990,6 @@ var EH$3 = /*#__PURE__*/Object.freeze({
     MrSearchResultsTitleEH: MrSearchResultsTitleEH
 });
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const MrHomeLayoutConfig = {
     layoutId: 'mr-home-layout',
     widgets: [],
@@ -13340,35 +8002,13 @@ const MrHomeLayoutConfig = {
     },
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrSliderDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         return data;
     }
 }
-if (false) {
-    /** @type {?} */
-    MrSliderDS.prototype.id;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrCollectionDS extends DataSource {
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         if (data === undefined) {
             return null;
@@ -13397,27 +8037,12 @@ class MrCollectionDS extends DataSource {
                     buttons: header.button
                 }
             },
-            items: items.map((/**
-             * @param {?} item
-             * @return {?}
-             */
-            (item) => (Object.assign({}, item, { classes: classes || '' }))))
+            items: items.map((item) => (Object.assign(Object.assign({}, item), { classes: classes || '' })))
         };
     }
 }
-if (false) {
-    /** @type {?} */
-    MrCollectionDS.prototype.id;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrSliderEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
         // this.innerEvents$.subscribe(({ type, payload }) => {
         //   switch (type) {
@@ -13431,14 +8056,7 @@ class MrSliderEH extends EventHandler {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrCollectionEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
         // this.innerEvents$.subscribe(({ type, payload }) => {
         //   switch (type) {
@@ -13452,14 +8070,7 @@ class MrCollectionEH extends EventHandler {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrHeroEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
         // this.innerEvents$.subscribe(({ type, payload }) => {
         //   switch (type) {
@@ -13473,39 +8084,23 @@ class MrHeroEH extends EventHandler {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const DATASOURCE_MAP = {
     slider: MrSliderDS,
     collection: MrCollectionDS,
     hero: MrHeroDS,
 };
-/** @type {?} */
 const EVENTHANDLER_MAP = {
     slider: MrSliderEH,
     collection: MrCollectionEH,
     hero: MrHeroEH,
 };
-class MrHomeLayoutComponent extends AbstractLayout {
-    /**
-     * @param {?} layoutsConfiguration
-     * @param {?} activatedRoute
-     * @param {?} configuration
-     * @param {?} communication
-     */
+let MrHomeLayoutComponent = class MrHomeLayoutComponent extends AbstractLayout {
     constructor(layoutsConfiguration, activatedRoute, configuration, communication) {
         super(layoutsConfiguration.get('MrHomeLayoutConfig') || MrHomeLayoutConfig);
         this.activatedRoute = activatedRoute;
         this.configuration = configuration;
         this.communication = communication;
     }
-    /**
-     * @protected
-     * @return {?}
-     */
     initPayload() {
         return {
             configId: this.configId,
@@ -13514,100 +8109,55 @@ class MrHomeLayoutComponent extends AbstractLayout {
             options: this.config.options || {}
         };
     }
-    /**
-     * @return {?}
-     */
     ngOnInit() {
-        this.activatedRoute.data.subscribe((/**
-         * @param {?} data
-         * @return {?}
-         */
-        (data) => {
+        this.activatedRoute.data.subscribe((data) => {
             this.configId = data.configId;
             this.loadWidgets();
             this.onInit();
-        }));
+        });
     }
-    /**
-     * @return {?}
-     */
     ngOnDestroy() {
         this.onDestroy();
     }
-    /**
-     * @return {?}
-     */
     loadWidgets() {
-        /** @type {?} */
         const homeConfig = this.configuration.get(this.configId) || {};
         const { sections } = homeConfig;
         this.widgets = [];
         if (sections) {
-            sections.forEach((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ id, type, options }) => {
+            sections.forEach(({ id, type, options }) => {
                 this.widgets.push({
                     id,
                     options,
                     dataSource: DATASOURCE_MAP[type],
                     eventHandler: EVENTHANDLER_MAP[type]
                 });
-            }));
+            });
         }
     }
-}
-MrHomeLayoutComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'mr-home-layout',
-                template: "<div class=\"mr-home mr-layout\" *ngIf=\"lb.dataSource\">\n    <section *ngFor=\"let section of lb.dataSource.pageConfig.sections\" class=\"{{ 'mr-layout__' + section.type }}\">\n        <ng-container [ngSwitch]=\"section.type\">\n\n            <!-- SLIDER -->\n            <ng-container *ngSwitchCase=\"'slider'\">\n                <n7-carousel \n                [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[section.id].emit\">\n                </n7-carousel> \n            </ng-container>\n\n            <!-- COLLECTION -->\n            <ng-container *ngSwitchCase=\"'collection'\">\n                <div class=\"mr-layout__maxwidth mr-items-preview\">\n                    <n7-inner-title \n                    [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                    [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-inner-title>\n                    <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                        <n7-item-preview\n                        *ngFor=\"let item of (lb.widgets[section.id].ds.out$ | async)?.items\"\n                        [data]=\"item\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n            </ng-container>\n\n            <!-- HERO -->\n            <ng-container *ngSwitchCase=\"'hero'\">\n                <n7-hero \n                [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[section.id].emit\">\n                </n7-hero> \n            </ng-container>\n        \n        </ng-container>\n    </section>\n    \n</div>\n"
-            }] }
-];
-/** @nocollapse */
+};
 MrHomeLayoutComponent.ctorParameters = () => [
     { type: LayoutsConfigurationService },
     { type: ActivatedRoute },
     { type: ConfigurationService },
     { type: CommunicationService }
 ];
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    MrHomeLayoutComponent.prototype.configId;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrHomeLayoutComponent.prototype.activatedRoute;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrHomeLayoutComponent.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrHomeLayoutComponent.prototype.communication;
-}
+MrHomeLayoutComponent = __decorate([
+    Component({
+        selector: 'mr-home-layout',
+        template: "<div class=\"mr-home mr-layout\" *ngIf=\"lb.dataSource\">\n    <section *ngFor=\"let section of lb.dataSource.pageConfig.sections\" class=\"{{ 'mr-layout__' + section.type }}\">\n        <ng-container [ngSwitch]=\"section.type\">\n\n            <!-- SLIDER -->\n            <ng-container *ngSwitchCase=\"'slider'\">\n                <n7-carousel \n                [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[section.id].emit\">\n                </n7-carousel> \n            </ng-container>\n\n            <!-- COLLECTION -->\n            <ng-container *ngSwitchCase=\"'collection'\">\n                <div class=\"mr-layout__maxwidth mr-items-preview\">\n                    <n7-inner-title \n                    [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                    [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-inner-title>\n                    <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                        <n7-item-preview\n                        *ngFor=\"let item of (lb.widgets[section.id].ds.out$ | async)?.items\"\n                        [data]=\"item\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n            </ng-container>\n\n            <!-- HERO -->\n            <ng-container *ngSwitchCase=\"'hero'\">\n                <n7-hero \n                [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[section.id].emit\">\n                </n7-hero> \n            </ng-container>\n        \n        </ng-container>\n    </section>\n    \n</div>\n"
+    }),
+    __metadata("design:paramtypes", [LayoutsConfigurationService,
+        ActivatedRoute,
+        ConfigurationService,
+        CommunicationService])
+], MrHomeLayoutComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrSearchLayoutDS extends LayoutDataSource$1 {
     constructor() {
         super(...arguments);
         this.sectionState = {};
         this.totalResultsText = null;
     }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     onInit(payload) {
         this.configuration = payload.configuration;
         this.searchService = payload.searchService;
@@ -13618,10 +8168,6 @@ class MrSearchLayoutDS extends LayoutDataSource$1 {
         // manual updates
         this.one('mr-search-page-title').update({});
     }
-    /**
-     * @param {?} response
-     * @return {?}
-     */
     handleResponse(response) {
         this.some([
             'mr-search-results-title',
@@ -13631,11 +8177,6 @@ class MrSearchLayoutDS extends LayoutDataSource$1 {
         this.one('n7-smart-pagination').updateOptions({ mode: 'payload' });
         this.one('n7-smart-pagination').update(this.getPaginationParams(response));
     }
-    /**
-     * @param {?} state
-     * @param {?} linksResponse
-     * @return {?}
-     */
     updateActiveFilters(state, linksResponse) {
         // active "tags" filters
         this.one('mr-search-tags').update({
@@ -13644,11 +8185,6 @@ class MrSearchLayoutDS extends LayoutDataSource$1 {
             facetsConfig: this.searchService.getConfig().facets
         });
     }
-    /**
-     * @private
-     * @param {?} response
-     * @return {?}
-     */
     getPaginationParams(response) {
         const { totalCount, page, limit } = response;
         const { pagination: paginationConfig } = this.pageConfig;
@@ -13662,71 +8198,23 @@ class MrSearchLayoutDS extends LayoutDataSource$1 {
             },
         };
     }
-    /**
-     * @param {?} id
-     * @param {?} newState
-     * @return {?}
-     */
     setSectionState(id, newState) {
         this.sectionState[id] = newState;
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutDS.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutDS.prototype.configId;
-    /** @type {?} */
-    MrSearchLayoutDS.prototype.searchService;
-    /** @type {?} */
-    MrSearchLayoutDS.prototype.sectionState;
-    /** @type {?} */
-    MrSearchLayoutDS.prototype.facetsConfig;
-    /** @type {?} */
-    MrSearchLayoutDS.prototype.pageConfig;
-    /** @type {?} */
-    MrSearchLayoutDS.prototype.totalResultsText;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-const hasValue = (/**
- * @param {?} value
- * @return {?}
- */
-(value) => {
+const hasValue = (value) => {
     if (Array.isArray(value)) {
         return value.length > 0;
     }
     return !!value;
-});
+};
 const ɵ0$1 = hasValue;
 var searchHelper = {
-    /**
-     * @param {?} state
-     * @param {?} schemas
-     * @return {?}
-     */
     stateToQueryParams(state, schemas) {
-        /** @type {?} */
         const queryParams = {};
-        Object.keys(state).forEach((/**
-         * @param {?} key
-         * @return {?}
-         */
-        (key) => {
-            /** @type {?} */
+        Object.keys(state).forEach((key) => {
             const value = state[key];
-            /** @type {?} */
             const schema = schemas[key];
             const { multiple, valueType } = schema;
             if (hasValue(value)) {
@@ -13736,89 +8224,48 @@ var searchHelper = {
                         queryParams[key] = multiple ? value.join(',') : value;
                         break;
                     case 'boolean':
-                        queryParams[key] = multiple ? value.map((/**
-                         * @param {?} v
-                         * @return {?}
-                         */
-                        (v) => +v)).join(',') : +value;
+                        queryParams[key] = multiple ? value.map((v) => +v).join(',') : +value;
                         break;
                     default:
                         break;
                 }
             }
-        }));
+        });
         return queryParams;
     },
-    /**
-     * @param {?} queryParams
-     * @param {?} schemas
-     * @return {?}
-     */
     queryParamsToState(queryParams, schemas) {
-        /** @type {?} */
         const state = {};
-        Object.keys(queryParams).forEach((/**
-         * @param {?} key
-         * @return {?}
-         */
-        (key) => {
-            /** @type {?} */
+        Object.keys(queryParams).forEach((key) => {
             const value = queryParams[key];
-            /** @type {?} */
             const schema = schemas[key];
             const { multiple, valueType } = schema;
             if (hasValue(value)) {
                 if (hasValue(value)) {
                     switch (valueType) {
                         case 'number':
-                            state[key] = multiple ? value.split(',').map((/**
-                             * @param {?} v
-                             * @return {?}
-                             */
-                            (v) => +v)) : +value;
+                            state[key] = multiple ? value.split(',').map((v) => +v) : +value;
                             break;
                         case 'string':
-                            state[key] = multiple ? value.split(',').map((/**
-                             * @param {?} v
-                             * @return {?}
-                             */
-                            (v) => `${v}`)) : `${value}`;
+                            state[key] = multiple ? value.split(',').map((v) => `${v}`) : `${value}`;
                             break;
                         case 'boolean':
-                            state[key] = multiple ? value.split(',').map((/**
-                             * @param {?} v
-                             * @return {?}
-                             */
-                            (v) => !!v)) : !!value;
+                            state[key] = multiple ? value.split(',').map((v) => !!v) : !!value;
                             break;
                         default:
                             break;
                     }
                 }
             }
-        }));
+        });
         return state;
     }
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const INPUT_STATE_CONTEXT = 'input';
-/** @type {?} */
 const FACET_STATE_CONTEXT = 'facet';
-/** @type {?} */
 const RESULTS_REQUEST_STATE_CONTEXT = 'resultsRequest';
-/** @type {?} */
 const FACETS_REQUEST_STATE_CONTEXT = 'facetsRequest';
-class MrSearchService {
-    /**
-     * @param {?} router
-     * @param {?} activatedRoute
-     * @param {?} communication
-     */
+let MrSearchService = class MrSearchService {
     constructor(router, activatedRoute, communication) {
         this.router = router;
         this.activatedRoute = activatedRoute;
@@ -13828,16 +8275,8 @@ class MrSearchService {
         this.contextState = {};
         this.state$ = {};
         this.beforeHook = {};
-        this.getConfig = (/**
-         * @return {?}
-         */
-        () => this.config);
+        this.getConfig = () => this.config;
     }
-    /**
-     * @param {?} searchId
-     * @param {?} config
-     * @return {?}
-     */
     init(searchId, config) {
         this.searchId = searchId;
         this.config = config;
@@ -13851,23 +8290,13 @@ class MrSearchService {
         this.onRouteChange();
         this.onResultsLoading();
     }
-    /**
-     * @param {?} context
-     * @param {?=} id
-     * @return {?}
-     */
     getState$(context, id) {
-        /** @type {?} */
         const stateId = id ? `${context}.${id}` : context;
         if (!this.state$[stateId]) {
             throw Error(`Key "${stateId}" does'nt exists`);
         }
         return this.state$[stateId];
     }
-    /**
-     * @param {?} context
-     * @return {?}
-     */
     addStateContext(context) {
         if (this.state$[context]) {
             throw Error(`State key "${context}" already exists`);
@@ -13877,13 +8306,7 @@ class MrSearchService {
         // create stream
         this.state$[context] = new Subject();
     }
-    /**
-     * @param {?} context
-     * @param {?} id
-     * @return {?}
-     */
     addState(context, id) {
-        /** @type {?} */
         const stateId = `${context}.${id}`;
         if (!this.state$[context]) {
             throw Error(`
@@ -13897,19 +8320,11 @@ class MrSearchService {
         // create stream
         this.state$[stateId] = new Subject();
     }
-    /**
-     * @param {?} context
-     * @param {?} id
-     * @param {?} newValue
-     * @return {?}
-     */
     setState(context, id, newValue) {
-        /** @type {?} */
         const stateId = `${context}.${id}`;
         if (!this.state$[stateId]) {
             throw Error(`Key "${stateId}" does'nt exists`);
         }
-        /** @type {?} */
         let value = newValue;
         // hook control
         if (this.beforeHook[stateId]) {
@@ -13920,75 +8335,38 @@ class MrSearchService {
         // update context
         this.setContextState(context, id, value);
     }
-    /**
-     * @param {?} context
-     * @param {?} id
-     * @param {?} hook
-     * @return {?}
-     */
     setBeforeHook(context, id, hook) {
-        /** @type {?} */
         const stateId = `${context}.${id}`;
         if (!this.state$[stateId]) {
             throw Error(`Key "${stateId}" does'nt exists`);
         }
         this.beforeHook[stateId] = hook;
     }
-    /**
-     * @return {?}
-     */
     reset() {
         // clear input states
-        Object.keys(this.contextState[INPUT_STATE_CONTEXT]).forEach((/**
-         * @param {?} id
-         * @return {?}
-         */
-        (id) => {
+        Object.keys(this.contextState[INPUT_STATE_CONTEXT]).forEach((id) => {
             this.setState(INPUT_STATE_CONTEXT, id, null);
-        }));
+        });
     }
-    /**
-     * @private
-     * @return {?}
-     */
     clear() {
         this.contextState = {};
         this.state$ = {};
         this.beforeHook = {};
     }
-    /**
-     * @private
-     * @param {?} context
-     * @param {?} id
-     * @param {?} newValue
-     * @return {?}
-     */
     setContextState(context, id, newValue) {
-        this.contextState[context] = Object.assign({}, this.contextState[context], { [`${id}`]: newValue });
+        this.contextState[context] = Object.assign(Object.assign({}, this.contextState[context]), { [`${id}`]: newValue });
         this.state$[context].next({
             lastUpdated: id,
             state: this.contextState[context]
         });
     }
-    /**
-     * @private
-     * @return {?}
-     */
     initInputState() {
         const { facets, layoutInputs } = this.config;
         // add context state
         this.addStateContext(INPUT_STATE_CONTEXT);
         // set facets input state
-        facets.sections.forEach((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ header, inputs }) => {
-            [header, ...inputs].forEach((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ id, queryParam, schema }) => {
+        facets.sections.forEach(({ header, inputs }) => {
+            [header, ...inputs].forEach(({ id, queryParam, schema }) => {
                 this.addState(INPUT_STATE_CONTEXT, id);
                 // is query param?
                 if (queryParam) {
@@ -13998,14 +8376,10 @@ class MrSearchService {
                 if (schema) {
                     this.inputSchemas[id] = schema;
                 }
-            }));
-        }));
+            });
+        });
         // set layout input state
-        layoutInputs.forEach((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ id, queryParam, schema }) => {
+        layoutInputs.forEach(({ id, queryParam, schema }) => {
             this.addState(INPUT_STATE_CONTEXT, id);
             if (queryParam) {
                 this.queryParamKeys.push(id);
@@ -14014,167 +8388,84 @@ class MrSearchService {
             if (schema) {
                 this.inputSchemas[id] = schema;
             }
-        }));
+        });
     }
-    /**
-     * @private
-     * @return {?}
-     */
     initFacetState() {
         const { facets } = this.config;
         // add context state
         this.addStateContext(FACET_STATE_CONTEXT);
         // set input state
-        facets.sections.forEach((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ header, inputs }) => {
-            [header, ...inputs].forEach((/**
-             * @param {?} input
-             * @return {?}
-             */
-            (input) => {
+        facets.sections.forEach(({ header, inputs }) => {
+            [header, ...inputs].forEach((input) => {
                 this.addState(FACET_STATE_CONTEXT, input.id);
-            }));
-        }));
+            });
+        });
     }
-    /**
-     * @private
-     * @return {?}
-     */
     onRouteChange() {
         const { results } = this.config.request;
         // add context state
         this.addStateContext(RESULTS_REQUEST_STATE_CONTEXT);
         // default states
-        ['loading', 'request', 'success', 'error'].forEach((/**
-         * @param {?} id
-         * @return {?}
-         */
-        (id) => {
+        ['loading', 'request', 'success', 'error'].forEach((id) => {
             this.addState(RESULTS_REQUEST_STATE_CONTEXT, id);
-        }));
+        });
         this.activatedRoute.queryParams.pipe(
         // fix initial listeners (symbolic timeout)
         delay(1), 
         // query params to state
-        map((/**
-         * @param {?} params
-         * @return {?}
-         */
-        (params) => searchHelper.queryParamsToState(params, this.inputSchemas))), 
+        map((params) => searchHelper.queryParamsToState(params, this.inputSchemas)), 
         // state != queryParams control
-        tap((/**
-         * @param {?} params
-         * @return {?}
-         */
-        (params) => {
+        tap((params) => {
             if (isEmpty(params)) {
                 this.reset();
             }
             // update state
             if (!isEmpty(params)) {
-                /** @type {?} */
                 const inputContext = this.contextState[INPUT_STATE_CONTEXT];
                 if (isEmpty(inputContext)) {
                     Object.keys(params)
-                        .forEach((/**
-                     * @param {?} inputId
-                     * @return {?}
-                     */
-                    (inputId) => {
+                        .forEach((inputId) => {
                         this.setState(INPUT_STATE_CONTEXT, inputId, params[inputId]);
-                    }));
+                    });
                 }
                 else {
                     Object.keys(inputContext)
-                        .filter((/**
-                     * @param {?} inputId
-                     * @return {?}
-                     */
-                    (inputId) => this.notEquals(inputContext[inputId], params[inputId])))
-                        .forEach((/**
-                     * @param {?} inputId
-                     * @return {?}
-                     */
-                    (inputId) => {
+                        .filter((inputId) => this.notEquals(inputContext[inputId], params[inputId]))
+                        .forEach((inputId) => {
                         this.setState(INPUT_STATE_CONTEXT, inputId, params[inputId] || null);
-                    }));
+                    });
                 }
             }
-        })), map((/**
-         * @param {?} params
-         * @return {?}
-         */
-        (params) => {
+        }), map((params) => {
             this.setState(RESULTS_REQUEST_STATE_CONTEXT, 'loading', params);
             return params;
-        })), debounceTime(results.delay || 1), map((/**
-         * @param {?} params
-         * @return {?}
-         */
-        (params) => {
+        }), debounceTime(results.delay || 1), map((params) => {
             this.setState(RESULTS_REQUEST_STATE_CONTEXT, 'request', params);
             return params;
-        })), switchMap((/**
-         * @param {?} state
-         * @return {?}
-         */
-        (state) => this.communication.request$(results.id, {
-            params: Object.assign({}, state, { searchId: this.searchId }),
+        }), switchMap((state) => this.communication.request$(results.id, {
+            params: Object.assign(Object.assign({}, state), { searchId: this.searchId }),
             method: 'POST',
-            onError: (/**
-             * @param {?} error
-             * @return {?}
-             */
-            (error) => {
+            onError: (error) => {
                 this.setState(RESULTS_REQUEST_STATE_CONTEXT, 'error', error);
-            })
-        }, results.provider || null)))).subscribe((/**
-         * @param {?} response
-         * @return {?}
-         */
-        (response) => {
+            }
+        }, results.provider || null))).subscribe((response) => {
             this.setState(RESULTS_REQUEST_STATE_CONTEXT, 'success', response);
-        }));
+        });
     }
-    /**
-     * @private
-     * @return {?}
-     */
     onInputsChange() {
-        this.getState$(INPUT_STATE_CONTEXT).pipe(filter((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ lastUpdated }) => this.queryParamKeys.indexOf(lastUpdated) !== -1))).subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ state }) => {
-            /** @type {?} */
+        this.getState$(INPUT_STATE_CONTEXT).pipe(filter(({ lastUpdated }) => this.queryParamKeys.indexOf(lastUpdated) !== -1)).subscribe(({ state }) => {
             const filteredState = {};
-            Object.keys(state).forEach((/**
-             * @param {?} id
-             * @return {?}
-             */
-            (id) => {
+            Object.keys(state).forEach((id) => {
                 if (this.queryParamKeys.indexOf(id) !== -1) {
                     filteredState[id] = state[id];
                 }
-            }));
-            /** @type {?} */
+            });
             const queryParams = searchHelper.stateToQueryParams(filteredState, this.inputSchemas);
             this.router.navigate([], {
                 queryParams
             });
-        }));
+        });
     }
-    /**
-     * @private
-     * @return {?}
-     */
     onResultsLoading() {
         const { facets } = this.config.request;
         if (!facets) {
@@ -14183,160 +8474,60 @@ class MrSearchService {
         // add context state
         this.addStateContext(FACETS_REQUEST_STATE_CONTEXT);
         // default states
-        ['loading', 'request', 'success', 'error'].forEach((/**
-         * @param {?} id
-         * @return {?}
-         */
-        (id) => {
+        ['loading', 'request', 'success', 'error'].forEach((id) => {
             this.addState(FACETS_REQUEST_STATE_CONTEXT, id);
-        }));
-        this.getState$(RESULTS_REQUEST_STATE_CONTEXT, 'loading').pipe(map((/**
-         * @param {?} params
-         * @return {?}
-         */
-        (params) => {
+        });
+        this.getState$(RESULTS_REQUEST_STATE_CONTEXT, 'loading').pipe(map((params) => {
             this.setState(FACETS_REQUEST_STATE_CONTEXT, 'loading', params);
             return params;
-        })), debounceTime(facets.delay || 1), map((/**
-         * @param {?} params
-         * @return {?}
-         */
-        (params) => {
+        }), debounceTime(facets.delay || 1), map((params) => {
             this.setState(FACETS_REQUEST_STATE_CONTEXT, 'request', params);
             return params;
-        })), switchMap((/**
-         * @param {?} state
-         * @return {?}
-         */
-        (state) => this.communication.request$(facets.id, {
-            params: Object.assign({}, state, { searchId: this.searchId }),
+        }), switchMap((state) => this.communication.request$(facets.id, {
+            params: Object.assign(Object.assign({}, state), { searchId: this.searchId }),
             method: 'POST',
-            onError: (/**
-             * @param {?} error
-             * @return {?}
-             */
-            (error) => {
+            onError: (error) => {
                 this.setState(FACETS_REQUEST_STATE_CONTEXT, 'error', error);
-            })
-        }, facets.provider || null)))).subscribe((/**
-         * @param {?} response
-         * @return {?}
-         */
-        (response) => {
+            }
+        }, facets.provider || null))).subscribe((response) => {
             this.setState(FACETS_REQUEST_STATE_CONTEXT, 'success', response);
-        }));
+        });
         // update facet links
-        this.getState$(FACETS_REQUEST_STATE_CONTEXT, 'success').subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ inputs }) => {
-            Object.keys(inputs).forEach((/**
-             * @param {?} id
-             * @return {?}
-             */
-            (id) => {
+        this.getState$(FACETS_REQUEST_STATE_CONTEXT, 'success').subscribe(({ inputs }) => {
+            Object.keys(inputs).forEach((id) => {
                 this.setState(FACET_STATE_CONTEXT, id, {
                     links: inputs[id]
                 });
-            }));
-        }));
+            });
+        });
     }
-    /**
-     * @param {?} val1
-     * @param {?} val2
-     * @return {?}
-     */
     notEquals(val1, val2) {
         if (Array.isArray(val1) && Array.isArray(val2)) {
             return !!xor(val1, val2).length;
         }
         return val1 !== val2;
     }
-}
-MrSearchService.decorators = [
-    { type: Injectable }
-];
-/** @nocollapse */
+};
 MrSearchService.ctorParameters = () => [
     { type: Router },
     { type: ActivatedRoute },
     { type: CommunicationService }
 ];
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchService.prototype.searchId;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchService.prototype.config;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchService.prototype.queryParamKeys;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchService.prototype.inputSchemas;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchService.prototype.contextState;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchService.prototype.state$;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchService.prototype.beforeHook;
-    /** @type {?} */
-    MrSearchService.prototype.getConfig;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchService.prototype.router;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchService.prototype.activatedRoute;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchService.prototype.communication;
-}
+MrSearchService = __decorate([
+    Injectable(),
+    __metadata("design:paramtypes", [Router,
+        ActivatedRoute,
+        CommunicationService])
+], MrSearchService);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrSearchLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.destroyed$ = new Subject();
         this.searchState = {};
     }
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'mr-search-layout.init':
                     this.searchService = payload.searchService;
@@ -14354,12 +8545,8 @@ class MrSearchLayoutEH extends EventHandler {
                     console.warn('unhandled inner event of type', type);
                     break;
             }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'n7-smart-pagination.click':
                     this.searchService.setState('input', 'page', payload.page);
@@ -14371,16 +8558,10 @@ class MrSearchLayoutEH extends EventHandler {
                     this.searchService.setState('input', 'sort', payload.value);
                     break;
                 case 'mr-search-tags.click': {
-                    /** @type {?} */
                     const stateValue = this.searchState[payload.id];
-                    /** @type {?} */
                     let newValue = null;
                     if (Array.isArray(stateValue)) {
-                        newValue = stateValue.filter((/**
-                         * @param {?} value
-                         * @return {?}
-                         */
-                        (value) => value !== payload.value));
+                        newValue = stateValue.filter((value) => value !== payload.value);
                     }
                     this.searchService.setState('input', payload.id, newValue);
                     break;
@@ -14388,102 +8569,42 @@ class MrSearchLayoutEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
-    /**
-     * @return {?}
-     */
     initStateListener() {
         // inputs listener
-        this.searchService.getState$(INPUT_STATE_CONTEXT).subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ state }) => {
+        this.searchService.getState$(INPUT_STATE_CONTEXT).subscribe(({ state }) => {
             this.searchState = state;
-        }));
-        this.searchService.getState$(FACETS_REQUEST_STATE_CONTEXT, 'success').subscribe((/**
-         * @param {?} response
-         * @return {?}
-         */
-        (response) => {
+        });
+        this.searchService.getState$(FACETS_REQUEST_STATE_CONTEXT, 'success').subscribe((response) => {
             this.linksResponse = response;
             this.dataSource.updateActiveFilters(this.searchState, this.linksResponse);
-        }));
-        this.searchService.getState$(RESULTS_REQUEST_STATE_CONTEXT, 'loading').subscribe((/**
-         * @return {?}
-         */
-        () => {
+        });
+        this.searchService.getState$(RESULTS_REQUEST_STATE_CONTEXT, 'loading').subscribe(() => {
             this.dataSource.setSectionState('results', 'LOADING');
-        }));
+        });
         // default params hook
-        this.searchService.setBeforeHook(RESULTS_REQUEST_STATE_CONTEXT, 'loading', (/**
-         * @param {?=} params
-         * @return {?}
-         */
-        (params = {}) => {
-            /** @type {?} */
+        this.searchService.setBeforeHook(RESULTS_REQUEST_STATE_CONTEXT, 'loading', (params = {}) => {
             const defaultParams = {
                 page: 1,
                 sort: '_score_DESC',
                 limit: 10
             };
-            Object.keys(defaultParams).forEach((/**
-             * @param {?} key
-             * @return {?}
-             */
-            (key) => {
+            Object.keys(defaultParams).forEach((key) => {
                 params[key] = params[key] || defaultParams[key];
-            }));
+            });
             return params;
-        }));
-        this.searchService.setBeforeHook(INPUT_STATE_CONTEXT, 'limit', (/**
-         * @param {?} value
-         * @return {?}
-         */
-        (value) => +value));
+        });
+        this.searchService.setBeforeHook(INPUT_STATE_CONTEXT, 'limit', (value) => +value);
         this.searchService.getState$(RESULTS_REQUEST_STATE_CONTEXT, 'success')
-            .subscribe((/**
-         * @param {?} response
-         * @return {?}
-         */
-        (response) => {
+            .subscribe((response) => {
             this.dataSource.handleResponse(response);
             // update layout state
             this.dataSource.setSectionState('results', isEmpty(response.results) ? 'EMPTY' : 'OK');
-        }));
+        });
     }
 }
-if (false) {
-    /** @type {?} */
-    MrSearchLayoutEH.prototype.dataSource;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutEH.prototype.destroyed$;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutEH.prototype.searchService;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutEH.prototype.searchState;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutEH.prototype.linksResponse;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const MrSearchLayoutConfig = {
     layoutId: 'mr-search-layout',
     widgets: [{
@@ -14512,10 +8633,6 @@ const MrSearchLayoutConfig = {
     layoutOptions: {}
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 const ɵ0$2 = {
     text: 'Filtra i risultati'
 }, ɵ1$1 = {
@@ -14573,7 +8690,6 @@ const ɵ0$2 = {
 }, ɵ15 = {
     links: []
 };
-/** @type {?} */
 const facets = {
     sections: [{
             header: {
@@ -14698,20 +8814,14 @@ const facets = {
         }],
     classes: 'facets-wrapper'
 };
-const ɵ16 = /**
- * @param {?} id
- * @return {?}
- */
-(id) => ({
+const ɵ16 = (id) => ({
     id,
     queryParam: true,
     schema: {
         valueType: id === 'sort' ? 'string' : 'number'
     }
 });
-/** @type {?} */
-const layoutInputs = ['page', 'limit', 'sort'].map((ɵ16));
-/** @type {?} */
+const layoutInputs = ['page', 'limit', 'sort'].map(ɵ16);
 const request = {
     results: {
         id: 'search',
@@ -14723,21 +8833,9 @@ const request = {
     provider: 'rest',
     delay: 500
 };
-var searchConfig = (/** @type {?} */ ({ request, facets, layoutInputs }));
+var searchConfig = { request, facets, layoutInputs };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class MrSearchLayoutComponent extends AbstractLayout {
-    /**
-     * @param {?} layoutsConfiguration
-     * @param {?} router
-     * @param {?} activatedRoute
-     * @param {?} communication
-     * @param {?} configuration
-     * @param {?} searchService
-     */
+let MrSearchLayoutComponent = class MrSearchLayoutComponent extends AbstractLayout {
     constructor(layoutsConfiguration, router, activatedRoute, communication, configuration, searchService) {
         super(layoutsConfiguration.get('MrSearchLayoutConfig') || MrSearchLayoutConfig);
         this.router = router;
@@ -14748,10 +8846,6 @@ class MrSearchLayoutComponent extends AbstractLayout {
         this.hostEmit$ = new Subject();
         this.guestEmit$ = new Subject();
     }
-    /**
-     * @protected
-     * @return {?}
-     */
     initPayload() {
         return {
             configId: this.configId,
@@ -14764,34 +8858,17 @@ class MrSearchLayoutComponent extends AbstractLayout {
             options: this.config.options || {},
         };
     }
-    /**
-     * @return {?}
-     */
     ngOnInit() {
-        this.activatedRoute.data.subscribe((/**
-         * @param {?} data
-         * @return {?}
-         */
-        (data) => {
+        this.activatedRoute.data.subscribe((data) => {
             this.configId = data.configId;
             this.searchService.init(this.configId, searchConfig);
             this.onInit();
-        }));
+        });
     }
-    /**
-     * @return {?}
-     */
     ngOnDestroy() {
         this.onDestroy();
     }
-}
-MrSearchLayoutComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'mr-search-layout',
-                template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth\">\n\n        <div class=\"mr-search__title\">\n            <n7-inner-title\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <aside class=\"mr-search__facets\">\n                <div class=\"filter-section\">\n                    <h2 *ngIf=\"lb.dataSource.pageConfig['facets-title']\">\n                        {{ lb.dataSource.pageConfig['facets-title'] }}\n                    </h2>\n                    <mr-search-facets-layout \n                    [searchService]=\"lb.dataSource.searchService\">\n                    </mr-search-facets-layout>\n                </div>\n            </aside>\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    <n7-inner-title\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\n                    </n7-inner-title>\n                </div>\n                <div class=\"mr-search__results-filters\">\n                    <n7-tag *ngFor=\"let tag of (lb.widgets['mr-search-tags'].ds.out$ | async)\"\n                    [data]=\"tag\"\n                    [emit]=\"lb.widgets['mr-search-tags'].emit\">\n                    </n7-tag>\n                </div>\n                <main class=\"mr-search__results\">\n                    <!-- SEARCH RESULTS -->\n                    <ng-container [ngSwitch]=\"lb.dataSource.sectionState.results\">\n                        \n                        <!-- loading -->\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\n                            <div class=\"mr-search__results-loading\">\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                                    blocks: [\n                                        { classes: 'search-result-placeholder-title' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' }\n                                    ]\n                                }\"></n7-content-placeholder>\n                            </div>\n                        </ng-container>\n                        \n                        <!-- ok: items > 0 -->\n                        <ng-container *ngSwitchCase=\"'OK'\">\n                            <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\n                            [data]=\"item\">\n                            </n7-item-preview>\n                        </ng-container>\n\n                        <!-- ok: items === 0 -->\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\n                            <div class=\"mr-search__results-fallback\">\n                                <p class=\"mr-search__results-fallback-string\">\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\n                                </p>\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\n                                </button>\n                            </div>\n                        </ng-container>\n\n                        <!-- ko: request problem -->\n                        <ng-container *ngSwitchCase=\"'KO'\">\n                            <p class=\"mr-search__results-ko-string\">\n                                {{ lb.dataSource.pageConfig.ko.text }}\n                            </p>\n                            <button class=\"n7-btn mr-search__results-ko-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                {{ lb.dataSource.pageConfig.ko.button }}\n                            </button>\n                        </ng-container>\n                        \n                    </ng-container>\n                </main>               \n                <n7-smart-pagination\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
-            }] }
-];
-/** @nocollapse */
+};
 MrSearchLayoutComponent.ctorParameters = () => [
     { type: LayoutsConfigurationService },
     { type: Router },
@@ -14800,71 +8877,29 @@ MrSearchLayoutComponent.ctorParameters = () => [
     { type: ConfigurationService },
     { type: MrSearchService }
 ];
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutComponent.prototype.configId;
-    /** @type {?} */
-    MrSearchLayoutComponent.prototype.hostEmit$;
-    /** @type {?} */
-    MrSearchLayoutComponent.prototype.guestEmit$;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutComponent.prototype.router;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutComponent.prototype.activatedRoute;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutComponent.prototype.communication;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutComponent.prototype.configuration;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrSearchLayoutComponent.prototype.searchService;
-}
+MrSearchLayoutComponent = __decorate([
+    Component({
+        selector: 'mr-search-layout',
+        template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth\">\n\n        <div class=\"mr-search__title\">\n            <n7-inner-title\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <aside class=\"mr-search__facets\">\n                <div class=\"filter-section\">\n                    <h2 *ngIf=\"lb.dataSource.pageConfig['facets-title']\">\n                        {{ lb.dataSource.pageConfig['facets-title'] }}\n                    </h2>\n                    <mr-search-facets-layout \n                    [searchService]=\"lb.dataSource.searchService\">\n                    </mr-search-facets-layout>\n                </div>\n            </aside>\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    <n7-inner-title\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\n                    </n7-inner-title>\n                </div>\n                <div class=\"mr-search__results-filters\">\n                    <n7-tag *ngFor=\"let tag of (lb.widgets['mr-search-tags'].ds.out$ | async)\"\n                    [data]=\"tag\"\n                    [emit]=\"lb.widgets['mr-search-tags'].emit\">\n                    </n7-tag>\n                </div>\n                <main class=\"mr-search__results\">\n                    <!-- SEARCH RESULTS -->\n                    <ng-container [ngSwitch]=\"lb.dataSource.sectionState.results\">\n                        \n                        <!-- loading -->\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\n                            <div class=\"mr-search__results-loading\">\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                                    blocks: [\n                                        { classes: 'search-result-placeholder-title' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' }\n                                    ]\n                                }\"></n7-content-placeholder>\n                            </div>\n                        </ng-container>\n                        \n                        <!-- ok: items > 0 -->\n                        <ng-container *ngSwitchCase=\"'OK'\">\n                            <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\n                            [data]=\"item\">\n                            </n7-item-preview>\n                        </ng-container>\n\n                        <!-- ok: items === 0 -->\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\n                            <div class=\"mr-search__results-fallback\">\n                                <p class=\"mr-search__results-fallback-string\">\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\n                                </p>\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\n                                </button>\n                            </div>\n                        </ng-container>\n\n                        <!-- ko: request problem -->\n                        <ng-container *ngSwitchCase=\"'KO'\">\n                            <p class=\"mr-search__results-ko-string\">\n                                {{ lb.dataSource.pageConfig.ko.text }}\n                            </p>\n                            <button class=\"n7-btn mr-search__results-ko-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                {{ lb.dataSource.pageConfig.ko.button }}\n                            </button>\n                        </ng-container>\n                        \n                    </ng-container>\n                </main>               \n                <n7-smart-pagination\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
+    }),
+    __metadata("design:paramtypes", [LayoutsConfigurationService,
+        Router,
+        ActivatedRoute,
+        CommunicationService,
+        ConfigurationService,
+        MrSearchService])
+], MrSearchLayoutComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrGlossaryLayoutDS extends LayoutDataSource$1 {
     // private communication;
-    /**
-     * @return {?}
-     */
     onInit() {
         // this.communication = payload.communication;
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrGlossaryLayoutEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'mr-glossary-layout.init':
                     this.dataSource.onInit(payload);
@@ -14873,7 +8908,7 @@ class MrGlossaryLayoutEH extends EventHandler {
                     console.warn('unhandled inner event of type', type);
                     break;
             }
-        }));
+        });
         /*
           this.outerEvents$.subscribe(({ type, payload }) => {
           });
@@ -14881,11 +8916,6 @@ class MrGlossaryLayoutEH extends EventHandler {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const MrGlossaryLayoutConfig = {
     layoutId: 'n7-glossary-layout',
     widgets: [
@@ -14901,74 +8931,40 @@ const MrGlossaryLayoutConfig = {
     layoutOptions: {}
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class MrGlossaryLayoutComponent extends AbstractLayout {
-    /**
-     * @param {?} layoutsConfiguration
-     */
+let MrGlossaryLayoutComponent = class MrGlossaryLayoutComponent extends AbstractLayout {
     constructor(layoutsConfiguration) {
         super(layoutsConfiguration.get('MrGlossaryLayoutConfig') || MrGlossaryLayoutConfig);
     }
-    /**
-     * @protected
-     * @return {?}
-     */
     initPayload() {
         return {
             options: this.config.options || {}
         };
     }
-    /**
-     * @return {?}
-     */
     ngOnInit() {
         this.onInit();
     }
-    /**
-     * @return {?}
-     */
     ngOnDestroy() {
         this.onDestroy();
     }
-}
-MrGlossaryLayoutComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'mr-glossary-layout',
-                template: "<div class=\"glossary-layout\" *ngIf=\"lb.dataSource\">\n    Hello, from Glossary layout!\n</div>\n"
-            }] }
-];
-/** @nocollapse */
+};
 MrGlossaryLayoutComponent.ctorParameters = () => [
     { type: LayoutsConfigurationService }
 ];
+MrGlossaryLayoutComponent = __decorate([
+    Component({
+        selector: 'mr-glossary-layout',
+        template: "<div class=\"glossary-layout\" *ngIf=\"lb.dataSource\">\n    Hello, from Glossary layout!\n</div>\n"
+    }),
+    __metadata("design:paramtypes", [LayoutsConfigurationService])
+], MrGlossaryLayoutComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrStaticLayoutDS extends LayoutDataSource$1 {
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     onInit(payload) {
         this.communication = payload.communication;
     }
-    /**
-     * @param {?} slug
-     * @return {?}
-     */
     pageRequest$(slug) {
         return this.communication.request$('wp-page', { urlParams: slug });
     }
-    /**
-     * @param {?} title
-     * @param {?} body
-     * @return {?}
-     */
     renderHTML(title, body) {
         this.RENDER_HTML = {
             title,
@@ -14976,34 +8972,14 @@ class MrStaticLayoutDS extends LayoutDataSource$1 {
         };
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    MrStaticLayoutDS.prototype.communication;
-    /** @type {?} */
-    MrStaticLayoutDS.prototype.RENDER_HTML;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class MrStaticLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.destroy$ = new Subject();
     }
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'mr-static-layout.init':
                     this.route = payload.route;
@@ -15018,52 +8994,17 @@ class MrStaticLayoutEH extends EventHandler {
                     console.warn('unhandled inner event of type', type);
                     break;
             }
-        }));
+        });
     }
-    /**
-     * @private
-     * @return {?}
-     */
     listenRoute() {
-        this.route.paramMap.pipe(takeUntil(this.destroy$), map((/**
-         * @param {?} params
-         * @return {?}
-         */
-        (params) => params.get('slug'))), switchMap((/**
-         * @param {?} slug
-         * @return {?}
-         */
-        (slug) => this.dataSource.pageRequest$(slug)))).subscribe((/**
-         * @param {?} response
-         * @return {?}
-         */
-        (response) => {
+        this.route.paramMap.pipe(takeUntil(this.destroy$), map((params) => params.get('slug')), switchMap((slug) => this.dataSource.pageRequest$(slug))).subscribe((response) => {
             const { title } = response;
             const { body } = response;
             this.dataSource.renderHTML(title, body);
-        }));
+        });
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    MrStaticLayoutEH.prototype.route;
-    /** @type {?} */
-    MrStaticLayoutEH.prototype.dataSource;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrStaticLayoutEH.prototype.destroy$;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const MrStaticLayoutConfig = {
     layoutId: 'mr-static-layout',
     widgets: [
@@ -15079,25 +9020,12 @@ const MrStaticLayoutConfig = {
     layoutOptions: {}
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class MrStaticLayoutComponent extends AbstractLayout {
-    /**
-     * @param {?} communication
-     * @param {?} route
-     * @param {?} layoutsConfiguration
-     */
+let MrStaticLayoutComponent = class MrStaticLayoutComponent extends AbstractLayout {
     constructor(communication, route, layoutsConfiguration) {
         super(layoutsConfiguration.get('MrStaticLayoutConfig') || MrStaticLayoutConfig);
         this.communication = communication;
         this.route = route;
     }
-    /**
-     * @protected
-     * @return {?}
-     */
     initPayload() {
         return {
             communication: this.communication,
@@ -15105,174 +9033,83 @@ class MrStaticLayoutComponent extends AbstractLayout {
             options: this.config.options || {}
         };
     }
-    /**
-     * @return {?}
-     */
     ngOnInit() {
         this.onInit();
     }
-    /**
-     * @return {?}
-     */
     ngOnDestroy() {
         this.onDestroy();
     }
-}
-MrStaticLayoutComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'mr-static-layout',
-                template: "<div class=\"mr-static-layout\" *ngIf=\"lb.dataSource.RENDER_HTML\">\n    <h1 class=\"mr-generated-title-WP\">{{lb.dataSource.RENDER_HTML.title}}</h1>\n    <div class=\"mr-generated-page-WP\" [innerHTML]=\"lb.dataSource.RENDER_HTML.body | keepHtml\"></div>\n</div>\n"
-            }] }
-];
-/** @nocollapse */
+};
 MrStaticLayoutComponent.ctorParameters = () => [
     { type: CommunicationService },
     { type: ActivatedRoute },
     { type: LayoutsConfigurationService }
 ];
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    MrStaticLayoutComponent.prototype.communication;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrStaticLayoutComponent.prototype.route;
-}
+MrStaticLayoutComponent = __decorate([
+    Component({
+        selector: 'mr-static-layout',
+        template: "<div class=\"mr-static-layout\" *ngIf=\"lb.dataSource.RENDER_HTML\">\n    <h1 class=\"mr-generated-title-WP\">{{lb.dataSource.RENDER_HTML.title}}</h1>\n    <div class=\"mr-generated-page-WP\" [innerHTML]=\"lb.dataSource.RENDER_HTML.body | keepHtml\"></div>\n</div>\n"
+    }),
+    __metadata("design:paramtypes", [CommunicationService,
+        ActivatedRoute,
+        LayoutsConfigurationService])
+], MrStaticLayoutComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class SearchFacetsLayoutDS extends LayoutDataSource$1 {
     constructor() {
         super(...arguments);
         this.inputsDS = {};
     }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     onInit(payload) {
         this.searchService = payload.searchService;
         this.searchConfig = this.searchService.getConfig();
         this.facets = this.searchConfig.facets;
         this.initInputs();
     }
-    /**
-     * @return {?}
-     */
     initInputs() {
         // set components data
-        this.facets.sections.forEach((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ header, inputs }) => {
-            [header, ...inputs].forEach((/**
-             * @param {?} input
-             * @return {?}
-             */
-            (input) => {
+        this.facets.sections.forEach(({ header, inputs }) => {
+            [header, ...inputs].forEach((input) => {
                 // set id
-                /** @type {?} */
                 const widgetDataSource = this.getWidgetDataSource(input.id);
                 widgetDataSource.id = input.id;
                 // caching DS for next updates
                 this.inputsDS[input.id] = widgetDataSource;
                 // first update
                 widgetDataSource.update(input.data);
-            }));
-        }));
+            });
+        });
     }
-    /**
-     * @param {?} id
-     * @param {?} newValue
-     * @return {?}
-     */
     updateInputValue(id, newValue) {
-        /** @type {?} */
         const ds = this.inputsDS[id];
         ds.setValue(newValue, ds.value !== newValue);
     }
-    /**
-     * @param {?} id
-     * @param {?} newData
-     * @return {?}
-     */
     updateInputData(id, newData) {
-        /** @type {?} */
         const ds = this.inputsDS[id];
-        ds.update(Object.assign({}, ds.input, newData));
+        ds.update(Object.assign(Object.assign({}, ds.input), newData));
         // refresh selected
         ds.setValue(ds.value, true);
     }
-    /**
-     * @param {?} id
-     * @return {?}
-     */
     clearInput(id) {
-        /** @type {?} */
         const ds = this.inputsDS[id];
         ds.clear();
         ds.setValue(ds.value, true);
     }
-    /**
-     * @return {?}
-     */
     clearInputs() {
-        Object.keys(this.inputsDS).forEach((/**
-         * @param {?} id
-         * @return {?}
-         */
-        (id) => {
+        Object.keys(this.inputsDS).forEach((id) => {
             this.clearInput(id);
-        }));
+        });
     }
 }
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchFacetsLayoutDS.prototype.searchService;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchFacetsLayoutDS.prototype.inputsDS;
-    /** @type {?} */
-    SearchFacetsLayoutDS.prototype.searchConfig;
-    /** @type {?} */
-    SearchFacetsLayoutDS.prototype.facets;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @record
- */
-function ChangedSubjects() { }
 class SearchFacetsLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.changed$ = {};
         this.destroyed$ = new Subject();
     }
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'mr-search-facets-layout.init':
                     this.searchService = payload.searchService;
@@ -15288,72 +9125,35 @@ class SearchFacetsLayoutEH extends EventHandler {
                 default:
                     break;
             }
-        }));
-        this.outerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
             if (type.indexOf('change')) {
                 this.changed$[payload.id].next(payload);
             }
-        }));
+        });
     }
-    /**
-     * @param {?} __0
-     * @return {?}
-     */
     initChangedListener({ facets }) {
-        facets.sections.forEach((/**
-         * @param {?} section
-         * @return {?}
-         */
-        (section) => {
-            /** @type {?} */
+        facets.sections.forEach((section) => {
             const sources = [];
             if (section.header) {
                 const { id, delay } = section.header;
                 sources.push({ id, delay });
             }
-            section.inputs.forEach((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ id, delay }) => {
+            section.inputs.forEach(({ id, delay }) => {
                 sources.push({ id, delay });
-            }));
-            sources.forEach((/**
-             * @param {?} source
-             * @return {?}
-             */
-            (source) => {
+            });
+            sources.forEach((source) => {
                 this.changed$[source.id] = new Subject();
-                this.changed$[source.id].pipe(debounceTime(source.delay || 1)).subscribe((/**
-                 * @param {?} __0
-                 * @return {?}
-                 */
-                ({ id, value }) => {
+                this.changed$[source.id].pipe(debounceTime(source.delay || 1)).subscribe(({ id, value }) => {
                     this.searchService.setState('input', id, value);
-                }));
-            }));
-        }));
+                });
+            });
+        });
     }
-    /**
-     * @return {?}
-     */
     initStateListener() {
         // listener for input updates
         this.searchService.getState$(INPUT_STATE_CONTEXT)
-            .pipe(takeUntil(this.destroyed$), filter((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ lastUpdated }) => this.dataSource.inputsDS[lastUpdated]))).subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ lastUpdated, state }) => {
-            /** @type {?} */
+            .pipe(takeUntil(this.destroyed$), filter(({ lastUpdated }) => this.dataSource.inputsDS[lastUpdated])).subscribe(({ lastUpdated, state }) => {
             const newValue = state[lastUpdated];
             if (newValue === null) {
                 this.dataSource.clearInput(lastUpdated);
@@ -15361,59 +9161,23 @@ class SearchFacetsLayoutEH extends EventHandler {
             else {
                 this.dataSource.updateInputValue(lastUpdated, newValue);
             }
-        }));
+        });
         // listener for facet updates
         this.searchService.getState$(FACET_STATE_CONTEXT)
-            .pipe(takeUntil(this.destroyed$), filter((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ lastUpdated }) => this.dataSource.inputsDS[lastUpdated]))).subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ lastUpdated, state }) => {
-            /** @type {?} */
+            .pipe(takeUntil(this.destroyed$), filter(({ lastUpdated }) => this.dataSource.inputsDS[lastUpdated])).subscribe(({ lastUpdated, state }) => {
             const newData = state[lastUpdated];
             this.dataSource.updateInputData(lastUpdated, newData);
-        }));
+        });
         // listener for facet header updates
         this.searchService.getState$(FACETS_REQUEST_STATE_CONTEXT, 'success')
-            .pipe(takeUntil(this.destroyed$)).subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ headers }) => {
-            Object.keys(headers).forEach((/**
-             * @param {?} id
-             * @return {?}
-             */
-            (id) => {
+            .pipe(takeUntil(this.destroyed$)).subscribe(({ headers }) => {
+            Object.keys(headers).forEach((id) => {
                 this.dataSource.updateInputValue(id, headers[id]);
-            }));
-        }));
+            });
+        });
     }
 }
-if (false) {
-    /** @type {?} */
-    SearchFacetsLayoutEH.prototype.changed$;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchFacetsLayoutEH.prototype.destroyed$;
-    /**
-     * @type {?}
-     * @private
-     */
-    SearchFacetsLayoutEH.prototype.searchService;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const SearchFacetsLayoutConfig = {
     layoutId: 'mr-search-facets-layout',
     widgets: [],
@@ -15424,104 +9188,48 @@ const SearchFacetsLayoutConfig = {
     layoutOptions: {}
 };
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class FacetTextDS extends DataSource {
     constructor() {
         super(...arguments);
-        this.getValue = (/**
-         * @return {?}
-         */
-        () => this.value);
+        this.getValue = () => this.value;
     }
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         return data;
     }
-    /**
-     * @param {?} value
-     * @param {?=} update
-     * @return {?}
-     */
     setValue(value, update = false) {
         this.value = value;
         if (update) {
-            this.update(Object.assign({}, this.input, { value }));
+            this.update(Object.assign(Object.assign({}, this.input), { value }));
             // fix element update
-            /** @type {?} */
-            const el = (/** @type {?} */ (document.getElementById(this.output.id)));
+            const el = document.getElementById(this.output.id);
             if (el) {
                 el.value = value;
             }
         }
     }
-    /**
-     * @return {?}
-     */
     clear() {
         this.value = null;
     }
 }
-if (false) {
-    /** @type {?} */
-    FacetTextDS.prototype.id;
-    /** @type {?} */
-    FacetTextDS.prototype.value;
-    /** @type {?} */
-    FacetTextDS.prototype.getValue;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class FacetCheckboxDS extends DataSource {
     constructor() {
         super(...arguments);
         this.value = [];
-        this.getValue = (/**
-         * @return {?}
-         */
-        () => this.value);
+        this.getValue = () => this.value;
     }
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         return data;
     }
-    /**
-     * @param {?} value
-     * @param {?=} update
-     * @return {?}
-     */
     setValue(value, update = false) {
         this.value = Array.isArray(value) ? value : [value];
         if (update) {
             const { checkboxes } = this.input;
-            /** @type {?} */
-            const updatedCheckboxes = checkboxes.map((/**
-             * @param {?} checkbox
-             * @return {?}
-             */
-            (checkbox) => (Object.assign({}, checkbox, { checked: this.value.indexOf(checkbox.payload) !== -1 }))));
-            this.update(Object.assign({}, this.input, { checkboxes: updatedCheckboxes }));
+            const updatedCheckboxes = checkboxes.map((checkbox) => (Object.assign(Object.assign({}, checkbox), { checked: this.value.indexOf(checkbox.payload) !== -1 })));
+            this.update(Object.assign(Object.assign({}, this.input), { checkboxes: updatedCheckboxes }));
         }
     }
-    /**
-     * @param {?} __0
-     * @return {?}
-     */
     toggleValue({ inputPayload, value: isChecked }) {
-        /** @type {?} */
         const exists = this.value.indexOf(inputPayload) !== -1;
         if (isChecked && !exists) {
             this.value.push(inputPayload);
@@ -15530,220 +9238,91 @@ class FacetCheckboxDS extends DataSource {
             this.value.splice(this.value.indexOf(inputPayload), 1);
         }
     }
-    /**
-     * @return {?}
-     */
     clear() {
         this.value = [];
     }
 }
-if (false) {
-    /** @type {?} */
-    FacetCheckboxDS.prototype.id;
-    /** @type {?} */
-    FacetCheckboxDS.prototype.value;
-    /** @type {?} */
-    FacetCheckboxDS.prototype.getValue;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class FacetSelectDS extends DataSource {
     constructor() {
         super(...arguments);
-        this.getValue = (/**
-         * @return {?}
-         */
-        () => this.value);
+        this.getValue = () => this.value;
     }
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         return data;
     }
-    /**
-     * @param {?} value
-     * @param {?=} update
-     * @return {?}
-     */
     setValue(value, update = false) {
         this.value = value;
         if (update) {
             const { options } = this.input;
-            /** @type {?} */
-            const updatedOptions = options.map((/**
-             * @param {?} option
-             * @return {?}
-             */
-            (option) => (Object.assign({}, option, { selected: value === option.value }))));
-            this.update(Object.assign({}, this.input, { options: updatedOptions }));
+            const updatedOptions = options.map((option) => (Object.assign(Object.assign({}, option), { selected: value === option.value })));
+            this.update(Object.assign(Object.assign({}, this.input), { options: updatedOptions }));
         }
     }
-    /**
-     * @return {?}
-     */
     clear() {
         this.value = null;
     }
 }
-if (false) {
-    /** @type {?} */
-    FacetSelectDS.prototype.id;
-    /** @type {?} */
-    FacetSelectDS.prototype.value;
-    /** @type {?} */
-    FacetSelectDS.prototype.getValue;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const ACTIVE_CLASS = 'is-active';
 class FacetLinkDS extends DataSource {
     constructor() {
         super(...arguments);
         this.value = null;
-        this.getValue = (/**
-         * @return {?}
-         */
-        () => this.value);
+        this.getValue = () => this.value;
     }
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         return data;
     }
-    /**
-     * @param {?} value
-     * @param {?=} update
-     * @return {?}
-     */
     setValue(value, update = false) {
         this.value = value;
         if (update) {
             const { links } = this.input;
-            /** @type {?} */
-            const updatedLinks = links.map((/**
-             * @param {?} link
-             * @return {?}
-             */
-            (link) => (Object.assign({}, link, { classes: this.value === link.payload ? ACTIVE_CLASS : '' }))));
-            this.update(Object.assign({}, this.input, { links: updatedLinks }));
+            const updatedLinks = links.map((link) => (Object.assign(Object.assign({}, link), { classes: this.value === link.payload ? ACTIVE_CLASS : '' })));
+            this.update(Object.assign(Object.assign({}, this.input), { links: updatedLinks }));
         }
     }
-    /**
-     * @param {?} linkValue
-     * @return {?}
-     */
     toggleValue(linkValue) {
         // update
         this.setValue(this.value !== linkValue ? linkValue : null, true);
     }
-    /**
-     * @return {?}
-     */
     clear() {
         this.value = null;
     }
 }
-if (false) {
-    /** @type {?} */
-    FacetLinkDS.prototype.id;
-    /** @type {?} */
-    FacetLinkDS.prototype.value;
-    /** @type {?} */
-    FacetLinkDS.prototype.getValue;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const ICON_OPEN = 'n7-icon-angle-down';
-/** @type {?} */
 const ICON_CLOSE = 'n7-icon-angle-right';
 class FacetHeaderDS extends DataSource {
     constructor() {
         super(...arguments);
-        this.getValue = (/**
-         * @return {?}
-         */
-        () => this.value);
+        this.getValue = () => this.value;
     }
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
-        return Object.assign({}, data, { iconRight: data.iconRight || ICON_OPEN });
+        return Object.assign(Object.assign({}, data), { iconRight: data.iconRight || ICON_OPEN });
     }
-    /**
-     * @param {?} value
-     * @param {?=} update
-     * @return {?}
-     */
     setValue(value, update = false) {
         this.value = value;
         if (update) {
-            this.update(Object.assign({}, this.input, { additionalText: value }));
+            this.update(Object.assign(Object.assign({}, this.input), { additionalText: value }));
         }
     }
-    /**
-     * @return {?}
-     */
     toggle() {
         let { iconRight } = this.output;
         iconRight = iconRight === ICON_OPEN ? ICON_CLOSE : ICON_OPEN;
-        this.update(Object.assign({}, this.input, { iconRight }));
+        this.update(Object.assign(Object.assign({}, this.input), { iconRight }));
     }
-    /**
-     * @return {?}
-     */
     isOpen() {
         return this.output.iconRight === ICON_OPEN;
     }
-    /**
-     * @return {?}
-     */
     clear() {
         this.value = null;
     }
 }
-if (false) {
-    /** @type {?} */
-    FacetHeaderDS.prototype.id;
-    /** @type {?} */
-    FacetHeaderDS.prototype.value;
-    /** @type {?} */
-    FacetHeaderDS.prototype.getValue;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class FacetHeaderEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type }) => {
+        this.innerEvents$.subscribe(({ type }) => {
             switch (type) {
                 case `${this.dataSource.id}.click`:
                     this.dataSource.toggle();
@@ -15755,50 +9334,28 @@ class FacetHeaderEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class FacetTextEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case `${this.dataSource.id}.change`:
                     this.dataSource.setValue(payload.value);
-                    this.emitOuter('change', Object.assign({}, payload, { id: this.dataSource.id }));
+                    this.emitOuter('change', Object.assign(Object.assign({}, payload), { id: this.dataSource.id }));
                     break;
                 default:
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class FacetCheckboxEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case `${this.dataSource.id}.change`:
                     this.dataSource.toggleValue(payload);
@@ -15810,50 +9367,28 @@ class FacetCheckboxEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class FacetSelectEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case `${this.dataSource.id}.change`:
                     this.dataSource.setValue(payload.value);
-                    this.emitOuter('change', Object.assign({}, payload, { id: this.dataSource.id }));
+                    this.emitOuter('change', Object.assign(Object.assign({}, payload), { id: this.dataSource.id }));
                     break;
                 default:
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class FacetLinkEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case `${this.dataSource.id}.change`:
                     this.dataSource.toggleValue(payload);
@@ -15865,57 +9400,29 @@ class FacetLinkEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const ACTIVE_CLASS$1 = 'is-active';
 class FacetLinkMultipleDS extends DataSource {
     constructor() {
         super(...arguments);
         this.value = [];
-        this.getValue = (/**
-         * @return {?}
-         */
-        () => this.value);
+        this.getValue = () => this.value;
     }
-    /**
-     * @protected
-     * @param {?} data
-     * @return {?}
-     */
     transform(data) {
         return data;
     }
-    /**
-     * @param {?} value
-     * @param {?=} update
-     * @return {?}
-     */
     setValue(value, update = false) {
         this.value = value;
         if (update) {
             const { links } = this.input;
-            /** @type {?} */
-            const updatedLinks = links.map((/**
-             * @param {?} link
-             * @return {?}
-             */
-            (link) => (Object.assign({}, link, { classes: this.value.includes(link.payload) ? ACTIVE_CLASS$1 : '' }))));
-            this.update(Object.assign({}, this.input, { links: updatedLinks }));
+            const updatedLinks = links.map((link) => (Object.assign(Object.assign({}, link), { classes: this.value.includes(link.payload) ? ACTIVE_CLASS$1 : '' })));
+            this.update(Object.assign(Object.assign({}, this.input), { links: updatedLinks }));
         }
     }
-    /**
-     * @param {?} linkValue
-     * @return {?}
-     */
     toggleValue(linkValue) {
-        /** @type {?} */
         const exists = this.value.includes(linkValue);
         if (!exists) {
             this.value.push(linkValue);
@@ -15926,36 +9433,14 @@ class FacetLinkMultipleDS extends DataSource {
         // update
         this.setValue(this.value, true);
     }
-    /**
-     * @return {?}
-     */
     clear() {
         this.value = [];
     }
 }
-if (false) {
-    /** @type {?} */
-    FacetLinkMultipleDS.prototype.id;
-    /** @type {?} */
-    FacetLinkMultipleDS.prototype.value;
-    /** @type {?} */
-    FacetLinkMultipleDS.prototype.getValue;
-}
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class FacetLinkMultipleEH extends EventHandler {
-    /**
-     * @return {?}
-     */
     listen() {
-        this.innerEvents$.subscribe((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ type, payload }) => {
+        this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case `${this.dataSource.id}.change`:
                     this.dataSource.toggleValue(payload);
@@ -15967,15 +9452,10 @@ class FacetLinkMultipleEH extends EventHandler {
                 default:
                     break;
             }
-        }));
+        });
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const DATASOURCE_MAP$1 = {
     header: FacetHeaderDS,
     text: FacetTextDS,
@@ -15984,7 +9464,6 @@ const DATASOURCE_MAP$1 = {
     link: FacetLinkDS,
     'link-multiple': FacetLinkMultipleDS,
 };
-/** @type {?} */
 const EVENTHANDLER_MAP$1 = {
     header: FacetHeaderEH,
     text: FacetTextEH,
@@ -15993,43 +9472,26 @@ const EVENTHANDLER_MAP$1 = {
     link: FacetLinkEH,
     'link-multiple': FacetLinkMultipleEH,
 };
-class MrSearchFacetsLayoutComponent extends AbstractLayout {
+let MrSearchFacetsLayoutComponent = class MrSearchFacetsLayoutComponent extends AbstractLayout {
     constructor() {
         super(SearchFacetsLayoutConfig);
     }
-    /**
-     * @protected
-     * @return {?}
-     */
     initPayload() {
         return {
             searchService: this.searchService
         };
     }
-    /**
-     * @return {?}
-     */
     ngOnInit() {
         this.loadWidgets();
         this.onInit();
     }
-    /**
-     * @return {?}
-     */
     ngOnDestroy() {
         this.onDestroy();
     }
-    /**
-     * @return {?}
-     */
     loadWidgets() {
         const { facets } = this.searchService.getConfig();
         this.widgets = [];
-        facets.sections.forEach((/**
-         * @param {?} __0
-         * @return {?}
-         */
-        ({ header, inputs }) => {
+        facets.sections.forEach(({ header, inputs }) => {
             if (header) {
                 this.widgets.push({
                     id: header.id,
@@ -16037,12 +9499,7 @@ class MrSearchFacetsLayoutComponent extends AbstractLayout {
                     eventHandler: EVENTHANDLER_MAP$1.header
                 });
             }
-            inputs.forEach((/**
-             * @param {?} input
-             * @return {?}
-             */
-            (input) => {
-                /** @type {?} */
+            inputs.forEach((input) => {
                 let inputType = input.type;
                 const { multiple } = input.schema;
                 // multiple control
@@ -16054,31 +9511,22 @@ class MrSearchFacetsLayoutComponent extends AbstractLayout {
                     dataSource: DATASOURCE_MAP$1[inputType],
                     eventHandler: EVENTHANDLER_MAP$1[inputType]
                 });
-            }));
-        }));
+            });
+        });
     }
-}
-MrSearchFacetsLayoutComponent.decorators = [
-    { type: Component, args: [{
-                selector: 'mr-search-facets-layout',
-                template: "<div *ngIf=\"lb.dataSource.facets\" class=\"mr-search-facets {{ lb.dataSource.facets.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.facets.sections\" class=\"mr-search-facets__section {{ section.classes || '' }}\">\n        <n7-facet-header\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\n        [emit]=\"lb.widgets[section.header.id].emit\"\n        ></n7-facet-header>\n\n        <div [hidden]=\"!lb.widgets[section.header.id].ds.isOpen()\" class=\"mr-search-facets__wrapper\">\n            <div *ngFor=\"let input of section.inputs\" class=\"mr-search-facets__input {{ input.classes || '' }}\">\n                <ng-container [ngSwitch]=\"input.type\">\n    \n                    <!-- INPUT TEXT -->\n                    <n7-input-text \n                    *ngSwitchCase=\"'text'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n    \n                    <!-- INPUT CHECKBOX -->\n                    <n7-input-checkbox \n                    *ngSwitchCase=\"'checkbox'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                    \n                    <!-- INPUT SELECT -->\n                    <n7-input-select \n                    *ngSwitchCase=\"'select'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                    \n                    <!-- INPUT LINK -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'link'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n\n                    <!-- INPUT LINKMULTI -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'linkMulti'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n                \n                </ng-container>\n            </div>\n        </div>\n        \n        \n    </div>\n</div>"
-            }] }
-];
-/** @nocollapse */
-MrSearchFacetsLayoutComponent.ctorParameters = () => [];
-MrSearchFacetsLayoutComponent.propDecorators = {
-    searchService: [{ type: Input }]
 };
-if (false) {
-    /** @type {?} */
-    MrSearchFacetsLayoutComponent.prototype.searchService;
-}
+__decorate([
+    Input(),
+    __metadata("design:type", MrSearchService)
+], MrSearchFacetsLayoutComponent.prototype, "searchService", void 0);
+MrSearchFacetsLayoutComponent = __decorate([
+    Component({
+        selector: 'mr-search-facets-layout',
+        template: "<div *ngIf=\"lb.dataSource.facets\" class=\"mr-search-facets {{ lb.dataSource.facets.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.facets.sections\" class=\"mr-search-facets__section {{ section.classes || '' }}\">\n        <n7-facet-header\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\n        [emit]=\"lb.widgets[section.header.id].emit\"\n        ></n7-facet-header>\n\n        <div [hidden]=\"!lb.widgets[section.header.id].ds.isOpen()\" class=\"mr-search-facets__wrapper\">\n            <div *ngFor=\"let input of section.inputs\" class=\"mr-search-facets__input {{ input.classes || '' }}\">\n                <ng-container [ngSwitch]=\"input.type\">\n    \n                    <!-- INPUT TEXT -->\n                    <n7-input-text \n                    *ngSwitchCase=\"'text'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n    \n                    <!-- INPUT CHECKBOX -->\n                    <n7-input-checkbox \n                    *ngSwitchCase=\"'checkbox'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                    \n                    <!-- INPUT SELECT -->\n                    <n7-input-select \n                    *ngSwitchCase=\"'select'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                    \n                    <!-- INPUT LINK -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'link'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n\n                    <!-- INPUT LINKMULTI -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'linkMulti'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n                \n                </ng-container>\n            </div>\n        </div>\n        \n        \n    </div>\n</div>"
+    }),
+    __metadata("design:paramtypes", [])
+], MrSearchFacetsLayoutComponent);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const COMPONENTS$3 = [
     MrHomeLayoutComponent,
     MrSearchLayoutComponent,
@@ -16086,130 +9534,68 @@ const COMPONENTS$3 = [
     MrStaticLayoutComponent,
     MrSearchFacetsLayoutComponent,
 ];
-class N7BoilerplateMurucaModule {
-}
-N7BoilerplateMurucaModule.decorators = [
-    { type: NgModule, args: [{
-                declarations: [
-                    EscapeHtmlPipe,
-                    COMPONENTS$3
-                ],
-                imports: [
-                    CommonModule,
-                    DvComponentsLibModule,
-                    N7BoilerplateCommonModule,
-                ],
-                providers: [
-                    MrSearchService
-                ],
-                entryComponents: COMPONENTS$3,
-                exports: COMPONENTS$3,
-            },] }
-];
+let N7BoilerplateMurucaModule = class N7BoilerplateMurucaModule {
+};
+N7BoilerplateMurucaModule = __decorate([
+    NgModule({
+        declarations: [
+            EscapeHtmlPipe,
+            COMPONENTS$3
+        ],
+        imports: [
+            CommonModule,
+            DvComponentsLibModule,
+            N7BoilerplateCommonModule,
+        ],
+        providers: [
+            MrSearchService
+        ],
+        entryComponents: COMPONENTS$3,
+        exports: COMPONENTS$3,
+    })
+], N7BoilerplateMurucaModule);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class N7BoilerplateLibModule {
-}
-N7BoilerplateLibModule.decorators = [
-    { type: NgModule, args: [{
-                imports: [
-                    CommonModule,
-                ],
-                providers: [],
-                exports: [
-                    // COMMON
-                    N7BoilerplateCommonModule,
-                    // AW
-                    N7BoilerplateAriannaWebModule,
-                    // DV
-                    N7BoilerplateDataVizModule,
-                    // MR
-                    N7BoilerplateMurucaModule,
-                ],
-            },] }
-];
+let N7BoilerplateLibModule = class N7BoilerplateLibModule {
+};
+N7BoilerplateLibModule = __decorate([
+    NgModule({
+        imports: [
+            CommonModule,
+        ],
+        providers: [],
+        exports: [
+            // COMMON
+            N7BoilerplateCommonModule,
+            // AW
+            N7BoilerplateAriannaWebModule,
+            // DV
+            N7BoilerplateDataVizModule,
+            // MR
+            N7BoilerplateMurucaModule,
+        ],
+    })
+], N7BoilerplateLibModule);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
+// main layout
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
+// home layout
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
+// example layout
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
+// home layout
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-class MrMenuService {
-    /**
-     * @param {?} http
-     * @param {?} configuration
-     */
+let MrMenuService = class MrMenuService {
     constructor(http, configuration) {
         this.http = http;
         this.configuration = configuration;
     }
-    /**
-     * @param {?} path
-     * @param {?} rootPath
-     * @return {?}
-     */
     load(path, rootPath) {
-        return this.http.get(path).pipe(catchError((/**
-         * @return {?}
-         */
-        () => of(null))), tap((/**
-         * @param {?} response
-         * @return {?}
-         */
-        (response) => this._handleResponse(response, rootPath)))).toPromise();
+        return this.http.get(path).pipe(catchError(() => of(null)), tap((response) => this._handleResponse(response, rootPath))).toPromise();
     }
-    /**
-     * @private
-     * @param {?} response
-     * @param {?} rootPath
-     * @return {?}
-     */
     _handleResponse(response, rootPath) {
         if (response) {
-            /** @type {?} */
             const headerConfig = this.configuration.get('header');
-            headerConfig.nav.items = response.map((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            ({ label, slug, isStatic }) => ({
+            headerConfig.nav.items = response.map(({ label, slug, isStatic }) => ({
                 text: label,
                 anchor: {
                     href: isStatic ? slug : `${rootPath}/${slug}`
@@ -16217,43 +9603,30 @@ class MrMenuService {
                 _meta: {
                     id: slug
                 }
-            })));
+            }));
             this.configuration.set('header', headerConfig);
         }
     }
-}
-MrMenuService.decorators = [
-    { type: Injectable, args: [{
-                providedIn: 'root',
-            },] }
-];
-/** @nocollapse */
+};
 MrMenuService.ctorParameters = () => [
     { type: HttpClient },
     { type: ConfigurationService }
 ];
-/** @nocollapse */ MrMenuService.ngInjectableDef = ɵɵdefineInjectable({ factory: function MrMenuService_Factory() { return new MrMenuService(ɵɵinject(HttpClient), ɵɵinject(ConfigurationService)); }, token: MrMenuService, providedIn: "root" });
-if (false) {
-    /**
-     * @type {?}
-     * @private
-     */
-    MrMenuService.prototype.http;
-    /**
-     * @type {?}
-     * @private
-     */
-    MrMenuService.prototype.configuration;
-}
+MrMenuService.ɵprov = ɵɵdefineInjectable({ factory: function MrMenuService_Factory() { return new MrMenuService(ɵɵinject(HttpClient), ɵɵinject(ConfigurationService)); }, token: MrMenuService, providedIn: "root" });
+MrMenuService = __decorate([
+    Injectable({
+        providedIn: 'root',
+    }),
+    __metadata("design:paramtypes", [HttpClient,
+        ConfigurationService])
+], MrMenuService);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+/*
+ * Public API Surface of n7-boilerplate-lib
  */
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * Generated bundle index. Do not edit.
  */
 
 export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrInnerTitleDS, MrItemPreviewsDS, MrMenuService, MrNavDS, MrNavEH, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageTitleDS, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrSearchService as ɵba, MrGlossaryLayoutComponent as ɵbb, MrStaticLayoutComponent as ɵbc, MrSearchFacetsLayoutComponent as ɵbd, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwHomeLayoutComponent as ɵm, AwSchedaLayoutComponent as ɵn, AwSearchLayoutComponent as ɵo, SearchService as ɵp, AwGalleryLayoutComponent as ɵq, BubbleChartWrapperComponent as ɵr, ChartTippyComponent as ɵs, SmartBreadcrumbsComponent as ɵt, DataWidgetWrapperComponent as ɵu, DatepickerWrapperComponent as ɵv, DvExampleLayoutComponent as ɵw, EscapeHtmlPipe as ɵx, MrHomeLayoutComponent as ɵy, MrSearchLayoutComponent as ɵz };

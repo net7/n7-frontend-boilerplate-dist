@@ -11,7 +11,7 @@ export declare class FacetCheckboxDS extends DataSource implements FacetDataSour
         inputPayload: any;
         value: any;
     }): void;
-    getValue: () => string[];
+    getValue: () => FACET_VALUE;
     clear(): void;
 }
 export {};

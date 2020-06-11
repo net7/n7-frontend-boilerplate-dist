@@ -1,47 +1,33 @@
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 //---------------------------
 // BubbleChartWrapper.ts
 //---------------------------
+import { __decorate, __metadata } from "tslib";
 import { Component, Input } from '@angular/core';
 var BubbleChartWrapperComponent = /** @class */ (function () {
     function BubbleChartWrapperComponent() {
     }
-    /**
-     * @param {?} type
-     * @param {?} payload
-     * @return {?}
-     */
-    BubbleChartWrapperComponent.prototype.onClick = /**
-     * @param {?} type
-     * @param {?} payload
-     * @return {?}
-     */
-    function (type, payload) {
+    BubbleChartWrapperComponent.prototype.onClick = function (type, payload) {
         this.emit(type, payload);
     };
-    BubbleChartWrapperComponent.decorators = [
-        { type: Component, args: [{
-                    selector: 'aw-bubble-chart-wrapper',
-                    template: "<div class=\"aw-bubble-chart-wrapper\">\n    <ng-content></ng-content>\n</div>"
-                }] }
-    ];
-    BubbleChartWrapperComponent.propDecorators = {
-        emit: [{ type: Input }],
-        container: [{ type: Input }],
-        buttons: [{ type: Input }]
-    };
+    __decorate([
+        Input(),
+        __metadata("design:type", Object)
+    ], BubbleChartWrapperComponent.prototype, "emit", void 0);
+    __decorate([
+        Input(),
+        __metadata("design:type", String)
+    ], BubbleChartWrapperComponent.prototype, "container", void 0);
+    __decorate([
+        Input(),
+        __metadata("design:type", Object)
+    ], BubbleChartWrapperComponent.prototype, "buttons", void 0);
+    BubbleChartWrapperComponent = __decorate([
+        Component({
+            selector: 'aw-bubble-chart-wrapper',
+            template: "<div class=\"aw-bubble-chart-wrapper\">\n    <ng-content></ng-content>\n</div>"
+        })
+    ], BubbleChartWrapperComponent);
     return BubbleChartWrapperComponent;
 }());
 export { BubbleChartWrapperComponent };
-if (false) {
-    /** @type {?} */
-    BubbleChartWrapperComponent.prototype.emit;
-    /** @type {?} */
-    BubbleChartWrapperComponent.prototype.container;
-    /** @type {?} */
-    BubbleChartWrapperComponent.prototype.buttons;
-}
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYnViYmxlLWNoYXJ0LXdyYXBwZXIuanMiLCJzb3VyY2VSb290Ijoibmc6Ly9AbjctZnJvbnRlbmQvYm9pbGVycGxhdGUvIiwic291cmNlcyI6WyJsaWIvYXJpYW5uYS13ZWIvY29tcG9uZW50cy9idWJibGUtY2hhcnQtd3JhcHBlci9idWJibGUtY2hhcnQtd3JhcHBlci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7O0FBSUEsT0FBTyxFQUFFLFNBQVMsRUFBRSxLQUFLLEVBQUUsTUFBTSxlQUFlLENBQUM7QUFFakQ7SUFBQTtJQWNBLENBQUM7Ozs7OztJQUhDLDZDQUFPOzs7OztJQUFQLFVBQVEsSUFBSSxFQUFFLE9BQU87UUFDbkIsSUFBSSxDQUFDLElBQUksQ0FBQyxJQUFJLEVBQUUsT0FBTyxDQUFDLENBQUM7SUFDM0IsQ0FBQzs7Z0JBYkYsU0FBUyxTQUFDO29CQUNULFFBQVEsRUFBRSx5QkFBeUI7b0JBQ25DLDBGQUEwQztpQkFDM0M7Ozt1QkFFRSxLQUFLOzRCQUVMLEtBQUs7MEJBRUwsS0FBSzs7SUFLUixrQ0FBQztDQUFBLEFBZEQsSUFjQztTQVZZLDJCQUEyQjs7O0lBQ3RDLDJDQUFtQjs7SUFFbkIsZ0RBQTJCOztJQUUzQiw4Q0FBc0IiLCJzb3VyY2VzQ29udGVudCI6WyIvLy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLVxuLy8gQnViYmxlQ2hhcnRXcmFwcGVyLnRzXG4vLy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLVxuXG5pbXBvcnQgeyBDb21wb25lbnQsIElucHV0IH0gZnJvbSAnQGFuZ3VsYXIvY29yZSc7XG5cbkBDb21wb25lbnQoe1xuICBzZWxlY3RvcjogJ2F3LWJ1YmJsZS1jaGFydC13cmFwcGVyJyxcbiAgdGVtcGxhdGVVcmw6ICcuL2J1YmJsZS1jaGFydC13cmFwcGVyLmh0bWwnLFxufSlcbmV4cG9ydCBjbGFzcyBCdWJibGVDaGFydFdyYXBwZXJDb21wb25lbnQge1xuICBASW5wdXQoKSBlbWl0OiBhbnk7XG5cbiAgQElucHV0KCkgY29udGFpbmVyOiBzdHJpbmc7XG5cbiAgQElucHV0KCkgYnV0dG9uczogYW55O1xuXG4gIG9uQ2xpY2sodHlwZSwgcGF5bG9hZCkge1xuICAgIHRoaXMuZW1pdCh0eXBlLCBwYXlsb2FkKTtcbiAgfVxufVxuIl19
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYnViYmxlLWNoYXJ0LXdyYXBwZXIuanMiLCJzb3VyY2VSb290Ijoibmc6Ly9AbjctZnJvbnRlbmQvYm9pbGVycGxhdGUvIiwic291cmNlcyI6WyJsaWIvYXJpYW5uYS13ZWIvY29tcG9uZW50cy9idWJibGUtY2hhcnQtd3JhcHBlci9idWJibGUtY2hhcnQtd3JhcHBlci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSw2QkFBNkI7QUFDN0Isd0JBQXdCO0FBQ3hCLDZCQUE2Qjs7QUFFN0IsT0FBTyxFQUFFLFNBQVMsRUFBRSxLQUFLLEVBQUUsTUFBTSxlQUFlLENBQUM7QUFNakQ7SUFBQTtJQVVBLENBQUM7SUFIQyw2Q0FBTyxHQUFQLFVBQVEsSUFBSSxFQUFFLE9BQU87UUFDbkIsSUFBSSxDQUFDLElBQUksQ0FBQyxJQUFJLEVBQUUsT0FBTyxDQUFDLENBQUM7SUFDM0IsQ0FBQztJQVJRO1FBQVIsS0FBSyxFQUFFOzs2REFBVztJQUVWO1FBQVIsS0FBSyxFQUFFOztrRUFBbUI7SUFFbEI7UUFBUixLQUFLLEVBQUU7O2dFQUFjO0lBTFgsMkJBQTJCO1FBSnZDLFNBQVMsQ0FBQztZQUNULFFBQVEsRUFBRSx5QkFBeUI7WUFDbkMsMEZBQTBDO1NBQzNDLENBQUM7T0FDVywyQkFBMkIsQ0FVdkM7SUFBRCxrQ0FBQztDQUFBLEFBVkQsSUFVQztTQVZZLDJCQUEyQiIsInNvdXJjZXNDb250ZW50IjpbIi8vLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXG4vLyBCdWJibGVDaGFydFdyYXBwZXIudHNcbi8vLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXG5cbmltcG9ydCB7IENvbXBvbmVudCwgSW5wdXQgfSBmcm9tICdAYW5ndWxhci9jb3JlJztcblxuQENvbXBvbmVudCh7XG4gIHNlbGVjdG9yOiAnYXctYnViYmxlLWNoYXJ0LXdyYXBwZXInLFxuICB0ZW1wbGF0ZVVybDogJy4vYnViYmxlLWNoYXJ0LXdyYXBwZXIuaHRtbCcsXG59KVxuZXhwb3J0IGNsYXNzIEJ1YmJsZUNoYXJ0V3JhcHBlckNvbXBvbmVudCB7XG4gIEBJbnB1dCgpIGVtaXQ6IGFueTtcblxuICBASW5wdXQoKSBjb250YWluZXI6IHN0cmluZztcblxuICBASW5wdXQoKSBidXR0b25zOiBhbnk7XG5cbiAgb25DbGljayh0eXBlLCBwYXlsb2FkKSB7XG4gICAgdGhpcy5lbWl0KHR5cGUsIHBheWxvYWQpO1xuICB9XG59XG4iXX0=
