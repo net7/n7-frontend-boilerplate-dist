@@ -1,8 +1,9 @@
 import { DataSource } from '@n7-frontend/core';
 export declare class AwEntitaMetadataViewerDS extends DataSource {
-    hasGroups: boolean;
+    hasFields: boolean;
     protected transform(data: any): {
-        group: any[];
+        group: {
+            items: any;
+        }[];
     };
-    static unpackFields(fields: any, metadataToShow?: any): any[];
 }

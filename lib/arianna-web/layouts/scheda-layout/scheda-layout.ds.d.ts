@@ -46,4 +46,10 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
     loadContent(response: any): void;
     collapseSidebar(): void;
     private _sidebarStickyControl;
+    getFields(response: any): {
+        key: any;
+        value: any;
+        order: any;
+        label: string;
+    }[];
 }

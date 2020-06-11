@@ -9,7 +9,7 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
     protected route: any;
     options: any;
     pageTitle: string;
-    showFields: boolean;
+    hasMetadataFields: boolean;
     myResponse: any;
     selectedTab: string;
     navHeader: any;
@@ -41,4 +41,10 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
     loadContent(res: any): void;
     private _getPaginationParams;
     getNavBasePath(): string;
+    getFields(response: any): {
+        key: any;
+        value: any;
+        order: any;
+        label: string;
+    }[];
 }
