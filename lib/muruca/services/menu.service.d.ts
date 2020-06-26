@@ -3,7 +3,9 @@ import { ConfigurationService } from '../../common/services/configuration.servic
 export declare class MrMenuService {
     private http;
     private configuration;
+    private dynamicPaths;
     constructor(http: HttpClient, configuration: ConfigurationService);
-    load(path: any, rootPath: any): Promise<any>;
+    load(path: any): Promise<any>;
     private _handleResponse;
+    isDynamicPath: (path: string) => boolean;
 }

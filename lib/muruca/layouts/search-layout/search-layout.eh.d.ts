@@ -4,6 +4,7 @@ export declare class MrSearchLayoutEH extends EventHandler {
     dataSource: MrSearchLayoutDS;
     private destroyed$;
     private searchService;
+    private layoutState;
     private searchState;
     private linksResponse;
     listen(): void;

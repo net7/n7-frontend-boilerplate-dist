@@ -1,0 +1,10 @@
+import { DataSource } from '@n7-frontend/core';
+import { MAP_MOCK } from '@n7-frontend/components';
+export class AwMapDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        this.transform = (data) => MAP_MOCK;
+    }
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibWFwLmRzLmpzIiwic291cmNlUm9vdCI6Im5nOi8vQG43LWZyb250ZW5kL2JvaWxlcnBsYXRlLyIsInNvdXJjZXMiOlsibGliL2FyaWFubmEtd2ViL2RhdGEtc291cmNlcy9tYXAuZHMudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsT0FBTyxFQUFFLFVBQVUsRUFBRSxNQUFNLG1CQUFtQixDQUFDO0FBQy9DLE9BQU8sRUFBRSxRQUFRLEVBQUUsTUFBTSx5QkFBeUIsQ0FBQztBQUVuRCxNQUFNLE9BQU8sT0FBUSxTQUFRLFVBQVU7SUFBdkM7O1FBQ0UsNkRBQTZEO1FBQ25ELGNBQVMsR0FBRyxDQUFDLElBQUksRUFBRSxFQUFFLENBQUMsUUFBUSxDQUFDO0lBQzNDLENBQUM7Q0FBQSIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IERhdGFTb3VyY2UgfSBmcm9tICdAbjctZnJvbnRlbmQvY29yZSc7XG5pbXBvcnQgeyBNQVBfTU9DSyB9IGZyb20gJ0BuNy1mcm9udGVuZC9jb21wb25lbnRzJztcblxuZXhwb3J0IGNsYXNzIEF3TWFwRFMgZXh0ZW5kcyBEYXRhU291cmNlIHtcbiAgLy8gZXNsaW50LWRpc2FibGUtbmV4dC1saW5lIEB0eXBlc2NyaXB0LWVzbGludC9uby11bnVzZWQtdmFyc1xuICBwcm90ZWN0ZWQgdHJhbnNmb3JtID0gKGRhdGEpID0+IE1BUF9NT0NLO1xufVxuIl19
