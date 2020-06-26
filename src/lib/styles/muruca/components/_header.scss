@@ -1,0 +1,57 @@
+/**
+ * HEADER
+ *
+ * Style for header, including main navigation
+ */
+
+/* ------------------------------------ *\
+    HEADER
+\* ------------------------------------ */
+.n7-header {
+    position: relative;
+    z-index: 100;
+    box-shadow: 0 15px 30px 0 rgba(0,0,0,0.05), 0 1px 2px 0 rgba(0,0,0,0.05);
+
+    &__content {
+        max-width: 1140px;
+        margin: 0 auto;
+    }
+
+    &__nav-item {
+        &.is-active {
+            .n7-header__nav-link {
+            }
+        }
+    }
+
+    /* Current page */
+    &__nav-item.is-current {
+        .n7-header__nav-label {
+            color: $color-text-link;
+        }
+    }
+    
+    &__nav-link {
+        &:focus {
+        }
+    }
+
+    &__nav-icon {
+    }
+
+    &__nav-label {
+        font-family: $font-family-headings;
+        font-weight: $font-weight-bold;
+        text-transform: uppercase;
+    }
+}
+
+
+/* ------------------------------------ *\
+   #MEDIA-QUERIES
+\* ------------------------------------ */
+@media all and (max-width: $header-breakpoint-mobile) {
+}
+
+@media all and (max-width: $header-breakpoint-mobile-small) {
+}

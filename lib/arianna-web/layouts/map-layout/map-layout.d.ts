@@ -22,7 +22,6 @@ export declare class AwMapLayoutComponent extends AbstractLayout implements OnIn
         mainState: MainStateService;
         router: Router;
         route: ActivatedRoute;
-        location: Location;
         titleService: Title;
         communication: CommunicationService;
         options: any;
