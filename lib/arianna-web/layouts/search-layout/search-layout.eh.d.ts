@@ -1,7 +1,7 @@
 import { EventHandler } from '@n7-frontend/core';
 export declare class AwSearchLayoutEH extends EventHandler {
+    layoutId: string;
     private destroyed$;
-    private configuration;
     private route;
     /** Emits when any of the search-facets are changed */
     private facetsChange$;
@@ -17,6 +17,10 @@ export declare class AwSearchLayoutEH extends EventHandler {
      * Handles changes to any of the search-facets
      */
     private _listenToFacetsChange;
+    /**
+     * Handles entity links pagination
+     */
+    private _listenToInternalFilters;
     /**
      * Handles changes happening on pagination and select elements.
      */

@@ -20,6 +20,7 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
     bubblesSize: number;
     bubblesEnabled: boolean;
     private communication;
+    fallbackText: string;
     onInit({ configuration, mainState, router, route, location, options, titleService, communication, }: {
         configuration: any;
         mainState: any;
@@ -36,7 +37,6 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
     handlePageNavigation: () => void;
     handleNavUpdate: (tab: any) => void;
     updateWidgets(data: any): void;
-    updateBubbes(data: any): void;
     loadItem(id: any, slug: any, tab: any): Observable<any>;
     loadContent(res: any): void;
     private _getPaginationParams;

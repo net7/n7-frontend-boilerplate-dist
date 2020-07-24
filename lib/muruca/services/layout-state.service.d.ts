@@ -1,4 +1,4 @@
-import { Subject } from 'rxjs';
+import { ReplaySubject } from 'rxjs';
 export declare enum LayoutState {
     IDLE = "IDLE",
     LOADING = "LOADING",
@@ -9,6 +9,6 @@ export declare enum LayoutState {
 export declare class MrLayoutStateService {
     private stateContainers;
     add(id: string | string[]): void;
-    get$(id: string): Subject<LayoutState>;
+    get$(id: string): ReplaySubject<LayoutState>;
     set(id: string, newState: LayoutState): void;
 }

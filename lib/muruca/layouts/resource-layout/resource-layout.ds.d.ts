@@ -6,9 +6,12 @@ export declare class MrResourceLayoutDS extends LayoutDataSource {
     private mainState;
     private configId;
     private pageConfig;
+    tabConfig: any;
+    id: string;
+    tab: string;
     onInit(payload: any): void;
     /** Request the configured widgets data */
-    pageRequest$(slug: any): Observable<any>;
+    pageRequest$(id: any, onError: (err: any) => void): Observable<any>;
     handleResponse(response: any): void;
     /** Load all the configured widgets */
     private initSections;

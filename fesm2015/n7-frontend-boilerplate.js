@@ -3,16 +3,17 @@ import { ɵɵdefineInjectable, Injectable, Inject, ɵɵinject, Component, Input,
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, MAP_MOCK, DATA_WIDGET_MOCK } from '@n7-frontend/components';
-import { ReplaySubject, empty, of, Subject, BehaviorSubject, fromEvent, forkJoin, merge } from 'rxjs';
-import { map, catchError, tap, takeUntil, filter, debounceTime, first, withLatestFrom, switchMap, delay } from 'rxjs/operators';
+import { ReplaySubject, empty, Subject, of, merge, fromEvent, BehaviorSubject, forkJoin } from 'rxjs';
+import { map, catchError, takeUntil, filter, tap, mapTo, debounceTime, switchMap, first, withLatestFrom, delay } from 'rxjs/operators';
 import { NavigationStart, Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Title, DomSanitizer } from '@angular/platform-browser';
 import { LayoutBuilder, EventHandler, DataSource, LayoutDataSource as LayoutDataSource$1 } from '@n7-frontend/core';
 import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
 import tippy, { hideAll } from 'tippy.js';
-import { get, cloneDeep, isEmpty, xor } from 'lodash';
+import { isEmpty, get, cloneDeep, xor } from 'lodash';
 import slugify from 'slugify';
 import { DataSource as DataSource$1 } from '@n7-frontend/core/dist/data-source';
+import * as moment from 'moment';
 
 let ConfigurationService = class ConfigurationService {
     constructor() {
@@ -367,59 +368,7 @@ class MainLayoutDS extends LayoutDataSource {
     }
 }
 
-let JsonConfigService = class JsonConfigService {
-    constructor(http, config) {
-        this.http = http;
-        this.config = config;
-    }
-    load(path, staticConfig) {
-        return this.http.get(path).pipe(catchError(() => of({})), tap((response) => this._handleResponse(response, staticConfig))).toPromise();
-    }
-    _handleResponse(response, staticConfig) {
-        // set config defaults
-        if (staticConfig) {
-            Object.keys(staticConfig).forEach((key) => this.config.set(key, staticConfig[key]));
-        }
-        // set loaded json config
-        if (response) {
-            Object.keys(response).forEach((key) => this.config.set(key, response[key]));
-            // config keys colors
-            if (response['config-keys']) {
-                const headTag = document.querySelector('head');
-                const styleElement = document.createElement('style');
-                const styles = [];
-                Object.keys(response['config-keys']).forEach((key) => {
-                    const configKey = response['config-keys'][key] || {};
-                    const className = configKey['class-name'];
-                    if (configKey.color && configKey.color.hex) {
-                        // add css class
-                        styles.push(`--color-${className}: ${configKey.color.hex};`);
-                    }
-                });
-                if (styles.length) {
-                    styles.unshift(':root {');
-                    styles.push('}');
-                    styleElement.appendChild(document.createTextNode(styles.join('\n')));
-                    headTag.appendChild(styleElement);
-                }
-            }
-        }
-    }
-};
-JsonConfigService.ctorParameters = () => [
-    { type: HttpClient },
-    { type: ConfigurationService }
-];
-JsonConfigService.ɵprov = ɵɵdefineInjectable({ factory: function JsonConfigService_Factory() { return new JsonConfigService(ɵɵinject(HttpClient), ɵɵinject(ConfigurationService)); }, token: JsonConfigService, providedIn: "root" });
-JsonConfigService = __decorate([
-    Injectable({
-        providedIn: 'root',
-    }),
-    __metadata("design:paramtypes", [HttpClient,
-        ConfigurationService])
-], JsonConfigService);
-
-class FacetInput {
+class AwFacetInput {
     constructor(config) {
         this.isEmpty = false;
         this.update = () => { this.output = this.transform(); };
@@ -440,16 +389,16 @@ class FacetInput {
         this.setData = (newData) => { this.data = newData; };
         this.config = config;
         this._setId();
-        FacetInput.index += 1;
+        AwFacetInput.index += 1;
     }
     clear() { return null; }
     _setId() {
-        this.id = `facet-input-${this.getType()}-${FacetInput.index}`;
+        this.id = `facet-input-${this.getType()}-${AwFacetInput.index}`;
     }
 }
-FacetInput.index = 0;
+AwFacetInput.index = 0;
 
-class FacetInputCheckbox extends FacetInput {
+class AwFacetInputCheckbox extends AwFacetInput {
     transform() {
         const facetId = this.getFacetId();
         return this.data.map(({ label, value }, index) => ({
@@ -480,97 +429,32 @@ class FacetInputCheckbox extends FacetInput {
     }
 }
 
-// eslint-disable-next-line import/no-extraneous-dependencies
-const domParser = new DOMParser();
-var helpers = {
-    prettifySnakeCase(key, label) {
-        if (typeof label === 'string') {
-            return label;
-        }
-        return (key || '').split('_').map((word, index) => (index === 0 ? this.ucFirst(word) : word)).join(' ');
-    },
-    ucFirst(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    },
-    slugify(str) {
-        if (!str) {
-            return '';
-        }
-        const parsedDoc = domParser.parseFromString(str, 'text/html');
-        let parsedString = parsedDoc.body.textContent || '';
-        // custom replacements
-        parsedString = parsedString.replace(/\//g, '-');
-        return slugify(parsedString, {
-            remove: /[*+~.()'"!:@,]/g,
-            lower: true
-        });
-    },
-    browserIsIE() {
-        return window.navigator.userAgent.match(/(MSIE|Trident)/);
-    },
-    escapeDoubleQuotes(str) {
-        if (str.search(/\\?(")([\w\s]+)\\?(")/g) >= 0) {
-            // match piece of string between double quotes
-            return str.replace(/\\?(")([\w\s]+)\\?(")/g, '\\$1$2\\$3'); // thanks @slevithan!
-        }
-        return str.replace(/\\([\s\S])|(")/g, '\\\\\\$1$2'); // thanks @slevithan!
-    },
-    unescapeDoubleQuotes(str) {
-        return (str && str !== '') ? str.replace(/\\*(")/g, '$1') : str; // thanks @slevithan!
-    }
-};
-
-class FacetInputText extends FacetInput {
-    transform() {
-        const facetId = this.getFacetId();
-        const payload = {
-            facetId,
-            source: 'input-text',
-        };
-        return {
-            type: 'text',
-            id: this.getId(),
-            label: this.config.label,
-            disabled: this.config.disabled,
-            placeholder: this.config.placeholder,
-            icon: this.config.icon,
-            inputPayload: Object.assign(Object.assign({}, payload), { trigger: 'input' }),
-            enterPayload: Object.assign(Object.assign({}, payload), { trigger: 'enter' }),
-            iconPayload: Object.assign(Object.assign({}, payload), { trigger: 'icon' }),
-            _meta: { facetId },
-        };
-    }
-    setActive(facetValue) {
-        this.output.value = helpers.unescapeDoubleQuotes(facetValue) || null;
-    }
-}
-
-/* eslint-disable */
-const RESULTS_LIMIT = 1000;
-class FacetInputLink extends FacetInput {
+const RESULTS_LIMIT = 2000;
+class AwFacetInputLink extends AwFacetInput {
     transform() {
         const facetId = this.getFacetId();
         const results = [];
         let resultsCounter = 0;
-        for (const itemData of this.data) {
-            const { label, counter, hidden } = itemData;
-            let { value, options } = itemData;
+        this.data.forEach(({ label, counter, hidden, value: rawValue, options: rawOptions }) => {
             if (hidden) {
-                continue;
+                return;
             }
             resultsCounter += 1;
             if (resultsCounter > RESULTS_LIMIT) {
-                break;
+                return;
             }
             // normalize value
-            value = `${value}`;
-            options = options || {};
+            const value = `${rawValue}`;
+            const options = rawOptions || {};
             const classes = [];
             if (options.classes) {
                 classes.push(options.classes);
             }
             if (this._isActive(this.facetValue, value)) {
                 classes.push('is-active');
+            }
+            if (value === '__loading__') {
+                classes.push('loader-link');
             }
             results.push({
                 type: 'link',
@@ -586,37 +470,7 @@ class FacetInputLink extends FacetInput {
                 classes: classes.join(' '),
                 _meta: { facetId, value },
             });
-        }
-        /* const results: any[] = this.data.map(({ label, value, counter, hidden, options }) => {
-          if (hidden) {
-            return;
-          }
-    
-          resultsCounter += 1;
-          // normalize value
-          value = '' + value;
-          options = options || {};
-    
-          const classes = [];
-          if (options.classes) { classes.push(options.classes); }
-          if (this._isActive(this.facetValue, value)) { classes.push('is-active'); }
-    
-          return {
-            type: 'link',
-            id: this.getId(),
-            text: label,
-            counter,
-            payload: {
-              facetId,
-              source: 'input-link',
-              value
-            },
-            icon: options.icon || null,
-            classes: classes.join(' '),
-            _meta: { facetId, value }
-          };
         });
-         */
         // empty state control
         const itemEmpty = results.filter((item) => item.id === 'empty')[0];
         if (this.isEmpty) {
@@ -663,7 +517,7 @@ class FacetInputLink extends FacetInput {
     }
 }
 
-class FacetInputSelect extends FacetInput {
+class AwFacetInputSelect extends AwFacetInput {
     transform() {
         const facetId = this.getFacetId();
         return {
@@ -690,11 +544,77 @@ class FacetInputSelect extends FacetInput {
     }
 }
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+const domParser = new DOMParser();
+var helpers = {
+    prettifySnakeCase(key, label) {
+        if (typeof label === 'string') {
+            return label;
+        }
+        return (key || '').split('_').map((word, index) => (index === 0 ? this.ucFirst(word) : word)).join(' ');
+    },
+    ucFirst(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    },
+    slugify(str) {
+        if (!str) {
+            return '';
+        }
+        const parsedDoc = domParser.parseFromString(str, 'text/html');
+        let parsedString = parsedDoc.body.textContent || '';
+        // custom replacements
+        parsedString = parsedString.replace(/\//g, '-');
+        return slugify(parsedString, {
+            remove: /[*+~.()'"!:@,]/g,
+            lower: true
+        });
+    },
+    browserIsIE() {
+        return window.navigator.userAgent.match(/(MSIE|Trident)/);
+    },
+    escapeDoubleQuotes(str) {
+        if (str.search(/\\?(")([\w\s]+)\\?(")/g) >= 0) {
+            // match piece of string between double quotes
+            return str.replace(/\\?(")([\w\s]+)\\?(")/g, '\\$1$2\\$3'); // thanks @slevithan!
+        }
+        return str.replace(/\\([\s\S])|(")/g, '\\\\\\$1$2'); // thanks @slevithan!
+    },
+    unescapeDoubleQuotes(str) {
+        return (str && str !== '') ? str.replace(/\\*(")/g, '$1') : str; // thanks @slevithan!
+    }
+};
+
+class AwFacetInputText extends AwFacetInput {
+    transform() {
+        const facetId = this.getFacetId();
+        const payload = {
+            facetId,
+            source: 'input-text',
+        };
+        return {
+            type: 'text',
+            id: this.getId(),
+            label: this.config.label,
+            disabled: this.config.disabled,
+            placeholder: this.config.placeholder,
+            icon: this.config.icon,
+            inputPayload: Object.assign(Object.assign({}, payload), { trigger: 'input' }),
+            enterPayload: Object.assign(Object.assign({}, payload), { trigger: 'enter' }),
+            iconPayload: Object.assign(Object.assign({}, payload), { trigger: 'icon' }),
+            _meta: { facetId },
+        };
+    }
+    setActive(facetValue) {
+        this.output.value = helpers.unescapeDoubleQuotes(facetValue) || null;
+    }
+}
+
+/* eslint-disable max-classes-per-file */
 const INPUTS_MAP = {
-    checkbox: FacetInputCheckbox,
-    text: FacetInputText,
-    link: FacetInputLink,
-    select: FacetInputSelect,
+    checkbox: AwFacetInputCheckbox,
+    text: AwFacetInputText,
+    link: AwFacetInputLink,
+    select: AwFacetInputSelect,
 };
 const FILTERS_MAP = {
     '=': '_filterDataEquals',
@@ -705,7 +625,7 @@ const FILTERS_MAP = {
     '<>': '_filterDataNotEqual',
     LIKE: '_filterDataLike',
 };
-class SearchModel {
+class AwSearchModel {
     constructor(id, config) {
         this._filters = [];
         this._facets = [];
@@ -730,9 +650,9 @@ class SearchModel {
         this._setTotalCount();
         // query params control
         /* eslint-disable @typescript-eslint/no-use-before-define */
-        if (SearchService.queryParams) {
-            this.updateFiltersFromQueryParams(SearchService.queryParams);
-            SearchService.queryParams = null;
+        if (AwSearchModel.queryParams) {
+            this.updateFiltersFromQueryParams(AwSearchModel.queryParams);
+            AwSearchModel.queryParams = null;
         }
     }
     updateFilter(facetId, value, remove) {
@@ -801,15 +721,20 @@ class SearchModel {
             results: this._config.results,
             filters: this._filters
                 .filter((filter) => filter.context !== 'internal')
-                .map(({ facetId, value, searchIn }) => ({ facetId, value, searchIn })),
+                .map(({ facetId, value, searchIn, pagination }) => (pagination ? {
+                facetId, value, searchIn, pagination
+            } : {
+                facetId, value, searchIn
+            })),
         };
     }
     getInternalFilters() {
         return this._filters
             .filter((filter) => (filter.context === 'internal'
-            && ((Array.isArray(filter.value) && filter.value.length)
-                || (!Array.isArray(filter.value) && filter.value))))
-            .map(({ facetId, value, searchIn }) => ({ facetId, value, searchIn }));
+            && !isEmpty(filter.value)))
+            .map(({ facetId, value, searchIn }) => ({
+            facetId, value, searchIn
+        }));
     }
     filtersAsQueryParams(filters) {
         const queryParams = {};
@@ -1005,32 +930,7 @@ class SearchModel {
         return results;
     }
 }
-let SearchService = class SearchService {
-    constructor() {
-        this._models = {};
-    }
-    add(id, config) {
-        if (this._models[id]) {
-            throw Error(`Search model '${id}' already exists!`);
-        }
-        this._models[id] = new SearchModel(id, config);
-    }
-    remove(id) {
-        if (this._models[id]) {
-            delete this._models[id];
-        }
-    }
-    model(id) {
-        return this._models[id] || null;
-    }
-};
-SearchService.queryParams = null;
-SearchService.ɵprov = ɵɵdefineInjectable({ factory: function SearchService_Factory() { return new SearchService(); }, token: SearchService, providedIn: "root" });
-SearchService = __decorate([
-    Injectable({
-        providedIn: 'root',
-    })
-], SearchService);
+AwSearchModel.queryParams = null;
 
 class MainLayoutEH extends EventHandler {
     constructor() {
@@ -1074,7 +974,7 @@ class MainLayoutEH extends EventHandler {
         })).subscribe((params) => {
             this.emitGlobal('queryparams', params);
             // to use in searchs
-            SearchService.queryParams = params;
+            AwSearchModel.queryParams = params;
         });
         // router changed
         this.router.events.pipe(filter((event) => event instanceof NavigationStart)).subscribe(() => {
@@ -1173,159 +1073,6 @@ class FacetsDS extends DataSource {
         const { searchModel } = this.options;
         this.searchModel = searchModel;
         return fields;
-    }
-}
-
-const HEADER_ICON_OPEN = 'n7-icon-angle-down';
-const HEADER_ICON_CLOSE = 'n7-icon-angle-right';
-class FacetsWrapperDS extends DataSource {
-    constructor() {
-        super(...arguments);
-        this.getRequestParams = () => this.searchModel.getRequestParams();
-        this.filtersAsQueryParams = (filters) => this.searchModel.filtersAsQueryParams(filters);
-        this.updateFiltersFromQueryParams = (queryParams) => {
-            this.searchModel.updateFiltersFromQueryParams(queryParams);
-        };
-        this.getInputByFacetId = (facetId) => this.searchModel.getInputByFacetId(facetId);
-        this.filterTarget = (target) => {
-            this.searchModel.filterTarget(target);
-        };
-        this.updateInputsFromFilters = () => {
-            this.searchModel.updateInputsFromFilters();
-        };
-    }
-    transform(data) {
-        if (!this.searchModel) {
-            this.searchModel = data.searchModel;
-        }
-        const id = this.searchModel.getId();
-        const fields = this.searchModel.getFields();
-        const groups = [];
-        fields.forEach((fieldConfig, fieldIndex) => {
-            const groupId = `group-${id}-${fieldIndex}`;
-            // header config
-            const header = this._headerConfig(fieldConfig.header, groupId);
-            // inputs config
-            const sections = [];
-            this.searchModel.getInputs()
-                .filter((input) => input.getSectionIndex() === fieldIndex)
-                .map((input) => {
-                input.update();
-                return {
-                    facetId: input.getFacetId(),
-                    type: input.getType(),
-                    output: input.getOutput(),
-                };
-            })
-                .forEach(({ type, output, facetId }) => {
-                sections.push({
-                    classes: this._getSectionClasses(type),
-                    inputs: Array.isArray(output) ? output : [output],
-                    _meta: {
-                        facetId,
-                    },
-                });
-            });
-            groups.push({
-                header,
-                facet: { sections },
-                classes: `n7-facets-wrapper__${groupId}`,
-                isOpen: true,
-                _meta: {
-                    groupId,
-                },
-            });
-        });
-        return {
-            groups,
-            classes: `n7-facets-wrapper__${this.searchModel.getId()}`,
-        };
-    }
-    toggleGroup({ eventPayload }) {
-        this.output.groups.forEach((group) => {
-            if (group._meta.groupId === eventPayload.groupId) {
-                group.isOpen = !group.isOpen;
-                group.header.iconRight = group.isOpen ? HEADER_ICON_OPEN : HEADER_ICON_CLOSE;
-            }
-        });
-    }
-    onFacetChange({ eventPayload }) {
-        const { facetId, source, trigger } = eventPayload.inputPayload;
-        const filter = this.searchModel.getFiltersByFacetId(facetId)[0] || { value: null };
-        const filterValue = filter.value;
-        let remove = false;
-        let value = eventPayload.inputPayload.value || eventPayload.value;
-        // normalize
-        value = `${value}`;
-        // remove control
-        if (Array.isArray(filterValue)) {
-            remove = filterValue.indexOf(value) !== -1;
-        }
-        else {
-            remove = filterValue === value;
-        }
-        // input text control
-        // TODO: gestire i casi enter / icon click nel input text
-        if (source === 'input-text' && ['enter', 'icon'].indexOf(trigger) !== -1)
-            return;
-        this.searchModel.updateFilter(facetId, value, remove);
-        this.searchModel.updateInputsFromFilters();
-    }
-    updateFilteredTarget(target) {
-        const input = this.searchModel.getInputByFacetId(target);
-        this.output.groups
-            .map((group) => group.facet)
-            .map((facet) => facet.sections)
-            .forEach((sections) => {
-            sections.forEach((section) => {
-                if (section._meta.facetId === target) {
-                    const inputOutput = input.getOutput();
-                    section.inputs = Array.isArray(inputOutput) ? inputOutput : [inputOutput];
-                }
-            });
-        });
-    }
-    updateInputLinks() {
-        const linksFacetIds = this.searchModel.getInputs()
-            .filter((input) => input.getType() === 'link')
-            .map((input) => input.getFacetId());
-        this.output.groups
-            .map((group) => group.facet)
-            .map((facet) => facet.sections)
-            .forEach((sections) => {
-            sections.forEach((section) => {
-                if (linksFacetIds.indexOf(section._meta.facetId) !== -1) {
-                    const input = this.searchModel.getInputByFacetId(section._meta.facetId);
-                    input.update();
-                    const inputOutput = input.getOutput();
-                    section.inputs = Array.isArray(inputOutput) ? inputOutput : [inputOutput];
-                }
-            });
-        });
-    }
-    _getSectionClasses(type) {
-        const classesMap = {
-            text: 'text',
-            checkbox: 'checkboxes',
-            link: 'links',
-            select: 'select',
-        };
-        return `n7-facet__section-input-${classesMap[type]}`;
-    }
-    _headerConfig(header, groupId) {
-        return header ? {
-            text: header.label,
-            iconRight: HEADER_ICON_OPEN,
-            classes: header.classes,
-            payload: {
-                source: 'group-header',
-                id: `${groupId}-header`,
-                groupId,
-            },
-            _meta: {
-                id: `${groupId}-header`,
-            },
-        } : null;
     }
 }
 
@@ -1471,7 +1218,6 @@ var DS = /*#__PURE__*/Object.freeze({
     SubnavDS: SubnavDS,
     BreadcrumbsDS: BreadcrumbsDS,
     FacetsDS: FacetsDS,
-    FacetsWrapperDS: FacetsWrapperDS,
     FooterDS: FooterDS,
     SmartPaginationDS: SmartPaginationDS
 });
@@ -1540,95 +1286,6 @@ class BreadcrumbsEH extends EventHandler {
     }
 }
 
-class FacetsWrapperEH extends EventHandler {
-    constructor() {
-        super(...arguments);
-        this._facetsChanged = false;
-        this.internalFacetsChange$ = new Subject();
-        this.externalFacetsChange$ = new Subject();
-    }
-    listen() {
-        // listen to inner (widget) events
-        this.innerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case 'facets-wrapper.facet':
-                    {
-                        // empty payload control
-                        if (!payload.eventPayload.inputPayload) {
-                            return;
-                        }
-                        const { facetId } = payload.eventPayload.inputPayload;
-                        const input = this.dataSource.getInputByFacetId(facetId);
-                        const context = input.getContext();
-                        this._facetsChanged = true;
-                        // update
-                        this.dataSource.onFacetChange(payload);
-                        // internal
-                        if (context === 'internal') {
-                            this.internalFacetsChange$.next(input.getTarget());
-                            // external
-                        }
-                        else {
-                            this.externalFacetsChange$.next();
-                        }
-                    }
-                    break;
-                case 'facets-wrapper.facetheader':
-                    this.dataSource.toggleGroup(payload);
-                    break;
-                default:
-                    break;
-            }
-        });
-        this.outerEvents$.subscribe(({ type, payload }) => {
-            if (type.indexOf('queryparamschange') !== -1 && this.dataSource.searchModel) {
-                this.dataSource.updateFiltersFromQueryParams(payload);
-                this.dataSource.updateInputsFromFilters();
-            }
-        });
-        // listen to global events
-        EventHandler.globalEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case 'global.searchresponse':
-                    if (this.dataSource.searchModel && this.dataSource.searchModel.getId() === payload) {
-                        this.dataSource.updateInputLinks();
-                        const internalFilters = this.dataSource.searchModel.getInternalFilters();
-                        internalFilters.forEach((filter) => {
-                            const input = this.dataSource.searchModel.getInputByFacetId(filter.facetId);
-                            const target = input.getTarget();
-                            this.dataSource.filterTarget(target);
-                            this.dataSource.updateFilteredTarget(target);
-                        });
-                    }
-                    break;
-                default:
-                    break;
-            }
-        });
-        // internal facets change
-        this.internalFacetsChange$.pipe(debounceTime(500)).subscribe((target) => {
-            this.dataSource.filterTarget(target);
-            this.dataSource.updateFilteredTarget(target);
-        });
-        // internal facets change
-        this.externalFacetsChange$.pipe(debounceTime(500)).subscribe(() => {
-            const requestParams = this.dataSource.getRequestParams();
-            const queryParams = this.dataSource.filtersAsQueryParams(requestParams.filters);
-            Object.keys(queryParams).forEach((key) => { queryParams[key] = queryParams[key] || null; });
-            // signal
-            this.emitOuter('facetschange');
-            // reset page
-            queryParams.page = 1;
-            // router signal
-            this.emitGlobal('navigate', {
-                handler: 'router',
-                path: [],
-                queryParams,
-            });
-        });
-    }
-}
-
 class FooterEH extends EventHandler {
     listen() {
         // no events
@@ -1658,7 +1315,6 @@ var EH = /*#__PURE__*/Object.freeze({
     HeaderEH: HeaderEH,
     SubnavEH: SubnavEH,
     BreadcrumbsEH: BreadcrumbsEH,
-    FacetsWrapperEH: FacetsWrapperEH,
     FooterEH: FooterEH,
     SmartPaginationEH: SmartPaginationEH
 });
@@ -1810,35 +1466,6 @@ Page404LayoutComponent = __decorate([
     __metadata("design:paramtypes", [LayoutsConfigurationService])
 ], Page404LayoutComponent);
 
-let FacetsWrapperComponent = class FacetsWrapperComponent {
-    headerEmit(eventType, eventPayload) {
-        if (!this.emit) {
-            return;
-        }
-        this.emit('facetheader', { eventType, eventPayload });
-    }
-    facetEmit(eventType, eventPayload) {
-        if (!this.emit) {
-            return;
-        }
-        this.emit('facet', { eventType, eventPayload });
-    }
-};
-__decorate([
-    Input(),
-    __metadata("design:type", Object)
-], FacetsWrapperComponent.prototype, "data", void 0);
-__decorate([
-    Input(),
-    __metadata("design:type", Object)
-], FacetsWrapperComponent.prototype, "emit", void 0);
-FacetsWrapperComponent = __decorate([
-    Component({
-        selector: 'n7-facets-wrapper',
-        template: "<div *ngIf=\"data\" class=\"n7-facets-wrapper {{ data.classes || '' }}\">\n    <div *ngFor=\"let group of data.groups\" class=\"n7-facets-wrapper__group {{ group.classes || '' }}\">\n        <n7-facet-header\n            [data]=\"group.header\"\n            [emit]=\"headerEmit.bind(this)\"\n        ></n7-facet-header>\n\n        <n7-facet\n            *ngIf=\"group.isOpen\"\n            [data]=\"group.facet\"\n            [emit]=\"facetEmit.bind(this)\"\n        ></n7-facet>\n    </div>\n</div>"
-    })
-], FacetsWrapperComponent);
-
 let SmartPaginationComponent = class SmartPaginationComponent {
     constructor() {
         this.handlePaginationEvent.bind(this);
@@ -1869,7 +1496,6 @@ var N7BoilerplateCommonModule_1;
 const COMPONENTS = [
     MainLayoutComponent,
     Page404LayoutComponent,
-    FacetsWrapperComponent,
     SmartPaginationComponent,
 ];
 let N7BoilerplateCommonModule = N7BoilerplateCommonModule_1 = class N7BoilerplateCommonModule {
@@ -1979,20 +1605,13 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         this.pageSize = 10; // linked objects page size
         // ===== BUBBLE CHART =====
         this.bubblesSize = 10; // related entities (bubbles) page size
+        this.fallbackText = '';
         this.updateComponent = (id, data, options) => {
             if (options) {
                 this.one(id).updateOptions(options);
             }
             this.one(id).update(data);
         };
-        // DEPRECATED
-        /* getNavigation(id) {
-          // Requests data from communication provider
-          return this.communication.request$('getEntityDetails', {
-            onError: (error) => console.error(error),
-            params: { entityId: id, entitiesListSize: this.bubblesSize },
-          });
-        } */
         this.drawPagination = () => {
             if (!this.myResponse.relatedItems)
                 return;
@@ -2053,9 +1672,6 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                 });
                 this.one('aw-linked-objects').update({ items: this.myResponse.relatedItems });
             }
-            if ((tab === 'overview' || tab === 'entita-collegate') && this.myResponse.relatedEntities) {
-                setTimeout(() => { this.updateBubbes(this.myResponse.relatedEntities); }, 800);
-            }
         };
     }
     onInit({ configuration, mainState, router, route, location, options, titleService, communication, }) {
@@ -2069,17 +1685,8 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         this.titleService = titleService;
         this.currentId = '';
         this.currentPage = +this.route.snapshot.queryParams.page;
-        this.bubblesEnabled = this.configuration.get('features-enabled') ? this.configuration.get('features-enabled').bubblechart : false;
-        this.bubblesSize = this.configuration.get('entita-layout') ? this.configuration.get('entita-layout').entitiesQuerySize : this.bubblesSize;
-        this.one('aw-bubble-chart').updateOptions({
-            selectable: false,
-            simple: true,
+        this.one('aw-related-entities').updateOptions({
             config: this.configuration,
-            limit: this.configuration.get('bubble-chart').bubbleLimit,
-            smallChartSize: this.configuration.get('entita-layout').overview.smallChartSize,
-        });
-        this.one('aw-chart-tippy').updateOptions({
-            basePath: this.configuration.get('paths').entitaBasePath,
         });
         // navigation update
         this.mainState.updateCustom('currentNav', 'entita');
@@ -2114,13 +1721,8 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             basePath: this.getNavBasePath(),
         });
         this.updateComponent('aw-entita-metadata-viewer', this.getFields(this.myResponse));
+        this.one('aw-related-entities').update(this.myResponse.relatedEntities);
         this.drawPagination();
-    }
-    updateBubbes(data) {
-        /*
-          Helper function to update the graph
-        */
-        this.one('aw-bubble-chart').update(data);
     }
     loadItem(id, slug, tab) {
         /*
@@ -2186,7 +1788,12 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                 : res.label;
         });
         this.one('aw-linked-objects').update({ items: res.relatedItems });
+        this.one('aw-related-entities').update(res.relatedEntities);
         this.drawPagination();
+        // fallback text
+        if (!this.hasMetadataFields) {
+            this.fallbackText = this.configuration.get('entita-layout').fallback;
+        }
         // update head title
         this.mainState.update('headTitle', `Arianna4View - Entità - ${this.myResponse.label}`);
     }
@@ -2216,7 +1823,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         const labels = this.configuration.get('labels');
         let metadataToShow = get(this.configuration.get('entita-layout'), 'metadata-to-show', []);
         if (this.selectedTab === 'overview') {
-            metadataToShow = get(this.configuration.get('entita-layout'), 'overview.campi', []);
+            metadataToShow = get(this.configuration.get('entita-layout'), 'overview.informazioni', []);
         }
         return metadataHelper.normalize({
             fields,
@@ -2262,9 +1869,6 @@ class AwEntitaLayoutEH extends EventHandler {
         });
         this.outerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
-                case 'aw-bubble-chart.d3end': // bounce the event, from bubble-chart to chart-tippy
-                    this.emitOuter('d3end', payload);
-                    break;
                 case 'aw-entita-nav.click':
                     if (payload) {
                         this.dataSource.selectedTab = payload;
@@ -2283,25 +1887,6 @@ class AwEntitaLayoutEH extends EventHandler {
                             size: this.dataSource.pageSize,
                         };
                         this.dataSource.updateComponent('aw-linked-objects', { items: this.dataSource.myResponse.relatedItems }, options);
-                    }
-                    break;
-                case 'aw-bubble-chart.bubble-tooltip-goto-click':
-                    {
-                        const { id, label } = payload;
-                        this.emitGlobal('navigate', {
-                            handler: 'router',
-                            path: [
-                                this.configuration.get('paths').entitaBasePath,
-                                id,
-                                helpers.slugify(label),
-                                'overview',
-                            ],
-                        });
-                    }
-                    break;
-                case 'aw-bubble-chart.bubble-filtered':
-                    if (this.dataSource.selectedTab === 'overview' || this.dataSource.selectedTab === 'entita-collegate') {
-                        this.emitOuter('filterbubbleresponse', payload.relatedEntities);
                     }
                     break;
                 case 'n7-smart-pagination.change':
@@ -2339,12 +1924,10 @@ class AwEntitaLayoutEH extends EventHandler {
                     if (res) {
                         this.dataSource.loadContent(res);
                         // remove the entity of this page
-                        const entities = res.relatedEntities.filter((entity) => entity.id !== params.get('id'));
                         this.dataSource.updateWidgets(res);
                         if (selectedItem) {
                             this.emitOuter('selectItem', selectedItem);
                         }
-                        this.emitOuter('filterbubbleresponse', entities);
                     }
                 });
             }
@@ -3025,22 +2608,26 @@ class AwEntitaNavDS extends DataSource {
         if (!param) {
             return null;
         }
-        const { data } = param;
-        const { selected } = param;
+        const { data, selected } = param;
         const navigation = { items: [], payload: 'entita-nav' };
         const { hasMetadataFields } = this.options;
-        navigation.items.push({
-            text: 'OVERVIEW',
-            anchor: { href: `${param.basePath}/overview` },
-            classes: selected === 'overview' ? 'is-selected' : '',
+        /* navigation.items.push({
+          text: 'OVERVIEW',
+          anchor: { href: `${param.basePath}/overview` },
+          classes: selected === 'overview' ? 'is-selected overview-tab' : 'overview-tab',
         });
         if (hasMetadataFields) {
-            navigation.items.push({
-                text: 'CAMPI',
-                anchor: { href: `${param.basePath}/campi` },
-                classes: selected === 'campi' ? 'is-selected' : '',
-            });
-        }
+          navigation.items.push({
+            text: 'INFORMAZIONI',
+            anchor: { href: `${param.basePath}/informazioni` },
+            classes: selected === 'informazioni' ? 'is-selected' : '',
+          });
+        } */
+        navigation.items.push({
+            text: 'INFORMAZIONI',
+            anchor: { href: `${param.basePath}/informazioni` },
+            classes: selected === 'informazioni' ? 'is-selected' : '',
+        });
         if (data.relatedItems) {
             navigation.items.push({
                 text: 'OGGETTI COLLEGATI',
@@ -3053,7 +2640,7 @@ class AwEntitaNavDS extends DataSource {
                 classes: selected === 'oggetti-collegati' ? 'is-selected' : '',
             });
         }
-        if (data.relatedEntities && this.options.bubblesEnabled) {
+        if (data.relatedEntities) {
             navigation.items.push({
                 text: 'ENTITÀ COLLEGATE',
                 anchor: { href: `${param.basePath}/entita-collegate` },
@@ -3075,7 +2662,7 @@ class AwEntitaNavDS extends DataSource {
             });
         }
         // one tab control
-        if (navigation.items.length === 2) {
+        if (navigation.items.length === 2 && !hasMetadataFields) {
             navigation.items.shift();
         }
         return navigation;
@@ -3300,8 +2887,13 @@ class AwSchedaMetadataDS extends DataSource {
 }
 
 class AwSchedaImageDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.hasNavigation = false;
+    }
     transform(data) {
         const tileSources = this.getTileSources(data.images);
+        this.hasNavigation = Array.isArray(data.images) && data.images.length > 1;
         return {
             images: [],
             viewerId: 'scheda-layout-viewer',
@@ -3327,7 +2919,7 @@ class AwSchedaImageDS extends DataSource {
         this.instance.world.removeAll();
         setTimeout(() => {
             const images = this.getTileSources(data.images);
-            console.warn('images', images.length, images);
+            this.hasNavigation = Array.isArray(data.images) && data.images.length > 1;
             this.instance.open(images);
         });
     }
@@ -3340,6 +2932,30 @@ class AwSchedaImageDS extends DataSource {
 class AwSchedaInnerTitleDS extends DataSource {
     transform(data) {
         return data;
+    }
+}
+
+class AwRelatedEntitiesDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.transform = (data) => {
+            const basePath = this.options.config.get('paths').entitaBasePath;
+            const previews = data ? data.map((d) => ({
+                title: d.entity.label,
+                anchor: {
+                    href: `${basePath}${d.entity.id}/${d.entity.label}`,
+                    target: '_blank'
+                },
+                classes: `is-${d.entity.typeOfEntity}`,
+                metadata: [{
+                        items: [{
+                                label: 'Tipo di entità',
+                                value: d.entity.typeOfEntity,
+                            }]
+                    }]
+            })) : [];
+            return { previews };
+        };
     }
 }
 
@@ -3367,6 +2983,281 @@ class AwSearchLayoutTabsDS extends DataSource {
     }
     setSelected(tabId) {
         this.selected = tabId;
+    }
+}
+
+// import { isEmpty } from 'lodash';
+const ENTITY_LINKS_CLASS = 'entity-links';
+const ENTITY_LINKS_PARENT_SELECTOR = '.n7-facets-wrapper__group:last-child .n7-facet__section-input-links';
+const loaderItem = {
+    counter: null,
+    label: 'Loading...',
+    searchData: [],
+    value: '__loading__',
+};
+var entityLinksHelper = {
+    paginationState: {},
+    paginate$: new Subject(),
+    listenToChanges(dataSource) {
+        const facetsWrapperEH = dataSource.getWidgetEventHandler('facets-wrapper');
+        return merge(facetsWrapperEH.internalFacetsChange$.pipe(mapTo(null)), this.paginate$).pipe(debounceTime(500), switchMap((pagination) => {
+            const requestParams = dataSource.searchModel.getRequestParams();
+            const internalFilters = dataSource.searchModel.getInternalFilters();
+            this.paginationState.offset = pagination ? this.paginationState.offset : 0;
+            this.updateParamsOffset(requestParams);
+            const filters = [...requestParams.filters, ...internalFilters];
+            const params = {
+                searchParameters: Object.assign(Object.assign({ totalCount: 100, gallery: !!(dataSource.searchModel.getId() === 'aw-gallery-layout') }, requestParams), { filters }),
+            };
+            // initial loader
+            if (this.paginationState.offset === 0) {
+                this.addInitialLoader(dataSource);
+            }
+            return dataSource.getFacetsReq$(params);
+        }));
+    },
+    onFacetsResponse(searchModel, facets) {
+        // pagination control
+        const entityLinksFacet = facets.find(({ id }) => id === ENTITY_LINKS_CLASS);
+        const { totalCount } = entityLinksFacet;
+        let { limit, offset } = this.paginationState;
+        if (typeof limit === 'undefined') {
+            limit = 10;
+        }
+        if (typeof offset === 'undefined') {
+            offset = 0;
+        }
+        this.paginationState.totalCount = totalCount;
+        if (offset > 0) {
+            const entityLinksInput = searchModel.getInputByFacetId(ENTITY_LINKS_CLASS);
+            const oldData = entityLinksInput.getData() || [];
+            // remove fake loading element
+            if (oldData.length) {
+                oldData.pop();
+            }
+            const newData = oldData.concat(entityLinksFacet.data);
+            entityLinksFacet.data = newData;
+        }
+        if (this.paginationState.totalCount > (limit + offset)) {
+            entityLinksFacet.data.push(loaderItem);
+        }
+        // empty state
+        const entityLinksInput = searchModel.getInputByFacetId(ENTITY_LINKS_CLASS);
+        entityLinksInput.setIsEmpty(!totalCount);
+        // fix scroll
+        if (offset === 0) {
+            const scrollEl = document.querySelector(ENTITY_LINKS_PARENT_SELECTOR);
+            if (scrollEl) {
+                scrollEl.scrollTop = 0;
+            }
+        }
+        // update loading state
+        this.paginationState.loading = false;
+    },
+    initPagination(searchModel) {
+        searchModel.getFilters().filter((filter) => (filter.pagination)).forEach(({ pagination }) => {
+            this.paginationState = Object.assign(Object.assign(Object.assign({}, pagination), this.paginationState), { loading: false });
+        });
+        setTimeout(() => {
+            const scrollEl = document.querySelector(ENTITY_LINKS_PARENT_SELECTOR);
+            const scroll$ = fromEvent(scrollEl, 'scroll');
+            scroll$.pipe(debounceTime(300)).subscribe(({ target }) => {
+                const { scrollTop, clientHeight, scrollHeight } = target;
+                const { offset, limit, totalCount, loading } = this.paginationState;
+                const margin = 150;
+                if ((scrollTop + clientHeight >= scrollHeight - margin)
+                    && (offset + limit < totalCount)
+                    && loading === false) {
+                    this.paginationState.loading = true;
+                    this.paginationState.offset = offset + limit;
+                    this.paginate$.next(this.paginationState);
+                }
+            });
+        });
+    },
+    /* clearInternalFilters(searchModel) {
+      const searchFilter = searchModel.getFiltersByFacetId('entity-search')[0];
+      const typesFilter = searchModel.getFiltersByFacetId('entity-types')[0];
+      if (!isEmpty(searchFilter.value) || !isEmpty(typesFilter.value)) {
+        searchFilter.value = '';
+        typesFilter.value = [];
+        searchModel.updateInputsFromFilters();
+      }
+    }, */
+    updateParamsOffset(params) {
+        const entityLinksFilter = params.filters
+            .find(({ facetId }) => facetId === ENTITY_LINKS_CLASS);
+        if (entityLinksFilter) {
+            entityLinksFilter.pagination.offset = this.paginationState.offset;
+        }
+    },
+    resetOffset() {
+        this.paginationState.offset = 0;
+    },
+    addInitialLoader(dataSource) {
+        dataSource.searchModel.setInputData(ENTITY_LINKS_CLASS, [loaderItem]);
+        const facetsWrapperDS = dataSource.getWidgetDataSource('facets-wrapper');
+        facetsWrapperDS.updateInputLinks();
+    }
+};
+
+const HEADER_ICON_OPEN = 'n7-icon-angle-down';
+const HEADER_ICON_CLOSE = 'n7-icon-angle-right';
+class AwFacetsWrapperDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.getRequestParams = () => this.searchModel.getRequestParams();
+        this.filtersAsQueryParams = (filters) => this.searchModel.filtersAsQueryParams(filters);
+        this.updateFiltersFromQueryParams = (queryParams) => {
+            this.searchModel.updateFiltersFromQueryParams(queryParams);
+        };
+        this.getInputByFacetId = (facetId) => this.searchModel.getInputByFacetId(facetId);
+        this.filterTarget = (target) => {
+            this.searchModel.filterTarget(target);
+        };
+        this.updateInputsFromFilters = () => {
+            this.searchModel.updateInputsFromFilters();
+        };
+    }
+    transform(data) {
+        if (!this.searchModel) {
+            this.searchModel = data.searchModel;
+            entityLinksHelper.initPagination(this.searchModel);
+        }
+        const id = this.searchModel.getId();
+        const fields = this.searchModel.getFields();
+        const groups = [];
+        fields.forEach((fieldConfig, fieldIndex) => {
+            const groupId = `group-${id}-${fieldIndex}`;
+            // header config
+            const header = this._headerConfig(fieldConfig.header, groupId);
+            // inputs config
+            const sections = [];
+            this.searchModel.getInputs()
+                .filter((input) => input.getSectionIndex() === fieldIndex)
+                .map((input) => {
+                input.update();
+                return {
+                    facetId: input.getFacetId(),
+                    type: input.getType(),
+                    output: input.getOutput(),
+                };
+            })
+                .forEach(({ type, output, facetId }) => {
+                sections.push({
+                    classes: this._getSectionClasses(type),
+                    inputs: Array.isArray(output) ? output : [output],
+                    _meta: {
+                        facetId,
+                    },
+                });
+            });
+            groups.push({
+                header,
+                facet: { sections },
+                classes: `n7-facets-wrapper__${groupId}`,
+                isOpen: true,
+                _meta: {
+                    groupId,
+                },
+            });
+        });
+        return {
+            groups,
+            classes: `n7-facets-wrapper__${this.searchModel.getId()}`,
+        };
+    }
+    toggleGroup({ eventPayload }) {
+        this.output.groups.forEach((group) => {
+            if (group._meta.groupId === eventPayload.groupId) {
+                group.isOpen = !group.isOpen;
+                group.header.iconRight = group.isOpen ? HEADER_ICON_OPEN : HEADER_ICON_CLOSE;
+            }
+        });
+    }
+    onFacetChange({ eventPayload }) {
+        const { facetId, source, trigger } = eventPayload.inputPayload;
+        const filter = this.searchModel.getFiltersByFacetId(facetId)[0] || { value: null };
+        const filterValue = filter.value;
+        let remove = false;
+        let value = eventPayload.inputPayload.value || eventPayload.value;
+        // normalize
+        value = `${value}`;
+        // remove control
+        if (Array.isArray(filterValue)) {
+            remove = filterValue.indexOf(value) !== -1;
+        }
+        else {
+            remove = filterValue === value;
+        }
+        // input text control
+        // TODO: gestire i casi enter / icon click nel input text
+        if (source === 'input-text' && ['enter', 'icon'].indexOf(trigger) !== -1)
+            return;
+        this.searchModel.updateFilter(facetId, value, remove);
+        this.searchModel.updateInputsFromFilters();
+    }
+    updateFilteredTarget(target) {
+        if (!this.searchModel) {
+            return;
+        }
+        const input = this.searchModel.getInputByFacetId(target);
+        this.output.groups
+            .map((group) => group.facet)
+            .map((facet) => facet.sections)
+            .forEach((sections) => {
+            sections.forEach((section) => {
+                if (section._meta.facetId === target) {
+                    const inputOutput = input.getOutput();
+                    section.inputs = Array.isArray(inputOutput) ? inputOutput : [inputOutput];
+                }
+            });
+        });
+    }
+    updateInputLinks() {
+        if (!this.searchModel) {
+            return;
+        }
+        const linksFacetIds = this.searchModel.getInputs()
+            .filter((input) => input.getType() === 'link')
+            .map((input) => input.getFacetId());
+        this.output.groups
+            .map((group) => group.facet)
+            .map((facet) => facet.sections)
+            .forEach((sections) => {
+            sections.forEach((section) => {
+                if (linksFacetIds.indexOf(section._meta.facetId) !== -1) {
+                    const input = this.searchModel.getInputByFacetId(section._meta.facetId);
+                    input.update();
+                    const inputOutput = input.getOutput();
+                    section.inputs = Array.isArray(inputOutput) ? inputOutput : [inputOutput];
+                }
+            });
+        });
+    }
+    _getSectionClasses(type) {
+        const classesMap = {
+            text: 'text',
+            checkbox: 'checkboxes',
+            link: 'links',
+            select: 'select',
+        };
+        return `n7-facet__section-input-${classesMap[type]}`;
+    }
+    _headerConfig(header, groupId) {
+        return header ? {
+            text: header.label,
+            iconRight: HEADER_ICON_OPEN,
+            classes: header.classes,
+            payload: {
+                source: 'group-header',
+                id: `${groupId}-header`,
+                groupId,
+            },
+            _meta: {
+                id: `${groupId}-header`,
+            },
+        } : null;
     }
 }
 
@@ -3480,6 +3371,86 @@ class AwMapDS extends DataSource {
     }
 }
 
+class AwTimelineDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        this.transform = (data) => ({
+            containerID: 'timeline-component',
+            libOptions: {
+                height: '500px',
+                locale: 'it_IT',
+                cluster: {
+                    // titleTemplate: '{count}',
+                    // fitOnDoubleClick: true,
+                    clusterCriteria: (f, s) => f.content.charAt(0) === s.content.charAt(0)
+                },
+                showTooltips: false,
+                tooltip: {
+                    followMouse: false,
+                    template: (d, element) => `<div class="tooltip">${element.title}</div>`
+                },
+                template: (d) => {
+                    const start = moment(d.start).format('DDMM') === '0101'
+                        ? moment(d.start).format('YYYY') : moment(d.start).format('DD MMMM YYYY');
+                    let end;
+                    if (d.end) {
+                        end = moment(d.end).format('DDMM') === '0101'
+                            ? moment(d.end).format('YYYY') : moment(d.end).format('DD MMMM YYYY');
+                    }
+                    const endHTML = d.end ? `- ${end}` : '';
+                    return (`<div class="dates"><em>${start}${endHTML}</em></div><div class="content">${d.content}</div>`);
+                },
+                width: '100%',
+                minHeight: '350px',
+                maxHeight: '800px',
+                // zoomMax: 31557600000, // one year
+                zoomFriction: 8
+            },
+            dataSet: [
+                {
+                    id: 1,
+                    content: 'Mostra internazionale di edilizia ospedaliera, Roma (1935)',
+                    start: '1935'
+                },
+                {
+                    id: 2,
+                    content: 'Mostra di edilizia ospedaliera, Fiuggi',
+                    start: '1942'
+                },
+                {
+                    id: 3,
+                    content: 'I Congresso mondiale di sociologia',
+                    start: '1951'
+                },
+                {
+                    id: 4,
+                    content: 'V Congresso mondiale di sociologia, Washington D.C. (1962)',
+                    start: '1962',
+                },
+                {
+                    id: 5,
+                    content: 'Mostra di edilizia pubblica, Pisa',
+                    start: '1967-06-16',
+                    end: '1967-06-21'
+                },
+                {
+                    id: 6,
+                    content: 'Strategia della tensione',
+                    start: '1975',
+                    end: '1984'
+                },
+                {
+                    id: 7,
+                    content: 'XX Congresso mondiale di sociologia, Roma',
+                    start: '1995'
+                }
+            ],
+            _setInstance: (timeline) => timeline
+        });
+    }
+}
+
 // Any
 
 var DS$1 = /*#__PURE__*/Object.freeze({
@@ -3502,9 +3473,12 @@ var DS$1 = /*#__PURE__*/Object.freeze({
     AwSchedaMetadataDS: AwSchedaMetadataDS,
     AwSchedaImageDS: AwSchedaImageDS,
     AwSchedaInnerTitleDS: AwSchedaInnerTitleDS,
+    AwRelatedEntitiesDS: AwRelatedEntitiesDS,
     AwSearchLayoutTabsDS: AwSearchLayoutTabsDS,
+    AwFacetsWrapperDS: AwFacetsWrapperDS,
     AwGalleryResultsDS: AwGalleryResultsDS,
-    AwMapDS: AwMapDS
+    AwMapDS: AwMapDS,
+    AwTimelineDS: AwTimelineDS
 });
 
 class AwHeroEH extends EventHandler {
@@ -3764,14 +3738,17 @@ class AwTreeEH extends EventHandler {
             });
         };
         this.scrollLeafIntoView = () => {
-            const treeNode = document.querySelector('div.aw-scheda__tree');
             setTimeout(() => {
+                const treeNode = document.querySelector('div.aw-scheda__tree');
                 const leafNode = treeNode.querySelector('.is-active');
                 if (leafNode && !this.isInViewport(leafNode)) {
                     leafNode.scrollIntoView();
                     window.scrollTo(0, 0);
+                    if (!this.isInViewport(leafNode)) {
+                        this.scrollLeafIntoView();
+                    }
                 }
-            }, 200);
+            });
         };
         this.isInViewport = (elem) => {
             const bounding = elem.getBoundingClientRect();
@@ -3849,6 +3826,91 @@ class AwTreeEH extends EventHandler {
 class AwSearchLayoutTabsEH extends EventHandler {
     listen() {
         // TODO
+    }
+}
+
+class AwFacetsWrapperEH extends EventHandler {
+    constructor() {
+        super(...arguments);
+        this.internalFacetsChange$ = new Subject();
+        this.externalFacetsChange$ = new Subject();
+    }
+    listen() {
+        // listen to inner (widget) events
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'facets-wrapper.facet':
+                    {
+                        // empty payload control
+                        if (!payload.eventPayload.inputPayload) {
+                            return;
+                        }
+                        const { facetId, value } = payload.eventPayload.inputPayload;
+                        if (value === '__loading__') {
+                            return;
+                        }
+                        const input = this.dataSource.getInputByFacetId(facetId);
+                        const context = input.getContext();
+                        // update
+                        this.dataSource.onFacetChange(payload);
+                        // internal
+                        if (context === 'internal') {
+                            this.internalFacetsChange$.next(input.getTarget());
+                            // external
+                        }
+                        else {
+                            this.externalFacetsChange$.next(facetId);
+                        }
+                    }
+                    break;
+                case 'facets-wrapper.facetheader':
+                    this.dataSource.toggleGroup(payload);
+                    break;
+                default:
+                    break;
+            }
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
+            if (type.indexOf('queryparamschange') !== -1 && this.dataSource.searchModel) {
+                this.dataSource.updateFiltersFromQueryParams(payload);
+                this.dataSource.updateInputsFromFilters();
+            }
+        });
+        // listen to global events
+        EventHandler.globalEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'global.searchresponse':
+                    if (this.dataSource.searchModel && this.dataSource.searchModel.getId() === payload) {
+                        this.dataSource.updateInputLinks();
+                        const internalFilters = this.dataSource.searchModel.getInternalFilters();
+                        internalFilters.forEach((filter) => {
+                            const input = this.dataSource.searchModel.getInputByFacetId(filter.facetId);
+                            const target = input.getTarget();
+                            // this.dataSource.filterTarget(target);
+                            this.dataSource.updateFilteredTarget(target);
+                        });
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
+        // internal facets change
+        this.externalFacetsChange$.pipe(debounceTime(500)).subscribe((facetId) => {
+            const requestParams = this.dataSource.getRequestParams();
+            const queryParams = this.dataSource.filtersAsQueryParams(requestParams.filters);
+            Object.keys(queryParams).forEach((key) => { queryParams[key] = queryParams[key] || null; });
+            // signal
+            this.emitOuter('facetschange', { facetId });
+            // reset page
+            queryParams.page = 1;
+            // router signal
+            this.emitGlobal('navigate', {
+                handler: 'router',
+                path: [],
+                queryParams,
+            });
+        });
     }
 }
 
@@ -4051,7 +4113,6 @@ class AwBubbleChartEH extends EventHandler {
                     this.dataSource.selected = [];
                     this.emitOuter('selection', []);
                     break;
-                case 'aw-scheda-layout.filterbubbleresponse':
                 case 'aw-entita-layout.filterbubbleresponse':
                 case 'aw-home-layout.filterbubbleresponse':
                     this.dataSource.updateChart(payload);
@@ -4104,7 +4165,7 @@ class AwChartTippyEH extends EventHandler {
                         flip: false,
                         theme: 'light-border no-padding',
                         placement: 'top',
-                        delay: [150, 30],
+                        delay: 150,
                         updateDuration: 400,
                     }));
                 }
@@ -4153,6 +4214,7 @@ var EH$1 = /*#__PURE__*/Object.freeze({
     AwSidebarHeaderEH: AwSidebarHeaderEH,
     AwTreeEH: AwTreeEH,
     AwSearchLayoutTabsEH: AwSearchLayoutTabsEH,
+    AwFacetsWrapperEH: AwFacetsWrapperEH,
     AwGalleryResultsEH: AwGalleryResultsEH,
     AwLinkedObjectsEH: AwLinkedObjectsEH,
     AwAutocompleteWrapperEH: AwAutocompleteWrapperEH,
@@ -4168,6 +4230,7 @@ const AwEntitaLayoutConfig = {
         { id: 'aw-entita-metadata-viewer' },
         { id: 'aw-linked-objects' },
         { id: 'aw-bubble-chart' },
+        { id: 'aw-related-entities' },
         { id: 'aw-chart-tippy' },
         {
             id: 'n7-smart-pagination',
@@ -4233,7 +4296,7 @@ AwEntitaLayoutComponent.ctorParameters = () => [
 AwEntitaLayoutComponent = __decorate([
     Component({
         selector: 'aw-entita-layout',
-        template: "<div class=\"aw-entity n7-side-auto-padding\" *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-title-wrapper-loading\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\"\n            class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__sidebar-nav-loading\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2]\"\n            [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-nav'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\" [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <!-- lb.dataSource.selectedTab -->\n    <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content-loading\">\n        <div class=\"aw-entity__content-loading-title\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\"></n7-content-placeholder>\n        </div>\n\n        <div class=\"aw-entity__content-loading-items\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n            [data]=\"{\n                blocks: [\n                {\n                    classes: 'entity-placeholder-item-preview'\n                }\n                ]\n            }\"></n7-content-placeholder>\n        </div>\n    </div>\n\n    <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\" class=\"aw-entity__content\">\n        <section>\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\n                class=\"aw-entity__content-section\" [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <a *ngIf=\"lb.dataSource.myResponse.wikiTab\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/wiki']\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                    <a *ngIf=\"lb.dataSource.myResponse.extraTab\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/maxxi']\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n            </div>\n\n            <ng-container \n                *ngIf=\"(\n                    lb.widgets['aw-entita-metadata-viewer'].ds.hasFields && \n                    ['overview', 'campi'].indexOf(lb.dataSource.selectedTab) !== -1\n                )\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n                    <div class=\"aw-entity__content-section-header\">\n                        <h2 class=\"aw-entity__content-section-title\">Campi</h2>\n                        <a \n                        *ngIf=\"lb.dataSource.selectedTab !== 'campi'\"\n                        class=\"n7-btn n7-btn-light\" \n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/campi']\">\n                            TUTTI I CAMPI <i class=\"n7-icon-angle-right\"></i>\n                        </a>\n                    </div>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async \">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews && lb.dataSource.myResponse.relatedItems\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <a *ngIf=\"lb.dataSource.selectedTab === 'overview' \"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/oggetti-collegati/']\"\n                        [queryParams]=\"{ page: 1 }\" class=\"n7-btn n7-btn-light\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <div class=\"aw-entity__content-item-previews\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <div class=\"aw-entity__content-item-preview-wrapper\">\n                            <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                            </n7-smart-breadcrumbs>\n                            <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                            <!-- relation -->\n                            <div class=\"aw-entity__relation\" *ngIf=\"preview.relation.value\">\n                                <p class=\"aw-entity__relation-description\">Relazione con \n                                <span class=\"aw-entity__relation-key\">{{preview.relation.key}}</span>:\n                                <span class=\"aw-entity__relation-value\"> {{preview.relation.value}}</span>\n                                </p>\n                            </div>\n                        </div>\n                    </ng-container>\n                </div>\n                <n7-smart-pagination \n                    *ngIf=\"lb.dataSource.selectedTab === 'oggetti-collegati'\"\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview aw-bubble-chart__{{lb.dataSource.selectedTab}}\"\n                *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.myResponse.relatedEntities\"\n                [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <a *ngIf=\"lb.dataSource.selectedTab == 'overview'\" class=\"n7-btn n7-btn-light\"\n                        [routerLink]=\"[lb.dataSource.getNavBasePath() + '/entita-collegate']\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <!-- Small Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper-small\" *ngIf=\"lb.dataSource.selectedTab == 'overview'\">\n                    <aw-bubble-chart-wrapper>\n                        <!-- Tippy template moved to end of HTML -->\n                        <n7-bubble-chart [data]=\"(lb.widgets['aw-bubble-chart'].ds.out$ | async)?.smallView\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n                <!-- Big Bubble Chart -->\n                <div class=\"aw-entity__bubble-chart-wrapper\" *ngIf=\"lb.dataSource.selectedTab == 'entita-collegate'\">\n                    <aw-bubble-chart-wrapper>\n                        <!-- Tippy template moved to end of HTML -->\n                        <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                            [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                        </n7-bubble-chart>\n                    </aw-bubble-chart-wrapper>\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                *ngIf=\"lb.dataSource.myResponse.extraTab\" [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n                *ngIf=\"lb.dataSource.myResponse.wikiTab\" [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{ lb.dataSource.myResponse.wikiTab.url }}\n                </a>\n            </div>\n        </section>\n    </div>\n    <!-- Template for bubble chart tooltips -->\n    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\" [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n    </aw-chart-tippy>\n</div>\n"
+        template: "<div class=\"aw-entity n7-side-auto-padding\"\n     *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\"\n             class=\"aw-entity__sidebar-title-wrapper-loading\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\"\n             class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\"\n             class=\"aw-entity__sidebar-nav-loading\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2]\"\n                                    [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-nav'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <n7-nav [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <!-- lb.dataSource.selectedTab -->\n    <div *ngIf=\"!(lb.widgets['aw-entita-nav'].ds.out$ | async)\"\n         class=\"aw-entity__content-loading\">\n        <div class=\"aw-entity__content-loading-title\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\"></n7-content-placeholder>\n        </div>\n\n        <div class=\"aw-entity__content-loading-items\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                    [data]=\"{\n                blocks: [{ classes: 'entity-placeholder-item-preview' }]\n            }\"></n7-content-placeholder>\n        </div>\n    </div>\n\n    <div *ngIf=\"!!(lb.widgets['aw-entita-nav'].ds.out$ | async)\"\n         class=\"aw-entity__content\">\n        <section>\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\n                 class=\"aw-entity__content-section\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <a *ngIf=\"lb.dataSource.myResponse.wikiTab\"\n                       class=\"n7-btn n7-btn-light\"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/wiki']\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                    <a *ngIf=\"lb.dataSource.myResponse.extraTab\"\n                       class=\"n7-btn n7-btn-light\"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/maxxi']\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n            </div>\n\n            <ng-container *ngIf=\"(\n                ['overview', 'informazioni'].includes(lb.dataSource.selectedTab)\n            )\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n                    <div class=\"aw-entity__content-section-header\"\n                         *ngIf=\"lb.dataSource.selectedTab === 'overview'\">\n                        <h2 class=\"aw-entity__content-section-title\"\n                            *ngIf=\"lb.dataSource.selectedTab === 'overview'\">Informazioni</h2>\n                        <a *ngIf=\"lb.dataSource.selectedTab !== 'informazioni'\"\n                           class=\"n7-btn n7-btn-light\"\n                           [routerLink]=\"[lb.dataSource.getNavBasePath() + '/informazioni']\">\n                            TUTTE LE INFORMAZIONI <i class=\"n7-icon-angle-right\"></i>\n                        </a>\n                    </div>\n                    <p *ngIf=\"lb.dataSource.fallbackText\"\n                       class=\"aw-entity__content-section-empty\">\n                        {{ lb.dataSource.fallbackText }}\n                    </p>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async\">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                 *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews && lb.dataSource.myResponse.relatedItems\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <a *ngIf=\"lb.dataSource.selectedTab === 'overview' \"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/oggetti-collegati/']\"\n                       [queryParams]=\"{ page: 1 }\"\n                       class=\"n7-btn n7-btn-light\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <div class=\"aw-entity__content-item-previews\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <div class=\"aw-entity__content-item-preview-wrapper\">\n                            <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                            </n7-smart-breadcrumbs>\n                            <n7-item-preview [data]=\"preview\"\n                                             [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                            <!-- relation -->\n                            <div class=\"aw-entity__relation\"\n                                 *ngIf=\"preview.relation.value\">\n                                <p class=\"aw-entity__relation-description\">Relazione con\n                                    <span class=\"aw-entity__relation-key\">{{preview.relation.key}}</span>:\n                                    <span class=\"aw-entity__relation-value\"> {{preview.relation.value}}</span>\n                                </p>\n                            </div>\n                        </div>\n                    </ng-container>\n                </div>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.selectedTab === 'oggetti-collegati'\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview aw-related-entities__{{lb.dataSource.selectedTab}}\"\n                 *ngIf=\"lb.dataSource.myResponse.relatedEntities\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <a *ngIf=\"lb.dataSource.selectedTab == 'overview'\"\n                       class=\"n7-btn n7-btn-light\"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/entita-collegate']\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n\n                <!-- ENTITA COLLEGATE -->\n                <section id=\"related-item-container\"\n                         class=\"aw-entity__section aw-entity__related\">\n                    <div class=\"aw-entity__inner-title\">\n                        {{lb.dataSource.relatedEntitiesHeader}}\n                    </div>\n                    <div class=\"aw-entity__related-items n7-grid-2\">\n                        <ng-container\n                                      *ngFor=\"let preview of (lb.widgets['aw-related-entities'].ds.out$ | async)?.previews\">\n                            <n7-item-preview [data]=\"preview\"\n                                             [emit]=\"lb.widgets['aw-related-entities'].emit\">\n                            </n7-item-preview>\n                        </ng-container>\n                    </div>\n                </section>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                 *ngIf=\"lb.dataSource.myResponse.extraTab\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n                 *ngIf=\"lb.dataSource.myResponse.wikiTab\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{ lb.dataSource.myResponse.wikiTab.url }}\n                </a>\n            </div>\n        </section>\n    </div>\n</div>\n"
     }),
     __metadata("design:paramtypes", [Router,
         ActivatedRoute,
@@ -4245,12 +4308,38 @@ AwEntitaLayoutComponent = __decorate([
         Title])
 ], AwEntitaLayoutComponent);
 
+let AwSearchService = class AwSearchService {
+    constructor() {
+        this._models = {};
+    }
+    add(id, config) {
+        if (this._models[id]) {
+            throw Error(`Search model '${id}' already exists!`);
+        }
+        this._models[id] = new AwSearchModel(id, config);
+    }
+    remove(id) {
+        if (this._models[id]) {
+            delete this._models[id];
+        }
+    }
+    model(id) {
+        return this._models[id] || null;
+    }
+};
+AwSearchService.ɵprov = ɵɵdefineInjectable({ factory: function AwSearchService_Factory() { return new AwSearchService(); }, token: AwSearchService, providedIn: "root" });
+AwSearchService = __decorate([
+    Injectable({
+        providedIn: 'root',
+    })
+], AwSearchService);
+
 var facetsConfig = {
     totalCount: 0,
     facets: [
         {
             id: 'query',
-            type: 'value'
+            type: 'value',
         },
         {
             id: 'query-all',
@@ -4259,25 +4348,29 @@ var facetsConfig = {
             data: [
                 {
                     value: '1',
-                    label: 'Cerca in tutti campi delle schede'
-                }
-            ]
+                    label: 'Cerca in tutti i campi delle schede',
+                },
+            ],
+        },
+        {
+            id: 'query-links',
+            type: 'value',
         },
         {
             id: 'entity-types',
             type: 'value',
             operator: 'OR',
             limit: 10,
-            order: 'count'
+            order: 'count',
         },
         {
             id: 'entity-search',
-            type: 'value'
+            type: 'value',
         },
         {
             id: 'entity-links',
             type: 'value',
-            searchData: ['entity-type']
+            searchData: ['entity-type'],
         },
     ],
     fields: [
@@ -4287,17 +4380,16 @@ var facetsConfig = {
                     type: 'text',
                     facetId: 'query',
                     placeholder: 'Cerca nei titoli delle schede',
-                    // icon: 'n7-icon-search',
                     filterConfig: {
                         delay: 500,
                         minChars: 3,
                         searchIn: [
                             {
                                 key: 'label.ngrams',
-                                operator: 'LIKE'
-                            }
-                        ]
-                    }
+                                operator: 'LIKE',
+                            },
+                        ],
+                    },
                 },
                 {
                     type: 'checkbox',
@@ -4305,18 +4397,31 @@ var facetsConfig = {
                     filterConfig: {
                         searchIn: [
                             {
-                                key: 'label.ngrams^5,text^4,fields.*^3',
-                                operator: '='
-                            }
-                        ]
-                    }
+                                key: 'label.ngrams^5,text^4,fields.*.label^3',
+                                operator: '=',
+                            },
+                        ],
+                    },
                 },
-            ]
+                {
+                    type: 'link',
+                    facetId: 'query-links',
+                    filterConfig: {
+                        isArray: true,
+                        searchIn: [
+                            {
+                                key: 'source.entityType',
+                                operator: '=',
+                            },
+                        ],
+                    },
+                },
+            ],
         },
         {
             header: {
                 label: 'Relazione con',
-                classes: 'related-class'
+                classes: 'related-class',
             },
             inputs: [
                 {
@@ -4329,16 +4434,15 @@ var facetsConfig = {
                         searchIn: [
                             {
                                 key: 'searchData.entity-type',
-                                operator: '='
-                            }
-                        ]
-                    }
+                                operator: '=',
+                            },
+                        ],
+                    },
                 },
                 {
                     type: 'text',
                     facetId: 'entity-search',
                     placeholder: 'Cerca entità',
-                    // icon: 'n7-icon-search',
                     filterConfig: {
                         delay: 500,
                         minChars: 3,
@@ -4347,56 +4451,67 @@ var facetsConfig = {
                         searchIn: [
                             {
                                 key: 'label',
-                                operator: 'LIKE'
-                            }
-                        ]
-                    }
+                                operator: 'LIKE',
+                            },
+                        ],
+                    },
                 },
                 {
                     type: 'link',
                     facetId: 'entity-links',
                     emptyState: {
-                        label: 'La tua ricerca non ha dato risultati, prova a cambiare i filtri'
+                        label: 'La tua ricerca non ha dato risultati, prova a cambiare i filtri',
                     },
                     filterConfig: {
                         isArray: true,
                         limit: 20,
+                        pagination: {
+                            limit: 50,
+                            offset: 0
+                        },
                         searchIn: [
                             {
                                 key: 'relatedEntities.id',
-                                operator: '='
-                            }
-                        ]
-                    }
-                }
-            ]
+                                operator: '=',
+                            },
+                        ],
+                    },
+                },
+            ],
         },
     ],
     results: {
         order: {
-            type: 'score',
-            key: '_score',
-            direction: 'DESC' // ASC | DESC
+            type: 'text',
+            key: 'label_sort',
+            direction: 'ASC' // ASC | DESC
         },
         fields: [
             {
                 id: 'description',
                 highlight: true,
-                limit: 200
-            }
-        ]
+                limit: 200,
+            },
+        ],
     },
-    page: { offset: 0, limit: 12 }
+    page: { offset: 0, limit: 10 },
 };
 
-const SEARCH_MODEL_ID = 'aw-gallery-layout';
-class AwGalleryLayoutDS extends LayoutDataSource {
+class AwSearchLayoutDS extends LayoutDataSource {
     constructor() {
         super(...arguments);
+        this.layoutId = 'aw-search-layout';
+        this.configId = 'search-layout';
+        this.currentNav = 'ricerca';
+        this.headTitle = 'Arianna4View - Ricerca';
+        this.facetsConfig = facetsConfig;
+        this.paginationList = [10, 25, 50];
         this.destroyed$ = new Subject();
         this.resetButtonEnabled = true;
-        this.currentPage = 1; // pagination value (url param)
-        this.pageSize = 12; // linked objects page size
+        /** Pagination value (url parameter) */
+        this.currentPage = 1;
+        /** Linked objects page size */
+        this.pageSize = 10;
         this.sidebarIsSticky = false;
         this.isFirstLoading = true;
         this.resultsLoading = false;
@@ -4407,20 +4522,19 @@ class AwGalleryLayoutDS extends LayoutDataSource {
         /** Current order direction */
         this.orderDirection = 'ASC';
         this.orderByLabel = 'Ordina per';
+        /** Options used to render the HTMLSelect */
         this.orderByOptions = [
             {
                 value: '_score_DESC',
                 label: 'Ordine per pertinenza',
                 type: 'score',
                 selected: false
-            },
-            {
+            }, {
                 value: 'label_sort_ASC',
                 label: 'Ordine alfabetico (A→Z)',
                 type: 'text',
-                selected: true
-            },
-            {
+                selected: true // Mirrors the default sorting method in `search-facets.config.ts`
+            }, {
                 value: 'label_sort_DESC',
                 label: 'Ordine alfabetico (Z→A)',
                 type: 'text',
@@ -4439,12 +4553,12 @@ class AwGalleryLayoutDS extends LayoutDataSource {
                 currentPage: this.currentPage,
                 pageLimit: 5,
                 sizes: {
-                    list: [12, 24, 48],
+                    list: this.paginationList,
                     active: this.pageSize,
                 },
             });
         };
-        this.getSearchModelId = () => SEARCH_MODEL_ID;
+        this.getSearchModelId = () => this.layoutId;
     }
     onInit({ configuration, mainState, options, communication, search, }) {
         this.configuration = configuration;
@@ -4454,28 +4568,27 @@ class AwGalleryLayoutDS extends LayoutDataSource {
         this.options = options;
         this.prettifyLabels = this.configuration.get('labels');
         this.configKeys = this.configuration.get('config-keys');
-        this.fallback = this.configuration.get('gallery-layout').fallback;
-        this.pageTitle = this.configuration.get('gallery-layout').title;
+        this.fallback = this.configuration.get(this.configId).fallback;
+        this.pageTitle = this.configuration.get(this.configId).title;
         // remove first
         // stateless search
-        if (this.search.model(SEARCH_MODEL_ID)) {
-            this.search.remove(SEARCH_MODEL_ID);
+        if (this.search.model(this.layoutId)) {
+            this.search.remove(this.layoutId);
         }
-        this.search.add(SEARCH_MODEL_ID, cloneDeep(facetsConfig));
-        this.searchModel = this.search.model(SEARCH_MODEL_ID);
+        this.search.add(this.layoutId, cloneDeep(this.facetsConfig));
+        this.searchModel = this.search.model(this.layoutId);
         // query params control
-        if (SearchService.queryParams) {
-            this.searchModel.updateFiltersFromQueryParams(SearchService.queryParams);
-            SearchService.queryParams = null;
+        if (AwSearchModel.queryParams) {
+            this.searchModel.updateFiltersFromQueryParams(AwSearchModel.queryParams);
+            AwSearchModel.queryParams = null;
         }
-        // sidebar sticky control
         this._sidebarStickyControl();
-        this.mainState.updateCustom('currentNav', 'galleria');
-        this.mainState.update('headTitle', 'Arianna4View - Galleria');
+        this.mainState.updateCustom('currentNav', this.currentNav);
+        this.mainState.update('headTitle', this.headTitle);
     }
     onDestroy() {
         this.destroyed$.next();
-        SearchService.queryParams = null;
+        AwSearchModel.queryParams = null;
     }
     onSearchResponse() {
         this.resetButtonEnabled = true;
@@ -4486,9 +4599,9 @@ class AwGalleryLayoutDS extends LayoutDataSource {
         }
     }
     /**
-    * Handles changes of the HTMLSelect order control
-    * @param payload _score_DESC, label_sort_ASC, label_sort_DESC
-    */
+     * Handles changes of the HTMLSelect order control
+     * @param payload _score_DESC, label_sort_ASC, label_sort_DESC
+     */
     onOrderByChange(payload) {
         const orderBy = payload.substring(0, payload.lastIndexOf('_'));
         const direction = payload.substring(payload.lastIndexOf('_') + 1);
@@ -4535,17 +4648,11 @@ class AwGalleryLayoutDS extends LayoutDataSource {
         this.searchModel.setPageConfigLimit(payload);
         this.searchModel.setPageConfigOffset((this.currentPage - 1) * this.pageSize);
     }
-    doSearchRequest$() {
-        const requestParams = this.searchModel.getRequestParams();
-        const requestPayload = {
-            searchParameters: Object.assign({ 
-                // FIXME: togliere totalCount
-                totalCount: 100, gallery: true }, requestParams),
-        };
+    getResultsReq$(params) {
         return this.communication.request$('search', {
+            params,
             onError: (error) => console.error(error),
-            params: requestPayload,
-        }).pipe(tap(({ totalCount, results, facets }) => {
+        }).pipe(tap(({ totalCount, results }) => {
             this.totalCount = totalCount;
             let resultsTitleIndex = 0;
             // results title
@@ -4555,15 +4662,10 @@ class AwGalleryLayoutDS extends LayoutDataSource {
             else if (this.totalCount === 1) {
                 resultsTitleIndex = 1;
             }
-            this.resultsTitle = this.configuration.get('gallery-layout').results[resultsTitleIndex];
-            // facets labels
-            this._addFacetsLabels(facets);
-            // facets options
-            this._addFacetsOptions(facets);
-            this.searchModel.updateFacets(facets);
+            this.resultsTitle = this.configuration.get(this.configId).results[resultsTitleIndex];
             this.searchModel.updateTotalCount(totalCount);
             this.one('aw-linked-objects').updateOptions({
-                context: 'gallery',
+                context: 'search',
                 config: this.configuration,
                 page: this.currentPage,
                 pagination: true,
@@ -4576,6 +4678,34 @@ class AwGalleryLayoutDS extends LayoutDataSource {
             this.drawPagination();
             this.one('aw-linked-objects').update({ items: this._normalizeItems(results.items) });
         }));
+    }
+    getFacetsReq$(params) {
+        return this.communication.request$('facets', {
+            params,
+            onError: (error) => console.error(error),
+        }).pipe(tap(({ facets }) => {
+            // entity links pagination control
+            entityLinksHelper.onFacetsResponse(this.searchModel, facets);
+            // facets labels
+            this._addFacetsLabels(facets);
+            // facets options
+            this._addFacetsOptions(facets);
+            this.searchModel.updateFacets(facets);
+        }));
+    }
+    doSearchRequest$() {
+        const requestParams = this.searchModel.getRequestParams();
+        const params = {
+            searchParameters: Object.assign({ totalCount: 0, gallery: !!(this.configId === 'gallery-layout') }, requestParams),
+        };
+        // update offset
+        entityLinksHelper.resetOffset();
+        entityLinksHelper.updateParamsOffset(params.searchParameters);
+        // initial loader
+        entityLinksHelper.addInitialLoader(this);
+        const resultsReq$ = this.getResultsReq$(params);
+        const facetsReq$ = this.getFacetsReq$(params);
+        return forkJoin(resultsReq$, facetsReq$);
     }
     _updateSearchPage(page) {
         if (+page === this.currentPage) {
@@ -4641,16 +4771,175 @@ class AwGalleryLayoutDS extends LayoutDataSource {
         queryParams.limit = this.pageSize;
         return {
             queryParams,
-            href: this.configuration.get('paths').galleryBasePath,
+            href: this.configuration.get('paths').searchBasePath,
         };
     }
 }
 
-class AwGalleryLayoutEH extends EventHandler {
+var facetsConfig$1 = {
+    totalCount: 0,
+    facets: [
+        {
+            id: 'query',
+            type: 'value'
+        },
+        {
+            id: 'query-all',
+            type: 'value',
+            hasStaticData: true,
+            data: [
+                {
+                    value: '1',
+                    label: 'Cerca in tutti i campi delle schede'
+                }
+            ]
+        },
+        {
+            id: 'entity-types',
+            type: 'value',
+            operator: 'OR',
+            limit: 10,
+            order: 'count'
+        },
+        {
+            id: 'entity-search',
+            type: 'value'
+        },
+        {
+            id: 'entity-links',
+            type: 'value',
+            searchData: ['entity-type']
+        },
+    ],
+    fields: [
+        {
+            inputs: [
+                {
+                    type: 'text',
+                    facetId: 'query',
+                    placeholder: 'Cerca nei titoli delle schede',
+                    filterConfig: {
+                        delay: 500,
+                        minChars: 3,
+                        searchIn: [
+                            {
+                                key: 'label.ngrams',
+                                operator: 'LIKE'
+                            }
+                        ]
+                    }
+                },
+                {
+                    type: 'checkbox',
+                    facetId: 'query-all',
+                    filterConfig: {
+                        searchIn: [
+                            {
+                                key: 'label.ngrams^5,text^4,fields.*^3',
+                                operator: '='
+                            }
+                        ]
+                    }
+                },
+            ]
+        },
+        {
+            header: {
+                label: 'Relazione con',
+                classes: 'related-class'
+            },
+            inputs: [
+                {
+                    type: 'checkbox',
+                    facetId: 'entity-types',
+                    filterConfig: {
+                        isArray: true,
+                        context: 'internal',
+                        target: 'entity-links',
+                        searchIn: [
+                            {
+                                key: 'searchData.entity-type',
+                                operator: '='
+                            }
+                        ]
+                    }
+                },
+                {
+                    type: 'text',
+                    facetId: 'entity-search',
+                    filterConfig: {
+                        delay: 500,
+                        minChars: 3,
+                        context: 'internal',
+                        target: 'entity-links',
+                        searchIn: [
+                            {
+                                key: 'label',
+                                operator: 'LIKE'
+                            }
+                        ]
+                    }
+                },
+                {
+                    type: 'link',
+                    facetId: 'entity-links',
+                    emptyState: {
+                        label: 'La tua ricerca non ha dato risultati, prova a cambiare i filtri'
+                    },
+                    filterConfig: {
+                        isArray: true,
+                        limit: 20,
+                        pagination: {
+                            limit: 50,
+                            offset: 0
+                        },
+                        searchIn: [
+                            {
+                                key: 'relatedEntities.id',
+                                operator: '='
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+    ],
+    results: {
+        order: {
+            type: 'score',
+            key: '_score',
+            direction: 'DESC' // ASC | DESC
+        },
+        fields: [
+            {
+                id: 'description',
+                highlight: true,
+                limit: 200
+            }
+        ]
+    },
+    page: { offset: 0, limit: 12 }
+};
+
+class AwGalleryLayoutDS extends AwSearchLayoutDS {
     constructor() {
         super(...arguments);
+        this.layoutId = 'aw-gallery-layout';
+        this.configId = 'gallery-layout';
+        this.currentNav = 'galleria';
+        this.headTitle = 'Arianna4View - Galleria';
+        this.facetsConfig = facetsConfig$1;
+        this.paginationList = [12, 24, 48];
+        this.pageSize = 12; // linked objects page size
+    }
+}
+
+class AwSearchLayoutEH extends EventHandler {
+    constructor() {
+        super(...arguments);
+        this.layoutId = 'aw-search-layout';
         this.destroyed$ = new Subject();
-        /** Emits when any of the gallery-facets are changed */
+        /** Emits when any of the search-facets are changed */
         this.facetsChange$ = new Subject();
         /** Emits when the pagination element
          * or the select-sort element are changed */
@@ -4663,14 +4952,14 @@ class AwGalleryLayoutEH extends EventHandler {
     listen() {
         this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
-                case 'aw-gallery-layout.init':
+                case `${this.layoutId}.init`:
                     {
                         this.route = payload.route;
-                        this.configuration = payload.configuration;
                         this.dataSource.onInit(payload);
                         this._listenToFacetsChange();
                         this._listenToAdditionalParamsChange();
                         this._listenToRouterChanges();
+                        this._listenToInternalFilters();
                         const { value: textInput } = this.dataSource.searchModel.getFiltersByFacetId('query')[0];
                         if ((textInput || '').length > 0) {
                             this.dataSource.isSearchingText.next(true);
@@ -4681,16 +4970,16 @@ class AwGalleryLayoutEH extends EventHandler {
                         }
                     }
                     break;
-                case 'aw-gallery-layout.destroy':
+                case `${this.layoutId}.destroy`:
                     this.dataSource.onDestroy();
                     this.destroyed$.next();
                     break;
-                case 'aw-gallery-layout.orderbychange':
+                case `${this.layoutId}.orderbychange`:
                     // handle the change of result-order
                     this.dataSource.onOrderByChange(payload);
                     this.additionalParamsChange$.next(); // emit from observable stream
                     break;
-                case 'aw-gallery-layout.searchreset':
+                case `${this.layoutId}.searchreset`:
                     this.dataSource.resetButtonEnabled = false;
                     this.dataSource.searchModel.clear();
                     this.additionalParamsChange$.next();
@@ -4741,7 +5030,6 @@ class AwGalleryLayoutEH extends EventHandler {
             this.dataSource.resultsLoading = true;
             if (this.textHasChanged) {
                 this.additionalParamsChange$.next();
-                this.textHasChanged = false; // reset
             }
             else {
                 this.dataSource.doSearchRequest$().subscribe(() => {
@@ -4750,6 +5038,15 @@ class AwGalleryLayoutEH extends EventHandler {
                     this.emitGlobal('searchresponse', this.dataSource.getSearchModelId());
                 });
             }
+        });
+    }
+    /**
+     * Handles entity links pagination
+     */
+    _listenToInternalFilters() {
+        entityLinksHelper.listenToChanges(this.dataSource)
+            .subscribe(() => {
+            this.emitGlobal('searchresponse', this.dataSource.getSearchModelId());
         });
     }
     /**
@@ -4770,12 +5067,14 @@ class AwGalleryLayoutEH extends EventHandler {
             if (this.textHasChanged) {
                 queryParams.orderby = '_score';
                 queryParams.orderdirection = 'DESC';
+                this.textHasChanged = false;
             }
             this.emitGlobal('navigate', {
                 handler: 'router',
                 path: [],
                 queryParams,
             });
+            this.facetsChange$.next();
         });
     }
     /** URL changes */
@@ -4797,6 +5096,13 @@ class AwGalleryLayoutEH extends EventHandler {
     }
 }
 
+class AwGalleryLayoutEH extends AwSearchLayoutEH {
+    constructor() {
+        super(...arguments);
+        this.layoutId = 'aw-gallery-layout';
+    }
+}
+
 const AwGalleryLayoutConfig = {
     layoutId: 'aw-gallery-layout',
     /**
@@ -4804,7 +5110,7 @@ const AwGalleryLayoutConfig = {
      * in this layout
      */
     widgets: [
-        { id: 'facets-wrapper', dataSource: FacetsWrapperDS, eventHandler: FacetsWrapperEH },
+        { id: 'facets-wrapper', dataSource: AwFacetsWrapperDS, eventHandler: AwFacetsWrapperEH },
         { id: 'aw-linked-objects' },
         { id: 'aw-search-layout-tabs', hasStaticData: true },
         {
@@ -4823,11 +5129,9 @@ const AwGalleryLayoutConfig = {
 };
 
 let AwGalleryLayoutComponent = class AwGalleryLayoutComponent extends AbstractLayout {
-    constructor(router, configuration, titleService, layoutsConfiguration, mainState, communication, search, route) {
-        super(AwGalleryLayoutConfig);
-        this.router = router;
+    constructor(configuration, layoutsConfiguration, mainState, communication, search, route) {
+        super(layoutsConfiguration.get('AwGalleryLayoutConfig') || AwGalleryLayoutConfig);
         this.configuration = configuration;
-        this.titleService = titleService;
         this.layoutsConfiguration = layoutsConfiguration;
         this.mainState = mainState;
         this.communication = communication;
@@ -4838,12 +5142,10 @@ let AwGalleryLayoutComponent = class AwGalleryLayoutComponent extends AbstractLa
         return {
             configuration: this.configuration,
             mainState: this.mainState,
-            router: this.router,
-            route: this.route,
-            titleService: this.titleService,
             communication: this.communication,
-            options: this.config.options || {},
             search: this.search,
+            route: this.route,
+            options: this.config.options || {},
         };
     }
     ngOnInit() {
@@ -4854,27 +5156,23 @@ let AwGalleryLayoutComponent = class AwGalleryLayoutComponent extends AbstractLa
     }
 };
 AwGalleryLayoutComponent.ctorParameters = () => [
-    { type: Router },
     { type: ConfigurationService },
-    { type: Title },
     { type: LayoutsConfigurationService },
     { type: MainStateService },
     { type: CommunicationService },
-    { type: SearchService },
+    { type: AwSearchService },
     { type: ActivatedRoute }
 ];
 AwGalleryLayoutComponent = __decorate([
     Component({
         selector: 'aw-gallery-layout',
-        template: "<div class=\"aw-search aw-gallery n7-side-auto-padding\"\n     id=\"gallery-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                                   [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\"\n                        class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                           for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                            id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\"\n                                [value]=\"option.value\"\n                                [selected]=\"option.selected\"\n                                [hidden]=\"option.type === 'score' && lb.dataSource.isSearchingText.value === false\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\"\n                                        [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper\">\n                <div class=\"n7-grid-3\">\n                    <div *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\"\n                                         [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\"\n                                class=\"n7-btn aw-search__fallback-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>\n"
+        template: "<div class=\"aw-search aw-gallery n7-side-auto-padding\"\n     id=\"gallery-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <aw-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                                   [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </aw-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\"\n                        class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                           for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                            id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\"\n                                [value]=\"option.value\"\n                                [selected]=\"option.selected\"\n                                [hidden]=\"option.type === 'score' && lb.dataSource.isSearchingText.value === false\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\"\n                                        [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper\">\n                <div class=\"n7-grid-3\">\n                    <div *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\"\n                                         [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\"\n                                class=\"n7-btn aw-search__fallback-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>\n"
     }),
-    __metadata("design:paramtypes", [Router,
-        ConfigurationService,
-        Title,
+    __metadata("design:paramtypes", [ConfigurationService,
         LayoutsConfigurationService,
         MainStateService,
         CommunicationService,
-        SearchService,
+        AwSearchService,
         ActivatedRoute])
 ], AwGalleryLayoutComponent);
 
@@ -5686,6 +5984,8 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         this.treeMaxHeight = '100%';
         this.contentIsLoading = false;
         this.currentId = null;
+        /** Switch loaded-content and loaded-empty states */
+        this.hasContent = true;
         this.getTree = () => AwSchedaLayoutDS.tree;
     }
     onInit({ configuration, mainState, router, options, titleService, communication, }) {
@@ -5696,21 +5996,15 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         this.communication = communication;
         this.options = options;
         this.sidebarCollapsed = false;
-        this.bubbleChartSectionTitle = this.configuration.get('scheda-layout')['bubble-chart'].title;
+        this.relatedEntitiesHeader = this.configuration.get('scheda-layout')['related-entities'].title;
         this.similarItemsSectionTitle = this.configuration.get('scheda-layout')['related-items'].title;
         this.metadataSectionTitle = this.getMetadataSectionTitle();
         this.hasSimilarItems = false;
-        this.bubblesEnabled = this.configuration.get('features-enabled') ? this.configuration.get('features-enabled').bubblechart : false;
-        this.one('aw-bubble-chart').updateOptions({
-            selectable: false,
-            simple: true,
-            config: this.configuration,
-            limit: this.configuration.get('bubble-chart').bubbleLimit,
-        });
         this.one('aw-chart-tippy').updateOptions({
             basePath: this.configuration.get('paths').entitaBasePath,
         });
         this.emptyLabel = this.configuration.get('scheda-layout')['empty-label'];
+        this.emptyStateString = this.configuration.get('scheda-layout')['empty-html'];
         this.one('aw-tree').updateOptions({ config: this.configuration.get('config-keys') });
         this.mainState.update('headTitle', 'Arianna4View - Patrimonio');
         this.mainState.update('pageTitle', 'Arianna4View - Patrimonio');
@@ -5753,8 +6047,11 @@ class AwSchedaLayoutDS extends LayoutDataSource {
             this.hasMetadata = Array.isArray(response.fields) && response.fields.length;
             this.hasSimilarItems = Array.isArray(response.relatedItems) && response.relatedItems.length;
             this.hasBreadcrumb = Array.isArray(response.breadcrumbs) && response.breadcrumbs.length;
-            this.hasBubbles = Array.isArray(response.relatedEntities) && response.relatedEntities.length;
+            this.hasRelatedEntities = Array.isArray(response.relatedEntities)
+                && response.relatedEntities.length;
             this.hasImage = !!response.image;
+            this.hasContent = !!(this.hasMetadata || this.hasSimilarItems
+                || this.hasRelatedEntities || this.hasImage);
             this.contentParts = [];
             const content = { content: null };
             if (response.text) {
@@ -5809,6 +6106,10 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         if (response.relatedItems) {
             this.one('aw-linked-objects').updateOptions({ context: 'scheda', config: this.configuration });
             this.one('aw-linked-objects').update(response);
+        }
+        if (response.relatedEntities) {
+            this.one('aw-related-entities').updateOptions({ context: 'scheda', config: this.configuration, list: 'relatedEntities' });
+            this.one('aw-related-entities').update(response.relatedEntities);
         }
         // control sticky
         setTimeout(() => {
@@ -5893,27 +6194,10 @@ class AwSchedaLayoutEH extends EventHandler {
                     break;
             }
         });
-        this.outerEvents$.subscribe(({ type, payload }) => {
+        this.outerEvents$.subscribe(({ type }) => {
             switch (type) {
-                case 'aw-bubble-chart.d3end': // bounce the event, from bubble-chart to chart-tippy
-                    this.emitOuter('d3end', payload);
-                    break;
                 case 'aw-sidebar-header.click':
                     this.dataSource.collapseSidebar();
-                    break;
-                case 'aw-bubble-chart.bubble-tooltip-goto-click':
-                    {
-                        const { id, label } = payload;
-                        this.emitGlobal('navigate', {
-                            handler: 'router',
-                            path: [
-                                this.configuration.get('paths').entitaBasePath,
-                                id,
-                                helpers.slugify(label),
-                                'overview',
-                            ],
-                        });
-                    }
                     break;
                 default:
                     break;
@@ -5931,19 +6215,8 @@ class AwSchedaLayoutEH extends EventHandler {
                 this.dataSource.contentIsLoading = true;
                 this.dataSource.loadItem(paramId).subscribe((response) => {
                     this.dataSource.contentIsLoading = false;
-                    if (response) {
+                    if (response)
                         this.dataSource.loadContent(response);
-                        if (Array.isArray(response.relatedEntities) && response.relatedEntities.length) {
-                            if (this.dataSource.bubblesEnabled) {
-                                response.relatedEntities.forEach((el) => {
-                                    el.entity.relationName = response.label.length > 30
-                                        ? `${response.label.substr(0, 30)}... `
-                                        : response.label;
-                                });
-                                this.emitOuter('filterbubbleresponse', response.relatedEntities);
-                            }
-                        }
-                    }
                 });
             }
         });
@@ -5977,7 +6250,7 @@ const AwPatrimonioLayoutConfig = {
         { id: 'aw-scheda-metadata' },
         { id: 'aw-scheda-image' },
         { id: 'aw-scheda-inner-title' },
-        { id: 'aw-bubble-chart' },
+        { id: 'aw-related-entities' },
         { id: 'aw-chart-tippy' },
         { id: 'aw-linked-objects' },
     ],
@@ -6036,7 +6309,7 @@ AwSchedaLayoutComponent.ctorParameters = () => [
 AwSchedaLayoutComponent = __decorate([
     Component({
         selector: 'aw-scheda-layout',
-        template: "<div class=\"aw-scheda\"\n     id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n        <!-- Left sidebar: tree -->\n        <div class=\"aw-scheda__tree sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                               [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n            <div class=\"aw-scheda__tree-content-loading\"\n                 *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                        [data]=\"{\n                    blocks: [{\n                        classes: 'tree-placeholder-item'\n                    }]\n                }\"></n7-content-placeholder>\n            </div>\n            <div class=\"aw-scheda__tree-content\"\n                 (click)=\"lb.eventHandler.emitOuter('treeposition', $event)\"\n                 [ngStyle]=\"{\n                    'max-height': lb.dataSource.treeMaxHeight,\n                    'overflow': 'auto'\n                }\">\n                <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                         [emit]=\"lb.widgets['aw-tree'].emit\"\n                         *ngIf=\"!lb.dataSource.sidebarCollapsed\">\n                </n7-tree>\n            </div>\n        </div>\n\n        <!-- Scheda details -->\n        <div class=\"aw-scheda__scheda-wrapper-loading\"\n             [hidden]=\"!lb.dataSource.contentIsLoading\">\n            <!--\n                <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'content-placeholder-title'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }, {\n                    classes: 'content-placeholder-item-preview'\n                }]\n            }\"></n7-content-placeholder>\n            -->\n        </div>\n        <div class=\"aw-scheda__scheda-wrapper\"\n             [hidden]=\"lb.dataSource.contentIsLoading\">\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                                  [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                                  [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\"\n                 class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n\n            <div *ngIf=\"!lb.dataSource.currentId\"\n                 class=\"aw-scheda__intro-text\"\n                 [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <section class=\"aw-scheda__section aw-scheda__image-viewer\"\n                     [hidden]=\"!lb.dataSource.hasImage\">\n                <n7-image-viewer [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n                </n7-image-viewer>\n            </section>\n\n            <section class=\"aw-scheda__section aw-scheda__description\"\n                     *ngIf=\"lb.dataSource.contentParts.content\">\n                <div *ngFor=\"let part of lb.dataSource.contentParts\">\n                    <div [innerHTML]=\"part.content\"></div>\n                </div>\n            </section>\n\n            <section class=\"aw-scheda__section aw-scheda__metadata\"\n            *ngIf=\"lb.dataSource.hasMetadata\">\n                <div class=\"aw-scheda__inner-title\"\n                *ngIf=\"lb.dataSource.metadataSectionTitle\"> \n                    {{lb.dataSource.metadataSectionTitle}}\n                </div>\n                <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n                </n7-metadata-viewer>\n            </section>\n\n            <section class=\"aw-scheda__section aw-scheda__bubble-chart\"\n                     *ngIf=\"lb.dataSource.bubblesEnabled && lb.dataSource.hasBubbles\">\n                <div *ngIf=\"lb.dataSource.hasBubbles\"\n                     class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.bubbleChartSectionTitle}}\n                </div>\n                <aw-bubble-chart-wrapper>\n                    <aw-chart-tippy [data]=\"lb.widgets['aw-chart-tippy'].ds.out$ | async\"\n                                    [emit]=\"lb.widgets['aw-chart-tippy'].emit\">\n                    </aw-chart-tippy>\n                    <n7-bubble-chart [data]=\"lb.widgets['aw-bubble-chart'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['aw-bubble-chart'].emit\">\n                    </n7-bubble-chart>\n                </aw-bubble-chart-wrapper>\n            </section>\n\n            <section *ngIf=\"lb.dataSource.hasSimilarItems && lb.dataSource.hasBubbles\"\n                     id=\"related-item-container\"\n                     class=\"aw-scheda__section aw-scheda__related\">\n                <div class=\"aw-scheda__inner-title\">\n                    {{lb.dataSource.similarItemsSectionTitle}}\n                </div>\n                <div class=\"aw-scheda__related-items n7-grid-2\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-item-preview [data]=\"preview\"\n                                         [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </ng-container>\n                </div>\n            </section>\n        </div>\n    </div>\n</div>\n"
+        template: "<div class=\"aw-scheda\"\n     id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n\n        <ng-container *ngTemplateOutlet=\"tree\"></ng-container>\n\n        <div class=\"aw-scheda__scheda-wrapper\"\n             [hidden]=\"lb.dataSource.contentIsLoading\">\n\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                                  [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                                  [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\"\n                 class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n\n            <div *ngIf=\"!lb.dataSource.currentId\"\n                 class=\"aw-scheda__intro-text\"\n                 [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <!-- Empty state -->\n            <ng-container *ngIf=\"!lb.dataSource.hasContent\">\n                <ng-container *ngTemplateOutlet=\"empty\"></ng-container>\n            </ng-container>\n\n            <!-- Content sections -->\n            <ng-container *ngIf=\"lb.dataSource.hasContent\">\n                <ng-container *ngTemplateOutlet=\"content\"></ng-container>\n            </ng-container>\n\n        </div>\n\n    </div>\n</div>\n\n<ng-template #tree>\n    <div class=\"aw-scheda__tree sticky-target\"\n         [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n        <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                           [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n        <div class=\"aw-scheda__tree-content-loading\"\n             *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                    [data]=\"{\n                            blocks: [{\n                                classes: 'tree-placeholder-item'\n                            }]\n                        }\"></n7-content-placeholder>\n        </div>\n        <div class=\"aw-scheda__tree-content\"\n             (click)=\"lb.eventHandler.emitOuter('treeposition', $event)\"\n             [ngStyle]=\"{\n                            'max-height': lb.dataSource.treeMaxHeight,\n                            'overflow': 'auto'\n                        }\">\n            <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                     [emit]=\"lb.widgets['aw-tree'].emit\"\n                     *ngIf=\"!lb.dataSource.sidebarCollapsed\">\n            </n7-tree>\n        </div>\n    </div>\n</ng-template>\n\n<ng-template #empty>\n    <section class=\"aw-scheda__section aw-scheda__empty\"\n             [innerHTML]=\"lb.dataSource.emptyStateString\">\n    </section>\n</ng-template>\n\n<ng-template #content>\n    <section class=\"aw-scheda__section aw-scheda__image-viewer\"\n             [ngClass]=\"{ 'navigation-hidden': !lb.widgets['aw-scheda-image'].ds.hasNavigation }\"\n             [hidden]=\"!lb.dataSource.hasImage\">\n        <n7-image-viewer [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n        </n7-image-viewer>\n    </section>\n\n    <section class=\"aw-scheda__section aw-scheda__description\"\n             *ngIf=\"lb.dataSource.contentParts.content\">\n        <div *ngFor=\"let part of lb.dataSource.contentParts\">\n            <div [innerHTML]=\"part.content\"></div>\n        </div>\n    </section>\n\n    <section class=\"aw-scheda__section aw-scheda__metadata\"\n             *ngIf=\"lb.dataSource.hasMetadata\">\n        <div class=\"aw-scheda__inner-title\"\n             *ngIf=\"lb.dataSource.metadataSectionTitle\">\n            {{lb.dataSource.metadataSectionTitle}}\n        </div>\n        <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n        </n7-metadata-viewer>\n    </section>\n\n    <!-- ENTITA COLLEGATE -->\n    <section *ngIf=\"lb.dataSource.hasRelatedEntities\"\n             id=\"related-item-container\"\n             class=\"aw-scheda__section aw-scheda__related\">\n        <div class=\"aw-scheda__inner-title\">\n            {{lb.dataSource.relatedEntitiesHeader}}\n        </div>\n        <div class=\"aw-scheda__related-items n7-grid-2\">\n            <ng-container *ngFor=\"let preview of (lb.widgets['aw-related-entities'].ds.out$ | async)?.previews\">\n                <n7-item-preview [data]=\"preview\"\n                                 [emit]=\"lb.widgets['aw-related-entities'].emit\">\n                </n7-item-preview>\n            </ng-container>\n        </div>\n    </section>\n\n    <!-- OGGETTI CULTURALI SIMILI -->\n    <section *ngIf=\"lb.dataSource.hasSimilarItems\"\n             id=\"related-item-container\"\n             class=\"aw-scheda__section aw-scheda__related\">\n        <div class=\"aw-scheda__inner-title\">\n            {{lb.dataSource.similarItemsSectionTitle}}\n        </div>\n        <div class=\"aw-scheda__related-items n7-grid-2\">\n            <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                <n7-item-preview [data]=\"preview\"\n                                 [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                </n7-item-preview>\n            </ng-container>\n        </div>\n    </section>\n</ng-template>\n"
     }),
     __metadata("design:paramtypes", [Router,
         ActivatedRoute,
@@ -6047,575 +6320,6 @@ AwSchedaLayoutComponent = __decorate([
         CommunicationService])
 ], AwSchedaLayoutComponent);
 
-var facetsConfig$1 = {
-    totalCount: 0,
-    facets: [
-        {
-            id: 'query',
-            type: 'value',
-        },
-        {
-            id: 'query-all',
-            type: 'value',
-            hasStaticData: true,
-            data: [
-                {
-                    value: '1',
-                    label: 'Cerca in tutti campi delle schede',
-                },
-            ],
-        },
-        {
-            id: 'query-links',
-            type: 'value',
-        },
-        {
-            id: 'entity-types',
-            type: 'value',
-            operator: 'OR',
-            limit: 10,
-            order: 'count',
-        },
-        {
-            id: 'entity-search',
-            type: 'value',
-        },
-        {
-            id: 'entity-links',
-            type: 'value',
-            searchData: ['entity-type'],
-        },
-    ],
-    fields: [
-        {
-            inputs: [
-                {
-                    type: 'text',
-                    facetId: 'query',
-                    placeholder: 'Cerca nei titoli delle schede',
-                    // icon: 'n7-icon-search',
-                    filterConfig: {
-                        delay: 500,
-                        minChars: 3,
-                        searchIn: [
-                            {
-                                key: 'label.ngrams',
-                                operator: 'LIKE',
-                            },
-                        ],
-                    },
-                },
-                {
-                    type: 'checkbox',
-                    facetId: 'query-all',
-                    filterConfig: {
-                        searchIn: [
-                            {
-                                key: 'label.ngrams^5,text^4,fields.*^3',
-                                operator: '=',
-                            },
-                        ],
-                    },
-                },
-                {
-                    type: 'link',
-                    facetId: 'query-links',
-                    filterConfig: {
-                        isArray: true,
-                        searchIn: [
-                            {
-                                key: 'source.entityType',
-                                operator: '=',
-                            },
-                        ],
-                    },
-                },
-            ],
-        },
-        {
-            header: {
-                label: 'Relazione con',
-                classes: 'related-class',
-            },
-            inputs: [
-                {
-                    type: 'checkbox',
-                    facetId: 'entity-types',
-                    filterConfig: {
-                        isArray: true,
-                        context: 'internal',
-                        target: 'entity-links',
-                        searchIn: [
-                            {
-                                key: 'searchData.entity-type',
-                                operator: '=',
-                            },
-                        ],
-                    },
-                },
-                {
-                    type: 'text',
-                    facetId: 'entity-search',
-                    placeholder: 'Cerca entità',
-                    // icon: 'n7-icon-search',
-                    filterConfig: {
-                        delay: 500,
-                        minChars: 3,
-                        context: 'internal',
-                        target: 'entity-links',
-                        searchIn: [
-                            {
-                                key: 'label',
-                                operator: 'LIKE',
-                            },
-                        ],
-                    },
-                },
-                {
-                    type: 'link',
-                    facetId: 'entity-links',
-                    emptyState: {
-                        label: 'La tua ricerca non ha dato risultati, prova a cambiare i filtri',
-                    },
-                    filterConfig: {
-                        isArray: true,
-                        limit: 20,
-                        searchIn: [
-                            {
-                                key: 'relatedEntities.id',
-                                operator: '=',
-                            },
-                        ],
-                    },
-                },
-            ],
-        },
-    ],
-    results: {
-        order: {
-            type: 'text',
-            key: 'label_sort',
-            direction: 'ASC' // ASC | DESC
-        },
-        fields: [
-            {
-                id: 'description',
-                highlight: true,
-                limit: 200,
-            },
-        ],
-    },
-    page: { offset: 0, limit: 10 },
-};
-
-const SEARCH_MODEL_ID$1 = 'aw-search-layout';
-class AwSearchLayoutDS extends LayoutDataSource {
-    constructor() {
-        super(...arguments);
-        this.destroyed$ = new Subject();
-        this.resetButtonEnabled = true;
-        /** Pagination value (url parameter) */
-        this.currentPage = 1;
-        /** Linked objects page size */
-        this.pageSize = 10;
-        this.sidebarIsSticky = false;
-        this.isFirstLoading = true;
-        this.resultsLoading = false;
-        /** True when the user has input a text string */
-        this.isSearchingText = new BehaviorSubject(false);
-        /** Current order method */
-        this.orderBy = 'label_sort';
-        /** Current order direction */
-        this.orderDirection = 'ASC';
-        this.orderByLabel = 'Ordina per';
-        /** Options used to render the HTMLSelect */
-        this.orderByOptions = [
-            {
-                value: '_score_DESC',
-                label: 'Ordine per pertinenza',
-                type: 'score',
-                selected: false
-            }, {
-                value: 'label_sort_ASC',
-                label: 'Ordine alfabetico (A→Z)',
-                type: 'text',
-                selected: true // Mirrors the default sorting method in `search-facets.config.ts`
-            }, {
-                value: 'label_sort_DESC',
-                label: 'Ordine alfabetico (Z→A)',
-                type: 'text',
-                selected: false
-            }
-        ];
-        this.drawPagination = () => {
-            const { href, queryParams } = this._getPaginationParams();
-            this.one('n7-smart-pagination').updateOptions({
-                mode: 'href',
-                href,
-                queryParams,
-            });
-            this.one('n7-smart-pagination').update({
-                totalPages: Math.ceil(this.totalCount / this.pageSize),
-                currentPage: this.currentPage,
-                pageLimit: 5,
-                sizes: {
-                    list: [10, 25, 50],
-                    active: this.pageSize,
-                },
-            });
-        };
-        this.getSearchModelId = () => SEARCH_MODEL_ID$1;
-    }
-    onInit({ configuration, mainState, options, communication, search, }) {
-        this.configuration = configuration;
-        this.mainState = mainState;
-        this.communication = communication;
-        this.search = search;
-        this.options = options;
-        this.prettifyLabels = this.configuration.get('labels');
-        this.configKeys = this.configuration.get('config-keys');
-        this.fallback = this.configuration.get('search-layout').fallback;
-        this.pageTitle = this.configuration.get('search-layout').title;
-        // remove first
-        // stateless search
-        if (this.search.model(SEARCH_MODEL_ID$1)) {
-            this.search.remove(SEARCH_MODEL_ID$1);
-        }
-        this.search.add(SEARCH_MODEL_ID$1, cloneDeep(facetsConfig$1));
-        this.searchModel = this.search.model(SEARCH_MODEL_ID$1);
-        // query params control
-        if (SearchService.queryParams) {
-            this.searchModel.updateFiltersFromQueryParams(SearchService.queryParams);
-            SearchService.queryParams = null;
-        }
-        this._sidebarStickyControl();
-        this.mainState.updateCustom('currentNav', 'ricerca');
-        this.mainState.update('headTitle', 'Arianna4View - Ricerca');
-    }
-    onDestroy() {
-        this.destroyed$.next();
-        SearchService.queryParams = null;
-    }
-    onSearchResponse() {
-        this.resetButtonEnabled = true;
-        if (this.isFirstLoading) {
-            this.isFirstLoading = false;
-            this.one('facets-wrapper').update({ searchModel: this.searchModel });
-            this.searchModel.updateInputsFromFilters();
-        }
-    }
-    /**
-     * Handles changes of the HTMLSelect order control
-     * @param payload _score_DESC, label_sort_ASC, label_sort_DESC
-     */
-    onOrderByChange(payload) {
-        const orderBy = payload.substring(0, payload.lastIndexOf('_'));
-        const direction = payload.substring(payload.lastIndexOf('_') + 1);
-        let type = '';
-        // set selected
-        this.orderByOptions.forEach((option) => {
-            if (option.value === payload) {
-                option.selected = true;
-                type = option.type;
-            }
-            else {
-                option.selected = false;
-            }
-        });
-        this.orderBy = orderBy;
-        this.orderDirection = direction;
-        this.searchModel.setSearchConfigOrderBy(orderBy);
-        this.searchModel.setSearchConfigDirection(direction);
-        this.searchModel.setSearchConfigType(type);
-    }
-    onPageSizeChange(size) {
-        this.pageSize = size;
-        return this._updateSearchPage(this.currentPage);
-    }
-    onPaginationChange(payload) {
-        const page = payload.replace('page-', '');
-        return this._updateSearchPage(page);
-    }
-    onPaginationGoToChange(payload) {
-        const page = payload.replace('goto-', '');
-        return this._updateSearchPage(page);
-    }
-    resetPagination() {
-        this._updateSearchPage(1);
-    }
-    onResultsLimitChange(payload) {
-        this.setLimit(payload);
-        // reset page & offset
-        this.currentPage = 1;
-        this.searchModel.setPageConfigOffset(0);
-    }
-    setLimit(payload) {
-        this.pageSize = payload;
-        this.searchModel.setPageConfigLimit(payload);
-        this.searchModel.setPageConfigOffset((this.currentPage - 1) * this.pageSize);
-    }
-    doSearchRequest$() {
-        const requestParams = this.searchModel.getRequestParams();
-        const requestPayload = {
-            searchParameters: Object.assign({ 
-                // FIXME: togliere totalCount
-                totalCount: 100 }, requestParams),
-        };
-        return this.communication.request$('search', {
-            onError: (error) => console.error(error),
-            params: requestPayload,
-        }).pipe(tap(({ totalCount, results, facets }) => {
-            this.totalCount = totalCount;
-            let resultsTitleIndex = 0;
-            // results title
-            if (this.totalCount > 1) {
-                resultsTitleIndex = 2;
-            }
-            else if (this.totalCount === 1) {
-                resultsTitleIndex = 1;
-            }
-            this.resultsTitle = this.configuration.get('search-layout').results[resultsTitleIndex];
-            // facets labels
-            this._addFacetsLabels(facets);
-            // facets options
-            this._addFacetsOptions(facets);
-            this.searchModel.updateFacets(facets);
-            this.searchModel.updateTotalCount(totalCount);
-            this.one('aw-linked-objects').updateOptions({
-                context: 'search',
-                config: this.configuration,
-                page: this.currentPage,
-                pagination: true,
-                paginationParams: this._getPaginationParams(),
-                dynamicPagination: {
-                    total: totalCount,
-                },
-                size: this.pageSize,
-            });
-            this.drawPagination();
-            this.one('aw-linked-objects').update({ items: this._normalizeItems(results.items) });
-        }));
-    }
-    _updateSearchPage(page) {
-        if (+page === this.currentPage) {
-            return of(false);
-        }
-        this.currentPage = +page;
-        const searchConfig = this.searchModel.getConfig();
-        const pageConfig = searchConfig.page;
-        const { limit } = pageConfig;
-        const newOffset = (this.currentPage - 1) * limit;
-        this.searchModel.setPageConfigOffset(newOffset);
-        return of(true);
-    }
-    _addFacetsLabels(facets) {
-        facets
-            .filter((f) => Array.isArray(f.data))
-            .forEach((f) => {
-            f.data.forEach((dataItem) => {
-                const key = dataItem.label;
-                dataItem.label = helpers.prettifySnakeCase(key, this.prettifyLabels[key]);
-            });
-        });
-    }
-    _addFacetsOptions(facets) {
-        facets
-            .filter((f) => f.id === 'query-links')
-            .forEach((f) => {
-            f.data.forEach((dataItem) => {
-                const config = this.configKeys[dataItem.value];
-                if (config) {
-                    dataItem.options = {
-                        icon: config.icon,
-                        classes: `color-${config['class-name']}`,
-                    };
-                }
-            });
-        });
-    }
-    _normalizeItems(items) {
-        return items.map((singleItem) => ({ item: Object.assign({}, singleItem) }));
-    }
-    _sidebarStickyControl() {
-        // no sticky for Internet Explorer
-        if (helpers.browserIsIE()) {
-            return;
-        }
-        const source$ = fromEvent(window, 'scroll');
-        source$.pipe(takeUntil(this.destroyed$)).subscribe(() => {
-            const windowOffsetTop = window.pageYOffset;
-            const stickyParent = document.getElementsByClassName('sticky-parent')[0];
-            const wrapperOffsetTop = stickyParent ? stickyParent.offsetTop : 0;
-            this.sidebarIsSticky = wrapperOffsetTop <= windowOffsetTop;
-        });
-    }
-    _getPaginationParams() {
-        const requestParams = this.searchModel.getRequestParams();
-        const queryParams = this.searchModel.filtersAsQueryParams(requestParams.filters);
-        Object.keys(queryParams).forEach((key) => { queryParams[key] = queryParams[key] || null; });
-        // aditional params
-        queryParams.orderby = this.orderBy;
-        queryParams.orderdirection = this.orderDirection;
-        queryParams.page = this.currentPage;
-        queryParams.limit = this.pageSize;
-        return {
-            queryParams,
-            href: this.configuration.get('paths').searchBasePath,
-        };
-    }
-}
-
-class AwSearchLayoutEH extends EventHandler {
-    constructor() {
-        super(...arguments);
-        this.destroyed$ = new Subject();
-        /** Emits when any of the search-facets are changed */
-        this.facetsChange$ = new Subject();
-        /** Emits when the pagination element
-         * or the select-sort element are changed */
-        this.additionalParamsChange$ = new Subject();
-        /** Last queried text, used to check if the text has changed */
-        this.previousText = '';
-        /** Is true when the search is triggered with a new text-string */
-        this.textHasChanged = false;
-    }
-    listen() {
-        this.innerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case 'aw-search-layout.init':
-                    {
-                        this.route = payload.route;
-                        this.configuration = payload.configuration;
-                        this.dataSource.onInit(payload);
-                        this._listenToFacetsChange();
-                        this._listenToAdditionalParamsChange();
-                        this._listenToRouterChanges();
-                        const { value: textInput } = this.dataSource.searchModel.getFiltersByFacetId('query')[0];
-                        if ((textInput || '').length > 0) {
-                            this.dataSource.isSearchingText.next(true);
-                            setTimeout(() => {
-                                this.dataSource.onOrderByChange('_score_DESC');
-                                this.additionalParamsChange$.next(); // emit from observable stream
-                            }, 100);
-                        }
-                    }
-                    break;
-                case 'aw-search-layout.destroy':
-                    this.dataSource.onDestroy();
-                    this.destroyed$.next();
-                    break;
-                case 'aw-search-layout.orderbychange':
-                    // handle the change of result-order
-                    this.dataSource.onOrderByChange(payload);
-                    this.additionalParamsChange$.next(); // emit from observable stream
-                    break;
-                case 'aw-search-layout.searchreset':
-                    this.dataSource.resetButtonEnabled = false;
-                    this.dataSource.searchModel.clear();
-                    this.additionalParamsChange$.next();
-                    break;
-                default:
-                    console.warn('(search) unhandled inner event of type', type);
-                    break;
-            }
-        });
-        this.outerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case 'facets-wrapper.facetschange':
-                    {
-                        this.dataSource.resetPagination();
-                        const { value: textInput } = this.dataSource.searchModel.getFiltersByFacetId('query')[0];
-                        // Checks if <input type=text>'s value has changed
-                        this.textHasChanged = !!(textInput && (textInput !== this.previousText));
-                        this.previousText = textInput;
-                        const activeOrder = this.dataSource.orderByOptions.filter((d) => d.selected)[0].value;
-                        if (this.textHasChanged && (textInput || '').length > 0) {
-                            // Add sort by score option
-                            this.dataSource.isSearchingText.next(true);
-                        }
-                        else if ((textInput || '').length === 0 && /score/i.test(activeOrder)) {
-                            // Remove sort by score option
-                            this.dataSource.isSearchingText.next(false);
-                            setTimeout(() => {
-                                this.dataSource.onOrderByChange('label_sort_ASC');
-                                this.additionalParamsChange$.next(); // emit from observable stream
-                            }, 100);
-                        }
-                    }
-                    break;
-                case 'n7-smart-pagination.change':
-                    this.dataSource.onResultsLimitChange(payload.value);
-                    this.additionalParamsChange$.next();
-                    break;
-                default:
-                    break;
-            }
-        });
-    }
-    /**
-     * Handles changes to any of the search-facets
-     */
-    _listenToFacetsChange() {
-        this.facetsChange$.pipe(debounceTime(500)).subscribe(() => {
-            this.dataSource.resultsLoading = true;
-            if (this.textHasChanged) {
-                this.additionalParamsChange$.next();
-                this.textHasChanged = false; // reset
-            }
-            else {
-                this.dataSource.doSearchRequest$().subscribe(() => {
-                    this.dataSource.resultsLoading = false;
-                    this.dataSource.onSearchResponse();
-                    this.emitGlobal('searchresponse', this.dataSource.getSearchModelId());
-                });
-            }
-        });
-    }
-    /**
-     * Handles changes happening on pagination and select elements.
-     */
-    _listenToAdditionalParamsChange() {
-        this.additionalParamsChange$.subscribe(() => {
-            const { searchModel } = this.dataSource;
-            const requestParams = searchModel.getRequestParams();
-            const queryParams = searchModel.filtersAsQueryParams(requestParams.filters);
-            Object.keys(queryParams).forEach((key) => { queryParams[key] = queryParams[key] || null; });
-            // aditional params
-            queryParams.orderby = this.dataSource.orderBy;
-            queryParams.orderdirection = this.dataSource.orderDirection;
-            queryParams.page = this.dataSource.currentPage;
-            queryParams.limit = this.dataSource.pageSize;
-            // If the searched text was updated, overwrite the query params and force sorting by "score".
-            if (this.textHasChanged) {
-                queryParams.orderby = '_score';
-                queryParams.orderdirection = 'DESC';
-            }
-            this.emitGlobal('navigate', {
-                handler: 'router',
-                path: [],
-                queryParams,
-            });
-        });
-    }
-    /** URL changes */
-    _listenToRouterChanges() {
-        this.route.queryParams.pipe(takeUntil(this.destroyed$)).subscribe((params) => {
-            this.emitOuter('queryparamschange', params);
-            // aditional params control
-            if (params.orderby && params.orderdirection) {
-                this.dataSource.onOrderByChange(`${params.orderby}_${params.orderdirection}`);
-            }
-            if (params.page) {
-                this.dataSource.onPaginationChange(`page-${params.page}`);
-            }
-            if (params.limit) {
-                this.dataSource.setLimit(+params.limit);
-            }
-            this.facetsChange$.next();
-        });
-    }
-}
-
 const AwSearchLayoutConfig = {
     layoutId: 'aw-search-layout',
     /**
@@ -6623,7 +6327,7 @@ const AwSearchLayoutConfig = {
      * in this layout
      */
     widgets: [
-        { id: 'facets-wrapper', dataSource: FacetsWrapperDS, eventHandler: FacetsWrapperEH },
+        { id: 'facets-wrapper', dataSource: AwFacetsWrapperDS, eventHandler: AwFacetsWrapperEH },
         { id: 'aw-linked-objects' },
         { id: 'aw-search-layout-tabs', hasStaticData: true },
         {
@@ -6678,21 +6382,153 @@ AwSearchLayoutComponent.ctorParameters = () => [
     { type: LayoutsConfigurationService },
     { type: MainStateService },
     { type: CommunicationService },
-    { type: SearchService },
+    { type: AwSearchService },
     { type: ActivatedRoute }
 ];
 AwSearchLayoutComponent = __decorate([
     Component({
         selector: 'aw-search-layout',
-        template: "<div class=\"aw-search n7-side-auto-padding\"\n     id=\"search-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n        <!--\n        <div class=\"aw-search__header-right\">\n            <n7-nav\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\n            </n7-nav>\n        </div>\n        -->\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <n7-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                                   [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </n7-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\"\n                        class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                           for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                            id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\"\n                                [value]=\"option.value\"\n                                [selected]=\"option.selected\"\n                                [hidden]=\"option.type === 'score' && lb.dataSource.isSearchingText.value === false\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\"\n                                        [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper\">\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                    <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                    </n7-smart-breadcrumbs>\n                    <n7-item-preview [data]=\"preview\"\n                                     [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\"\n                                class=\"n7-btn aw-search__fallback-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>\n"
+        template: "<div class=\"aw-search n7-side-auto-padding\"\n     id=\"search-layout\">\n    <div class=\"aw-search__header\">\n        <div class=\"aw-search__header-left\">\n            <h1 class=\"aw-search__header-title\">{{ lb.dataSource.pageTitle }}</h1>\n        </div>\n        <!--\n        <div class=\"aw-search__header-right\">\n            <n7-nav\n                [data]=\"lb.widgets['aw-search-layout-tabs'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-search-layout-tabs'].emit\">\n            </n7-nav>\n        </div>\n        -->\n    </div>\n    <div class=\"aw-search__content-wrapper sticky-parent\">\n        <!-- Left sidebar: facets -->\n        <div *ngIf=\"!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar-loading sticky-target\">\n            <div class=\"aw-search__facets-loading\">\n                <n7-content-placeholder [data]=\"{\n                    blocks: [{\n                        classes: 'search-placeholder-facet-input'\n                    }, {\n                        classes: 'search-placeholder-facet-check'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }, {\n                        classes: 'search-placeholder-facet-item'\n                    }]\n                }\">\n                </n7-content-placeholder>\n            </div>\n        </div>\n        <div *ngIf=\"!!(lb.widgets['facets-wrapper'].ds.out$ | async)\"\n             class=\"aw-search__sidebar sticky-target\"\n             [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n            <div class=\"aw-search__facets\">\n                <aw-facets-wrapper [data]=\"lb.widgets['facets-wrapper'].ds.out$ | async\"\n                                   [emit]=\"lb.widgets['facets-wrapper'].emit\">\n                </aw-facets-wrapper>\n            </div>\n        </div>\n        <div class=\"aw-search__content\">\n            <div class=\"aw-search__results-header\">\n                <div class=\"aw-search__results-header-left\">\n                    <h3 *ngIf=\"!lb.dataSource.resultsLoading\"\n                        class=\"aw-search__total\">\n                        <span class=\"aw-search__total-number\">{{ lb.dataSource.totalCount }}</span>&nbsp;\n                        <span class=\"aw-search__total-title\">{{ lb.dataSource.resultsTitle }}</span>\n                    </h3>\n                </div>\n                <div class=\"aw-search__results-header-right\">\n                    <label class=\"aw-search__results-select-orderby-label\"\n                           for=\"aw-search__results-select-orderby\">{{ lb.dataSource.orderByLabel }}</label>\n                    <select (change)=\"lb.eventHandler.emitInner('orderbychange', $event.target.value)\"\n                            id=\"aw-search__results-select-orderby\">\n                        <option *ngFor=\"let option of lb.dataSource.orderByOptions\"\n                                [value]=\"option.value\"\n                                [selected]=\"option.selected\"\n                                [hidden]=\"option.type === 'score' && lb.dataSource.isSearchingText.value === false\">\n                            {{ option.label }}</option>\n                    </select>\n                </div>\n            </div>\n            <!-- Search details -->\n            <div *ngIf=\"lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper-loading\">\n                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\"\n                                        [data]=\"{\n                    blocks: [\n                        { classes: 'search-result-placeholder-title' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' },\n                        { classes: 'search-result-placeholder-metadata' }\n                    ]\n                }\"></n7-content-placeholder>\n            </div>\n            <div *ngIf=\"!lb.dataSource.resultsLoading\"\n                 class=\"aw-search__results-wrapper\">\n                <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                    <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                    </n7-smart-breadcrumbs>\n                    <n7-item-preview [data]=\"preview\"\n                                     [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </ng-container>\n                <ng-container *ngIf=\"lb.dataSource.totalCount == 0\">\n                    <div class=\"aw-search__fallback\">\n                        <p class=\"aw-search__fallback-string\">\n                            {{ lb.dataSource.fallback }}\n                        </p>\n                        <button [disabled]=\"!lb.dataSource.resetButtonEnabled\"\n                                class=\"n7-btn aw-search__fallback-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset', {})\">\n                            Resetta la ricerca\n                        </button>\n                    </div>\n                </ng-container>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.totalCount > 10\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n    </div>\n</div>\n"
     }),
     __metadata("design:paramtypes", [ConfigurationService,
         LayoutsConfigurationService,
         MainStateService,
         CommunicationService,
-        SearchService,
+        AwSearchService,
         ActivatedRoute])
 ], AwSearchLayoutComponent);
+
+class AwTimelineLayoutDS extends LayoutDataSource {
+    onInit({ configuration, mainState, router, route, location, options, titleService, communication, }) {
+        this.route = route;
+        this.communication = communication;
+        this.configuration = configuration;
+        this.mainState = mainState;
+        this.options = options;
+        this.router = router;
+        this.location = location;
+        this.titleService = titleService;
+        this.mainState.update('headTitle', 'Arianna4View - Timeline');
+        this.one('aw-scheda-inner-title').update({
+            title: {
+                main: {
+                    text: '<strong>68</strong> Oggetti culturali collegati a "V Congresso mondiale di sociologia, Washington D.C. (1962)"'
+                }
+            }
+        });
+        this.one('aw-linked-objects').updateOptions({
+            context: 'map',
+            config: this.configuration,
+            page: 1,
+            // pagination: true,
+            // paginationParams: this._getPaginationParams(),
+            // dynamicPagination: {
+            //   total: totalCount,
+            // },
+            size: 10,
+        });
+        this.one('aw-linked-objects').update(MAP_RESULTS);
+    }
+}
+
+class AwTimelineLayoutEH extends EventHandler {
+    constructor() {
+        super(...arguments);
+        this.destroyed$ = new Subject();
+    }
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'aw-timeline-layout.init':
+                    this.dataSource.onInit(payload);
+                    this.configuration = payload.configuration;
+                    this.route = payload.route;
+                    break;
+                case 'aw-timeline-layout.destroy':
+                    this.destroyed$.next();
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+}
+
+const AwTimelineLayoutConfig = {
+    layoutId: 'aw-timeline-layout',
+    widgets: [
+        { id: 'aw-timeline', hasStaticData: true },
+        { id: 'aw-scheda-inner-title' },
+        { id: 'aw-linked-objects' }
+    ],
+    layoutDS: AwTimelineLayoutDS,
+    layoutEH: AwTimelineLayoutEH,
+    widgetsDataSources: DS$1,
+    widgetsEventHandlers: EH$1,
+    options: {
+    // TODO
+    },
+};
+
+let AwTimelineLayoutComponent = class AwTimelineLayoutComponent extends AbstractLayout {
+    constructor(router, route, location, configuration, layoutsConfiguration, communication, mainState, titleService) {
+        super(layoutsConfiguration.get('AwTimelineLayoutConfig') || AwTimelineLayoutConfig);
+        this.router = router;
+        this.route = route;
+        this.location = location;
+        this.configuration = configuration;
+        this.layoutsConfiguration = layoutsConfiguration;
+        this.communication = communication;
+        this.mainState = mainState;
+        this.titleService = titleService;
+    }
+    /*
+      Optional variables that can be accessed from the layout's logic.
+      If removed, they must also be removed from the layout's DataSource file,
+      and from this file imports.
+     */
+    initPayload() {
+        return {
+            configuration: this.configuration,
+            mainState: this.mainState,
+            router: this.router,
+            route: this.route,
+            titleService: this.titleService,
+            communication: this.communication,
+            options: this.config.options || {},
+        };
+    }
+    ngOnInit() {
+        this.onInit();
+    }
+    ngOnDestroy() {
+        this.onDestroy();
+    }
+};
+AwTimelineLayoutComponent.ctorParameters = () => [
+    { type: Router },
+    { type: ActivatedRoute },
+    { type: Location },
+    { type: ConfigurationService },
+    { type: LayoutsConfigurationService },
+    { type: CommunicationService },
+    { type: MainStateService },
+    { type: Title }
+];
+AwTimelineLayoutComponent = __decorate([
+    Component({
+        selector: 'aw-timeline-layout',
+        template: "<div class=\"aw-map\"\n     id=\"map-layout\"\n     *ngIf=\"lb.dataSource\">\n  <n7-inner-title [data]=\"{\n               title: {\n                    main: {\n                         text: 'Gli eventi dell\\'archivio'\n                    }\n               }\n          }\">\n  </n7-inner-title>\n  <n7-timeline [data]=\"lb.widgets['aw-timeline'].ds.out$ | async\"></n7-timeline>\n  <ng-container *ngTemplateOutlet=\"results\"></ng-container>\n</div>\n\n<ng-template #results>\n  <!-- RESULT LIST -->\n  <ng-container *ngIf=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n    <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n    </n7-inner-title>\n  </ng-container>\n\n  <ng-container *ngIf=\"lb.widgets['aw-linked-objects'].ds.out$ | async\">\n    <div *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n      <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n      </n7-smart-breadcrumbs>\n      <n7-item-preview [data]=\"preview\"\n                       [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n      </n7-item-preview>\n    </div>\n  </ng-container>\n</ng-template>\n"
+    }),
+    __metadata("design:paramtypes", [Router,
+        ActivatedRoute,
+        Location,
+        ConfigurationService,
+        LayoutsConfigurationService,
+        CommunicationService,
+        MainStateService,
+        Title])
+], AwTimelineLayoutComponent);
 
 //---------------------------
 let ChartTippyComponent = class ChartTippyComponent {
@@ -7159,6 +6995,15 @@ var apolloConfig = {
                 }
               }
             }
+            relatedEntities {
+              count
+              entity {
+                id
+                label
+                typeOfEntity
+                relation
+              }
+            }
           }
         }
       }`,
@@ -7221,125 +7066,108 @@ var apolloConfig = {
     search: {
         queryName: 'search',
         queryBody: `{
-        search(__PARAMS__){
-          totalCount
-          facets {
-            id
+      search(__PARAMS__){
+        totalCount
+        results {
+          order{
             type
-            operator
-            limit
-            order
-            data {
-              label
-              value
-              counter
-              searchData {
-                key
-                value
-              }
-            }
+            key
+            direction
           }
-          results {
-            order{
-              type
-              key
-              direction
-            }
-            fields
-            {
+          fields
+          {
+            id
+            highlight
+            limit
+          }
+          items {
+            ... on Entity {
               id
-              highlight
-              limit
-            }
-            items {
-              ... on Entity {
-                id
-                label
-                typeOfEntity
-                fields {
-                  ...
-                  on KeyValueField {
-                    key
-                    value
+              label
+              typeOfEntity
+              fields {
+                ...
+                on KeyValueField {
+                  key
+                  value
+                }
+                ... on KeyValueFieldGroup {
+                  label
+                  fields {
+                    ...
+                    on KeyValueField {
+                      key
+                      value
+                    }
                   }
-                  ... on KeyValueFieldGroup {
+                }
+              }
+              relatedEntities {
+                  count
+                  entity{
+                    id
                     label
+                    typeOfEntity
+                  }
+              }
+              relatedItems {
+                  thumbnail
+                  item {
+                    label
+                    id
                     fields {
                       ...
                       on KeyValueField {
                         key
                         value
                       }
-                    }
-                  }
-                }
-                relatedEntities {
-                    count
-                    entity{
-                      id
-                      label
-                      typeOfEntity
-                    }
-                }
-                relatedItems {
-                    thumbnail
-                    item {
-                      label
-                      id
-                      fields {
-                        ...
-                        on KeyValueField {
-                          key
-                          value
-                        }
-                        ... on KeyValueFieldGroup {
-                          label
-                          fields {
-                            ...
-                            on KeyValueField {
-                              key
-                              value
-                            }
+                      ... on KeyValueFieldGroup {
+                        label
+                        fields {
+                          ...
+                          on KeyValueField {
+                            key
+                            value
                           }
                         }
                       }
-                  }
-                  relatedTypesOfEntity {
-                    type
-                    count
-                  }
+                    }
                 }
-              }
-              ... on Item {
-                id
-                label
-                icon
-                title
-                subTitle
-                image
-                text
                 relatedTypesOfEntity {
                   type
                   count
                 }
-                breadcrumbs {
-                  label
-                  link
+              }
+            }
+            ... on Item {
+              id
+              label
+              icon
+              title
+              subTitle
+              image
+              text
+              relatedTypesOfEntity {
+                type
+                count
+              }
+              breadcrumbs {
+                label
+                link
+              }
+              fields {
+                ...
+                on KeyValueField {
+                  key
+                  value
                 }
-                fields {
-                  ...
-                  on KeyValueField {
-                    key
-                    value
-                  }
-                  ... on KeyValueFieldGroup {
-                    label
-                    fields {
-                      ...
-                      on KeyValueField {
-                        key
-                        value
-                      }
+                ... on KeyValueFieldGroup {
+                  label
+                  fields {
+                    ...
+                    on KeyValueField {
+                      key
+                      value
                     }
                   }
                 }
@@ -7347,7 +7175,32 @@ var apolloConfig = {
             }
           }
         }
-      }`,
+      }
+    }`,
+    },
+    facets: {
+        queryName: 'search',
+        queryBody: `{
+      search(__PARAMS__){
+        facets {
+          id
+          type
+          operator
+          limit
+          order
+          totalCount
+          data {
+            label
+            value
+            counter
+            searchData {
+              key
+              value
+            }
+          }
+        }
+      }
+    }`,
     },
     getMissingBubble: {
         queryName: 'getEntity',
@@ -7361,6 +7214,35 @@ var apolloConfig = {
     },
 };
 
+let AwFacetsWrapperComponent = class AwFacetsWrapperComponent {
+    headerEmit(eventType, eventPayload) {
+        if (!this.emit) {
+            return;
+        }
+        this.emit('facetheader', { eventType, eventPayload });
+    }
+    facetEmit(eventType, eventPayload) {
+        if (!this.emit) {
+            return;
+        }
+        this.emit('facet', { eventType, eventPayload });
+    }
+};
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], AwFacetsWrapperComponent.prototype, "data", void 0);
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], AwFacetsWrapperComponent.prototype, "emit", void 0);
+AwFacetsWrapperComponent = __decorate([
+    Component({
+        selector: 'aw-facets-wrapper',
+        template: "<div *ngIf=\"data\" class=\"n7-facets-wrapper {{ data.classes || '' }}\">\n    <div *ngFor=\"let group of data.groups\" class=\"n7-facets-wrapper__group {{ group.classes || '' }}\">\n        <n7-facet-header\n            [data]=\"group.header\"\n            [emit]=\"headerEmit.bind(this)\"\n        ></n7-facet-header>\n\n        <n7-facet\n            *ngIf=\"group.isOpen\"\n            [data]=\"group.facet\"\n            [emit]=\"facetEmit.bind(this)\"\n        ></n7-facet>\n    </div>\n</div>"
+    })
+], AwFacetsWrapperComponent);
+
 const COMPONENTS$1 = [
     AwEntitaLayoutComponent,
     AwGalleryLayoutComponent,
@@ -7368,9 +7250,11 @@ const COMPONENTS$1 = [
     AwMapLayoutComponent,
     AwSchedaLayoutComponent,
     AwSearchLayoutComponent,
+    AwTimelineLayoutComponent,
     BubbleChartWrapperComponent,
     ChartTippyComponent,
     SmartBreadcrumbsComponent,
+    AwFacetsWrapperComponent,
 ];
 let N7BoilerplateAriannaWebModule = class N7BoilerplateAriannaWebModule {
     constructor(initStatus, config) {
@@ -7815,6 +7699,93 @@ class MrGlossaryLayoutEH extends EventHandler {
     }
 }
 
+class MrBreadcrumbsDS extends DataSource {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    transform(data) {
+        const bcMock = {
+            items: [{
+                    label: 'Home',
+                    anchor: { href: '/home' }
+                }, {
+                    label: 'Opere',
+                    anchor: { href: '/opere' }
+                }, {
+                    label: 'Opere giovanili',
+                    anchor: { href: '/opere-giovanili' }
+                }, {
+                    label: 'Canzoniere',
+                    anchor: { href: '/canzoniere' }
+                }, {
+                    label: 'Canzoniere (Rerum vulgarium fragmenta)',
+                    anchor: { href: '/canzoniere/rerum-vulgarium-fragmenta' }
+                }]
+        };
+        return bcMock;
+    }
+}
+
+const extractQueryParams = (queryParams) => {
+    const params = {};
+    queryParams.split('&').forEach((param) => {
+        const [key, value] = param.split('=');
+        params[key] = value;
+    });
+    return params;
+};
+const ɵ0$1 = extractQueryParams;
+var linksHelper = {
+    getQueryParams(href) {
+        const queryParams = href.split('?')[1] ? extractQueryParams(href.split('?')[1]) : null;
+        return this.isExternalLink(href) ? null : queryParams;
+    },
+    getRouterLink(href) {
+        return this.isExternalLink(href) ? href : href.split('?')[0];
+    },
+    isExternalLink(href) {
+        return /^http(?:s)?:\/{2}\S+$/.test(href);
+    }
+};
+
+class MrCollectionDS extends DataSource {
+    transform(data) {
+        if (data === undefined) {
+            return null;
+        }
+        const { header, items } = data;
+        const { classes } = this.options;
+        if ((header || {}).button) {
+            const { link, text } = header.button;
+            header.button = [{
+                    text,
+                    anchor: {
+                        href: linksHelper.getRouterLink(link),
+                        queryParams: linksHelper.getQueryParams(link)
+                    }
+                }];
+        }
+        return {
+            header: {
+                title: {
+                    main: {
+                        text: header.title,
+                        classes: 'bold'
+                    },
+                    secondary: header.subtitle ? {
+                        text: header.subtitle,
+                    } : null
+                },
+                actions: {
+                    buttons: header.button
+                }
+            },
+            items: items.map((item) => (Object.assign(Object.assign({}, item), { anchor: {
+                    href: linksHelper.getRouterLink(item.link),
+                    queryParams: linksHelper.getQueryParams(item.link)
+                }, classes: classes || '' })))
+        };
+    }
+}
+
 class MrFiltersDS extends DataSource {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     transform(data) {
@@ -7832,9 +7803,10 @@ class MrHeroDS extends DataSource {
             title,
             classes,
             backgroundImage,
-            image: backgroundImage ? image : null,
-            button: button ? Object.assign(Object.assign({}, button), { anchor: {
-                    href: button.anchor
+            image: !backgroundImage ? image : null,
+            button: button && button.link ? Object.assign(Object.assign({}, button), { anchor: {
+                    href: linksHelper.getRouterLink(button.link),
+                    queryParams: linksHelper.getQueryParams(button.link)
                 } }) : null
         };
     }
@@ -7868,9 +7840,15 @@ class MrImageViewerDS extends DataSource {
     }
 }
 
+class MrInfoBoxDS extends DataSource {
+    transform(data) {
+        return data;
+    }
+}
+
 class MrInnerTitleDS extends DataSource {
     transform(data) {
-        const { title, subtitle, button } = data;
+        const { title, description, button } = data;
         return {
             title: {
                 main: {
@@ -7878,15 +7856,16 @@ class MrInnerTitleDS extends DataSource {
                     classes: 'bold'
                 },
                 secondary: {
-                    text: subtitle,
+                    text: description,
                     classes: 'italic'
                 }
             },
-            actions: button ? {
+            actions: button && button.link ? {
                 buttons: [
                     {
                         anchor: {
-                            href: button.link,
+                            href: linksHelper.getRouterLink(button.link),
+                            queryParams: linksHelper.getQueryParams(button.link)
                         },
                         text: button.text,
                         classes: 'n7-btn-cta'
@@ -8018,7 +7997,28 @@ class MrItemPreviewsDS extends DataSource {
 }
 
 class MrMetadataDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        /** Test if a string is a valid URL */
+        this.isUrl = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/;
+        /** Turn a string into an anchor element */
+        this.toUrl = (string) => `<a href="${string}" target="_blank">${string}<a>`;
+    }
     transform(data) {
+        const { hideLabels } = this.options;
+        const group = data.group.map((d) => {
+            let { items } = d;
+            // Convert URLs to anchor elements and remove labels if necessary
+            items = d.items.map(({ label, value }) => {
+                if (this.isUrl.test(value)) {
+                    return ({ label: hideLabels ? '' : label, value: this.toUrl(value) });
+                }
+                return ({ label: hideLabels ? '' : label, value });
+            });
+            return { items };
+        });
+        // Overwrite the metadata group
+        data.group = group;
         return data;
     }
 }
@@ -8043,6 +8043,12 @@ class MrNavDS extends DataSource {
     }
 }
 
+class MrTextViewerDS extends DataSource {
+    transform(data) {
+        return data;
+    }
+}
+
 class MrSearchPageTitleDS extends DataSource {
     transform() {
         const { title } = this.options.config;
@@ -8059,21 +8065,20 @@ class MrSearchPageTitleDS extends DataSource {
 class MrSearchResultsTitleDS extends DataSource {
     transform(data) {
         const { totalResultsText, sort } = this.options.config;
-        const { totalCount, sort: currentSort } = data;
+        const { total_count: totalCount, sort: currentSort } = data;
+        const mainText = `<strong>${totalCount || 0}</strong> ${totalResultsText[totalCount === 1 ? 1 : 0]}`;
         return {
             title: {
                 main: {
-                    text: totalCount
-                },
-                secondary: {
-                    text: totalResultsText[totalCount === 1 ? 1 : 0]
+                    text: mainText
                 }
             },
             actions: {
                 select: {
                     label: sort.label,
-                    options: sort.options.map(({ label, value, selected }) => ({
+                    options: sort.options.map(({ label, value, selected, disabled }) => ({
                         value,
+                        disabled,
                         selected: currentSort ? value === currentSort : selected,
                         text: label
                     })),
@@ -8082,13 +8087,23 @@ class MrSearchResultsTitleDS extends DataSource {
             }
         };
     }
+    OnInputQueryChange(value) {
+        const { sort } = this.options.config;
+        sort.options.forEach((option) => {
+            if (option.value === '_score') {
+                option.disabled = !value;
+            }
+        });
+        this.update(this.input);
+    }
 }
 
 class MrSearchResultsDS extends DataSource {
     transform(data) {
         const { results } = data;
-        const { resourcePath } = this.options.config;
-        return results.map((item) => (Object.assign(Object.assign({}, item), { anchor: {
+        const { resourcePath, itemPreview } = this.options.config;
+        const classes = itemPreview && itemPreview.classes ? itemPreview.classes : '';
+        return results.map((item) => (Object.assign(Object.assign({}, item), { classes, anchor: {
                 href: `${resourcePath}/${item.id}`,
                 target: '_blank'
             } })));
@@ -8135,14 +8150,18 @@ class MrSearchTagsDS extends DataSource {
 
 var DS$3 = /*#__PURE__*/Object.freeze({
     __proto__: null,
+    MrBreadcrumbsDS: MrBreadcrumbsDS,
+    MrCollectionDS: MrCollectionDS,
     MrFiltersDS: MrFiltersDS,
     MrHeroDS: MrHeroDS,
     MrImageViewerDS: MrImageViewerDS,
+    MrInfoBoxDS: MrInfoBoxDS,
     MrInnerTitleDS: MrInnerTitleDS,
     MrItemPreviewDS: MrItemPreviewDS,
     MrItemPreviewsDS: MrItemPreviewsDS,
     MrMetadataDS: MrMetadataDS,
     MrNavDS: MrNavDS,
+    MrTextViewerDS: MrTextViewerDS,
     MrSearchPageTitleDS: MrSearchPageTitleDS,
     MrSearchResultsTitleDS: MrSearchResultsTitleDS,
     MrSearchResultsDS: MrSearchResultsDS,
@@ -8196,6 +8215,15 @@ class MrSearchResultsTitleEH extends EventHandler {
             switch (type) {
                 case 'mr-search-results-title.change':
                     this.emitOuter('change', payload);
+                    break;
+                default:
+                    break;
+            }
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'mr-search-layout.inputquerychange':
+                    this.dataSource.OnInputQueryChange(payload);
                     break;
                 default:
                     break;
@@ -8255,11 +8283,49 @@ MrGlossaryLayoutComponent = __decorate([
     __metadata("design:paramtypes", [LayoutsConfigurationService])
 ], MrGlossaryLayoutComponent);
 
+var LayoutState;
+(function (LayoutState) {
+    LayoutState["IDLE"] = "IDLE";
+    LayoutState["LOADING"] = "LOADING";
+    LayoutState["SUCCESS"] = "SUCCESS";
+    LayoutState["EMPTY"] = "EMPTY";
+    LayoutState["ERROR"] = "ERROR";
+})(LayoutState || (LayoutState = {}));
+let MrLayoutStateService = class MrLayoutStateService {
+    constructor() {
+        this.stateContainers = {};
+    }
+    add(id) {
+        const ids = Array.isArray(id) ? id : [id];
+        ids.forEach((key) => {
+            this.stateContainers[key] = new ReplaySubject();
+            // initial state
+            this.stateContainers[key].next(LayoutState.IDLE);
+        });
+    }
+    get$(id) {
+        if (!this.stateContainers[id]) {
+            throw Error(`Layout state id '${id}' does not exists`);
+        }
+        return this.stateContainers[id];
+    }
+    set(id, newState) {
+        if (!this.stateContainers[id]) {
+            throw Error(`Layout state id '${id}' does not exists`);
+        }
+        this.stateContainers[id].next(newState);
+    }
+};
+MrLayoutStateService = __decorate([
+    Injectable()
+], MrLayoutStateService);
+
 class MrHomeLayoutDS extends LayoutDataSource {
     onInit(payload) {
         this.configuration = payload.configuration;
         this.communication = payload.communication;
         this.mainState = payload.mainState;
+        this.layoutState = payload.layoutState;
         this.configId = payload.configId;
         this.pageConfig = this.configuration.get(this.configId) || {};
         this.doRequest();
@@ -8268,13 +8334,22 @@ class MrHomeLayoutDS extends LayoutDataSource {
     }
     doRequest() {
         const { sections } = this.pageConfig;
-        if (sections) {
+        if (!isEmpty(sections)) {
+            this.layoutState.set('content', LayoutState.LOADING);
             this.communication.request$('home', {
                 method: 'POST',
-                params: sections.map(({ id }) => id)
+                params: sections.map(({ id }) => id),
+                onError: (err) => {
+                    console.warn(`Error loading ${this.configId} sections`, err.message);
+                    this.layoutState.set('content', LayoutState.ERROR);
+                }
             }).subscribe((response) => {
+                this.layoutState.set('content', LayoutState.SUCCESS);
                 this.initSections(response);
             });
+        }
+        else {
+            console.warn(`There are no sections configured for ${this.configId} layout`);
         }
     }
     initSections(response) {
@@ -8337,52 +8412,6 @@ class MrSliderDS extends DataSource {
     }
 }
 
-class MrCollectionDS extends DataSource {
-    transform(data) {
-        if (data === undefined) {
-            return null;
-        }
-        const { header, items } = data;
-        const { classes } = this.options;
-        if ((header || {}).button) {
-            header.button = [{
-                    text: header.button.text,
-                    anchor: {
-                        href: header.button.anchor
-                    }
-                }];
-        }
-        return {
-            header: {
-                title: {
-                    main: {
-                        text: header.title,
-                        classes: 'bold'
-                    },
-                    secondary: header.subtitle ? {
-                        text: header.subtitle,
-                    } : false,
-                    actions: header.button ? {
-                        buttons: [
-                            {
-                                text: header.button.text,
-                                payload: header.button.link,
-                                classes: 'n7-btn-cta'
-                            }
-                        ]
-                    } : false
-                },
-                actions: {
-                    buttons: header.button
-                }
-            },
-            items: items.map((item) => (Object.assign(Object.assign({}, item), { anchor: {
-                    href: item.anchor
-                }, classes: classes || '' })))
-        };
-    }
-}
-
 class MrSliderEH extends EventHandler {
     listen() {
         // this.innerEvents$.subscribe(({ type, payload }) => {
@@ -8436,12 +8465,13 @@ const EVENTHANDLER_MAP = {
     hero: MrHeroEH,
 };
 let MrHomeLayoutComponent = class MrHomeLayoutComponent extends AbstractLayout {
-    constructor(layoutsConfiguration, activatedRoute, configuration, communication, mainState) {
+    constructor(layoutsConfiguration, activatedRoute, configuration, communication, mainState, layoutState) {
         super(layoutsConfiguration.get('MrHomeLayoutConfig') || MrHomeLayoutConfig);
         this.activatedRoute = activatedRoute;
         this.configuration = configuration;
         this.communication = communication;
         this.mainState = mainState;
+        this.layoutState = layoutState;
     }
     initPayload() {
         return {
@@ -8449,12 +8479,14 @@ let MrHomeLayoutComponent = class MrHomeLayoutComponent extends AbstractLayout {
             mainState: this.mainState,
             configuration: this.configuration,
             communication: this.communication,
+            layoutState: this.layoutState,
             options: this.config.options || {}
         };
     }
     ngOnInit() {
         this.activatedRoute.data.subscribe((data) => {
             this.configId = data.configId;
+            this.layoutState.add('content');
             this.loadWidgets();
             this.onInit();
         });
@@ -8483,18 +8515,20 @@ MrHomeLayoutComponent.ctorParameters = () => [
     { type: ActivatedRoute },
     { type: ConfigurationService },
     { type: CommunicationService },
-    { type: MainStateService }
+    { type: MainStateService },
+    { type: MrLayoutStateService }
 ];
 MrHomeLayoutComponent = __decorate([
     Component({
         selector: 'mr-home-layout',
-        template: "<div class=\"mr-home mr-layout\" *ngIf=\"lb.dataSource\">\n    <section *ngFor=\"let section of lb.dataSource.pageConfig.sections\" class=\"{{ 'mr-layout__' + section.type }}\">\n        <ng-container [ngSwitch]=\"section.type\">\n\n            <!-- SLIDER -->\n            <ng-container *ngSwitchCase=\"'slider'\">\n                <n7-carousel \n                [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[section.id].emit\">\n                </n7-carousel> \n            </ng-container>\n\n            <!-- COLLECTION -->\n            <ng-container *ngSwitchCase=\"'collection'\">\n                <div class=\"mr-layout__maxwidth mr-items-preview\">\n                    <n7-inner-title \n                    [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                    [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-inner-title>\n                    <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                        <n7-item-preview\n                        *ngFor=\"let item of (lb.widgets[section.id].ds.out$ | async)?.items\"\n                        [data]=\"item\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n            </ng-container>\n\n            <!-- HERO -->\n            <ng-container *ngSwitchCase=\"'hero'\">\n                <n7-hero \n                [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                [emit]=\"lb.widgets[section.id].emit\">\n                </n7-hero> \n            </ng-container>\n        \n        </ng-container>\n    </section>\n    \n</div>\n"
+        template: "<div class=\"mr-home mr-layout\" *ngIf=\"lb.dataSource\">\n    <!-- HOME CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            loading...\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            error!\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <section *ngFor=\"let section of lb.dataSource.pageConfig.sections\" class=\"{{ 'mr-layout__' + section.type }}\">\n                <ng-container [ngSwitch]=\"section.type\">\n        \n                    <!-- SLIDER -->\n                    <ng-container *ngSwitchCase=\"'slider'\">\n                        <n7-carousel \n                        [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-carousel> \n                    </ng-container>\n        \n                    <!-- COLLECTION -->\n                    <ng-container *ngSwitchCase=\"'collection'\">\n                        <div class=\"mr-layout__maxwidth mr-items-preview\">\n                            <n7-inner-title \n                            [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                            [emit]=\"lb.widgets[section.id].emit\">\n                            </n7-inner-title>\n                            <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                                <n7-item-preview\n                                *ngFor=\"let item of (lb.widgets[section.id].ds.out$ | async)?.items\"\n                                [data]=\"item\"\n                                [emit]=\"lb.widgets[section.id].emit\">\n                                </n7-item-preview>\n                            </div>\n                        </div>\n                    </ng-container>\n        \n                    <!-- HERO -->\n                    <ng-container *ngSwitchCase=\"'hero'\">\n                        <n7-hero \n                        [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-hero> \n                    </ng-container>\n                \n                </ng-container>\n            </section>\n        </ng-container>\n\n    </ng-container>\n</div>\n"
     }),
     __metadata("design:paramtypes", [LayoutsConfigurationService,
         ActivatedRoute,
         ConfigurationService,
         CommunicationService,
-        MainStateService])
+        MainStateService,
+        MrLayoutStateService])
 ], MrHomeLayoutComponent);
 
 class MrResourceLayoutDS extends LayoutDataSource {
@@ -8504,14 +8538,16 @@ class MrResourceLayoutDS extends LayoutDataSource {
         this.mainState = payload.mainState;
         this.configId = payload.configId;
         this.pageConfig = this.configuration.get(this.configId);
+        this.tabConfig = this.configuration.get('tabs')[this.pageConfig.tabs];
     }
     /** Request the configured widgets data */
-    pageRequest$(slug) {
+    pageRequest$(id, onError) {
         const { sections } = this.pageConfig;
         return this.communication.request$('resource', {
+            onError,
             method: 'POST',
             params: {
-                slug,
+                id,
                 type: this.pageConfig.type,
                 sections: sections.map((s) => s.id),
             }
@@ -8524,7 +8560,6 @@ class MrResourceLayoutDS extends LayoutDataSource {
     /** Load all the configured widgets */
     initSections(response) {
         const { sections } = this.pageConfig;
-        // console.log({ sections });
         sections.forEach(({ id }) => {
             const widgetDataSource = this.getWidgetDataSource(id);
             if (!widgetDataSource)
@@ -8554,17 +8589,34 @@ class MrResourceLayoutEH extends EventHandler {
         this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'mr-resource-layout.init':
-                    this.route = payload.route;
-                    this.dataSource.onInit(payload);
-                    this.listenRoute();
+                    {
+                        this.route = payload.route;
+                        const { slug, tab } = this.route.snapshot.params;
+                        this.dataSource.tab = tab;
+                        this.dataSource.slug = slug;
+                        this.layoutState = payload.layoutState;
+                        this.dataSource.onInit(payload);
+                        this.listenRoute();
+                    }
+                    break;
+                case 'mr-resource-layout.destroy':
+                    this.destroy$.next();
                     break;
                 default:
+                    console.warn('unhandled inner event of type', type);
                     break;
             }
         });
     }
     listenRoute() {
-        this.route.paramMap.pipe(takeUntil(this.destroy$), map((params) => params.get('slug')), switchMap((slug) => this.dataSource.pageRequest$(slug))).subscribe((response) => {
+        this.route.paramMap.pipe(takeUntil(this.destroy$), tap(() => {
+            this.layoutState.set('content', LayoutState.LOADING);
+        }), map((params) => params.get('id')), switchMap((id) => this.dataSource.pageRequest$(id, (err) => {
+            console.warn(`Error loading resource layout for ${id}`, err.message);
+            this.dataSource.id = id;
+            this.layoutState.set('content', LayoutState.ERROR);
+        }))).subscribe((response) => {
+            this.layoutState.set('content', LayoutState.SUCCESS);
             this.dataSource.handleResponse(response);
         });
     }
@@ -8572,7 +8624,9 @@ class MrResourceLayoutEH extends EventHandler {
 
 const MrResourceLayoutConfig = {
     layoutId: 'mr-resource-layout',
-    widgets: [],
+    widgets: [
+        { id: 'mr-read-more' }
+    ],
     layoutDS: MrResourceLayoutDS,
     layoutEH: MrResourceLayoutEH,
     widgetsDataSources: DS$3,
@@ -8596,24 +8650,30 @@ class MrImageViewerEH extends EventHandler {
     }
 }
 
+const ɵ0$2 = (d) => d;
 const DATASOURCE_MAP$1 = {
-    viewer: MrImageViewerDS,
+    breadcrumbs: MrBreadcrumbsDS,
+    collection: MrCollectionDS,
+    info: MrInfoBoxDS,
     metadata: MrMetadataDS,
     preview: MrItemPreviewDS,
+    text: MrTextViewerDS,
     title: MrInnerTitleDS,
-    collection: MrCollectionDS
+    viewer: MrImageViewerDS,
+    tabs: ɵ0$2
 };
 const EVENTHANDLER_MAP$1 = {
     viewer: MrImageViewerEH,
 };
 let MrResourceLayoutComponent = class MrResourceLayoutComponent extends AbstractLayout {
-    constructor(layoutsConfiguration, activatedRoute, configuration, communication, mainState, route) {
+    constructor(layoutsConfiguration, activatedRoute, configuration, communication, mainState, route, layoutState) {
         super(layoutsConfiguration.get('MrResourceLayoutConfig') || MrResourceLayoutConfig);
         this.activatedRoute = activatedRoute;
         this.configuration = configuration;
         this.communication = communication;
         this.mainState = mainState;
         this.route = route;
+        this.layoutState = layoutState;
     }
     initPayload() {
         return {
@@ -8621,12 +8681,14 @@ let MrResourceLayoutComponent = class MrResourceLayoutComponent extends Abstract
             configuration: this.configuration,
             communication: this.communication,
             mainState: this.mainState,
+            layoutState: this.layoutState,
             options: this.config.options || {},
             route: this.route
         };
     }
     ngOnInit() {
         this.activatedRoute.data.subscribe((data) => {
+            this.layoutState.add('content');
             this.configId = data.configId;
             this.loadWidgets();
             this.onInit();
@@ -8639,9 +8701,10 @@ let MrResourceLayoutComponent = class MrResourceLayoutComponent extends Abstract
         const { sections } = this.configuration.get(this.configId);
         this.widgets = [];
         if (sections) {
-            sections.forEach(({ id, type }) => {
+            sections.forEach(({ id, type, options }) => {
                 this.widgets.push({
                     id,
+                    options,
                     dataSource: DATASOURCE_MAP$1[type],
                     eventHandler: EVENTHANDLER_MAP$1[type]
                 });
@@ -8655,19 +8718,21 @@ MrResourceLayoutComponent.ctorParameters = () => [
     { type: ConfigurationService },
     { type: CommunicationService },
     { type: MainStateService },
-    { type: ActivatedRoute }
+    { type: ActivatedRoute },
+    { type: MrLayoutStateService }
 ];
 MrResourceLayoutComponent = __decorate([
     Component({
         selector: 'mr-resource-layout',
-        template: "<div class=\"mr-resource mr-layout\"\n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\">\n  <section *ngFor=\"let section of lb.dataSource.pageConfig.sections\"\n           class=\"{{ 'mr-layout__' + section.type }}\">\n    <ng-container [ngSwitch]=\"section.type\">\n\n      <!-- INNER TITLE -->\n      <ng-container *ngSwitchCase=\"'title'\">\n        <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n        </n7-inner-title>\n      </ng-container>\n\n      <!-- IMAGE VIEWER -->\n      <ng-container *ngSwitchCase=\"'viewer'\">\n        <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                         [emit]=\"lb.widgets[section.id].emit\">\n        </n7-image-viewer>\n      </ng-container>\n\n      <!-- METADATA VIEWER -->\n      <ng-container *ngSwitchCase=\"'metadata'\">\n        <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                            [emit]=\"lb.widgets[section.id].emit\">\n        </n7-metadata-viewer>\n      </ng-container>\n\n      <!-- COLLECTION -->\n      <ng-container *ngSwitchCase=\"'collection'\">\n        <div class=\"mr-layout__maxwidth mr-items-preview\">\n          <n7-inner-title [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                          [emit]=\"lb.widgets[section.id].emit\">\n          </n7-inner-title>\n          <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n            <n7-item-preview *ngFor=\"let item of (lb.widgets[section.id].ds.out$ | async)?.items\"\n                             [data]=\"item\"\n                             [emit]=\"lb.widgets[section.id].emit\">\n            </n7-item-preview>\n          </div>\n        </div>\n      </ng-container>\n\n      <!-- ITEM PREVIEW -->\n      <ng-container *ngSwitchCase=\"'preview'\">\n        <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                         [emit]=\"lb.widgets[section.id].emit\">\n        </n7-item-preview>\n      </ng-container>\n\n    </ng-container>\n  </section>\n</div>\n"
+        template: "<div class=\"mr-resource mr-layout\"\n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\">\n  <!-- RESOURCE LAYOUT CONTENT -->\n  <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n    <!-- loading -->\n    <ng-container *ngSwitchCase=\"'LOADING'\">\n      loading...\n    </ng-container>\n\n    <!-- error -->\n    <ng-container *ngSwitchCase=\"'ERROR'\">\n      error!\n    </ng-container>\n\n    <!-- success -->\n    <ng-container *ngSwitchCase=\"'SUCCESS'\">\n\n      <section *ngFor=\"let section of lb.dataSource.pageConfig.sections\"\n               class=\"{{ 'mr-layout__' + section.type }}\">\n        <ng-container [ngSwitch]=\"section.type\">\n\n          <!-- TABS -->\n          <ng-container *ngSwitchCase=\"'tabs'\">\n            <ng-container *ngFor=\"let tab of lb.dataSource.tabConfig\">\n              <n7-anchor-wrapper [data]=\"{ href: '/opera' + '/' + lb.dataSource.slug + '/' + tab.id }\">\n                <span class=\"n7-btn n7-btn-light\">{{tab.label}}</span>\n              </n7-anchor-wrapper>\n            </ng-container>\n          </ng-container>\n\n          <!-- INNER TITLE -->\n          <ng-container *ngSwitchCase=\"'title'\">\n            <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                            [emit]=\"lb.widgets[section.id].emit\">\n            </n7-inner-title>\n          </ng-container>\n\n          <!-- IMAGE VIEWER -->\n          <ng-container *ngSwitchCase=\"'viewer'\">\n            <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                             [emit]=\"lb.widgets[section.id].emit\">\n            </n7-image-viewer>\n          </ng-container>\n\n          <!-- METADATA VIEWER -->\n          <ng-container *ngSwitchCase=\"'metadata'\">\n            <mr-read-more [data]=\"{ limit: 130 }\">\n              <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                                  [emit]=\"lb.widgets[section.id].emit\">\n              </n7-metadata-viewer>\n            </mr-read-more>\n          </ng-container>\n\n          <!-- COLLECTION -->\n          <ng-container *ngSwitchCase=\"'collection'\">\n            <div class=\"mr-layout__maxwidth mr-items-preview\">\n              <n7-inner-title [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                              [emit]=\"lb.widgets[section.id].emit\">\n              </n7-inner-title>\n              <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                <n7-item-preview *ngFor=\"let item of (lb.widgets[section.id].ds.out$ | async)?.items\"\n                                 [data]=\"item\"\n                                 [emit]=\"lb.widgets[section.id].emit\">\n                </n7-item-preview>\n              </div>\n            </div>\n          </ng-container>\n\n          <!-- ITEM PREVIEW -->\n          <ng-container *ngSwitchCase=\"'preview'\">\n            <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                             [emit]=\"lb.widgets[section.id].emit\">\n            </n7-item-preview>\n          </ng-container>\n\n          <!-- TEXT VIEWER -->\n          <ng-container *ngSwitchCase=\"'text'\">\n            <div class=\"text-viewer__mock\">n7-text-viewer</div>\n          </ng-container>\n\n          <!-- INFO BOX -->\n          <ng-container *ngSwitchCase=\"'info'\">\n            <div class=\"info-box__mock\">info-box</div>\n          </ng-container>\n\n          <!-- BREADCRUMBS -->\n          <ng-container *ngSwitchCase=\"'breadcrumbs'\">\n            <n7-breadcrumbs [data]=\"{\n              items: [{\n                label: 'Home',\n                anchor: { href: '/home' }\n              }, {\n                label: 'Opere',\n                anchor: { href: '/opere' }\n              }, {\n                label: 'Opere giovanili',\n                anchor: { href: '/opere-giovanili' }\n              }, {\n                label: 'Canzoniere',\n                anchor: { href: '/canzoniere' }\n              }, {\n                label: 'Canzoniere (Rerum vulgarium fragmenta)',\n                anchor: { href: '/canzoniere/rerum-vulgarium-fragmenta' }\n              }]\n            }\">\n            </n7-breadcrumbs>\n          </ng-container>\n\n        </ng-container>\n      </section>\n    </ng-container>\n\n  </ng-container>\n</div>\n"
     }),
     __metadata("design:paramtypes", [LayoutsConfigurationService,
         ActivatedRoute,
         ConfigurationService,
         CommunicationService,
         MainStateService,
-        ActivatedRoute])
+        ActivatedRoute,
+        MrLayoutStateService])
 ], MrResourceLayoutComponent);
 
 class SearchFacetsLayoutDS extends LayoutDataSource$1 {
@@ -8684,7 +8749,9 @@ class SearchFacetsLayoutDS extends LayoutDataSource$1 {
     initInputs() {
         // set components data
         this.facets.sections.forEach(({ header, inputs }) => {
-            [header, ...inputs].forEach((input) => {
+            [header, ...inputs]
+                .filter((input) => input)
+                .forEach((input) => {
                 // set id
                 const widgetDataSource = this.getWidgetDataSource(input.id);
                 widgetDataSource.id = input.id;
@@ -8723,7 +8790,7 @@ const hasValue = (value) => {
     }
     return !!value;
 };
-const ɵ0$1 = hasValue;
+const ɵ0$3 = hasValue;
 var searchHelper = {
     stateToQueryParams(state, schemas) {
         const queryParams = {};
@@ -8777,6 +8844,7 @@ var searchHelper = {
 
 const INPUT_STATE_CONTEXT = 'input';
 const FACET_STATE_CONTEXT = 'facet';
+const SECTION_STATE_CONTEXT = 'section';
 const RESULTS_REQUEST_STATE_CONTEXT = 'resultsRequest';
 const FACETS_REQUEST_STATE_CONTEXT = 'facetsRequest';
 let MrSearchService = class MrSearchService {
@@ -8799,6 +8867,7 @@ let MrSearchService = class MrSearchService {
         // initial states
         this.initInputState();
         this.initFacetState();
+        this.initSectionState();
         // listeners
         this.onInputsChange();
         this.onRouteChange();
@@ -8880,7 +8949,12 @@ let MrSearchService = class MrSearchService {
         this.addStateContext(INPUT_STATE_CONTEXT);
         // set facets input state
         facets.sections.forEach(({ header, inputs }) => {
-            [header, ...inputs].forEach(({ id, queryParam, schema }) => {
+            [header, ...inputs]
+                .filter((input) => input)
+                .forEach(({ id, queryParam, schema }) => {
+                if (!id) {
+                    return;
+                }
                 this.addState(INPUT_STATE_CONTEXT, id);
                 // is query param?
                 if (queryParam) {
@@ -8910,9 +8984,20 @@ let MrSearchService = class MrSearchService {
         this.addStateContext(FACET_STATE_CONTEXT);
         // set input state
         facets.sections.forEach(({ header, inputs }) => {
-            [header, ...inputs].forEach((input) => {
+            [header, ...inputs]
+                .filter((input) => input)
+                .forEach((input) => {
                 this.addState(FACET_STATE_CONTEXT, input.id);
             });
+        });
+    }
+    initSectionState() {
+        const { facets } = this.config;
+        // add context state
+        this.addStateContext(SECTION_STATE_CONTEXT);
+        // set input state
+        facets.sections.forEach(({ id }) => {
+            this.addState(SECTION_STATE_CONTEXT, id);
         });
     }
     onRouteChange() {
@@ -8995,6 +9080,13 @@ let MrSearchService = class MrSearchService {
             this.setState(FACETS_REQUEST_STATE_CONTEXT, 'loading', params);
             return params;
         }), debounceTime(facets.delay || 1), map((params) => {
+            params.facets = [];
+            this.config.facets.sections.forEach(({ inputs }) => {
+                inputs.filter(({ type }) => type === 'link')
+                    .forEach(({ id }) => {
+                    params.facets.push(id);
+                });
+            });
             this.setState(FACETS_REQUEST_STATE_CONTEXT, 'request', params);
             return params;
         }), switchMap((state) => this.communication.request$(facets.id, {
@@ -9077,7 +9169,7 @@ class SearchFacetsLayoutEH extends EventHandler {
             sources.forEach((source) => {
                 this.changed$[source.id] = new Subject();
                 this.changed$[source.id].pipe(debounceTime(source.delay || 1)).subscribe(({ id, value }) => {
-                    this.searchService.setState('input', id, value);
+                    this.searchService.setState(INPUT_STATE_CONTEXT, id, value);
                 });
             });
         });
@@ -9106,6 +9198,11 @@ class SearchFacetsLayoutEH extends EventHandler {
             Object.keys(headers).forEach((id) => {
                 this.dataSource.updateInputValue(id, headers[id]);
             });
+        });
+        // listener for section updates
+        this.searchService.getState$(SECTION_STATE_CONTEXT)
+            .pipe(takeUntil(this.destroyed$)).subscribe(({ lastUpdated, state }) => {
+            console.log('section', lastUpdated, state);
         });
     }
 }
@@ -9223,8 +9320,8 @@ class FacetLinkDS extends DataSource {
     }
 }
 
-const ICON_OPEN = 'n7-icon-angle-down';
-const ICON_CLOSE = 'n7-icon-angle-right';
+const ICON_OPEN = 'n7-icon-angle-up';
+const ICON_CLOSE = 'n7-icon-angle-down';
 class FacetHeaderDS extends DataSource {
     constructor() {
         super(...arguments);
@@ -9260,7 +9357,8 @@ class FacetHeaderEH extends EventHandler {
                     this.dataSource.toggle();
                     this.emitOuter('change', {
                         isOpen: this.dataSource.isOpen(),
-                        id: this.dataSource.id
+                        id: this.dataSource.id,
+                        value: this.dataSource.value
                     });
                     break;
                 default:
@@ -9454,7 +9552,7 @@ __decorate([
 MrSearchFacetsLayoutComponent = __decorate([
     Component({
         selector: 'mr-search-facets-layout',
-        template: "<div *ngIf=\"lb.dataSource.facets\" class=\"mr-search-facets {{ lb.dataSource.facets.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.facets.sections\" class=\"mr-search-facets__section {{ section.classes || '' }}\">\n        <n7-facet-header\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\n        [emit]=\"lb.widgets[section.header.id].emit\"\n        ></n7-facet-header>\n\n        <div [hidden]=\"!lb.widgets[section.header.id].ds.isOpen()\" class=\"mr-search-facets__wrapper\">\n            <div *ngFor=\"let input of section.inputs\" class=\"mr-search-facets__input {{ input.classes || '' }}\">\n                <ng-container [ngSwitch]=\"input.type\">\n    \n                    <!-- INPUT TEXT -->\n                    <n7-input-text \n                    *ngSwitchCase=\"'text'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n    \n                    <!-- INPUT CHECKBOX -->\n                    <n7-input-checkbox \n                    *ngSwitchCase=\"'checkbox'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                    \n                    <!-- INPUT SELECT -->\n                    <n7-input-select \n                    *ngSwitchCase=\"'select'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                    \n                    <!-- INPUT LINK -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'link'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n\n                    <!-- INPUT LINKMULTI -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'linkMulti'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n                \n                </ng-container>\n            </div>\n        </div>\n        \n        \n    </div>\n</div>"
+        template: "<div *ngIf=\"lb.dataSource.facets\" class=\"mr-facets__facets-wrapper {{ lb.dataSource.facets.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.facets.sections\" \n    class=\"mr-facets__single-facet {{ section.classes || '' }}\"\n    [ngClass]=\"lb.dataSource.searchService.getState$('section', section.id) | async\">\n        <n7-facet-header\n        *ngIf=\"section.header\"\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\n        [emit]=\"lb.widgets[section.header.id].emit\"\n        ></n7-facet-header>\n\n        <div [hidden]=\"section.header && !lb.widgets[section.header.id].ds.isOpen()\" class=\"mr-facets__single-facet-content\">\n            <div *ngFor=\"let input of section.inputs\" class=\"mr-facets__single-facet-inner-content {{ input.classes || '' }}\">\n                <ng-container [ngSwitch]=\"input.type\">\n    \n                    <!-- INPUT TEXT -->\n                    <n7-input-text \n                    *ngSwitchCase=\"'text'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n    \n                    <!-- INPUT CHECKBOX -->\n                    <n7-input-checkbox \n                    *ngSwitchCase=\"'checkbox'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                    \n                    <!-- INPUT SELECT -->\n                    <n7-input-select \n                    *ngSwitchCase=\"'select'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                    \n                    <!-- INPUT LINK -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'link'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n\n                    <!-- INPUT LINKMULTI -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'linkMulti'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n                \n                </ng-container>\n            </div>\n        </div>\n    </div>\n</div>"
     }),
     __metadata("design:paramtypes", [])
 ], MrSearchFacetsLayoutComponent);
@@ -9495,7 +9593,7 @@ class MrSearchLayoutDS extends LayoutDataSource$1 {
         });
     }
     getPaginationParams(response) {
-        const { totalCount, page, limit } = response;
+        const { total_count: totalCount, page, limit } = response;
         const { pagination: paginationConfig } = this.pageConfig;
         return {
             totalPages: Math.ceil(totalCount / limit),
@@ -9513,46 +9611,6 @@ class MrSearchLayoutDS extends LayoutDataSource$1 {
         this.mainState.update('headTitle', [appName, pageTitle].join(' > '));
     }
 }
-
-var LayoutState;
-(function (LayoutState) {
-    LayoutState["IDLE"] = "IDLE";
-    LayoutState["LOADING"] = "LOADING";
-    LayoutState["SUCCESS"] = "SUCCESS";
-    LayoutState["EMPTY"] = "EMPTY";
-    LayoutState["ERROR"] = "ERROR";
-})(LayoutState || (LayoutState = {}));
-let MrLayoutStateService = class MrLayoutStateService {
-    constructor() {
-        this.stateContainers = {};
-    }
-    add(id) {
-        const ids = Array.isArray(id) ? id : [id];
-        ids.forEach((key) => {
-            if (this.stateContainers[key]) {
-                throw Error(`Layout state id '${key}' already exists`);
-            }
-            this.stateContainers[key] = new Subject();
-            // initial state
-            this.stateContainers[key].next(LayoutState.IDLE);
-        });
-    }
-    get$(id) {
-        if (!this.stateContainers[id]) {
-            throw Error(`Layout state id '${id}' does not exists`);
-        }
-        return this.stateContainers[id];
-    }
-    set(id, newState) {
-        if (!this.stateContainers[id]) {
-            throw Error(`Layout state id '${id}' does not exists`);
-        }
-        this.stateContainers[id].next(newState);
-    }
-};
-MrLayoutStateService = __decorate([
-    Injectable()
-], MrLayoutStateService);
 
 class MrSearchLayoutEH extends EventHandler {
     constructor() {
@@ -9611,19 +9669,32 @@ class MrSearchLayoutEH extends EventHandler {
         this.searchService.getState$(INPUT_STATE_CONTEXT).subscribe(({ state }) => {
             this.searchState = state;
         });
+        this.searchService.getState$(INPUT_STATE_CONTEXT, 'query').subscribe((val) => {
+            this.emitOuter('inputquerychange', val);
+            this.searchService.setState(INPUT_STATE_CONTEXT, 'sort', val ? '_score' : 'sort_ASC');
+        });
         this.searchService.getState$(FACETS_REQUEST_STATE_CONTEXT, 'success').subscribe((response) => {
             this.linksResponse = response;
             this.dataSource.updateActiveFilters(this.searchState, this.linksResponse);
+            // update sections
+            if (response.inputs) {
+                const { inputs } = response;
+                Object.keys(inputs).forEach((inputKey) => {
+                    const currentInput = inputs[inputKey];
+                    this.searchService.setState(SECTION_STATE_CONTEXT, `section-${inputKey}`, Array.isArray(currentInput) && currentInput.length ? 'is-not-empty' : 'is-empty');
+                });
+            }
         });
         this.searchService.getState$(RESULTS_REQUEST_STATE_CONTEXT, 'loading').subscribe(() => {
             this.layoutState.set('results', LayoutState.LOADING);
         });
         // default params hook
         this.searchService.setBeforeHook(RESULTS_REQUEST_STATE_CONTEXT, 'loading', (params = {}) => {
+            // FIXME: prendere da configurazione
             const defaultParams = {
                 page: 1,
-                sort: '_score_DESC',
-                limit: 10
+                sort: 'sort_ASC',
+                limit: 12
             };
             Object.keys(defaultParams).forEach((key) => {
                 params[key] = params[key] || defaultParams[key];
@@ -9647,10 +9718,6 @@ class MrSearchLayoutEH extends EventHandler {
 const MrSearchLayoutConfig = {
     layoutId: 'mr-search-layout',
     widgets: [{
-            id: 'facets-wrapper',
-            dataSource: FacetsWrapperDS,
-            eventHandler: FacetsWrapperEH
-        }, {
             id: 'mr-search-page-title'
         }, {
             id: 'mr-search-results-title'
@@ -9672,69 +9739,52 @@ const MrSearchLayoutConfig = {
     layoutOptions: {}
 };
 
-const ɵ0$2 = {
-    text: 'Filtra i risultati'
-}, ɵ1$1 = {
+const ɵ0$4 = {
     id: 'query',
     placeholder: 'Cerca nei titoli',
     icon: 'n7-icon-search',
     inputPayload: 'search-input',
     enterPayload: 'search-enter',
     iconPayload: 'search-icon'
-}, ɵ2$1 = {
+}, ɵ1$1 = {
     text: 'Toponimi',
-    additionalText: '786',
+    additionalText: null,
+}, ɵ2$1 = {
+    id: 'text-01',
+    placeholder: 'Search',
+    icon: 'n7-icon-search',
+    inputPayload: 'search-input',
+    enterPayload: 'search-enter',
+    iconPayload: 'search-icon',
 }, ɵ3$1 = {
-    id: 'input-text-01',
-    placeholder: 'Search',
-    icon: 'n7-icon-search',
-    inputPayload: 'search-input',
-    enterPayload: 'search-enter',
-    iconPayload: 'search-icon',
-}, ɵ4$1 = {
     links: []
+}, ɵ4$1 = {
+    text: 'Continenti',
+    additionalText: null
 }, ɵ5 = {
-    text: 'Glossario',
-    additionalText: '96',
+    links: []
 }, ɵ6 = {
-    id: 'input-text-02',
-    placeholder: 'Search',
-    icon: 'n7-icon-search',
-    inputPayload: 'search-input',
-    enterPayload: 'search-enter',
-    iconPayload: 'search-icon',
+    text: 'Keywords',
+    additionalText: null,
+    iconRight: 'n7-icon-angle-down'
 }, ɵ7 = {
     links: []
 }, ɵ8 = {
-    text: 'Continenti',
-    additionalText: '3'
+    text: 'Data di pubblicazione',
+    additionalText: null,
+    iconRight: 'n7-icon-angle-down'
 }, ɵ9 = {
     links: []
 }, ɵ10 = {
-    text: 'Keywords',
-    additionalText: '108',
-    iconRight: 'n7-icon-angle-right'
-}, ɵ11 = {
-    links: []
-}, ɵ12 = {
-    text: 'Data di pubblicazione',
-    additionalText: '20',
-    iconRight: 'n7-icon-angle-right'
-}, ɵ13 = {
-    links: []
-}, ɵ14 = {
     text: 'Luogo di pubblicazione',
-    additionalText: '15',
-    iconRight: 'n7-icon-angle-right'
-}, ɵ15 = {
+    additionalText: null,
+    iconRight: 'n7-icon-angle-down'
+}, ɵ11 = {
     links: []
 };
 const facets = {
     sections: [{
-            header: {
-                id: 'header-filtra',
-                data: ɵ0$2
-            },
+            id: 'section-query',
             inputs: [{
                     id: 'query',
                     type: 'text',
@@ -9743,45 +9793,56 @@ const facets = {
                     schema: {
                         valueType: 'string'
                     },
-                    data: ɵ1$1
+                    data: ɵ0$4
                 }]
         }, {
+            id: 'section-toponyms',
             header: {
-                id: 'header-toponimi',
-                data: ɵ2$1
+                id: 'header-toponyms',
+                data: ɵ1$1
             },
             inputs: [{
-                    id: 'input-toponimi-filter',
+                    id: 'toponyms-filter',
                     type: 'text',
                     delay: 500,
                     schema: {
                         valueType: 'string'
                     },
-                    data: ɵ3$1
+                    data: ɵ2$1
                 }, {
-                    id: 'input-toponimi',
+                    id: 'toponyms',
                     type: 'link',
                     queryParam: true,
                     schema: {
                         valueType: 'string',
+                        multiple: true
                     },
-                    data: ɵ4$1
+                    data: ɵ3$1
                 }]
         }, {
+            id: 'section-continents',
             header: {
-                id: 'header-glossario',
-                data: ɵ5
+                id: 'header-continents',
+                data: ɵ4$1
             },
             inputs: [{
-                    id: 'input-glossario-filter',
-                    type: 'text',
-                    delay: 500,
+                    id: 'continents',
+                    type: 'link',
+                    queryParam: true,
                     schema: {
-                        valueType: 'string'
+                        valueType: 'string',
+                        multiple: true
                     },
-                    data: ɵ6
-                }, {
-                    id: 'input-glossario',
+                    data: ɵ5
+                }]
+        }, {
+            id: 'section-keywords',
+            header: {
+                id: 'header-keywords',
+                data: ɵ6
+            },
+            inputs: [{
+                    id: 'keywords',
                     type: 'link',
                     queryParam: true,
                     schema: {
@@ -9789,14 +9850,15 @@ const facets = {
                         multiple: true
                     },
                     data: ɵ7
-                }]
+                }],
         }, {
+            id: 'section-date',
             header: {
-                id: 'header-continenti',
+                id: 'header-date',
                 data: ɵ8
             },
             inputs: [{
-                    id: 'input-continenti',
+                    id: 'date',
                     type: 'link',
                     queryParam: true,
                     schema: {
@@ -9804,14 +9866,15 @@ const facets = {
                         multiple: true
                     },
                     data: ɵ9
-                }]
+                }],
         }, {
+            id: 'section-place',
             header: {
-                id: 'header-keywords',
+                id: 'header-place',
                 data: ɵ10
             },
             inputs: [{
-                    id: 'input-keywords',
+                    id: 'place',
                     type: 'link',
                     queryParam: true,
                     schema: {
@@ -9820,47 +9883,17 @@ const facets = {
                     },
                     data: ɵ11
                 }],
-        }, {
-            header: {
-                id: 'header-data',
-                data: ɵ12
-            },
-            inputs: [{
-                    id: 'input-data',
-                    type: 'link',
-                    queryParam: true,
-                    schema: {
-                        valueType: 'string',
-                        multiple: true
-                    },
-                    data: ɵ13
-                }],
-        }, {
-            header: {
-                id: 'header-luogo',
-                data: ɵ14
-            },
-            inputs: [{
-                    id: 'input-luogo',
-                    type: 'link',
-                    queryParam: true,
-                    schema: {
-                        valueType: 'string',
-                        multiple: true
-                    },
-                    data: ɵ15
-                }],
         }],
     classes: 'facets-wrapper'
 };
-const ɵ16 = (id) => ({
+const ɵ12 = (id) => ({
     id,
     queryParam: true,
     schema: {
         valueType: id === 'sort' ? 'string' : 'number'
     }
 });
-const layoutInputs = ['page', 'limit', 'sort'].map(ɵ16);
+const layoutInputs = ['page', 'limit', 'sort'].map(ɵ12);
 const request = {
     results: {
         id: 'search',
@@ -9925,7 +9958,7 @@ MrSearchLayoutComponent.ctorParameters = () => [
 MrSearchLayoutComponent = __decorate([
     Component({
         selector: 'mr-search-layout',
-        template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth\">\n\n        <div class=\"mr-search__title\">\n            <n7-inner-title\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <aside class=\"mr-search__facets\">\n                <div class=\"filter-section\">\n                    <h2 *ngIf=\"lb.dataSource.pageConfig['facetsTitle']\">\n                        {{ lb.dataSource.pageConfig['facetsTitle'] }}\n                    </h2>\n                    <mr-search-facets-layout \n                    [searchService]=\"lb.dataSource.searchService\">\n                    </mr-search-facets-layout>\n                </div>\n            </aside>\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    <n7-inner-title\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\n                    </n7-inner-title>\n                </div>\n                <div class=\"mr-search__results-filters\">\n                    <span *ngIf=\"(\n                        lb.dataSource.pageConfig['filtersTitle'] && \n                        lb.widgets['mr-search-tags'].ds.hasFilters\n                    )\" \n                    class=\"mr-search__results-filters-title\">{{ lb.dataSource.pageConfig['filtersTitle'] }}</span>\n                    <n7-tag *ngFor=\"let tag of (lb.widgets['mr-search-tags'].ds.out$ | async)\"\n                    [data]=\"tag\"\n                    [emit]=\"lb.widgets['mr-search-tags'].emit\">\n                    </n7-tag>\n                </div>\n                <main class=\"mr-search__results\">\n                    <!-- SEARCH RESULTS -->\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\n                        \n                        <!-- loading -->\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\n                            <div class=\"mr-search__results-loading\">\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                                    blocks: [\n                                        { classes: 'search-result-placeholder-title' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' }\n                                    ]\n                                }\"></n7-content-placeholder>\n                            </div>\n                        </ng-container>\n                        \n                        <!-- success: items > 0 -->\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n                            <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\n                            [data]=\"item\">\n                            </n7-item-preview>\n                        </ng-container>\n\n                        <!-- empty: items === 0 -->\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\n                            <div class=\"mr-search__results-fallback\">\n                                <p class=\"mr-search__results-fallback-string\">\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\n                                </p>\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\n                                </button>\n                            </div>\n                        </ng-container>\n\n                        <!-- error: request problem -->\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\n                            <p class=\"mr-search__results-ko-string\">\n                                {{ lb.dataSource.pageConfig.ko.text }}\n                            </p>\n                            <button class=\"n7-btn mr-search__results-ko-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                {{ lb.dataSource.pageConfig.ko.button }}\n                            </button>\n                        </ng-container>\n                        \n                    </ng-container>\n                </main>               \n                <n7-smart-pagination\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
+        template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth\">\n\n        <div class=\"mr-search__title\">\n            <n7-inner-title\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <aside class=\"mr-facets\">\n                <div class=\"mr-facets__contents\">\n                    <h2 class=\"mr-facets__title\" \n                        *ngIf=\"lb.dataSource.pageConfig['facetsTitle']\">\n                        {{ lb.dataSource.pageConfig['facetsTitle'] }}\n                    </h2>\n                    <mr-search-facets-layout \n                    [searchService]=\"lb.dataSource.searchService\">\n                    </mr-search-facets-layout>\n                </div>\n            </aside>\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    <n7-inner-title\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\n                    </n7-inner-title>\n                </div>\n                <div *ngIf=\"(\n                    lb.dataSource.pageConfig['filtersTitle'] && \n                    lb.widgets['mr-search-tags'].ds.hasFilters\n                )\" \n                class=\"mr-search__results-filters\">\n                    <span class=\"mr-search__results-filters-title\">{{ lb.dataSource.pageConfig['filtersTitle'] }}</span>\n                    <div class=\"mr-search__results-filters-wrapper\">\n                        <n7-tag *ngFor=\"let tag of (lb.widgets['mr-search-tags'].ds.out$ | async)\"\n                        [data]=\"tag\"\n                        [emit]=\"lb.widgets['mr-search-tags'].emit\">\n                        </n7-tag>\n                    </div>\n                </div>\n                <main class=\"mr-search__results\">\n                    <!-- SEARCH RESULTS -->\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\n                        \n                        <!-- loading -->\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\n                            <div class=\"mr-search__results-loading n7-grid-3\">\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                                    blocks: [\n                                        { classes: 'search-result-placeholder-title' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' }\n                                    ]\n                                }\"></n7-content-placeholder>\n                            </div>\n                        </ng-container>\n                        \n                        <!-- success: items > 0 -->\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n                            <div class=\"n7-grid-3\">\n                                <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\n                                [data]=\"item\">\n                                </n7-item-preview>\n                            </div>\n                        </ng-container>\n\n                        <!-- empty: items === 0 -->\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\n                            <div class=\"mr-search__results-fallback\">\n                                <p class=\"mr-search__results-fallback-string\">\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\n                                </p>\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\n                                </button>\n                            </div>\n                        </ng-container>\n\n                        <!-- error: request problem -->\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\n                            <p class=\"mr-search__results-ko-string\">\n                                {{ lb.dataSource.pageConfig.ko.text }}\n                            </p>\n                            <button class=\"n7-btn mr-search__results-ko-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                {{ lb.dataSource.pageConfig.ko.button }}\n                            </button>\n                        </ng-container>\n                        \n                    </ng-container>\n                </main>               \n                <n7-smart-pagination\n                *ngIf=\"(layoutState.get$('results') | async) === 'SUCCESS'\"\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
     }),
     __metadata("design:paramtypes", [LayoutsConfigurationService,
         Router,
@@ -9949,8 +9982,11 @@ class MrStaticLayoutDS extends LayoutDataSource$1 {
      * - base-url/static/sample-page
      * - base-url/static/another-page
      */
-    pageRequest$(slug) {
-        return this.communication.request$('wp-page', { urlParams: slug });
+    pageRequest$(slug, onError) {
+        return this.communication.request$('wp-page', {
+            onError,
+            urlParams: slug,
+        });
     }
     handleResponse(response) {
         const { title, body } = response;
@@ -9979,6 +10015,7 @@ class MrStaticLayoutEH extends EventHandler {
             switch (type) {
                 case 'mr-static-layout.init':
                     this.route = payload.route;
+                    this.layoutState = payload.layoutState;
                     this.dataSource.onInit(payload);
                     // listen route
                     this.listenRoute();
@@ -9993,7 +10030,13 @@ class MrStaticLayoutEH extends EventHandler {
         });
     }
     listenRoute() {
-        this.route.url.pipe(takeUntil(this.destroy$), switchMap((url) => this.dataSource.pageRequest$(url[0].path))).subscribe((response) => {
+        this.route.url.pipe(takeUntil(this.destroy$), tap(() => {
+            this.layoutState.set('content', LayoutState.LOADING);
+        }), switchMap((url) => this.dataSource.pageRequest$(url[0].path, (err) => {
+            console.warn(`Error loading static layout for ${url[0].path}`, err.message);
+            this.layoutState.set('content', LayoutState.ERROR);
+        }))).subscribe((response) => {
+            this.layoutState.set('content', LayoutState.SUCCESS);
             this.dataSource.handleResponse(response);
         });
     }
@@ -10015,23 +10058,26 @@ const MrStaticLayoutConfig = {
 };
 
 let MrStaticLayoutComponent = class MrStaticLayoutComponent extends AbstractLayout {
-    constructor(communication, configuration, mainState, route, layoutsConfiguration) {
+    constructor(communication, configuration, mainState, route, layoutState, layoutsConfiguration) {
         super(layoutsConfiguration.get('MrStaticLayoutConfig') || MrStaticLayoutConfig);
         this.communication = communication;
         this.configuration = configuration;
         this.mainState = mainState;
         this.route = route;
+        this.layoutState = layoutState;
     }
     initPayload() {
         return {
             communication: this.communication,
             configuration: this.configuration,
             mainState: this.mainState,
+            layoutState: this.layoutState,
             route: this.route,
             options: this.config.options || {}
         };
     }
     ngOnInit() {
+        this.layoutState.add('content');
         this.onInit();
     }
     ngOnDestroy() {
@@ -10043,27 +10089,94 @@ MrStaticLayoutComponent.ctorParameters = () => [
     { type: ConfigurationService },
     { type: MainStateService },
     { type: ActivatedRoute },
+    { type: MrLayoutStateService },
     { type: LayoutsConfigurationService }
 ];
 MrStaticLayoutComponent = __decorate([
     Component({
         selector: 'mr-static-layout',
-        template: "<div class=\"mr-static-layout\" *ngIf=\"lb.dataSource.html\">\n    <h1 class=\"mr-generated-title-WP\">{{lb.dataSource.html.title}}</h1>\n    <div class=\"mr-generated-page-WP\" [innerHTML]=\"lb.dataSource.html.body | keepHtml\"></div>\n</div>\n"
+        template: "<div class=\"mr-static-layout\" *ngIf=\"lb.dataSource\">\n    <!-- STATIC LAYOUT CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            loading...\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            error!\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <h1 class=\"mr-generated-title-WP\">{{lb.dataSource.html.title}}</h1>\n            <div class=\"mr-generated-page-WP\" [innerHTML]=\"lb.dataSource.html.body | keepHtml\"></div>\n        </ng-container>\n    \n    </ng-container>\n</div>\n"
     }),
     __metadata("design:paramtypes", [CommunicationService,
         ConfigurationService,
         MainStateService,
         ActivatedRoute,
+        MrLayoutStateService,
         LayoutsConfigurationService])
 ], MrStaticLayoutComponent);
 
+//---------------------------
+let ReadMoreComponent = class ReadMoreComponent {
+    constructor() {
+        // CSS Classes
+        this.state = 'is-expanded';
+        this.collapsed = new BehaviorSubject(false);
+        this._loaded = false;
+        // onClick(type, payload) {
+        //   if (!this.emit) return;
+        //   this.emit(type, payload);
+        // }
+    }
+    /**
+     * Determine if the view is taller than the given height limit,
+     * if it is, render the "Read-more" button.
+     */
+    ngAfterViewChecked() {
+        if (this._loaded)
+            return;
+        if (this.root && this.root.nativeElement.clientHeight > 0) {
+            this._loaded = true;
+            const height = this.root.nativeElement.clientHeight;
+            const { limit } = this.data;
+            this.data.height = height;
+            if (height > limit) {
+                setTimeout(() => {
+                    this.toggleClass();
+                    this.collapsed.next(true);
+                });
+            }
+        }
+    }
+    toggleClass() {
+        if (this.state === 'is-collapsed')
+            this.state = 'is-expanded';
+        if (this.state === 'is-expanded')
+            this.state = 'is-collapsed';
+    }
+    handleToggle() {
+        const v = this.collapsed.value;
+        this.collapsed.next(!v);
+    }
+};
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], ReadMoreComponent.prototype, "data", void 0);
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], ReadMoreComponent.prototype, "emit", void 0);
+__decorate([
+    ViewChild('root', { read: ElementRef }),
+    __metadata("design:type", ElementRef)
+], ReadMoreComponent.prototype, "root", void 0);
+ReadMoreComponent = __decorate([
+    Component({
+        selector: 'mr-read-more',
+        template: "<div class=\"mr-read-more {{this.state}}\"\n     *ngIf=\"data\"\n     #root>\n     <!-- Child component -->\n     <ng-content class=\"content\"></ng-content>\n     <div [hidden]=\"!collapsed.value\"\n          (click)=\"handleToggle()\">\n          Mostra tutto\n     </div>\n</div>\n"
+    })
+], ReadMoreComponent);
+
 const COMPONENTS$3 = [
+    // Layout components
     MrGlossaryLayoutComponent,
     MrHomeLayoutComponent,
     MrResourceLayoutComponent,
     MrSearchFacetsLayoutComponent,
     MrSearchLayoutComponent,
     MrStaticLayoutComponent,
+    // Custom components
+    ReadMoreComponent
 ];
 let N7BoilerplateMurucaModule = class N7BoilerplateMurucaModule {
 };
@@ -10107,6 +10220,58 @@ N7BoilerplateLibModule = __decorate([
         ],
     })
 ], N7BoilerplateLibModule);
+
+let JsonConfigService = class JsonConfigService {
+    constructor(http, config) {
+        this.http = http;
+        this.config = config;
+    }
+    load(path, staticConfig) {
+        return this.http.get(path).pipe(catchError(() => of({})), tap((response) => this._handleResponse(response, staticConfig))).toPromise();
+    }
+    _handleResponse(response, staticConfig) {
+        // set config defaults
+        if (staticConfig) {
+            Object.keys(staticConfig).forEach((key) => this.config.set(key, staticConfig[key]));
+        }
+        // set loaded json config
+        if (response) {
+            Object.keys(response).forEach((key) => this.config.set(key, response[key]));
+            // config keys colors
+            if (response['config-keys']) {
+                const headTag = document.querySelector('head');
+                const styleElement = document.createElement('style');
+                const styles = [];
+                Object.keys(response['config-keys']).forEach((key) => {
+                    const configKey = response['config-keys'][key] || {};
+                    const className = configKey['class-name'];
+                    if (configKey.color && configKey.color.hex) {
+                        // add css class
+                        styles.push(`--color-${className}: ${configKey.color.hex};`);
+                    }
+                });
+                if (styles.length) {
+                    styles.unshift(':root {');
+                    styles.push('}');
+                    styleElement.appendChild(document.createTextNode(styles.join('\n')));
+                    headTag.appendChild(styleElement);
+                }
+            }
+        }
+    }
+};
+JsonConfigService.ctorParameters = () => [
+    { type: HttpClient },
+    { type: ConfigurationService }
+];
+JsonConfigService.ɵprov = ɵɵdefineInjectable({ factory: function JsonConfigService_Factory() { return new JsonConfigService(ɵɵinject(HttpClient), ɵɵinject(ConfigurationService)); }, token: JsonConfigService, providedIn: "root" });
+JsonConfigService = __decorate([
+    Injectable({
+        providedIn: 'root',
+    }),
+    __metadata("design:paramtypes", [HttpClient,
+        ConfigurationService])
+], JsonConfigService);
 
 // main layout
 
@@ -10196,5 +10361,5 @@ DynamicPathGuard = __decorate([
  * Generated bundle index. Do not edit.
  */
 
-export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetInput, FacetInputCheckbox, FacetInputLink, FacetInputSelect, FacetInputText, FacetsDS, FacetsWrapperComponent, FacetsWrapperDS, FacetsWrapperEH, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageTitleDS, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SearchModel, SearchService, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrHomeLayoutComponent as ɵba, MrResourceLayoutComponent as ɵbb, MrSearchFacetsLayoutComponent as ɵbc, MrSearchLayoutComponent as ɵbd, MrSearchService as ɵbe, MrLayoutStateService as ɵbf, MrStaticLayoutComponent as ɵbg, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, FacetsWrapperComponent as ɵg, SmartPaginationComponent as ɵh, CommunicationService as ɵi, ApolloProvider as ɵj, RestProvider as ɵk, AwEntitaLayoutComponent as ɵl, AwGalleryLayoutComponent as ɵm, SearchService as ɵn, AwHomeLayoutComponent as ɵo, AwMapLayoutComponent as ɵp, AwSchedaLayoutComponent as ɵq, AwSearchLayoutComponent as ɵr, BubbleChartWrapperComponent as ɵs, ChartTippyComponent as ɵt, SmartBreadcrumbsComponent as ɵu, DataWidgetWrapperComponent as ɵv, DatepickerWrapperComponent as ɵw, DvExampleLayoutComponent as ɵx, EscapeHtmlPipe as ɵy, MrGlossaryLayoutComponent as ɵz };
+export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrBreadcrumbsDS, MrCollectionDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageTitleDS, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrTextViewerDS, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, ɵ0$2 as ɵ0, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrGlossaryLayoutComponent as ɵba, MrHomeLayoutComponent as ɵbb, MrLayoutStateService as ɵbc, MrResourceLayoutComponent as ɵbd, MrSearchFacetsLayoutComponent as ɵbe, MrSearchLayoutComponent as ɵbf, MrSearchService as ɵbg, MrStaticLayoutComponent as ɵbh, ReadMoreComponent as ɵbi, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, AwGalleryLayoutComponent as ɵl, AwSearchService as ɵm, AwHomeLayoutComponent as ɵn, AwMapLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwSearchLayoutComponent as ɵq, AwTimelineLayoutComponent as ɵr, BubbleChartWrapperComponent as ɵs, ChartTippyComponent as ɵt, SmartBreadcrumbsComponent as ɵu, AwFacetsWrapperComponent as ɵv, DataWidgetWrapperComponent as ɵw, DatepickerWrapperComponent as ɵx, DvExampleLayoutComponent as ɵy, EscapeHtmlPipe as ɵz };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

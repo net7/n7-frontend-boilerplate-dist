@@ -31,6 +31,10 @@ declare const _default: {
         queryName: string;
         queryBody: string;
     };
+    facets: {
+        queryName: string;
+        queryBody: string;
+    };
     getMissingBubble: {
         queryName: string;
         queryBody: string;

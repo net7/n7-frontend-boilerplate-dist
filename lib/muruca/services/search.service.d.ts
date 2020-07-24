@@ -3,6 +3,7 @@ import { Subject } from 'rxjs';
 import { CommunicationService } from '../../common/services/communication.service';
 export declare const INPUT_STATE_CONTEXT = "input";
 export declare const FACET_STATE_CONTEXT = "facet";
+export declare const SECTION_STATE_CONTEXT = "section";
 export declare const RESULTS_REQUEST_STATE_CONTEXT = "resultsRequest";
 export declare const FACETS_REQUEST_STATE_CONTEXT = "facetsRequest";
 export declare class MrSearchService {
@@ -29,6 +30,7 @@ export declare class MrSearchService {
     private setContextState;
     private initInputState;
     private initFacetState;
+    private initSectionState;
     private onRouteChange;
     private onInputsChange;
     private onResultsLoading;

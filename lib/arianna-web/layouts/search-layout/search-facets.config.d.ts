@@ -101,6 +101,7 @@ declare const _default: {
                 delay?: undefined;
                 minChars?: undefined;
                 limit?: undefined;
+                pagination?: undefined;
             };
             placeholder?: undefined;
             emptyState?: undefined;
@@ -119,6 +120,7 @@ declare const _default: {
                 }[];
                 isArray?: undefined;
                 limit?: undefined;
+                pagination?: undefined;
             };
             emptyState?: undefined;
         } | {
@@ -130,6 +132,10 @@ declare const _default: {
             filterConfig: {
                 isArray: boolean;
                 limit: number;
+                pagination: {
+                    limit: number;
+                    offset: number;
+                };
                 searchIn: {
                     key: string;
                     operator: string;

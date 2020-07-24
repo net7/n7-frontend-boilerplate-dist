@@ -1,6 +1,12 @@
 import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
 import { Observable, BehaviorSubject } from 'rxjs';
 export declare class AwSearchLayoutDS extends LayoutDataSource {
+    layoutId: string;
+    configId: string;
+    currentNav: string;
+    headTitle: string;
+    facetsConfig: any;
+    paginationList: number[];
     private destroyed$;
     private communication;
     private configuration;
@@ -9,8 +15,8 @@ export declare class AwSearchLayoutDS extends LayoutDataSource {
     private searchModel;
     private prettifyLabels;
     private configKeys;
-    private fallback;
-    private resetButtonEnabled;
+    fallback: string;
+    resetButtonEnabled: boolean;
     pageTitle: string;
     resultsTitle: string;
     totalCount: number;
@@ -53,6 +59,8 @@ export declare class AwSearchLayoutDS extends LayoutDataSource {
     onResultsLimitChange(payload: any): void;
     setLimit(payload: any): void;
     getSearchModelId: () => string;
+    private getResultsReq$;
+    private getFacetsReq$;
     doSearchRequest$(): Observable<any>;
     private _updateSearchPage;
     private _addFacetsLabels;

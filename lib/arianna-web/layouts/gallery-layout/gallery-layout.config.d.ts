@@ -2,8 +2,8 @@ import { AwGalleryLayoutDS } from './gallery-layout.ds';
 import { AwGalleryLayoutEH } from './gallery-layout.eh';
 import * as DS from '../../data-sources';
 import * as EH from '../../event-handlers';
-import { FacetsWrapperDS, SmartPaginationDS } from '../../../common/data-sources';
-import { FacetsWrapperEH, SmartPaginationEH } from '../../../common/event-handlers';
+import { SmartPaginationDS } from '../../../common/data-sources';
+import { SmartPaginationEH } from '../../../common/event-handlers';
 export declare const AwGalleryLayoutConfig: {
     layoutId: string;
     /**
@@ -12,8 +12,8 @@ export declare const AwGalleryLayoutConfig: {
      */
     widgets: ({
         id: string;
-        dataSource: typeof FacetsWrapperDS;
-        eventHandler: typeof FacetsWrapperEH;
+        dataSource: typeof DS.AwFacetsWrapperDS;
+        eventHandler: typeof EH.AwFacetsWrapperEH;
         hasStaticData?: undefined;
     } | {
         id: string;

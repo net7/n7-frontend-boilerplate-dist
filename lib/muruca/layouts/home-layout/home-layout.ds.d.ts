@@ -3,6 +3,7 @@ export declare class MrHomeLayoutDS extends LayoutDataSource {
     private configuration;
     private communication;
     private mainState;
+    private layoutState;
     private configId;
     private pageConfig;
     onInit(payload: any): void;

@@ -8,6 +8,7 @@ export * from './scheda-breadcrumbs.eh';
 export * from './sidebar-header.eh';
 export * from './tree.eh';
 export * from './search-layout-tabs.eh';
+export * from './aw-facets-wrapper.eh';
 export * from './gallery-results.eh';
 export * from './linked-objects.eh';
 export * from './autocomplete-wrapper.eh';

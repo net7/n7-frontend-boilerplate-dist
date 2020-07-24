@@ -12,7 +12,7 @@ export declare class MrStaticLayoutDS extends LayoutDataSource {
      * - base-url/static/sample-page
      * - base-url/static/another-page
      */
-    pageRequest$(slug: string): Observable<any>;
+    pageRequest$(slug: string, onError: (err: any) => void): Observable<any>;
     handleResponse(response: any): void;
     setHtml(title: any, body: any): void;
     updateHeadTitle(pageTitle: string): void;

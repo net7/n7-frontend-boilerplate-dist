@@ -1,60 +1,158 @@
-import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
-import { Observable, BehaviorSubject } from 'rxjs';
-export declare class AwGalleryLayoutDS extends LayoutDataSource {
-    private destroyed$;
-    private communication;
-    private configuration;
-    private mainState;
-    private search;
-    private searchModel;
-    private prettifyLabels;
-    private configKeys;
-    private fallback;
-    private resetButtonEnabled;
-    pageTitle: string;
-    resultsTitle: string;
-    totalCount: number;
-    currentPage: any;
+import { AwSearchLayoutDS } from '../search-layout/search-layout.ds';
+export declare class AwGalleryLayoutDS extends AwSearchLayoutDS {
+    layoutId: string;
+    configId: string;
+    currentNav: string;
+    headTitle: string;
+    facetsConfig: {
+        totalCount: number;
+        facets: ({
+            id: string;
+            type: string;
+            hasStaticData?: undefined;
+            data?: undefined;
+            operator?: undefined;
+            limit?: undefined;
+            order?: undefined;
+            searchData?: undefined;
+        } | {
+            id: string;
+            type: string;
+            hasStaticData: boolean;
+            data: {
+                value: string;
+                label: string;
+            }[];
+            operator?: undefined;
+            limit?: undefined;
+            order?: undefined;
+            searchData?: undefined;
+        } | {
+            id: string;
+            type: string;
+            operator: string;
+            limit: number;
+            order: string;
+            hasStaticData?: undefined;
+            data?: undefined;
+            searchData?: undefined;
+        } | {
+            id: string;
+            type: string;
+            searchData: string[];
+            hasStaticData?: undefined;
+            data?: undefined;
+            operator?: undefined;
+            limit?: undefined;
+            order?: undefined;
+        })[];
+        fields: ({
+            inputs: ({
+                type: string;
+                facetId: string;
+                placeholder: string;
+                filterConfig: {
+                    delay: number;
+                    minChars: number;
+                    searchIn: {
+                        key: string;
+                        operator: string;
+                    }[];
+                };
+            } | {
+                type: string;
+                facetId: string;
+                filterConfig: {
+                    searchIn: {
+                        key: string;
+                        operator: string;
+                    }[];
+                    delay?: undefined;
+                    minChars?: undefined;
+                };
+                placeholder?: undefined;
+            })[];
+            header?: undefined;
+        } | {
+            header: {
+                label: string;
+                classes: string;
+            };
+            inputs: ({
+                type: string;
+                facetId: string;
+                filterConfig: {
+                    isArray: boolean;
+                    context: string;
+                    target: string;
+                    searchIn: {
+                        key: string;
+                        operator: string;
+                    }[];
+                    delay?: undefined;
+                    minChars?: undefined;
+                    limit?: undefined;
+                    pagination?: undefined;
+                };
+                emptyState?: undefined;
+            } | {
+                type: string;
+                facetId: string;
+                filterConfig: {
+                    delay: number;
+                    minChars: number;
+                    context: string;
+                    target: string;
+                    searchIn: {
+                        key: string;
+                        operator: string;
+                    }[];
+                    isArray?: undefined;
+                    limit?: undefined;
+                    pagination?: undefined;
+                };
+                emptyState?: undefined;
+            } | {
+                type: string;
+                facetId: string;
+                emptyState: {
+                    label: string;
+                };
+                filterConfig: {
+                    isArray: boolean;
+                    limit: number;
+                    pagination: {
+                        limit: number;
+                        offset: number;
+                    };
+                    searchIn: {
+                        key: string;
+                        operator: string;
+                    }[];
+                    context?: undefined;
+                    target?: undefined;
+                    delay?: undefined;
+                    minChars?: undefined;
+                };
+            })[];
+        })[];
+        results: {
+            order: {
+                type: string;
+                key: string;
+                direction: string;
+            };
+            fields: {
+                id: string;
+                highlight: boolean;
+                limit: number;
+            }[];
+        };
+        page: {
+            offset: number;
+            limit: number;
+        };
+    };
+    paginationList: number[];
     pageSize: number;
-    sidebarIsSticky: boolean;
-    isFirstLoading: boolean;
-    resultsLoading: boolean;
-    /** True when the user has input a text string */
-    isSearchingText: BehaviorSubject<boolean>;
-    /** Current order method */
-    orderBy: string;
-    /** Current order direction */
-    orderDirection: string;
-    options: any;
-    orderByLabel: string;
-    orderByOptions: any;
-    onInit({ configuration, mainState, options, communication, search, }: {
-        configuration: any;
-        mainState: any;
-        options: any;
-        communication: any;
-        search: any;
-    }): void;
-    onDestroy(): void;
-    onSearchResponse(): void;
-    /**
-    * Handles changes of the HTMLSelect order control
-    * @param payload _score_DESC, label_sort_ASC, label_sort_DESC
-    */
-    onOrderByChange(payload: any): void;
-    onPageSizeChange(size: any): Observable<boolean>;
-    onPaginationChange(payload: any): Observable<boolean>;
-    onPaginationGoToChange(payload: any): Observable<boolean>;
-    drawPagination: () => void;
-    resetPagination(): void;
-    onResultsLimitChange(payload: any): void;
-    setLimit(payload: any): void;
-    getSearchModelId: () => string;
-    doSearchRequest$(): Observable<any>;
-    private _updateSearchPage;
-    private _addFacetsLabels;
-    private _addFacetsOptions;
-    private _normalizeItems;
-    private _sidebarStickyControl;
-    private _getPaginationParams;
 }

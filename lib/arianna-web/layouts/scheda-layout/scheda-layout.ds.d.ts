@@ -14,12 +14,11 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
     contentParts: any;
     tree: any;
     sidebarCollapsed: boolean;
-    bubbleChartSectionTitle: string;
+    relatedEntitiesHeader: string;
     similarItemsSectionTitle: string;
     metadataSectionTitle: string;
     hasMetadata: boolean;
-    hasBubbles: boolean;
-    bubblesEnabled: boolean;
+    hasRelatedEntities: boolean;
     hasSimilarItems: boolean;
     hasImage: boolean;
     imageViewerIstance: any;
@@ -28,6 +27,10 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
     contentIsLoading: boolean;
     currentId: string | null;
     emptyLabel: string;
+    /** Switch loaded-content and loaded-empty states */
+    hasContent: boolean;
+    /** String to render in the loaded-empty state */
+    emptyStateString: string;
     onInit({ configuration, mainState, router, options, titleService, communication, }: {
         configuration: any;
         mainState: any;

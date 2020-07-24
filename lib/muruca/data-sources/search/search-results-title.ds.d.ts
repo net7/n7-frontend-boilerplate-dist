@@ -3,10 +3,7 @@ export declare class MrSearchResultsTitleDS extends DataSource {
     protected transform(data: any): {
         title: {
             main: {
-                text: any;
-            };
-            secondary: {
-                text: any;
+                text: string;
             };
         };
         actions: {
@@ -17,4 +14,5 @@ export declare class MrSearchResultsTitleDS extends DataSource {
             };
         };
     };
+    OnInputQueryChange(value: any): void;
 }

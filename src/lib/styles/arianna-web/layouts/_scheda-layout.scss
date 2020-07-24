@@ -180,7 +180,6 @@
     /* Minor inner titles that descibe the various sections */
     .aw-scheda__inner-title {
         padding: 0 $aw-scheda-content-padding $aw-scheda-content-padding $aw-scheda-content-padding;
-        // border-top: 2px solid $color-border-normal;
         font-size: $font-size-xxl;
         font-weight: $font-weight-normal;
     }
@@ -238,9 +237,6 @@
     }
 
     .aw-scheda__related-items {
-        // display: grid;
-        // grid-template-columns: repeat(2, 1fr);
-        // grid-column-gap: $grid-gutter-h;
         padding: 0 $aw-scheda-content-padding $aw-scheda-content-padding $aw-scheda-content-padding;
 
         /* Targeting elements in the last row */
@@ -260,6 +256,20 @@
     background-color: $color-background-base;
     z-index: 4;
     box-shadow: 0 2px 20px 0 rgba(0,0,0,0.08);
+}
+
+
+/* image viewer navigation */
+.navigation-hidden .n7-image-viewer {
+    .n7-image-viewer__prev,
+    .n7-image-viewer__next {
+        display: none !important;
+    }
+}
+
+/* Empty state */
+.aw-scheda__empty {
+    text-align: center;
 }
 
 

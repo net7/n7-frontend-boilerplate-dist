@@ -26,6 +26,7 @@ export interface SearchFacetsInput {
     value?: string | string[] | boolean | null;
 }
 export interface SearchFacetsSection {
+    id: string;
     header: InputHeaderData;
     inputs: SearchFacetsInput[];
     classes?: string;
