@@ -21,6 +21,7 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
     bubblesEnabled: boolean;
     private communication;
     fallbackText: string;
+    loading: boolean;
     onInit({ configuration, mainState, router, route, location, options, titleService, communication, }: {
         configuration: any;
         mainState: any;
