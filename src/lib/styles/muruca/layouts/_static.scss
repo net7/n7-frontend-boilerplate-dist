@@ -1,32 +1,33 @@
 /**
- * TIPPY-TOOLTIP
+ * STATIC
  *
- * Tippy tooltip component customizations.
+ * Specific style for static pages.
+ * Inner content HTML is produced by WP text editor (formerly Gutenberg).
  */
- 
+
 /* ------------------------------------ *\
-   #TIPPY-TOOLTIP
+   #STATIC
 \* ------------------------------------ */
-.tippy-tooltip {
-    &.light-border-theme {
-        border-radius: $border-radius;
-        border: none;
-        box-shadow: $tippy-box-shadow;
+.mr-static {
+    &__title {
+        max-width: $page-readable-width;
+        margin: 0 auto $space*6 auto;
+        padding: $space*6 0;
+        border-bottom: 1px solid $color-border-normal;
     }
 
-    .tippy-content {
-        padding: $space*1.5 $space*2;
-        text-align: left;
-    }
-
-    .tippy-arrow:before {
-        border-top-color: #e9e9e9 !important;
+    &__content {
+        margin: 0 auto;
     }
 }
+
 
 /* ------------------------------------ *\
    #MEDIA-QUERIES
 \* ------------------------------------ */
+@media all and (max-width: 1120px) {
+}
+
 @media all and (max-width: $breakpoint-laptop) {
 }
 
