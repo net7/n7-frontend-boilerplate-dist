@@ -2426,11 +2426,14 @@
                 d.forEach(function (el) {
                     var itemData = el.item ? el.item : el;
                     var infoData = lodash.get(el, paths.metadata.info.data, itemData.fields);
+                    var toeData = lodash.get(el, paths.metadata.toe.data, itemData.relatedTypesOfEntity);
+                    var breadcrumbs = lodash.get(el, paths.metadata.breadcrumbs.data, itemData.breadcrumbs);
                     var infoDataItems = infoData
                         ? infoData.filter(function (info) { return enabledKeys.indexOf(info.key) !== -1; })
                         : [];
-                    var toeData = lodash.get(el, paths.metadata.toe.data, itemData.relatedTypesOfEntity);
-                    var breadcrumbs = lodash.get(el, paths.metadata.breadcrumbs.data, itemData.breadcrumbs);
+                    // order metadata
+                    infoDataItems = infoDataItems.map(function (info) { return (__assign(__assign({}, info), { order: enabledKeys.indexOf(info.key) })); });
+                    infoDataItems.sort(function (a, b) { return a.order - b.order; });
                     if (['entita', 'search', 'gallery'].includes(context)) {
                         if (itemData.typeOfEntity && itemData.typeOfEntity !== '') {
                             infoDataItems.push({ key: 'Tipo di entità', value: keys[itemData.typeOfEntity]['singular-label'] });
@@ -4335,7 +4338,7 @@
             _this.scrollLeafIntoView = function () {
                 setTimeout(function () {
                     var treeNode = document.querySelector('div.aw-scheda__tree');
-                    var leafNode = treeNode.querySelector('.is-active');
+                    var leafNode = treeNode.querySelector('.is-active .n7-tree__item-contents');
                     if (leafNode && !_this.isInViewport(leafNode)) {
                         leafNode.scrollIntoView();
                         window.scrollTo(0, 0);

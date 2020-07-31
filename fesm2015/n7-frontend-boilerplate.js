@@ -2021,11 +2021,14 @@ class AwLinkedObjectsDS extends DataSource {
             d.forEach((el) => {
                 const itemData = el.item ? el.item : el;
                 const infoData = get(el, paths.metadata.info.data, itemData.fields);
-                const infoDataItems = infoData
-                    ? infoData.filter((info) => enabledKeys.indexOf(info.key) !== -1)
-                    : [];
                 const toeData = get(el, paths.metadata.toe.data, itemData.relatedTypesOfEntity);
                 const breadcrumbs = get(el, paths.metadata.breadcrumbs.data, itemData.breadcrumbs);
+                let infoDataItems = infoData
+                    ? infoData.filter((info) => enabledKeys.indexOf(info.key) !== -1)
+                    : [];
+                // order metadata
+                infoDataItems = infoDataItems.map((info) => (Object.assign(Object.assign({}, info), { order: enabledKeys.indexOf(info.key) })));
+                infoDataItems.sort((a, b) => a.order - b.order);
                 if (['entita', 'search', 'gallery'].includes(context)) {
                     if (itemData.typeOfEntity && itemData.typeOfEntity !== '') {
                         infoDataItems.push({ key: 'Tipo di entità', value: keys[itemData.typeOfEntity]['singular-label'] });
@@ -3753,7 +3756,7 @@ class AwTreeEH extends EventHandler {
         this.scrollLeafIntoView = () => {
             setTimeout(() => {
                 const treeNode = document.querySelector('div.aw-scheda__tree');
-                const leafNode = treeNode.querySelector('.is-active');
+                const leafNode = treeNode.querySelector('.is-active .n7-tree__item-contents');
                 if (leafNode && !this.isInViewport(leafNode)) {
                     leafNode.scrollIntoView();
                     window.scrollTo(0, 0);
