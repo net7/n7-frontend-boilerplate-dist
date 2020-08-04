@@ -7391,7 +7391,7 @@
                         tippyData.appendChild(liArray[i].cloneNode(true)); // add <li> to tippy data (<ol>)
                         liArray[i].children[0].innerText = '…'; // convert to ellipsis
                         liArray[i].className = 'n7-breadcrumbs__item-ellipsis'; // set class to list item
-                        this.tippyBuilder(liArray[i], tippyData); // append tooltip to ellipsis
+                        this.tippyBuilder(liArray[i].children[0], tippyData); // append tooltip to ellipsis
                         i += 1;
                         // update widths
                         (_a = this.getWidths(this.bcdiv, this.bcol), parentWidth = _a.parentWidth, childWidth = _a.childWidth);
@@ -7423,7 +7423,7 @@
         SmartBreadcrumbsComponent = __decorate([
             core.Component({
                 selector: 'n7-smart-breadcrumbs',
-                template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\n    <nav class=\"n7-breadcrumbs__nav\">\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\n                <n7-anchor-wrapper [classes]=\"item.classes\"\n                [data]=\"item.anchor\"\n                (clicked)=\"onClick($event)\">\n                    {{ item.label }}\n                </n7-anchor-wrapper>\n            </li>\n        </ol>\n    </nav>\n</div>"
+                template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\n    <nav class=\"n7-breadcrumbs__nav\">\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\n                <span class=\"ellipsis-target\">\n                    <n7-anchor-wrapper [classes]=\"item.classes\"\n                        [data]=\"item.anchor\"\n                        (clicked)=\"onClick($event)\">\n                        {{ item.label }}\n                    </n7-anchor-wrapper>\n                </span>\n            </li>\n        </ol>\n    </nav>\n</div>\n"
             })
         ], SmartBreadcrumbsComponent);
         return SmartBreadcrumbsComponent;
@@ -8538,13 +8538,15 @@
                     var id = _a.id;
                     if (state[id]) {
                         var values = Array.isArray(state[id]) ? state[id] : [state[id]];
-                        values.forEach(function (value) {
+                        values
+                            .forEach(function (value) {
+                            var _a;
                             var text = value;
                             if (linkInputs[id]) {
-                                text = linkInputs[id].find(function (_a) {
+                                text = (_a = linkInputs[id].find(function (_a) {
                                     var payload = _a.payload;
                                     return payload === value;
-                                }).text;
+                                })) === null || _a === void 0 ? void 0 : _a.text;
                             }
                             tags.push({
                                 text: text,
@@ -9325,9 +9327,9 @@
         stateToQueryParams: function (state, schemas) {
             var queryParams = {};
             Object.keys(state).forEach(function (key) {
-                var value = state[key];
                 var schema = schemas[key];
                 var multiple = schema.multiple, valueType = schema.valueType;
+                var value = state[key];
                 if (hasValue(value)) {
                     switch (valueType) {
                         case 'number':
@@ -9353,6 +9355,7 @@
                 if (hasValue(value)) {
                     if (hasValue(value)) {
                         switch (valueType) {
+                            // http://localhost:4200/maps?sort=sort_ASC&limit=12&authors=D%27Elia%5C%2C%20Pasquale&continents=Asia
                             case 'number':
                                 state[key] = multiple ? value.split(',').map(function (v) { return +v; }) : +value;
                                 break;
@@ -9407,7 +9410,7 @@
         MrSearchService.prototype.getState$ = function (context, id) {
             var stateId = id ? context + "." + id : context;
             if (!this.state$[stateId]) {
-                throw Error("Key \"" + stateId + "\" does'nt exists");
+                throw Error("Key \"" + stateId + "\" does not exist");
             }
             return this.state$[stateId];
         };
@@ -9423,7 +9426,7 @@
         MrSearchService.prototype.addState = function (context, id) {
             var stateId = context + "." + id;
             if (!this.state$[context]) {
-                throw Error("\n        State context \"" + context + "\" does'nt exists.\n        You must add context first\n      ");
+                throw Error("\n        State context \"" + context + "\" does not exist.\n        You must add context first\n      ");
             }
             if (this.state$[stateId]) {
                 throw Error("State key \"" + stateId + "\" already exists");
@@ -9434,7 +9437,7 @@
         MrSearchService.prototype.setState = function (context, id, newValue) {
             var stateId = context + "." + id;
             if (!this.state$[stateId]) {
-                throw Error("Key \"" + stateId + "\" does'nt exists");
+                throw Error("Key \"" + stateId + "\" does not exist");
             }
             var value = newValue;
             // hook control
@@ -9449,7 +9452,7 @@
         MrSearchService.prototype.setBeforeHook = function (context, id, hook) {
             var stateId = context + "." + id;
             if (!this.state$[stateId]) {
-                throw Error("Key \"" + stateId + "\" does'nt exists");
+                throw Error("Key \"" + stateId + "\" does not exist");
             }
             this.beforeHook[stateId] = hook;
         };
@@ -9644,6 +9647,11 @@
                     _this.setState(FACETS_REQUEST_STATE_CONTEXT, 'error', error);
                 }
             }, facets.provider || null); })).subscribe(function (response) {
+                // clean up
+                var inputs = response.inputs;
+                Object.keys(inputs).forEach(function (inputKey) {
+                    inputs[inputKey] = inputs[inputKey].map(function (item) { return (__assign(__assign({}, item), { payload: item.payload && typeof item.payload === 'string' ? encodeURIComponent(item.payload) : item.payload })); });
+                });
                 _this.setState(FACETS_REQUEST_STATE_CONTEXT, 'success', response);
             });
             // update facet links
@@ -9767,12 +9775,6 @@
                 Object.keys(headers).forEach(function (id) {
                     _this.dataSource.updateInputValue(id, headers[id]);
                 });
-            });
-            // listener for section updates
-            this.searchService.getState$(SECTION_STATE_CONTEXT)
-                .pipe(operators.takeUntil(this.destroyed$)).subscribe(function (_a) {
-                var lastUpdated = _a.lastUpdated, state = _a.state;
-                console.log('section', lastUpdated, state);
             });
         };
         return SearchFacetsLayoutEH;
@@ -10421,22 +10423,27 @@
     }, ɵ5 = {
         links: []
     }, ɵ6 = {
-        text: 'Keywords',
-        additionalText: null,
-        iconRight: 'n7-icon-angle-down'
+        text: 'Autori',
+        additionalText: null
     }, ɵ7 = {
         links: []
     }, ɵ8 = {
-        text: 'Data di pubblicazione',
+        text: 'Keywords',
         additionalText: null,
         iconRight: 'n7-icon-angle-down'
     }, ɵ9 = {
         links: []
     }, ɵ10 = {
-        text: 'Luogo di pubblicazione',
+        text: 'Data di pubblicazione',
         additionalText: null,
         iconRight: 'n7-icon-angle-down'
     }, ɵ11 = {
+        links: []
+    }, ɵ12 = {
+        text: 'Luogo di pubblicazione',
+        additionalText: null,
+        iconRight: 'n7-icon-angle-down'
+    }, ɵ13 = {
         links: []
     };
     var facets = {
@@ -10493,10 +10500,26 @@
                         data: ɵ5
                     }]
             }, {
+                id: 'section-authors',
+                header: {
+                    id: 'header-authors',
+                    data: ɵ6
+                },
+                inputs: [{
+                        id: 'authors',
+                        type: 'link',
+                        queryParam: true,
+                        schema: {
+                            valueType: 'string',
+                            multiple: true
+                        },
+                        data: ɵ7
+                    }]
+            }, {
                 id: 'section-keywords',
                 header: {
                     id: 'header-keywords',
-                    data: ɵ6
+                    data: ɵ8
                 },
                 inputs: [{
                         id: 'keywords',
@@ -10506,13 +10529,13 @@
                             valueType: 'string',
                             multiple: true
                         },
-                        data: ɵ7
+                        data: ɵ9
                     }],
             }, {
                 id: 'section-date',
                 header: {
                     id: 'header-date',
-                    data: ɵ8
+                    data: ɵ10
                 },
                 inputs: [{
                         id: 'date',
@@ -10522,13 +10545,13 @@
                             valueType: 'string',
                             multiple: true
                         },
-                        data: ɵ9
+                        data: ɵ11
                     }],
             }, {
                 id: 'section-place',
                 header: {
                     id: 'header-place',
-                    data: ɵ10
+                    data: ɵ12
                 },
                 inputs: [{
                         id: 'place',
@@ -10538,19 +10561,19 @@
                             valueType: 'string',
                             multiple: true
                         },
-                        data: ɵ11
+                        data: ɵ13
                     }],
             }],
         classes: 'facets-wrapper'
     };
-    var ɵ12 = function (id) { return ({
+    var ɵ14 = function (id) { return ({
         id: id,
         queryParam: true,
         schema: {
             valueType: id === 'sort' ? 'string' : 'number'
         }
     }); };
-    var layoutInputs = ['page', 'limit', 'sort'].map(ɵ12);
+    var layoutInputs = ['page', 'limit', 'sort'].map(ɵ14);
     var request = {
         results: {
             id: 'search',

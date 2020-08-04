@@ -6644,7 +6644,7 @@ let SmartBreadcrumbsComponent = class SmartBreadcrumbsComponent {
                     tippyData.appendChild(liArray[i].cloneNode(true)); // add <li> to tippy data (<ol>)
                     liArray[i].children[0].innerText = '…'; // convert to ellipsis
                     liArray[i].className = 'n7-breadcrumbs__item-ellipsis'; // set class to list item
-                    this.tippyBuilder(liArray[i], tippyData); // append tooltip to ellipsis
+                    this.tippyBuilder(liArray[i].children[0], tippyData); // append tooltip to ellipsis
                     i += 1;
                     // update widths
                     ({ parentWidth, childWidth } = this.getWidths(this.bcdiv, this.bcol));
@@ -6677,7 +6677,7 @@ __decorate([
 SmartBreadcrumbsComponent = __decorate([
     Component({
         selector: 'n7-smart-breadcrumbs',
-        template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\n    <nav class=\"n7-breadcrumbs__nav\">\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\n                <n7-anchor-wrapper [classes]=\"item.classes\"\n                [data]=\"item.anchor\"\n                (clicked)=\"onClick($event)\">\n                    {{ item.label }}\n                </n7-anchor-wrapper>\n            </li>\n        </ol>\n    </nav>\n</div>"
+        template: "<div *ngIf=\"data\" class=\"n7-breadcrumbs {{ data.classes || '' }}\" #bcdiv>\n    <nav class=\"n7-breadcrumbs__nav\">\n        <ol class=\"n7-breadcrumbs__list\" #bcol>\n            <li *ngFor=\"let item of data.items\" class=\"n7-breadcrumbs__item {{ item.classes || '' }}\">\n                <span class=\"ellipsis-target\">\n                    <n7-anchor-wrapper [classes]=\"item.classes\"\n                        [data]=\"item.anchor\"\n                        (clicked)=\"onClick($event)\">\n                        {{ item.label }}\n                    </n7-anchor-wrapper>\n                </span>\n            </li>\n        </ol>\n    </nav>\n</div>\n"
     })
 ], SmartBreadcrumbsComponent);
 
@@ -8158,10 +8158,12 @@ class MrSearchTagsDS extends DataSource {
                 .forEach(({ id }) => {
                 if (state[id]) {
                     const values = Array.isArray(state[id]) ? state[id] : [state[id]];
-                    values.forEach((value) => {
+                    values
+                        .forEach((value) => {
+                        var _a;
                         let text = value;
                         if (linkInputs[id]) {
-                            text = linkInputs[id].find(({ payload }) => payload === value).text;
+                            text = (_a = linkInputs[id].find(({ payload }) => payload === value)) === null || _a === void 0 ? void 0 : _a.text;
                         }
                         tags.push({
                             text,
@@ -8830,9 +8832,9 @@ var searchHelper = {
     stateToQueryParams(state, schemas) {
         const queryParams = {};
         Object.keys(state).forEach((key) => {
-            const value = state[key];
             const schema = schemas[key];
             const { multiple, valueType } = schema;
+            const value = state[key];
             if (hasValue(value)) {
                 switch (valueType) {
                     case 'number':
@@ -8858,6 +8860,7 @@ var searchHelper = {
             if (hasValue(value)) {
                 if (hasValue(value)) {
                     switch (valueType) {
+                        // http://localhost:4200/maps?sort=sort_ASC&limit=12&authors=D%27Elia%5C%2C%20Pasquale&continents=Asia
                         case 'number':
                             state[key] = multiple ? value.split(',').map((v) => +v) : +value;
                             break;
@@ -8911,7 +8914,7 @@ let MrSearchService = class MrSearchService {
     getState$(context, id) {
         const stateId = id ? `${context}.${id}` : context;
         if (!this.state$[stateId]) {
-            throw Error(`Key "${stateId}" does'nt exists`);
+            throw Error(`Key "${stateId}" does not exist`);
         }
         return this.state$[stateId];
     }
@@ -8928,7 +8931,7 @@ let MrSearchService = class MrSearchService {
         const stateId = `${context}.${id}`;
         if (!this.state$[context]) {
             throw Error(`
-        State context "${context}" does'nt exists.
+        State context "${context}" does not exist.
         You must add context first
       `);
         }
@@ -8941,7 +8944,7 @@ let MrSearchService = class MrSearchService {
     setState(context, id, newValue) {
         const stateId = `${context}.${id}`;
         if (!this.state$[stateId]) {
-            throw Error(`Key "${stateId}" does'nt exists`);
+            throw Error(`Key "${stateId}" does not exist`);
         }
         let value = newValue;
         // hook control
@@ -8956,7 +8959,7 @@ let MrSearchService = class MrSearchService {
     setBeforeHook(context, id, hook) {
         const stateId = `${context}.${id}`;
         if (!this.state$[stateId]) {
-            throw Error(`Key "${stateId}" does'nt exists`);
+            throw Error(`Key "${stateId}" does not exist`);
         }
         this.beforeHook[stateId] = hook;
     }
@@ -9131,6 +9134,11 @@ let MrSearchService = class MrSearchService {
                 this.setState(FACETS_REQUEST_STATE_CONTEXT, 'error', error);
             }
         }, facets.provider || null))).subscribe((response) => {
+            // clean up
+            const { inputs } = response;
+            Object.keys(inputs).forEach((inputKey) => {
+                inputs[inputKey] = inputs[inputKey].map((item) => (Object.assign(Object.assign({}, item), { payload: item.payload && typeof item.payload === 'string' ? encodeURIComponent(item.payload) : item.payload })));
+            });
             this.setState(FACETS_REQUEST_STATE_CONTEXT, 'success', response);
         });
         // update facet links
@@ -9233,11 +9241,6 @@ class SearchFacetsLayoutEH extends EventHandler {
             Object.keys(headers).forEach((id) => {
                 this.dataSource.updateInputValue(id, headers[id]);
             });
-        });
-        // listener for section updates
-        this.searchService.getState$(SECTION_STATE_CONTEXT)
-            .pipe(takeUntil(this.destroyed$)).subscribe(({ lastUpdated, state }) => {
-            console.log('section', lastUpdated, state);
         });
     }
 }
@@ -9799,22 +9802,27 @@ const ɵ0$4 = {
 }, ɵ5 = {
     links: []
 }, ɵ6 = {
-    text: 'Keywords',
-    additionalText: null,
-    iconRight: 'n7-icon-angle-down'
+    text: 'Autori',
+    additionalText: null
 }, ɵ7 = {
     links: []
 }, ɵ8 = {
-    text: 'Data di pubblicazione',
+    text: 'Keywords',
     additionalText: null,
     iconRight: 'n7-icon-angle-down'
 }, ɵ9 = {
     links: []
 }, ɵ10 = {
-    text: 'Luogo di pubblicazione',
+    text: 'Data di pubblicazione',
     additionalText: null,
     iconRight: 'n7-icon-angle-down'
 }, ɵ11 = {
+    links: []
+}, ɵ12 = {
+    text: 'Luogo di pubblicazione',
+    additionalText: null,
+    iconRight: 'n7-icon-angle-down'
+}, ɵ13 = {
     links: []
 };
 const facets = {
@@ -9871,10 +9879,26 @@ const facets = {
                     data: ɵ5
                 }]
         }, {
+            id: 'section-authors',
+            header: {
+                id: 'header-authors',
+                data: ɵ6
+            },
+            inputs: [{
+                    id: 'authors',
+                    type: 'link',
+                    queryParam: true,
+                    schema: {
+                        valueType: 'string',
+                        multiple: true
+                    },
+                    data: ɵ7
+                }]
+        }, {
             id: 'section-keywords',
             header: {
                 id: 'header-keywords',
-                data: ɵ6
+                data: ɵ8
             },
             inputs: [{
                     id: 'keywords',
@@ -9884,13 +9908,13 @@ const facets = {
                         valueType: 'string',
                         multiple: true
                     },
-                    data: ɵ7
+                    data: ɵ9
                 }],
         }, {
             id: 'section-date',
             header: {
                 id: 'header-date',
-                data: ɵ8
+                data: ɵ10
             },
             inputs: [{
                     id: 'date',
@@ -9900,13 +9924,13 @@ const facets = {
                         valueType: 'string',
                         multiple: true
                     },
-                    data: ɵ9
+                    data: ɵ11
                 }],
         }, {
             id: 'section-place',
             header: {
                 id: 'header-place',
-                data: ɵ10
+                data: ɵ12
             },
             inputs: [{
                     id: 'place',
@@ -9916,19 +9940,19 @@ const facets = {
                         valueType: 'string',
                         multiple: true
                     },
-                    data: ɵ11
+                    data: ɵ13
                 }],
         }],
     classes: 'facets-wrapper'
 };
-const ɵ12 = (id) => ({
+const ɵ14 = (id) => ({
     id,
     queryParam: true,
     schema: {
         valueType: id === 'sort' ? 'string' : 'number'
     }
 });
-const layoutInputs = ['page', 'limit', 'sort'].map(ɵ12);
+const layoutInputs = ['page', 'limit', 'sort'].map(ɵ14);
 const request = {
     results: {
         id: 'search',
