@@ -3,5 +3,6 @@ export * from './layouts-configuration.service';
 export * from './main-state.service';
 export * from './communication.service';
 export * from './json-config.service';
+export * from './local-config.service';
 export * from './communication-providers/apollo.provider';
 export * from './communication-providers/rest.provider';

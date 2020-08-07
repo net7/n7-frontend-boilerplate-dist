@@ -6971,33 +6971,33 @@ var apolloConfig = {
                 }
             }
             relatedItems {
-                thumbnail
-                item {
-                  label
-                  id
-                  fields {
-                    ...
-                    on KeyValueField {
-                      key
-                      value
-                    }
-                    ... on KeyValueFieldGroup {
-                      label
-                      fields {
-                        ...
-                        on KeyValueField {
-                          key
-                          value
-                        }
+              thumbnail
+              item {
+                label
+                id
+                fields {
+                  ...
+                  on KeyValueField {
+                    key
+                    value
+                  }
+                  ... on KeyValueFieldGroup {
+                    label
+                    fields {
+                      ...
+                      on KeyValueField {
+                        key
+                        value
                       }
                     }
                   }
-                  relatedTypesOfEntity {
-                    type
-                    count
-                  }
+                }
+                relatedTypesOfEntity {
+                  type
+                  count
                 }
               }
+            }
             breadcrumbs {
               label
               link
@@ -7033,6 +7033,10 @@ var apolloConfig = {
                 typeOfEntity
                 relation
               }
+            }
+            breadcrumbs {
+              label
+              link
             }
           }
         }
@@ -8761,7 +8765,7 @@ MrResourceLayoutComponent.ctorParameters = () => [
 MrResourceLayoutComponent = __decorate([
     Component({
         selector: 'mr-resource-layout',
-        template: "<div class=\"mr-resource mr-layout\"\n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\">\n  <!-- RESOURCE LAYOUT CONTENT -->\n  <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n    <!-- loading -->\n    <ng-container *ngSwitchCase=\"'LOADING'\">\n      loading...\n    </ng-container>\n\n    <!-- error -->\n    <ng-container *ngSwitchCase=\"'ERROR'\">\n      error!\n    </ng-container>\n\n    <!-- success -->\n    <ng-container *ngSwitchCase=\"'SUCCESS'\">\n      <ng-container *ngIf=\"lb.dataSource.pageConfig.sections as sections\">\n        <!-- Pass the list of blocks to render to the block template -->\n        <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\n        <div class=\"mr-resource__content\">\n          <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\n        </div>\n      </ng-container>\n    </ng-container>\n\n  </ng-container>\n</div>\n\n\n\n\n<ng-template #blocks\n             let-list>\n  <section *ngFor=\"let section of list\"\n           class=\"{{ 'mr-layout__' + section.type }}\">\n    <ng-container [ngSwitch]=\"section.type\">\n      <!-- TABS -->\n      <!-- TABS -->\n      <ng-container *ngSwitchCase=\"'tabs'\">\n        <ng-container *ngFor=\"let tab of lb.dataSource.tabConfig\">\n          <n7-anchor-wrapper [data]=\"{ href: '/opera' + '/' + lb.dataSource.slug + '/' + tab.id }\">\n            <span class=\"n7-btn n7-btn-light\">{{tab.label}}</span>\n          </n7-anchor-wrapper>\n        </ng-container>\n      </ng-container>\n\n      <!-- INNER TITLE -->\n      <div class=\"mr-resource__title\">\n        <ng-container *ngSwitchCase=\"'title'\">\n          <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                          [emit]=\"lb.widgets[section.id].emit\">\n          </n7-inner-title>\n        </ng-container>\n      </div>\n\n      <!-- IMAGE VIEWER -->\n      <ng-container *ngSwitchCase=\"'viewer'\">\n        <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                         [emit]=\"lb.widgets[section.id].emit\">\n        </n7-image-viewer>\n      </ng-container>\n\n      <!-- METADATA VIEWER -->\n      <ng-container *ngSwitchCase=\"'metadata'\">\n        <mr-read-more [data]=\"{ limit: 130 }\">\n          <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                              [emit]=\"lb.widgets[section.id].emit\">\n          </n7-metadata-viewer>\n        </mr-read-more>\n      </ng-container>\n\n      <!-- COLLECTION -->\n      <ng-container *ngSwitchCase=\"'collection'\">\n        <div class=\"mr-layout__maxwidth mr-items-preview\">\n          <n7-inner-title [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                          [emit]=\"lb.widgets[section.id].emit\">\n          </n7-inner-title>\n          <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n            <n7-item-preview *ngFor=\"let item of (lb.widgets[section.id].ds.out$ | async)?.items\"\n                             [data]=\"item\"\n                             [emit]=\"lb.widgets[section.id].emit\">\n            </n7-item-preview>\n          </div>\n        </div>\n      </ng-container>\n\n      <!-- ITEM PREVIEW -->\n      <ng-container *ngSwitchCase=\"'preview'\">\n        <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                         [emit]=\"lb.widgets[section.id].emit\">\n        </n7-item-preview>\n      </ng-container>\n\n      <!-- TEXT VIEWER -->\n      <ng-container *ngSwitchCase=\"'text'\">\n        <div class=\"text-viewer__mock\">n7-text-viewer</div>\n      </ng-container>\n\n      <!-- INFO BOX -->\n      <ng-container *ngSwitchCase=\"'info'\">\n        <div class=\"info-box__mock\">info-box</div>\n      </ng-container>\n\n      <!-- BREADCRUMBS -->\n      <ng-container *ngSwitchCase=\"'breadcrumbs'\">\n        <n7-breadcrumbs [data]=\"{\n            items: [{\n              label: 'Home',\n              anchor: { href: '/home' }\n            }, {\n              label: 'Opere',\n              anchor: { href: '/opere' }\n            }, {\n              label: 'Opere giovanili',\n              anchor: { href: '/opere-giovanili' }\n            }, {\n              label: 'Canzoniere',\n              anchor: { href: '/canzoniere' }\n            }, {\n              label: 'Canzoniere (Rerum vulgarium fragmenta)',\n              anchor: { href: '/canzoniere/rerum-vulgarium-fragmenta' }\n            }]\n          }\">\n        </n7-breadcrumbs>\n      </ng-container>\n    </ng-container>\n  </section>\n</ng-template>\n"
+        template: "<div class=\"mr-resource mr-layout\"\n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\">\n  <!-- RESOURCE LAYOUT CONTENT -->\n  <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n    <!-- loading -->\n    <ng-container *ngSwitchCase=\"'LOADING'\">\n      loading...\n    </ng-container>\n\n    <!-- error -->\n    <ng-container *ngSwitchCase=\"'ERROR'\">\n      error!\n    </ng-container>\n\n    <!-- success -->\n    <ng-container *ngSwitchCase=\"'SUCCESS'\">\n      <ng-container *ngIf=\"lb.dataSource.pageConfig.sections as sections\">\n        <!-- Pass the list of blocks to render to the block template -->\n        <div class=\"mr-resource__top\">\n            <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\n        </div>\n        <div class=\"mr-resource__content\">\n          <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\n        </div>\n      </ng-container>\n    </ng-container>\n\n  </ng-container>\n</div>\n\n<ng-template #blocks\n             let-list>\n  <section *ngFor=\"let section of list\"\n           class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\n    <ng-container [ngSwitch]=\"section.type\">\n      <!-- TABS -->\n      <!-- TABS -->\n      <ng-container *ngSwitchCase=\"'tabs'\">\n        <ng-container *ngFor=\"let tab of lb.dataSource.tabConfig\">\n          <n7-anchor-wrapper [data]=\"{ href: '/opera' + '/' + lb.dataSource.slug + '/' + tab.id }\">\n            <span class=\"n7-btn n7-btn-light\">{{tab.label}}</span>\n          </n7-anchor-wrapper>\n        </ng-container>\n      </ng-container>\n\n      <!-- INNER TITLE -->\n    <ng-container *ngSwitchCase=\"'title'\">\n        <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n        </n7-inner-title>\n    </ng-container>\n\n      <!-- IMAGE VIEWER -->\n      <ng-container *ngSwitchCase=\"'viewer'\">\n        <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                         [emit]=\"lb.widgets[section.id].emit\">\n        </n7-image-viewer>\n      </ng-container>\n\n      <!-- METADATA VIEWER -->\n      <ng-container *ngSwitchCase=\"'metadata'\">\n        <h3 class=\"mr-resource__section-title mr-resource__metadata-title\">Metadati</h3>\n        <mr-read-more [data]=\"{ limit: 130 }\">\n          <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                              [emit]=\"lb.widgets[section.id].emit\">\n          </n7-metadata-viewer>\n        </mr-read-more>\n      </ng-container>\n\n      <!-- COLLECTION -->\n      <ng-container *ngSwitchCase=\"'collection'\">\n        <div class=\"mr-layout__maxwidth mr-items-preview\">\n          <n7-inner-title [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                          [emit]=\"lb.widgets[section.id].emit\">\n          </n7-inner-title>\n          <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n            <n7-item-preview *ngFor=\"let item of (lb.widgets[section.id].ds.out$ | async)?.items\"\n                             [data]=\"item\"\n                             [emit]=\"lb.widgets[section.id].emit\">\n            </n7-item-preview>\n          </div>\n        </div>\n      </ng-container>\n\n      <!-- ITEM PREVIEW -->\n      <ng-container *ngSwitchCase=\"'preview'\">\n        <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                         [emit]=\"lb.widgets[section.id].emit\">\n        </n7-item-preview>\n      </ng-container>\n\n      <!-- TEXT VIEWER -->\n      <ng-container *ngSwitchCase=\"'text'\">\n        <div class=\"text-viewer__mock\">n7-text-viewer</div>\n      </ng-container>\n\n      <!-- INFO BOX -->\n      <ng-container *ngSwitchCase=\"'info'\">\n        <div class=\"info-box__mock\">info-box</div>\n      </ng-container>\n\n      <!-- BREADCRUMBS -->\n      <ng-container *ngSwitchCase=\"'breadcrumbs'\">\n        <n7-breadcrumbs [data]=\"{\n            items: [{\n              label: 'Home',\n              anchor: { href: '/home' }\n            }, {\n              label: 'Opere',\n              anchor: { href: '/opere' }\n            }, {\n              label: 'Opere giovanili',\n              anchor: { href: '/opere-giovanili' }\n            }, {\n              label: 'Canzoniere',\n              anchor: { href: '/canzoniere' }\n            }, {\n              label: 'Canzoniere (Rerum vulgarium fragmenta)',\n              anchor: { href: '/canzoniere/rerum-vulgarium-fragmenta' }\n            }]\n          }\">\n        </n7-breadcrumbs>\n      </ng-container>\n    </ng-container>\n  </section>\n</ng-template>\n"
     }),
     __metadata("design:paramtypes", [LayoutsConfigurationService,
         ActivatedRoute,
@@ -10332,6 +10336,29 @@ JsonConfigService = __decorate([
         ConfigurationService])
 ], JsonConfigService);
 
+let LocalConfigService = class LocalConfigService {
+    constructor(config) {
+        this.config = config;
+    }
+    load(config) {
+        return of(true).pipe(tap(() => {
+            if (config) {
+                Object.keys(config).forEach((key) => this.config.set(key, config[key]));
+            }
+        })).toPromise();
+    }
+};
+LocalConfigService.ctorParameters = () => [
+    { type: ConfigurationService }
+];
+LocalConfigService.ɵprov = ɵɵdefineInjectable({ factory: function LocalConfigService_Factory() { return new LocalConfigService(ɵɵinject(ConfigurationService)); }, token: LocalConfigService, providedIn: "root" });
+LocalConfigService = __decorate([
+    Injectable({
+        providedIn: 'root',
+    }),
+    __metadata("design:paramtypes", [ConfigurationService])
+], LocalConfigService);
+
 // main layout
 
 // home layout
@@ -10420,5 +10447,5 @@ DynamicPathGuard = __decorate([
  * Generated bundle index. Do not edit.
  */
 
-export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrBreadcrumbsDS, MrCollectionDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageTitleDS, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrTextViewerDS, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, ɵ0$2 as ɵ0, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrGlossaryLayoutComponent as ɵba, MrHomeLayoutComponent as ɵbb, MrLayoutStateService as ɵbc, MrResourceLayoutComponent as ɵbd, MrSearchFacetsLayoutComponent as ɵbe, MrSearchLayoutComponent as ɵbf, MrSearchService as ɵbg, MrStaticLayoutComponent as ɵbh, ReadMoreComponent as ɵbi, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, AwGalleryLayoutComponent as ɵl, AwSearchService as ɵm, AwHomeLayoutComponent as ɵn, AwMapLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwSearchLayoutComponent as ɵq, AwTimelineLayoutComponent as ɵr, BubbleChartWrapperComponent as ɵs, ChartTippyComponent as ɵt, SmartBreadcrumbsComponent as ɵu, AwFacetsWrapperComponent as ɵv, DataWidgetWrapperComponent as ɵw, DatepickerWrapperComponent as ɵx, DvExampleLayoutComponent as ɵy, EscapeHtmlPipe as ɵz };
+export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, LocalConfigService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrBreadcrumbsDS, MrCollectionDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageTitleDS, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrTextViewerDS, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, ɵ0$2 as ɵ0, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrGlossaryLayoutComponent as ɵba, MrHomeLayoutComponent as ɵbb, MrLayoutStateService as ɵbc, MrResourceLayoutComponent as ɵbd, MrSearchFacetsLayoutComponent as ɵbe, MrSearchLayoutComponent as ɵbf, MrSearchService as ɵbg, MrStaticLayoutComponent as ɵbh, ReadMoreComponent as ɵbi, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, AwGalleryLayoutComponent as ɵl, AwSearchService as ɵm, AwHomeLayoutComponent as ɵn, AwMapLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwSearchLayoutComponent as ɵq, AwTimelineLayoutComponent as ɵr, BubbleChartWrapperComponent as ɵs, ChartTippyComponent as ɵt, SmartBreadcrumbsComponent as ɵu, AwFacetsWrapperComponent as ɵv, DataWidgetWrapperComponent as ɵw, DatepickerWrapperComponent as ɵx, DvExampleLayoutComponent as ɵy, EscapeHtmlPipe as ɵz };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map
