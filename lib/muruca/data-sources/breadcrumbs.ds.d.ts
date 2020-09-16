@@ -1,5 +1,5 @@
 import { DataSource } from '@n7-frontend/core';
+import { BreadcrumbsData } from '@n7-frontend/components';
 export declare class MrBreadcrumbsDS extends DataSource {
-    id: string;
-    protected transform(data: any): any;
+    protected transform(data: any): BreadcrumbsData;
 }

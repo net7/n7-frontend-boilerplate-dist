@@ -4,7 +4,9 @@ import * as DS from '../../data-sources';
 import * as EH from '../../event-handlers';
 export declare const MrStaticLayoutConfig: {
     layoutId: string;
-    widgets: any[];
+    widgets: {
+        id: string;
+    }[];
     layoutDS: typeof MrStaticLayoutDS;
     layoutEH: typeof MrStaticLayoutEH;
     widgetsDataSources: typeof DS;

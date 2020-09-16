@@ -15,6 +15,7 @@ export declare class MrSearchService {
     private queryParamKeys;
     private inputSchemas;
     private contextState;
+    private internalFilterState;
     private state$;
     private beforeHook;
     constructor(router: Router, activatedRoute: ActivatedRoute, communication: CommunicationService);
@@ -33,6 +34,9 @@ export declare class MrSearchService {
     private initSectionState;
     private onRouteChange;
     private onInputsChange;
+    private onInternalInputsChange;
+    private doSingleFacetRequest;
     private onResultsLoading;
+    private onFacetsRequestSuccess;
     notEquals(val1: any, val2: any): boolean;
 }

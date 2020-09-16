@@ -5,7 +5,7 @@ export declare class MrMenuService {
     private configuration;
     private dynamicPaths;
     constructor(http: HttpClient, configuration: ConfigurationService);
-    load(path: any): Promise<any>;
+    load(): Promise<any>;
     private _handleResponse;
     isDynamicPath: (path: string) => boolean;
 }

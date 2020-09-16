@@ -13,4 +13,5 @@ export declare class MrSearchLayoutDS extends LayoutDataSource {
     updateActiveFilters(state: any, linksResponse: any): void;
     private getPaginationParams;
     private updateHeadTitle;
+    private addTranslations;
 }

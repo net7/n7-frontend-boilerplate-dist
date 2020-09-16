@@ -7,7 +7,7 @@ import { ReplaySubject, empty, Subject, of, merge, fromEvent, BehaviorSubject, f
 import { map, catchError, takeUntil, filter, tap, mapTo, debounceTime, switchMap, first, withLatestFrom, delay } from 'rxjs/operators';
 import { NavigationStart, Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Title, DomSanitizer } from '@angular/platform-browser';
-import { LayoutBuilder, EventHandler, DataSource, LayoutDataSource as LayoutDataSource$1 } from '@n7-frontend/core';
+import { LayoutBuilder, EventHandler, DataSource, LayoutDataSource as LayoutDataSource$1, _t } from '@n7-frontend/core';
 import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
 import tippy, { hideAll } from 'tippy.js';
 import { isEmpty, get, cloneDeep, xor } from 'lodash';
@@ -4413,7 +4413,7 @@ var facetsConfig = {
                     filterConfig: {
                         searchIn: [
                             {
-                                key: 'label.ngrams^5,text^4,fields.*.label^3',
+                                key: 'label.ngrams^5,text^4,fields.*^3',
                                 operator: '=',
                             },
                         ],
@@ -7735,27 +7735,23 @@ class MrGlossaryLayoutEH extends EventHandler {
 }
 
 class MrBreadcrumbsDS extends DataSource {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     transform(data) {
-        const bcMock = {
-            items: [{
-                    label: 'Home',
-                    anchor: { href: '/home' }
-                }, {
-                    label: 'Opere',
-                    anchor: { href: '/opere' }
-                }, {
-                    label: 'Opere giovanili',
-                    anchor: { href: '/opere-giovanili' }
-                }, {
-                    label: 'Canzoniere',
-                    anchor: { href: '/canzoniere' }
-                }, {
-                    label: 'Canzoniere (Rerum vulgarium fragmenta)',
-                    anchor: { href: '/canzoniere/rerum-vulgarium-fragmenta' }
-                }]
-        };
-        return bcMock;
+        let items = [];
+        if (Array.isArray(data) && data.length) {
+            let { base } = this.options || {};
+            base = Array.isArray(base) ? base : [];
+            items = [
+                ...base.map(({ link, title }) => ({
+                    label: _t(title),
+                    anchor: { href: link }
+                })),
+                ...data.map(({ link, title }) => ({
+                    label: title,
+                    anchor: { href: link }
+                }))
+            ];
+        }
+        return { items };
     }
 }
 
@@ -8084,6 +8080,19 @@ class MrTextViewerDS extends DataSource {
     }
 }
 
+class MrResourceTabsDS extends DataSource {
+    transform(data) {
+        const { currentTab, root, slug, id: resourceId } = this.options;
+        return data.map(({ id, label }) => ({
+            label: _t(label),
+            classes: currentTab === id ? 'is-active' : '',
+            anchor: {
+                href: `/${root}/${resourceId}/${slug}/${id}`
+            }
+        }));
+    }
+}
+
 class MrSearchPageTitleDS extends DataSource {
     transform() {
         const { title } = this.options.config;
@@ -8101,7 +8110,15 @@ class MrSearchResultsTitleDS extends DataSource {
     transform(data) {
         const { totalResultsText, sort } = this.options.config;
         const { total_count: totalCount, sort: currentSort } = data;
-        const mainText = `<strong>${totalCount || 0}</strong> ${totalResultsText[totalCount === 1 ? 1 : 0]}`;
+        const mainText = _t(totalResultsText, { total: totalCount }, (key, { total }) => {
+            if (total === 0) {
+                return `${key}_0`;
+            }
+            if (total === 1) {
+                return `${key}_1`;
+            }
+            return key;
+        });
         return {
             title: {
                 main: {
@@ -8153,7 +8170,7 @@ class MrSearchTagsDS extends DataSource {
     }
     transform(data) {
         const { state, linksResponse, facetsConfig } = data;
-        const { inputs: linkInputs } = linksResponse;
+        const { facets } = linksResponse;
         const tags = [];
         // inputs config
         facetsConfig.sections.forEach(({ inputs }) => {
@@ -8166,8 +8183,8 @@ class MrSearchTagsDS extends DataSource {
                         .forEach((value) => {
                         var _a;
                         let text = value;
-                        if (linkInputs[id]) {
-                            text = (_a = linkInputs[id].find(({ payload }) => payload === value)) === null || _a === void 0 ? void 0 : _a.text;
+                        if (facets[id]) {
+                            text = (_a = facets[id].values.find(({ payload }) => payload === value)) === null || _a === void 0 ? void 0 : _a.text;
                         }
                         tags.push({
                             text,
@@ -8186,6 +8203,31 @@ class MrSearchTagsDS extends DataSource {
     }
 }
 
+var dateHelper = {
+    format(date, format) {
+        return moment(date).format(format);
+    }
+};
+
+class MrStaticMetadataDS extends DataSource {
+    transform(data) {
+        const items = ['authors', 'date', 'time_to_read']
+            .filter((metakey) => data[metakey])
+            .map((metakey) => {
+            const itemValue = metakey === 'date' ? dateHelper.format(data[metakey], _t('global#date_human')) : data[metakey];
+            if (metakey === 'time_to_read') {
+                return {
+                    value: _t(`resource#${metakey}`, { value: itemValue }, (key, placeholders) => (placeholders.value === 1 ? `${key}_1` : key))
+                };
+            }
+            return {
+                value: _t(`resource#${metakey}`, { value: itemValue })
+            };
+        });
+        return { group: [{ items }] };
+    }
+}
+
 var DS$3 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     MrBreadcrumbsDS: MrBreadcrumbsDS,
@@ -8200,10 +8242,12 @@ var DS$3 = /*#__PURE__*/Object.freeze({
     MrMetadataDS: MrMetadataDS,
     MrNavDS: MrNavDS,
     MrTextViewerDS: MrTextViewerDS,
+    MrResourceTabsDS: MrResourceTabsDS,
     MrSearchPageTitleDS: MrSearchPageTitleDS,
     MrSearchResultsTitleDS: MrSearchResultsTitleDS,
     MrSearchResultsDS: MrSearchResultsDS,
-    MrSearchTagsDS: MrSearchTagsDS
+    MrSearchTagsDS: MrSearchTagsDS,
+    MrStaticMetadataDS: MrStaticMetadataDS
 });
 
 class MrDummyEH extends EventHandler {
@@ -8358,7 +8402,12 @@ MrLayoutStateService = __decorate([
     Injectable()
 ], MrLayoutStateService);
 
-class MrHomeLayoutDS extends LayoutDataSource {
+class MrHomeLayoutDS extends LayoutDataSource$1 {
+    constructor() {
+        super(...arguments);
+        this.errorTitle = _t('global#layout_error_title');
+        this.errorDescription = _t('global#layout_error_description');
+    }
     onInit(payload) {
         this.configuration = payload.configuration;
         this.communication = payload.communication;
@@ -8559,7 +8608,7 @@ MrHomeLayoutComponent.ctorParameters = () => [
 MrHomeLayoutComponent = __decorate([
     Component({
         selector: 'mr-home-layout',
-        template: "<div class=\"mr-home mr-layout\" *ngIf=\"lb.dataSource\">\n    <!-- HOME CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            loading...\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            error!\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <section *ngFor=\"let section of lb.dataSource.pageConfig.sections\" class=\"{{ 'mr-layout__' + section.type }}\">\n                <ng-container [ngSwitch]=\"section.type\">\n        \n                    <!-- SLIDER -->\n                    <ng-container *ngSwitchCase=\"'slider'\">\n                        <n7-carousel \n                        [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-carousel> \n                    </ng-container>\n        \n                    <!-- COLLECTION -->\n                    <ng-container *ngSwitchCase=\"'collection'\">\n                        <div class=\"mr-layout__maxwidth mr-items-preview\">\n                            <n7-inner-title \n                            [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                            [emit]=\"lb.widgets[section.id].emit\">\n                            </n7-inner-title>\n                            <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                                <n7-item-preview\n                                *ngFor=\"let item of (lb.widgets[section.id].ds.out$ | async)?.items\"\n                                [data]=\"item\"\n                                [emit]=\"lb.widgets[section.id].emit\">\n                                </n7-item-preview>\n                            </div>\n                        </div>\n                    </ng-container>\n        \n                    <!-- HERO -->\n                    <ng-container *ngSwitchCase=\"'hero'\">\n                        <n7-hero \n                        [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-hero> \n                    </ng-container>\n                \n                </ng-container>\n            </section>\n        </ng-container>\n\n    </ng-container>\n</div>\n"
+        template: "<div class=\"mr-home mr-layout\"\n     *ngIf=\"lb.dataSource\"\n     [ngClass]=\"{\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\n      }\">\n    <!-- HOME CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            <div class=\"mr-layout__loader\">\n                <n7-loader></n7-loader>\n            </div>\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            <div class=\"mr-layout__error\">\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\n                <p>{{ lb.dataSource.errorDescription }}</p>\n            </div>\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <section *ngFor=\"let section of lb.dataSource.pageConfig.sections\" class=\"{{ 'mr-layout__' + section.type }}\">\n                <ng-container [ngSwitch]=\"section.type\">\n        \n                    <!-- SLIDER -->\n                    <ng-container *ngSwitchCase=\"'slider'\">\n                        <n7-carousel \n                        [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-carousel> \n                    </ng-container>\n        \n                    <!-- COLLECTION -->\n                    <ng-container *ngSwitchCase=\"'collection'\">\n                        <div class=\"mr-layout__maxwidth mr-items-preview\">\n                            <n7-inner-title \n                            [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                            [emit]=\"lb.widgets[section.id].emit\">\n                            </n7-inner-title>\n                            <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                                <n7-item-preview\n                                *ngFor=\"let item of (lb.widgets[section.id].ds.out$ | async)?.items\"\n                                [data]=\"item\"\n                                [emit]=\"lb.widgets[section.id].emit\">\n                                </n7-item-preview>\n                            </div>\n                        </div>\n                    </ng-container>\n        \n                    <!-- HERO -->\n                    <ng-container *ngSwitchCase=\"'hero'\">\n                        <n7-hero \n                        [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-hero> \n                    </ng-container>\n                \n                </ng-container>\n            </section>\n        </ng-container>\n\n    </ng-container>\n</div>\n"
     }),
     __metadata("design:paramtypes", [LayoutsConfigurationService,
         ActivatedRoute,
@@ -8569,7 +8618,17 @@ MrHomeLayoutComponent = __decorate([
         MrLayoutStateService])
 ], MrHomeLayoutComponent);
 
-class MrResourceLayoutDS extends LayoutDataSource {
+class MrResourceLayoutDS extends LayoutDataSource$1 {
+    constructor() {
+        super(...arguments);
+        /** Stores "max height" for the read-more-wrapper from configuration */
+        this.readMoreConfig = {
+            limit: 130,
+            label: _t('readmore#label')
+        };
+        this.errorTitle = _t('global#layout_error_title');
+        this.errorDescription = _t('global#layout_error_description');
+    }
     onInit(payload) {
         this.configuration = payload.configuration;
         this.communication = payload.communication;
@@ -8577,6 +8636,11 @@ class MrResourceLayoutDS extends LayoutDataSource {
         this.configId = payload.configId;
         this.pageConfig = this.configuration.get(this.configId);
         this.tabConfig = this.configuration.get('tabs')[this.pageConfig.tabs];
+        this.readMoreConfig.limit = this.configuration.get(this.configId).maxHeight;
+        // add translations
+        ['top', 'content'].forEach((type) => {
+            this.pageConfig.sections[type] = this.pageConfig.sections[type].map((section) => (Object.assign(Object.assign({}, section), { title: _t(section.title) })));
+        });
     }
     /** Request the configured widgets data */
     pageRequest$(id, onError) {
@@ -8612,6 +8676,17 @@ class MrResourceLayoutDS extends LayoutDataSource {
                 this.one(id).update(responseSection);
             }
         });
+        // update tabs
+        if (this.tabConfig) {
+            const tabSection = sections.find(({ type }) => type === 'tabs');
+            this.one(tabSection.id).updateOptions({
+                id: this.id,
+                root: this.pageConfig.tabs,
+                slug: this.slug,
+                currentTab: this.tab
+            });
+            this.one(tabSection.id).update(this.tabConfig);
+        }
     }
     updateHeadTitle({ title: resourceTitle }) {
         const appName = this.configuration.get('name');
@@ -8631,9 +8706,11 @@ class MrResourceLayoutEH extends EventHandler {
                 case 'mr-resource-layout.init':
                     {
                         this.route = payload.route;
-                        const { slug, tab } = this.route.snapshot.params;
-                        this.dataSource.tab = tab;
+                        const { slug, id } = this.route.snapshot.params;
+                        const { url } = this.route.snapshot;
+                        this.dataSource.tab = url[url.length - 1].path;
                         this.dataSource.slug = slug;
+                        this.dataSource.id = id;
                         this.layoutState = payload.layoutState;
                         this.dataSource.onInit(payload);
                         this.listenRoute();
@@ -8690,7 +8767,6 @@ class MrImageViewerEH extends EventHandler {
     }
 }
 
-const ɵ0$2 = (d) => d;
 const DATASOURCE_MAP$1 = {
     breadcrumbs: MrBreadcrumbsDS,
     collection: MrCollectionDS,
@@ -8700,7 +8776,7 @@ const DATASOURCE_MAP$1 = {
     text: MrTextViewerDS,
     title: MrInnerTitleDS,
     viewer: MrImageViewerDS,
-    tabs: ɵ0$2
+    tabs: MrResourceTabsDS
 };
 const EVENTHANDLER_MAP$1 = {
     viewer: MrImageViewerEH,
@@ -8765,7 +8841,7 @@ MrResourceLayoutComponent.ctorParameters = () => [
 MrResourceLayoutComponent = __decorate([
     Component({
         selector: 'mr-resource-layout',
-        template: "<div class=\"mr-resource mr-layout\"\n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\">\n  <!-- RESOURCE LAYOUT CONTENT -->\n  <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n    <!-- loading -->\n    <ng-container *ngSwitchCase=\"'LOADING'\">\n      loading...\n    </ng-container>\n\n    <!-- error -->\n    <ng-container *ngSwitchCase=\"'ERROR'\">\n      error!\n    </ng-container>\n\n    <!-- success -->\n    <ng-container *ngSwitchCase=\"'SUCCESS'\">\n      <ng-container *ngIf=\"lb.dataSource.pageConfig.sections as sections\">\n        <!-- Pass the list of blocks to render to the block template -->\n        <div class=\"mr-resource__top\">\n            <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\n        </div>\n        <div class=\"mr-resource__content\">\n          <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\n        </div>\n      </ng-container>\n    </ng-container>\n\n  </ng-container>\n</div>\n\n<ng-template #blocks\n             let-list>\n  <section *ngFor=\"let section of list\"\n           class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\n    <ng-container [ngSwitch]=\"section.type\">\n      <!-- TABS -->\n      <!-- TABS -->\n      <ng-container *ngSwitchCase=\"'tabs'\">\n        <ng-container *ngFor=\"let tab of lb.dataSource.tabConfig\">\n          <n7-anchor-wrapper [data]=\"{ href: '/opera' + '/' + lb.dataSource.slug + '/' + tab.id }\">\n            <span class=\"n7-btn n7-btn-light\">{{tab.label}}</span>\n          </n7-anchor-wrapper>\n        </ng-container>\n      </ng-container>\n\n      <!-- INNER TITLE -->\n    <ng-container *ngSwitchCase=\"'title'\">\n        <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n        </n7-inner-title>\n    </ng-container>\n\n      <!-- IMAGE VIEWER -->\n      <ng-container *ngSwitchCase=\"'viewer'\">\n        <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                         [emit]=\"lb.widgets[section.id].emit\">\n        </n7-image-viewer>\n      </ng-container>\n\n      <!-- METADATA VIEWER -->\n      <ng-container *ngSwitchCase=\"'metadata'\">\n        <h3 class=\"mr-resource__section-title mr-resource__metadata-title\">Metadati</h3>\n        <mr-read-more [data]=\"{ limit: 130 }\">\n          <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                              [emit]=\"lb.widgets[section.id].emit\">\n          </n7-metadata-viewer>\n        </mr-read-more>\n      </ng-container>\n\n      <!-- COLLECTION -->\n      <ng-container *ngSwitchCase=\"'collection'\">\n        <div class=\"mr-layout__maxwidth mr-items-preview\">\n          <n7-inner-title [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                          [emit]=\"lb.widgets[section.id].emit\">\n          </n7-inner-title>\n          <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n            <n7-item-preview *ngFor=\"let item of (lb.widgets[section.id].ds.out$ | async)?.items\"\n                             [data]=\"item\"\n                             [emit]=\"lb.widgets[section.id].emit\">\n            </n7-item-preview>\n          </div>\n        </div>\n      </ng-container>\n\n      <!-- ITEM PREVIEW -->\n      <ng-container *ngSwitchCase=\"'preview'\">\n        <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                         [emit]=\"lb.widgets[section.id].emit\">\n        </n7-item-preview>\n      </ng-container>\n\n      <!-- TEXT VIEWER -->\n      <ng-container *ngSwitchCase=\"'text'\">\n        <div class=\"text-viewer__mock\">n7-text-viewer</div>\n      </ng-container>\n\n      <!-- INFO BOX -->\n      <ng-container *ngSwitchCase=\"'info'\">\n        <div class=\"info-box__mock\">info-box</div>\n      </ng-container>\n\n      <!-- BREADCRUMBS -->\n      <ng-container *ngSwitchCase=\"'breadcrumbs'\">\n        <n7-breadcrumbs [data]=\"{\n            items: [{\n              label: 'Home',\n              anchor: { href: '/home' }\n            }, {\n              label: 'Opere',\n              anchor: { href: '/opere' }\n            }, {\n              label: 'Opere giovanili',\n              anchor: { href: '/opere-giovanili' }\n            }, {\n              label: 'Canzoniere',\n              anchor: { href: '/canzoniere' }\n            }, {\n              label: 'Canzoniere (Rerum vulgarium fragmenta)',\n              anchor: { href: '/canzoniere/rerum-vulgarium-fragmenta' }\n            }]\n          }\">\n        </n7-breadcrumbs>\n      </ng-container>\n    </ng-container>\n  </section>\n</ng-template>\n"
+        template: "<div class=\"mr-resource mr-layout\" \n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\"\n     [ngClass]=\"{\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\n      }\">\n    <!-- RESOURCE LAYOUT CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            <div class=\"mr-layout__loader\">\n                <n7-loader></n7-loader>\n            </div>\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            <div class=\"mr-layout__error\">\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\n                <p>{{ lb.dataSource.errorDescription }}</p>\n            </div>\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <ng-container *ngIf=\"lb.dataSource.pageConfig.sections as sections\">\n                <!-- Pass the list of blocks to render to the block template -->\n                <div class=\"mr-resource__top\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\n                </div>\n                <div class=\"mr-resource__content mr-side-margin\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\n                </div>\n            </ng-container>\n        </ng-container>\n\n    </ng-container>\n</div>\n\n<ng-template #blocks let-list>\n    <section *ngFor=\"let section of list\" class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\n        <ng-container [ngSwitch]=\"section.type\">\n\n            <!-- TABS -->\n            <ng-container *ngSwitchCase=\"'tabs'\">\n                <ng-container *ngFor=\"let tab of lb.widgets[section.id].ds.out$ | async\">\n                    <n7-anchor-wrapper [data]=\"tab.anchor\" [classes]=\"tab.classes\">\n                        <span class=\"mr-resource__tabs-item\">{{ tab.label }}</span>\n                    </n7-anchor-wrapper>\n                </ng-container>\n            </ng-container>\n\n            <!-- INNER TITLE -->\n            <ng-container *ngSwitchCase=\"'title'\">\n                <div class=\"mr-resource__title-content mr-side-margin\">\n                    <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-inner-title>\n                </div>\n            </ng-container>\n\n            <!-- IMAGE VIEWER -->\n            <ng-container *ngSwitchCase=\"'viewer'\">\n                <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                </n7-image-viewer>\n            </ng-container>\n\n            <!-- METADATA VIEWER -->\n            <ng-container *ngSwitchCase=\"'metadata'\">\n                <div class=\"mr-resource__metadata-content\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__metadata-title\">\n                        {{ section.title }}\n                    </h3>\n                    <mr-read-more [data]=\"lb.dataSource.readMoreConfig\">\n                        <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                            [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-metadata-viewer>\n                    </mr-read-more>\n                </div>\n            </ng-container>\n\n            <!-- COLLECTION -->\n            <ng-container *ngSwitchCase=\"'collection'\">\n                <div *ngIf=\"lb.widgets[section.id].ds.out$ | async as collection$\" class=\"mr-layout__maxwidth mr-items-preview\">\n                    <!-- <n7-inner-title [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-inner-title> -->\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__collection-title\">\n                        {{ section.title }}\n                    </h3>\n                    <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                        <n7-item-preview *ngFor=\"let item of (collection$ || {})?.items\"\n                            [data]=\"item\" [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n            </ng-container>\n\n            <!-- ITEM PREVIEW -->\n            <ng-container *ngSwitchCase=\"'preview'\">\n                <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__preview-title\">\n                    {{ section.title }}\n                </h3>\n                <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                </n7-item-preview>\n            </ng-container>\n\n            <!-- TEXT VIEWER -->\n            <ng-container *ngSwitchCase=\"'text-viewer'\">\n                <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__text-viewer-title\">\n                    {{ section.title }}\n                </h3>\n                <div class=\"text-viewer__mock\">n7-text-viewer</div>\n            </ng-container>\n\n            <!-- INFO BOX -->\n            <ng-container *ngSwitchCase=\"'info-box'\">\n                <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__info-box-title\">\n                    {{ section.title }}\n                </h3>\n                <div class=\"info-box__mock\">info-box</div>\n            </ng-container>\n\n            <!-- BREADCRUMBS -->\n            <ng-container *ngSwitchCase=\"'breadcrumbs'\">\n                <n7-breadcrumbs [data]=\"lb.widgets[section.id].ds.out$ | async\">\n                </n7-breadcrumbs>\n            </ng-container>\n        </ng-container>\n    </section>\n</ng-template>"
     }),
     __metadata("design:paramtypes", [LayoutsConfigurationService,
         ActivatedRoute,
@@ -8831,7 +8907,7 @@ const hasValue = (value) => {
     }
     return !!value;
 };
-const ɵ0$3 = hasValue;
+const ɵ0$2 = hasValue;
 var searchHelper = {
     stateToQueryParams(state, schemas) {
         const queryParams = {};
@@ -8864,7 +8940,6 @@ var searchHelper = {
             if (hasValue(value)) {
                 if (hasValue(value)) {
                     switch (valueType) {
-                        // http://localhost:4200/maps?sort=sort_ASC&limit=12&authors=D%27Elia%5C%2C%20Pasquale&continents=Asia
                         case 'number':
                             state[key] = multiple ? value.split(',').map((v) => +v) : +value;
                             break;
@@ -8897,6 +8972,10 @@ let MrSearchService = class MrSearchService {
         this.queryParamKeys = [];
         this.inputSchemas = {};
         this.contextState = {};
+        this.internalFilterState = {
+            globalParams: {},
+            facets: {}
+        };
         this.state$ = {};
         this.beforeHook = {};
         this.getConfig = () => this.config;
@@ -8912,6 +8991,7 @@ let MrSearchService = class MrSearchService {
         this.initSectionState();
         // listeners
         this.onInputsChange();
+        this.onInternalInputsChange();
         this.onRouteChange();
         this.onResultsLoading();
     }
@@ -8969,7 +9049,9 @@ let MrSearchService = class MrSearchService {
     }
     reset() {
         // clear input states
-        Object.keys(this.contextState[INPUT_STATE_CONTEXT]).forEach((id) => {
+        Object.keys(this.contextState[INPUT_STATE_CONTEXT])
+            .filter((id) => !this.internalFilterState.facets[id])
+            .forEach((id) => {
             this.setState(INPUT_STATE_CONTEXT, id, null);
         });
     }
@@ -8993,7 +9075,7 @@ let MrSearchService = class MrSearchService {
         facets.sections.forEach(({ header, inputs }) => {
             [header, ...inputs]
                 .filter((input) => input)
-                .forEach(({ id, queryParam, schema }) => {
+                .forEach(({ id, queryParam, schema, limit, type }) => {
                 if (!id) {
                     return;
                 }
@@ -9005,6 +9087,14 @@ let MrSearchService = class MrSearchService {
                 // schemas
                 if (schema) {
                     this.inputSchemas[id] = schema;
+                }
+                // links internal state
+                if (type === 'link') {
+                    this.internalFilterState.facets[id] = {
+                        id,
+                        limit,
+                        offset: 0,
+                    };
                 }
             });
         });
@@ -9065,12 +9155,14 @@ let MrSearchService = class MrSearchService {
                 const inputContext = this.contextState[INPUT_STATE_CONTEXT];
                 if (isEmpty(inputContext)) {
                     Object.keys(params)
+                        .filter((inputId) => this.queryParamKeys[inputId])
                         .forEach((inputId) => {
                         this.setState(INPUT_STATE_CONTEXT, inputId, params[inputId]);
                     });
                 }
                 else {
                     Object.keys(inputContext)
+                        .filter((inputId) => this.queryParamKeys[inputId])
                         .filter((inputId) => this.notEquals(inputContext[inputId], params[inputId]))
                         .forEach((inputId) => {
                         this.setState(INPUT_STATE_CONTEXT, inputId, params[inputId] || null);
@@ -9107,6 +9199,47 @@ let MrSearchService = class MrSearchService {
             });
         });
     }
+    onInternalInputsChange() {
+        this.getState$(INPUT_STATE_CONTEXT).pipe(filter(({ lastUpdated }) => this.queryParamKeys.indexOf(lastUpdated) === -1), map(({ lastUpdated, state }) => {
+            const { sections } = this.config.facets;
+            let inputConfig;
+            sections.forEach((section) => {
+                section.inputs.forEach((input) => {
+                    if (input.id === lastUpdated) {
+                        inputConfig = input;
+                    }
+                });
+            });
+            if (inputConfig && inputConfig.target) {
+                return {
+                    inputConfig,
+                    value: state[lastUpdated]
+                };
+            }
+            return null;
+        }), filter((data) => data !== null)).subscribe(({ inputConfig, value }) => {
+            const { target } = inputConfig;
+            // update internal filters
+            this.internalFilterState.facets[target].query = value;
+            this.doSingleFacetRequest(target);
+        });
+    }
+    doSingleFacetRequest(target) {
+        const { facets } = this.config.request;
+        const { globalParams } = this.internalFilterState;
+        const { id, limit, offset, query } = this.internalFilterState.facets[target];
+        this.communication.request$(facets.id, {
+            params: Object.assign(Object.assign({}, globalParams), { facets: [{
+                        id, limit, offset, query
+                    }], searchId: this.searchId }),
+            method: 'POST',
+            onError: (error) => {
+                this.setState(FACETS_REQUEST_STATE_CONTEXT, 'error', error);
+            }
+        }, facets.provider || null).subscribe((response) => {
+            this.onFacetsRequestSuccess(response);
+        });
+    }
     onResultsLoading() {
         const { facets } = this.config.request;
         if (!facets) {
@@ -9119,14 +9252,18 @@ let MrSearchService = class MrSearchService {
             this.addState(FACETS_REQUEST_STATE_CONTEXT, id);
         });
         this.getState$(RESULTS_REQUEST_STATE_CONTEXT, 'loading').pipe(map((params) => {
-            this.setState(FACETS_REQUEST_STATE_CONTEXT, 'loading', params);
-            return params;
+            const facetsParams = Object.assign({}, params);
+            this.setState(FACETS_REQUEST_STATE_CONTEXT, 'loading', facetsParams);
+            // updated internal filter state
+            this.internalFilterState.globalParams = Object.assign({}, facetsParams);
+            return facetsParams;
         }), debounceTime(facets.delay || 1), map((params) => {
             params.facets = [];
             this.config.facets.sections.forEach(({ inputs }) => {
                 inputs.filter(({ type }) => type === 'link')
                     .forEach(({ id }) => {
-                    params.facets.push(id);
+                    const offset = 0;
+                    params.facets.push(Object.assign(Object.assign({}, this.internalFilterState.facets[id]), { offset }));
                 });
             });
             this.setState(FACETS_REQUEST_STATE_CONTEXT, 'request', params);
@@ -9138,21 +9275,27 @@ let MrSearchService = class MrSearchService {
                 this.setState(FACETS_REQUEST_STATE_CONTEXT, 'error', error);
             }
         }, facets.provider || null))).subscribe((response) => {
-            // clean up
-            const { inputs } = response;
-            Object.keys(inputs).forEach((inputKey) => {
-                inputs[inputKey] = inputs[inputKey].map((item) => (Object.assign(Object.assign({}, item), { payload: item.payload && typeof item.payload === 'string' ? encodeURIComponent(item.payload) : item.payload })));
-            });
-            this.setState(FACETS_REQUEST_STATE_CONTEXT, 'success', response);
+            this.onFacetsRequestSuccess(response);
         });
         // update facet links
-        this.getState$(FACETS_REQUEST_STATE_CONTEXT, 'success').subscribe(({ inputs }) => {
-            Object.keys(inputs).forEach((id) => {
+        this.getState$(FACETS_REQUEST_STATE_CONTEXT, 'success').subscribe((response) => {
+            const { facets: responseFacets } = response;
+            Object.keys(responseFacets).forEach((id) => {
                 this.setState(FACET_STATE_CONTEXT, id, {
-                    links: inputs[id]
+                    links: responseFacets[id].values
                 });
             });
         });
+    }
+    onFacetsRequestSuccess(response) {
+        const { facets: responseFacets } = response;
+        Object.keys(responseFacets).forEach((inputKey) => {
+            // update internal filter state
+            const { total_count } = responseFacets[inputKey];
+            this.internalFilterState.facets[inputKey].total_count = total_count;
+            responseFacets[inputKey].values = responseFacets[inputKey].values.map((item) => (Object.assign(Object.assign({}, item), { payload: item.payload && typeof item.payload === 'string' ? encodeURIComponent(item.payload) : item.payload })));
+        });
+        this.setState(FACETS_REQUEST_STATE_CONTEXT, 'success', response);
     }
     notEquals(val1, val2) {
         if (Array.isArray(val1) && Array.isArray(val2)) {
@@ -9241,9 +9384,11 @@ class SearchFacetsLayoutEH extends EventHandler {
         });
         // listener for facet header updates
         this.searchService.getState$(FACETS_REQUEST_STATE_CONTEXT, 'success')
-            .pipe(takeUntil(this.destroyed$)).subscribe(({ headers }) => {
-            Object.keys(headers).forEach((id) => {
-                this.dataSource.updateInputValue(id, headers[id]);
+            .pipe(takeUntil(this.destroyed$)).subscribe((response) => {
+            const { facets } = response;
+            Object.keys(facets).forEach((id) => {
+                const { total_count: totalCount } = facets[id];
+                this.dataSource.updateInputValue(`header-${id}`, totalCount);
             });
         });
     }
@@ -9265,7 +9410,7 @@ class FacetTextDS extends DataSource {
         this.getValue = () => this.value;
     }
     transform(data) {
-        return data;
+        return Object.assign(Object.assign({}, data), { placeholder: _t(data.placeholder) });
     }
     setValue(value, update = false) {
         this.value = value;
@@ -9370,7 +9515,7 @@ class FacetHeaderDS extends DataSource {
         this.getValue = () => this.value;
     }
     transform(data) {
-        return Object.assign(Object.assign({}, data), { iconRight: data.iconRight || ICON_OPEN });
+        return Object.assign(Object.assign({}, data), { text: _t(data.text), iconRight: data.iconRight || ICON_OPEN });
     }
     setValue(value, update = false) {
         this.value = value;
@@ -9616,6 +9761,8 @@ class MrSearchLayoutDS extends LayoutDataSource$1 {
         this.one('mr-search-page-title').update({});
         // update head title
         this.updateHeadTitle();
+        // update translations
+        this.addTranslations(this.pageConfig);
     }
     handleResponse(response) {
         this.some([
@@ -9651,6 +9798,27 @@ class MrSearchLayoutDS extends LayoutDataSource$1 {
         const appName = this.configuration.get('name');
         const pageTitle = this.pageConfig.title;
         this.mainState.update('headTitle', [appName, pageTitle].join(' > '));
+    }
+    addTranslations(config) {
+        var _a;
+        if (config.facetsTitle) {
+            config.facetsTitle = _t(config.facetsTitle);
+        }
+        if (config.filtersTitle) {
+            config.filtersTitle = _t(config.filtersTitle);
+        }
+        if ((_a = config === null || config === void 0 ? void 0 : config.sort) === null || _a === void 0 ? void 0 : _a.label) {
+            config.sort.label = _t(config.sort.label);
+            config.sort.options = config.sort.options.map((option) => (Object.assign(Object.assign({}, option), { label: _t(option.label) })));
+        }
+        ['text', 'button'].forEach((key) => {
+            if (config.fallback) {
+                config.fallback[key] = _t(config.fallback[key]);
+            }
+            if (config.ko) {
+                config.ko[key] = _t(config.ko[key]);
+            }
+        });
     }
 }
 
@@ -9707,40 +9875,65 @@ class MrSearchLayoutEH extends EventHandler {
         });
     }
     initStateListener() {
+        var _a;
+        // default params
+        const { pageConfig } = this.dataSource;
+        const defaultLimit = pageConfig.pagination.options[0];
+        let defaultSort = (_a = pageConfig.sort.options.find((option) => option.selected === true)) === null || _a === void 0 ? void 0 : _a.value;
+        if (!defaultSort) {
+            defaultSort = pageConfig.sort.options[0].value;
+        }
         // inputs listener
-        this.searchService.getState$(INPUT_STATE_CONTEXT).subscribe(({ state }) => {
+        this.searchService.getState$(INPUT_STATE_CONTEXT).pipe(takeUntil(this.destroyed$)).subscribe(({ state }) => {
             this.searchState = state;
         });
-        this.searchService.getState$(INPUT_STATE_CONTEXT, 'query').subscribe((val) => {
+        this.searchService.getState$(INPUT_STATE_CONTEXT, 'query').pipe(takeUntil(this.destroyed$)).subscribe((val) => {
             this.emitOuter('inputquerychange', val);
             this.searchService.setState(INPUT_STATE_CONTEXT, 'sort', val ? '_score' : 'sort_ASC');
         });
-        this.searchService.getState$(FACETS_REQUEST_STATE_CONTEXT, 'success').subscribe((response) => {
+        this.searchService.getState$(FACETS_REQUEST_STATE_CONTEXT, 'success').pipe(takeUntil(this.destroyed$)).subscribe((response) => {
             this.linksResponse = response;
             this.dataSource.updateActiveFilters(this.searchState, this.linksResponse);
             // update sections
-            if (response.inputs) {
-                const { inputs } = response;
-                Object.keys(inputs).forEach((inputKey) => {
-                    const currentInput = inputs[inputKey];
-                    this.searchService.setState(SECTION_STATE_CONTEXT, `section-${inputKey}`, Array.isArray(currentInput) && currentInput.length ? 'is-not-empty' : 'is-empty');
+            if (response) {
+                const { facets } = response;
+                Object.keys(facets).forEach((inputKey) => {
+                    const { total_count: totalCount } = facets[inputKey];
+                    this.searchService.setState(SECTION_STATE_CONTEXT, `section-${inputKey}`, totalCount ? 'is-not-empty' : 'is-empty');
                 });
             }
         });
-        this.searchService.getState$(RESULTS_REQUEST_STATE_CONTEXT, 'loading').subscribe(() => {
+        this.searchService.getState$(RESULTS_REQUEST_STATE_CONTEXT, 'loading').pipe(takeUntil(this.destroyed$)).subscribe(() => {
             this.layoutState.set('results', LayoutState.LOADING);
         });
-        // default params hook
+        // results params hook
         this.searchService.setBeforeHook(RESULTS_REQUEST_STATE_CONTEXT, 'loading', (params = {}) => {
-            // FIXME: prendere da configurazione
-            const defaultParams = {
-                page: 1,
-                sort: 'sort_ASC',
-                limit: 12
+            const results = {
+                sort: defaultSort,
+                limit: defaultLimit,
+                offset: 0
             };
-            Object.keys(defaultParams).forEach((key) => {
-                params[key] = params[key] || defaultParams[key];
+            // sort check
+            if (params.sort) {
+                results.sort = params.sort;
+            }
+            // offset check
+            if (params.page && params.page > 1) {
+                results.offset = results.limit * params.page;
+            }
+            params.results = results;
+            // cleanup
+            Object.keys(params)
+                .filter((key) => ['sort', 'page'].includes(key))
+                .forEach((key) => {
+                delete params[key];
             });
+            return params;
+        });
+        // facets params hook
+        this.searchService.setBeforeHook(FACETS_REQUEST_STATE_CONTEXT, 'loading', (params = {}) => {
+            // clean up
+            delete params.results;
             return params;
         });
         this.searchService.getState$(RESULTS_REQUEST_STATE_CONTEXT, 'success')
@@ -9781,195 +9974,6 @@ const MrSearchLayoutConfig = {
     layoutOptions: {}
 };
 
-const ɵ0$4 = {
-    id: 'query',
-    placeholder: 'Cerca nei titoli',
-    icon: 'n7-icon-search',
-    inputPayload: 'search-input',
-    enterPayload: 'search-enter',
-    iconPayload: 'search-icon'
-}, ɵ1$1 = {
-    text: 'Toponimi',
-    additionalText: null,
-}, ɵ2$1 = {
-    id: 'text-01',
-    placeholder: 'Search',
-    icon: 'n7-icon-search',
-    inputPayload: 'search-input',
-    enterPayload: 'search-enter',
-    iconPayload: 'search-icon',
-}, ɵ3$1 = {
-    links: []
-}, ɵ4$1 = {
-    text: 'Continenti',
-    additionalText: null
-}, ɵ5 = {
-    links: []
-}, ɵ6 = {
-    text: 'Autori',
-    additionalText: null
-}, ɵ7 = {
-    links: []
-}, ɵ8 = {
-    text: 'Keywords',
-    additionalText: null,
-    iconRight: 'n7-icon-angle-down'
-}, ɵ9 = {
-    links: []
-}, ɵ10 = {
-    text: 'Data di pubblicazione',
-    additionalText: null,
-    iconRight: 'n7-icon-angle-down'
-}, ɵ11 = {
-    links: []
-}, ɵ12 = {
-    text: 'Luogo di pubblicazione',
-    additionalText: null,
-    iconRight: 'n7-icon-angle-down'
-}, ɵ13 = {
-    links: []
-};
-const facets = {
-    sections: [{
-            id: 'section-query',
-            inputs: [{
-                    id: 'query',
-                    type: 'text',
-                    queryParam: true,
-                    delay: 500,
-                    schema: {
-                        valueType: 'string'
-                    },
-                    data: ɵ0$4
-                }]
-        }, {
-            id: 'section-toponyms',
-            header: {
-                id: 'header-toponyms',
-                data: ɵ1$1
-            },
-            inputs: [{
-                    id: 'toponyms-filter',
-                    type: 'text',
-                    delay: 500,
-                    schema: {
-                        valueType: 'string'
-                    },
-                    data: ɵ2$1
-                }, {
-                    id: 'toponyms',
-                    type: 'link',
-                    queryParam: true,
-                    schema: {
-                        valueType: 'string',
-                        multiple: true
-                    },
-                    data: ɵ3$1
-                }]
-        }, {
-            id: 'section-continents',
-            header: {
-                id: 'header-continents',
-                data: ɵ4$1
-            },
-            inputs: [{
-                    id: 'continents',
-                    type: 'link',
-                    queryParam: true,
-                    schema: {
-                        valueType: 'string',
-                        multiple: true
-                    },
-                    data: ɵ5
-                }]
-        }, {
-            id: 'section-authors',
-            header: {
-                id: 'header-authors',
-                data: ɵ6
-            },
-            inputs: [{
-                    id: 'authors',
-                    type: 'link',
-                    queryParam: true,
-                    schema: {
-                        valueType: 'string',
-                        multiple: true
-                    },
-                    data: ɵ7
-                }]
-        }, {
-            id: 'section-keywords',
-            header: {
-                id: 'header-keywords',
-                data: ɵ8
-            },
-            inputs: [{
-                    id: 'keywords',
-                    type: 'link',
-                    queryParam: true,
-                    schema: {
-                        valueType: 'string',
-                        multiple: true
-                    },
-                    data: ɵ9
-                }],
-        }, {
-            id: 'section-date',
-            header: {
-                id: 'header-date',
-                data: ɵ10
-            },
-            inputs: [{
-                    id: 'date',
-                    type: 'link',
-                    queryParam: true,
-                    schema: {
-                        valueType: 'string',
-                        multiple: true
-                    },
-                    data: ɵ11
-                }],
-        }, {
-            id: 'section-place',
-            header: {
-                id: 'header-place',
-                data: ɵ12
-            },
-            inputs: [{
-                    id: 'place',
-                    type: 'link',
-                    queryParam: true,
-                    schema: {
-                        valueType: 'string',
-                        multiple: true
-                    },
-                    data: ɵ13
-                }],
-        }],
-    classes: 'facets-wrapper'
-};
-const ɵ14 = (id) => ({
-    id,
-    queryParam: true,
-    schema: {
-        valueType: id === 'sort' ? 'string' : 'number'
-    }
-});
-const layoutInputs = ['page', 'limit', 'sort'].map(ɵ14);
-const request = {
-    results: {
-        id: 'search',
-        delay: 500
-    },
-    facets: {
-        id: 'facets',
-    },
-    provider: 'rest',
-    delay: 500
-};
-var searchConfig = { request, facets, layoutInputs };
-
 let MrSearchLayoutComponent = class MrSearchLayoutComponent extends AbstractLayout {
     constructor(layoutsConfiguration, router, activatedRoute, communication, configuration, searchService, layoutState, mainState) {
         super(layoutsConfiguration.get('MrSearchLayoutConfig') || MrSearchLayoutConfig);
@@ -9997,7 +10001,7 @@ let MrSearchLayoutComponent = class MrSearchLayoutComponent extends AbstractLayo
     ngOnInit() {
         this.activatedRoute.data.subscribe((data) => {
             this.configId = data.configId;
-            const { searchId } = this.configuration.get(this.configId);
+            const { searchId, searchConfig } = this.configuration.get(this.configId);
             this.searchService.init(searchId, searchConfig);
             // add layout states
             this.layoutState.add(['results']);
@@ -10021,7 +10025,7 @@ MrSearchLayoutComponent.ctorParameters = () => [
 MrSearchLayoutComponent = __decorate([
     Component({
         selector: 'mr-search-layout',
-        template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth\">\n\n        <div class=\"mr-search__title\">\n            <n7-inner-title\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <aside class=\"mr-facets\">\n                <div class=\"mr-facets__contents\">\n                    <h2 class=\"mr-facets__title\" \n                        *ngIf=\"lb.dataSource.pageConfig['facetsTitle']\">\n                        {{ lb.dataSource.pageConfig['facetsTitle'] }}\n                    </h2>\n                    <mr-search-facets-layout \n                    [searchService]=\"lb.dataSource.searchService\">\n                    </mr-search-facets-layout>\n                </div>\n            </aside>\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    <n7-inner-title\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\n                    </n7-inner-title>\n                </div>\n                <div *ngIf=\"(\n                    lb.dataSource.pageConfig['filtersTitle'] && \n                    lb.widgets['mr-search-tags'].ds.hasFilters\n                )\" \n                class=\"mr-search__results-filters\">\n                    <span class=\"mr-search__results-filters-title\">{{ lb.dataSource.pageConfig['filtersTitle'] }}</span>\n                    <div class=\"mr-search__results-filters-wrapper\">\n                        <n7-tag *ngFor=\"let tag of (lb.widgets['mr-search-tags'].ds.out$ | async)\"\n                        [data]=\"tag\"\n                        [emit]=\"lb.widgets['mr-search-tags'].emit\">\n                        </n7-tag>\n                    </div>\n                </div>\n                <main class=\"mr-search__results\">\n                    <!-- SEARCH RESULTS -->\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\n                        \n                        <!-- loading -->\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\n                            <div class=\"mr-search__results-loading n7-grid-3\">\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                                    blocks: [\n                                        { classes: 'search-result-placeholder-title' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' }\n                                    ]\n                                }\"></n7-content-placeholder>\n                            </div>\n                        </ng-container>\n                        \n                        <!-- success: items > 0 -->\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n                            <div class=\"n7-grid-3\">\n                                <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\n                                [data]=\"item\">\n                                </n7-item-preview>\n                            </div>\n                        </ng-container>\n\n                        <!-- empty: items === 0 -->\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\n                            <div class=\"mr-search__results-fallback\">\n                                <p class=\"mr-search__results-fallback-string\">\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\n                                </p>\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\n                                </button>\n                            </div>\n                        </ng-container>\n\n                        <!-- error: request problem -->\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\n                            <p class=\"mr-search__results-ko-string\">\n                                {{ lb.dataSource.pageConfig.ko.text }}\n                            </p>\n                            <button class=\"n7-btn mr-search__results-ko-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                {{ lb.dataSource.pageConfig.ko.button }}\n                            </button>\n                        </ng-container>\n                        \n                    </ng-container>\n                </main>               \n                <n7-smart-pagination\n                *ngIf=\"(layoutState.get$('results') | async) === 'SUCCESS'\"\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
+        template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth mr-side-margin\">\n\n        <div class=\"mr-search__title\">\n            <n7-inner-title\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <aside class=\"mr-facets\">\n                <div class=\"mr-facets__contents\">\n                    <h2 class=\"mr-facets__title\" \n                        *ngIf=\"lb.dataSource.pageConfig['facetsTitle']\">\n                        {{ lb.dataSource.pageConfig['facetsTitle'] }}\n                    </h2>\n                    <mr-search-facets-layout \n                    [searchService]=\"lb.dataSource.searchService\">\n                    </mr-search-facets-layout>\n                </div>\n            </aside>\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    <n7-inner-title\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\n                    </n7-inner-title>\n                </div>\n                <div *ngIf=\"(\n                    lb.dataSource.pageConfig['filtersTitle'] && \n                    lb.widgets['mr-search-tags'].ds.hasFilters\n                )\" \n                class=\"mr-search__results-filters\">\n                    <span class=\"mr-search__results-filters-title\">{{ lb.dataSource.pageConfig['filtersTitle'] }}</span>\n                    <div class=\"mr-search__results-filters-wrapper\">\n                        <n7-tag *ngFor=\"let tag of (lb.widgets['mr-search-tags'].ds.out$ | async)\"\n                        [data]=\"tag\"\n                        [emit]=\"lb.widgets['mr-search-tags'].emit\">\n                        </n7-tag>\n                    </div>\n                </div>\n                <main class=\"mr-search__results\">\n                    <!-- SEARCH RESULTS -->\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\n                        \n                        <!-- loading -->\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\n                            <div class=\"mr-search__results-loading n7-grid-3\">\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                                    blocks: [\n                                        { classes: 'search-result-placeholder-title' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' }\n                                    ]\n                                }\"></n7-content-placeholder>\n                            </div>\n                        </ng-container>\n                        \n                        <!-- success: items > 0 -->\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n                            <div class=\"n7-grid-3\">\n                                <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\n                                [data]=\"item\">\n                                </n7-item-preview>\n                            </div>\n                        </ng-container>\n\n                        <!-- empty: items === 0 -->\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\n                            <div class=\"mr-search__results-fallback\">\n                                <p class=\"mr-search__results-fallback-string\">\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\n                                </p>\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\n                                </button>\n                            </div>\n                        </ng-container>\n\n                        <!-- error: request problem -->\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\n                            <p class=\"mr-search__results-ko-string\">\n                                {{ lb.dataSource.pageConfig.ko.text }}\n                            </p>\n                            <button class=\"n7-btn mr-search__results-ko-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                {{ lb.dataSource.pageConfig.ko.button }}\n                            </button>\n                        </ng-container>\n                        \n                    </ng-container>\n                </main>               \n                <n7-smart-pagination\n                *ngIf=\"(layoutState.get$('results') | async) === 'SUCCESS'\"\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
     }),
     __metadata("design:paramtypes", [LayoutsConfigurationService,
         Router,
@@ -10034,33 +10038,31 @@ MrSearchLayoutComponent = __decorate([
 ], MrSearchLayoutComponent);
 
 class MrStaticLayoutDS extends LayoutDataSource$1 {
+    constructor() {
+        super(...arguments);
+        this.errorTitle = _t('global#layout_error_title');
+        this.errorDescription = _t('global#layout_error_description');
+    }
     onInit(payload) {
         this.communication = payload.communication;
         this.configuration = payload.configuration;
         this.mainState = payload.mainState;
     }
-    /**
-     * Make a request to serverless based on the url slug
-     * Example:
-     * - base-url/static/sample-page
-     * - base-url/static/another-page
-     */
     pageRequest$(slug, onError) {
-        return this.communication.request$('wp-page', {
+        return this.communication.request$('static', {
             onError,
             urlParams: slug,
         });
     }
     handleResponse(response) {
-        const { title, body } = response;
-        this.setHtml(title, body);
-        this.updateHeadTitle(title);
+        this.setHtml(response);
+        this.updateHeadTitle(response.title);
     }
-    setHtml(title, body) {
-        this.html = {
-            title,
-            body,
-        };
+    setHtml(response) {
+        const { content, title } = response;
+        this.title = title;
+        this.content = content;
+        this.one('mr-static-metadata').update(response);
     }
     updateHeadTitle(pageTitle) {
         const appName = this.configuration.get('name');
@@ -10107,12 +10109,9 @@ class MrStaticLayoutEH extends EventHandler {
 
 const MrStaticLayoutConfig = {
     layoutId: 'mr-static-layout',
-    widgets: [
-    // {
-    //   id: 'title',          ← Insert a component here.
-    //   hasStaticData: true,  ← Renders the widget before this.one().update is called.
-    // }
-    ],
+    widgets: [{
+            id: 'mr-static-metadata'
+        }],
     layoutDS: MrStaticLayoutDS,
     layoutEH: MrStaticLayoutEH,
     widgetsDataSources: DS$3,
@@ -10158,7 +10157,7 @@ MrStaticLayoutComponent.ctorParameters = () => [
 MrStaticLayoutComponent = __decorate([
     Component({
         selector: 'mr-static-layout',
-        template: "<div class=\"mr-static mr-layout\" *ngIf=\"lb.dataSource\">\n    <!-- STATIC LAYOUT CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            loading...\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            error!\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <h1 class=\"mr-static__title mr-generated-title-WP\">{{lb.dataSource.html.title}}</h1>\n            <div class=\"mr-static__content mr-wp-content\" [innerHTML]=\"lb.dataSource.html.body | keepHtml\"></div>\n        </ng-container>\n    \n    </ng-container>\n</div>\n"
+        template: "<div class=\"mr-static mr-layout\"\n     *ngIf=\"lb.dataSource\"\n     [ngClass]=\"{\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\n      }\">\n    <!-- STATIC LAYOUT CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            <div class=\"mr-layout__loader\">\n                <n7-loader></n7-loader>\n            </div>\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            <div class=\"mr-layout__error\">\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\n                <p>{{ lb.dataSource.errorDescription }}</p>\n            </div>\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <h1 class=\"mr-static__title mr-generated-title-WP\">{{lb.dataSource.title}}</h1>\n            <n7-metadata-viewer \n            [data]=\"lb.widgets['mr-static-metadata'].ds.out$ | async\">\n            </n7-metadata-viewer>\n            <div class=\"mr-static__content mr-wp-content\" [innerHTML]=\"lb.dataSource.content | keepHtml\"></div>\n        </ng-container>\n    \n    </ng-container>\n</div>\n"
     }),
     __metadata("design:paramtypes", [CommunicationService,
         ConfigurationService,
@@ -10226,7 +10225,7 @@ __decorate([
 ReadMoreComponent = __decorate([
     Component({
         selector: 'mr-read-more',
-        template: "<div class=\"mr-read-more {{this.state}}\"\n     *ngIf=\"data\"\n     #root>\n     <!-- Child component -->\n     <ng-content class=\"content\"></ng-content>\n     <div [hidden]=\"!collapsed.value\"\n          (click)=\"handleToggle()\">\n          Mostra tutto\n     </div>\n</div>\n"
+        template: "<div class=\"mr-read-more {{this.state}}\"\n     *ngIf=\"data\"\n     #root>\n     <!-- Child component -->\n     <ng-content class=\"content\"></ng-content>\n     <div [hidden]=\"!collapsed.value\"\n          (click)=\"handleToggle()\">\n          {{ data.label }}\n     </div>\n</div>\n"
     })
 ], ReadMoreComponent);
 
@@ -10374,8 +10373,17 @@ let MrMenuService = class MrMenuService {
         this.dynamicPaths = [];
         this.isDynamicPath = (path) => this.dynamicPaths.includes(path);
     }
-    load(path) {
-        return this.http.get(path).pipe(catchError(() => of(null)), tap((response) => this._handleResponse(response))).toPromise();
+    load() {
+        var _a;
+        const { defaultProvider, providers } = this.configuration.get('communication');
+        const currentProvider = providers[defaultProvider] || {};
+        const { baseUrl } = currentProvider;
+        const menuPath = (_a = currentProvider === null || currentProvider === void 0 ? void 0 : currentProvider.config) === null || _a === void 0 ? void 0 : _a.menu;
+        if (baseUrl && menuPath) {
+            const url = baseUrl + menuPath;
+            return this.http.get(url).pipe(catchError(() => of(null)), tap((response) => this._handleResponse(response))).toPromise();
+        }
+        return of(null).toPromise();
     }
     _handleResponse(response) {
         if (response) {
@@ -10410,6 +10418,42 @@ MrMenuService = __decorate([
     __metadata("design:paramtypes", [HttpClient,
         ConfigurationService])
 ], MrMenuService);
+
+let MrFooterService = class MrFooterService {
+    constructor(http, configuration) {
+        this.http = http;
+        this.configuration = configuration;
+    }
+    load() {
+        var _a;
+        const { defaultProvider, providers } = this.configuration.get('communication');
+        const currentProvider = providers[defaultProvider] || {};
+        const { baseUrl } = currentProvider;
+        const menuPath = (_a = currentProvider === null || currentProvider === void 0 ? void 0 : currentProvider.config) === null || _a === void 0 ? void 0 : _a.footer;
+        if (baseUrl && menuPath) {
+            const url = baseUrl + menuPath;
+            return this.http.get(url).pipe(catchError(() => of(null)), tap((response) => this._handleResponse(response))).toPromise();
+        }
+        return of(null).toPromise();
+    }
+    _handleResponse(response) {
+        if (response) {
+            this.configuration.set('footer', response);
+        }
+    }
+};
+MrFooterService.ctorParameters = () => [
+    { type: HttpClient },
+    { type: ConfigurationService }
+];
+MrFooterService.ɵprov = ɵɵdefineInjectable({ factory: function MrFooterService_Factory() { return new MrFooterService(ɵɵinject(HttpClient), ɵɵinject(ConfigurationService)); }, token: MrFooterService, providedIn: "root" });
+MrFooterService = __decorate([
+    Injectable({
+        providedIn: 'root',
+    }),
+    __metadata("design:paramtypes", [HttpClient,
+        ConfigurationService])
+], MrFooterService);
 
 let DynamicPathGuard = class DynamicPathGuard {
     constructor(menuService, router) {
@@ -10447,5 +10491,5 @@ DynamicPathGuard = __decorate([
  * Generated bundle index. Do not edit.
  */
 
-export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, LocalConfigService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrBreadcrumbsDS, MrCollectionDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageTitleDS, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrTextViewerDS, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, ɵ0$2 as ɵ0, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrGlossaryLayoutComponent as ɵba, MrHomeLayoutComponent as ɵbb, MrLayoutStateService as ɵbc, MrResourceLayoutComponent as ɵbd, MrSearchFacetsLayoutComponent as ɵbe, MrSearchLayoutComponent as ɵbf, MrSearchService as ɵbg, MrStaticLayoutComponent as ɵbh, ReadMoreComponent as ɵbi, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, AwGalleryLayoutComponent as ɵl, AwSearchService as ɵm, AwHomeLayoutComponent as ɵn, AwMapLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwSearchLayoutComponent as ɵq, AwTimelineLayoutComponent as ɵr, BubbleChartWrapperComponent as ɵs, ChartTippyComponent as ɵt, SmartBreadcrumbsComponent as ɵu, AwFacetsWrapperComponent as ɵv, DataWidgetWrapperComponent as ɵw, DatepickerWrapperComponent as ɵx, DvExampleLayoutComponent as ɵy, EscapeHtmlPipe as ɵz };
+export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, LocalConfigService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrBreadcrumbsDS, MrCollectionDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrFooterService, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrResourceTabsDS, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageTitleDS, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrStaticMetadataDS, MrTextViewerDS, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrGlossaryLayoutComponent as ɵba, MrHomeLayoutComponent as ɵbb, MrLayoutStateService as ɵbc, MrResourceLayoutComponent as ɵbd, MrSearchFacetsLayoutComponent as ɵbe, MrSearchLayoutComponent as ɵbf, MrSearchService as ɵbg, MrStaticLayoutComponent as ɵbh, ReadMoreComponent as ɵbi, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, AwGalleryLayoutComponent as ɵl, AwSearchService as ɵm, AwHomeLayoutComponent as ɵn, AwMapLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwSearchLayoutComponent as ɵq, AwTimelineLayoutComponent as ɵr, BubbleChartWrapperComponent as ɵs, ChartTippyComponent as ɵt, SmartBreadcrumbsComponent as ɵu, AwFacetsWrapperComponent as ɵv, DataWidgetWrapperComponent as ɵw, DatepickerWrapperComponent as ɵx, DvExampleLayoutComponent as ɵy, EscapeHtmlPipe as ɵz };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map
