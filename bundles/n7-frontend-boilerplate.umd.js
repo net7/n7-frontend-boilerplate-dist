@@ -9604,6 +9604,7 @@
                             id: id,
                             limit: limit,
                             offset: 0,
+                            query: ''
                         };
                     }
                 });
@@ -9796,7 +9797,10 @@
                         .forEach(function (_a) {
                         var id = _a.id;
                         var offset = 0;
-                        params.facets.push(__assign(__assign({}, _this.internalFilterState.facets[id]), { offset: offset }));
+                        var _b = _this.internalFilterState.facets[id], limit = _b.limit, query = _b.query;
+                        params.facets.push({
+                            id: id, limit: limit, offset: offset, query: query
+                        });
                     });
                 });
                 _this.setState(FACETS_REQUEST_STATE_CONTEXT, 'request', params);

@@ -9094,6 +9094,7 @@ let MrSearchService = class MrSearchService {
                         id,
                         limit,
                         offset: 0,
+                        query: ''
                     };
                 }
             });
@@ -9263,7 +9264,10 @@ let MrSearchService = class MrSearchService {
                 inputs.filter(({ type }) => type === 'link')
                     .forEach(({ id }) => {
                     const offset = 0;
-                    params.facets.push(Object.assign(Object.assign({}, this.internalFilterState.facets[id]), { offset }));
+                    const { limit, query } = this.internalFilterState.facets[id];
+                    params.facets.push({
+                        id, limit, offset, query
+                    });
                 });
             });
             this.setState(FACETS_REQUEST_STATE_CONTEXT, 'request', params);
