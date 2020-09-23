@@ -39,5 +39,6 @@ export declare class MrSearchService {
     private doSingleFacetRequest;
     private onResultsLoading;
     private onFacetsRequestSuccess;
+    private onFacetsScroll;
     notEquals(val1: any, val2: any): boolean;
 }

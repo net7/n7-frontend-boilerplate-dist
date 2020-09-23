@@ -6,6 +6,7 @@ declare type collectionResponse = {
         button?: any;
     };
     items: {
+        text?: string;
         link?: string;
         title?: string;
         type?: string;

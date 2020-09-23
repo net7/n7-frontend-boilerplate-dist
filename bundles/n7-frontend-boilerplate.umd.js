@@ -820,6 +820,9 @@
         },
         unescapeDoubleQuotes: function (str) {
             return (str && str !== '') ? str.replace(/\\*(")/g, '$1') : str; // thanks @slevithan!
+        },
+        striptags: function (str) {
+            return str.replace(/(<([^>]+)>)/gi, '');
         }
     };
 
@@ -8082,6 +8085,10 @@
         }
     };
 
+    var ITEM_PREVIEW_DEFAULTS = {
+        limit: 100,
+        striptags: true
+    };
     var MrCollectionDS = /** @class */ (function (_super) {
         __extends(MrCollectionDS, _super);
         function MrCollectionDS() {
@@ -8092,9 +8099,10 @@
                 return null;
             }
             var header = data.header, items = data.items;
-            var classes = this.options.classes;
+            var _a = this.options, classes = _a.classes, itemPreview = _a.itemPreview;
+            var itemPreviewOptions = lodash.merge(ITEM_PREVIEW_DEFAULTS, (itemPreview || {}));
             if ((header || {}).button) {
-                var _a = header.button, link = _a.link, text = _a.text;
+                var _b = header.button, link = _b.link, text = _b.text;
                 header.button = [{
                         text: text,
                         anchor: {
@@ -8118,10 +8126,20 @@
                         buttons: header.button
                     }
                 },
-                items: items.map(function (item) { return (__assign(__assign({}, item), { anchor: {
-                        href: linksHelper.getRouterLink(item.link),
-                        queryParams: linksHelper.getQueryParams(item.link)
-                    }, classes: classes || '' })); })
+                items: items.map(function (item) {
+                    // striptags
+                    if (itemPreviewOptions.striptags) {
+                        item.text = helpers.striptags(item.text);
+                    }
+                    // limit
+                    if (itemPreviewOptions.limit && (item.text.length > itemPreviewOptions.limit)) {
+                        item.text = item.text.substring(0, itemPreviewOptions.limit) + "...";
+                    }
+                    return __assign(__assign({}, item), { anchor: {
+                            href: linksHelper.getRouterLink(item.link),
+                            queryParams: linksHelper.getQueryParams(item.link)
+                        }, classes: classes || '' });
+                })
             };
         };
         return MrCollectionDS;
@@ -8242,13 +8260,30 @@
         return MrInnerTitleDS;
     }(core$1.DataSource));
 
+    var ITEM_PREVIEW_DEFAULTS$1 = {
+        limit: 100,
+        striptags: true
+    };
     var MrItemPreviewDS = /** @class */ (function (_super) {
         __extends(MrItemPreviewDS, _super);
         function MrItemPreviewDS() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
         MrItemPreviewDS.prototype.transform = function (data) {
-            return data;
+            var _a = this.options, classes = _a.classes, itemPreview = _a.itemPreview;
+            var itemPreviewOptions = lodash.merge(ITEM_PREVIEW_DEFAULTS$1, (itemPreview || {}));
+            // striptags
+            if (itemPreviewOptions.striptags) {
+                data.text = helpers.striptags(data.text);
+            }
+            // limit
+            if (itemPreviewOptions.limit && (data.text.length > itemPreviewOptions.limit)) {
+                data.text = data.text.substring(0, itemPreviewOptions.limit) + "...";
+            }
+            return __assign(__assign({}, data), { anchor: {
+                    href: linksHelper.getRouterLink(data.link),
+                    queryParams: linksHelper.getQueryParams(data.link)
+                }, classes: classes || '' });
         };
         return MrItemPreviewDS;
     }(core$1.DataSource));
@@ -8530,6 +8565,10 @@
         return MrSearchResultsTitleDS;
     }(core$1.DataSource));
 
+    var ITEM_PREVIEW_DEFAULTS$2 = {
+        limit: 100,
+        striptags: true
+    };
     var MrSearchResultsDS = /** @class */ (function (_super) {
         __extends(MrSearchResultsDS, _super);
         function MrSearchResultsDS() {
@@ -8538,12 +8577,22 @@
         MrSearchResultsDS.prototype.transform = function (data) {
             var results = data.results;
             var itemPreview = this.options.config.itemPreview;
-            var classes = itemPreview && itemPreview.classes ? itemPreview.classes : '';
-            return results.map(function (item) { return (__assign(__assign({}, item), { classes: classes, anchor: {
-                    href: linksHelper.getRouterLink(item.link),
-                    queryParams: linksHelper.getQueryParams(item.link),
-                    target: '_blank'
-                } })); });
+            var itemPreviewOptions = lodash.merge(ITEM_PREVIEW_DEFAULTS$2, (itemPreview || {}));
+            return results.map(function (item) {
+                // striptags
+                if (itemPreviewOptions.striptags) {
+                    item.text = helpers.striptags(item.text);
+                }
+                // limit
+                if (itemPreviewOptions.limit && (item.text.length > itemPreviewOptions.limit)) {
+                    item.text = item.text.substring(0, itemPreviewOptions.limit) + "...";
+                }
+                return __assign(__assign({}, item), { classes: itemPreviewOptions.classes, anchor: {
+                        href: linksHelper.getRouterLink(item.link),
+                        queryParams: linksHelper.getQueryParams(item.link),
+                        target: '_blank'
+                    } });
+            });
         };
         return MrSearchResultsDS;
     }(core$1.DataSource));
@@ -8573,13 +8622,15 @@
                         var values = Array.isArray(state[id]) ? state[id] : [state[id]];
                         values
                             .forEach(function (value) {
-                            var _a;
                             var text = value;
                             if (facets[id]) {
-                                text = (_a = facets[id].values.find(function (_a) {
+                                var selectedFacet = facets[id].values.find(function (_a) {
                                     var payload = _a.payload;
                                     return payload === value;
-                                })) === null || _a === void 0 ? void 0 : _a.text;
+                                });
+                                if (selectedFacet) {
+                                    text = selectedFacet.text;
+                                }
                             }
                             tags.push({
                                 text: text,
@@ -8615,13 +8666,9 @@
                 .filter(function (metakey) { return data[metakey]; })
                 .map(function (metakey) {
                 var itemValue = metakey === 'date' ? dateHelper.format(data[metakey], core$1._t('global#date_human')) : data[metakey];
-                if (metakey === 'time_to_read') {
-                    return {
-                        value: core$1._t("resource#" + metakey, { value: itemValue }, function (key, placeholders) { return (placeholders.value === 1 ? key + "_1" : key); })
-                    };
-                }
                 return {
-                    value: core$1._t("resource#" + metakey, { value: itemValue })
+                    label: core$1._t("resource#" + metakey),
+                    value: itemValue
                 };
             });
             return { group: [{ items: items }] };
@@ -9346,7 +9393,7 @@
         MrResourceLayoutComponent = __decorate([
             core.Component({
                 selector: 'mr-resource-layout',
-                template: "<div class=\"mr-resource mr-layout\" \n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\"\n     [ngClass]=\"{\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\n      }\">\n    <!-- RESOURCE LAYOUT CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            <div class=\"mr-layout__loader\">\n                <n7-loader></n7-loader>\n            </div>\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            <div class=\"mr-layout__error\">\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\n                <p>{{ lb.dataSource.errorDescription }}</p>\n            </div>\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <ng-container *ngIf=\"lb.dataSource.pageConfig.sections as sections\">\n                <!-- Pass the list of blocks to render to the block template -->\n                <div class=\"mr-resource__top\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\n                </div>\n                <div class=\"mr-resource__content mr-side-margin\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\n                </div>\n            </ng-container>\n        </ng-container>\n\n    </ng-container>\n</div>\n\n<ng-template #blocks let-list>\n    <section *ngFor=\"let section of list\" class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\n        <ng-container [ngSwitch]=\"section.type\">\n\n            <!-- TABS -->\n            <ng-container *ngSwitchCase=\"'tabs'\">\n                <ng-container *ngFor=\"let tab of lb.widgets[section.id].ds.out$ | async\">\n                    <n7-anchor-wrapper [data]=\"tab.anchor\" [classes]=\"tab.classes\">\n                        <span class=\"mr-resource__tabs-item\">{{ tab.label }}</span>\n                    </n7-anchor-wrapper>\n                </ng-container>\n            </ng-container>\n\n            <!-- INNER TITLE -->\n            <ng-container *ngSwitchCase=\"'title'\">\n                <div class=\"mr-resource__title-content mr-side-margin\">\n                    <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-inner-title>\n                </div>\n            </ng-container>\n\n            <!-- IMAGE VIEWER -->\n            <ng-container *ngSwitchCase=\"'viewer'\">\n                <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                </n7-image-viewer>\n            </ng-container>\n\n            <!-- METADATA VIEWER -->\n            <ng-container *ngSwitchCase=\"'metadata'\">\n                <div class=\"mr-resource__metadata-content\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__metadata-title\">\n                        {{ section.title }}\n                    </h3>\n                    <mr-read-more [data]=\"lb.dataSource.readMoreConfig\">\n                        <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                            [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-metadata-viewer>\n                    </mr-read-more>\n                </div>\n            </ng-container>\n\n            <!-- COLLECTION -->\n            <ng-container *ngSwitchCase=\"'collection'\">\n                <div *ngIf=\"lb.widgets[section.id].ds.out$ | async as collection$\" class=\"mr-resource__collection-content\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title\">\n                        {{ section.title }}\n                    </h3>\n                    <div class=\"mr-resource__collection-grid {{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                        <n7-item-preview *ngFor=\"let item of collection$?.items\"\n                            [data]=\"item\" [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n            </ng-container>\n\n            <!-- ITEM PREVIEW -->\n            <ng-container *ngSwitchCase=\"'preview'\">\n                <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__preview-title\">\n                    {{ section.title }}\n                </h3>\n                <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                </n7-item-preview>\n            </ng-container>\n\n            <!-- TEXT VIEWER -->\n            <ng-container *ngSwitchCase=\"'text-viewer'\">\n                <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__text-viewer-title\">\n                    {{ section.title }}\n                </h3>\n                <div class=\"text-viewer__mock\">n7-text-viewer</div>\n            </ng-container>\n\n            <!-- INFO BOX -->\n            <ng-container *ngSwitchCase=\"'info-box'\">\n                <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__info-box-title\">\n                    {{ section.title }}\n                </h3>\n                <div class=\"info-box__mock\">info-box</div>\n            </ng-container>\n\n            <!-- BREADCRUMBS -->\n            <ng-container *ngSwitchCase=\"'breadcrumbs'\">\n                <n7-breadcrumbs [data]=\"lb.widgets[section.id].ds.out$ | async\">\n                </n7-breadcrumbs>\n            </ng-container>\n        </ng-container>\n    </section>\n</ng-template>\n"
+                template: "<div class=\"mr-resource mr-layout\" \n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\"\n     [ngClass]=\"{\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\n      }\">\n    <!-- RESOURCE LAYOUT CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            <div class=\"mr-layout__loader\">\n                <n7-loader></n7-loader>\n            </div>\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            <div class=\"mr-layout__error\">\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\n                <p>{{ lb.dataSource.errorDescription }}</p>\n            </div>\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <ng-container *ngIf=\"lb.dataSource.pageConfig.sections as sections\">\n                <!-- Pass the list of blocks to render to the block template -->\n                <div class=\"mr-resource__top\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\n                </div>\n                <div class=\"mr-resource__content mr-side-margin\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\n                </div>\n            </ng-container>\n        </ng-container>\n\n    </ng-container>\n</div>\n\n<ng-template #blocks let-list>\n    <ng-container *ngFor=\"let section of list\">\n        <section *ngIf=\"lb.widgets[section.id].ds.out$ | async\"\n        class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\n            <ng-container [ngSwitch]=\"section.type\">\n    \n                <!-- TABS -->\n                <ng-container *ngSwitchCase=\"'tabs'\">\n                    <ng-container *ngFor=\"let tab of lb.widgets[section.id].ds.out$ | async\">\n                        <n7-anchor-wrapper [data]=\"tab.anchor\" [classes]=\"tab.classes\">\n                            <span class=\"mr-resource__tabs-item\">{{ tab.label }}</span>\n                        </n7-anchor-wrapper>\n                    </ng-container>\n                </ng-container>\n    \n                <!-- INNER TITLE -->\n                <ng-container *ngSwitchCase=\"'title'\">\n                    <div class=\"mr-resource__title-content mr-side-margin\">\n                        <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                            [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-inner-title>\n                    </div>\n                </ng-container>\n    \n                <!-- IMAGE VIEWER -->\n                <ng-container *ngSwitchCase=\"'viewer'\">\n                    <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-image-viewer>\n                </ng-container>\n    \n                <!-- METADATA VIEWER -->\n                <ng-container *ngSwitchCase=\"'metadata'\">\n                    <div class=\"mr-resource__metadata-content\">\n                        <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__metadata-title\">\n                            {{ section.title }}\n                        </h3>\n                        <mr-read-more [data]=\"lb.dataSource.readMoreConfig\">\n                            <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                                [emit]=\"lb.widgets[section.id].emit\">\n                            </n7-metadata-viewer>\n                        </mr-read-more>\n                    </div>\n                </ng-container>\n    \n                <!-- COLLECTION -->\n                <ng-container *ngSwitchCase=\"'collection'\">\n                    <div *ngIf=\"lb.widgets[section.id].ds.out$ | async as collection$\" class=\"mr-resource__collection-content\">\n                        <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title\">\n                            {{ section.title }}\n                        </h3>\n                        <div class=\"mr-resource__collection-grid {{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                            <n7-item-preview *ngFor=\"let item of collection$?.items\"\n                                [data]=\"item\" [emit]=\"lb.widgets[section.id].emit\">\n                            </n7-item-preview>\n                        </div>\n                    </div>\n                </ng-container>\n    \n                <!-- ITEM PREVIEW -->\n                <ng-container *ngSwitchCase=\"'preview'\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__preview-title\">\n                        {{ section.title }}\n                    </h3>\n                    <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-item-preview>\n                </ng-container>\n    \n                <!-- TEXT VIEWER -->\n                <ng-container *ngSwitchCase=\"'text-viewer'\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__text-viewer-title\">\n                        {{ section.title }}\n                    </h3>\n                    <div class=\"text-viewer__mock\">n7-text-viewer</div>\n                </ng-container>\n    \n                <!-- INFO BOX -->\n                <ng-container *ngSwitchCase=\"'info-box'\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__info-box-title\">\n                        {{ section.title }}\n                    </h3>\n                    <div class=\"info-box__mock\">info-box</div>\n                </ng-container>\n    \n                <!-- BREADCRUMBS -->\n                <ng-container *ngSwitchCase=\"'breadcrumbs'\">\n                    <n7-breadcrumbs [data]=\"lb.widgets[section.id].ds.out$ | async\">\n                    </n7-breadcrumbs>\n                </ng-container>\n            </ng-container>\n        </section>\n    </ng-container>\n</ng-template>\n"
             }),
             __metadata("design:paramtypes", [LayoutsConfigurationService,
                 router.ActivatedRoute,
@@ -9508,6 +9555,7 @@
             this.onInternalInputsChange();
             this.onRouteChange();
             this.onResultsLoading();
+            this.onFacetsScroll();
         };
         MrSearchService.prototype.getState$ = function (context, id) {
             var stateId = id ? context + "." + id : context;
@@ -9609,7 +9657,9 @@
                             id: id,
                             limit: limit,
                             offset: 0,
-                            query: ''
+                            query: '',
+                            loading: false,
+                            values: []
                         };
                     }
                     // internal filters
@@ -9680,14 +9730,14 @@
                     var inputContext_1 = _this.contextState[INPUT_STATE_CONTEXT];
                     if (lodash.isEmpty(inputContext_1)) {
                         Object.keys(params)
-                            .filter(function (inputId) { return _this.queryParamKeys[inputId]; })
+                            .filter(function (inputId) { return _this.queryParamKeys.includes(inputId); })
                             .forEach(function (inputId) {
                             _this.setState(INPUT_STATE_CONTEXT, inputId, params[inputId]);
                         });
                     }
                     else {
                         Object.keys(inputContext_1)
-                            .filter(function (inputId) { return _this.queryParamKeys[inputId]; })
+                            .filter(function (inputId) { return _this.queryParamKeys.includes(inputId); })
                             .filter(function (inputId) { return _this.notEquals(inputContext_1[inputId], params[inputId]); })
                             .forEach(function (inputId) {
                             _this.setState(INPUT_STATE_CONTEXT, inputId, params[inputId] || null);
@@ -9757,6 +9807,7 @@
                 var target = inputConfig.target;
                 // update internal filters
                 _this.internalFilterState.facets[target].query = value;
+                _this.internalFilterState.facets[target].offset = 0;
                 _this.doSingleFacetRequest(target);
             });
         };
@@ -9775,6 +9826,8 @@
                 }
             }, facets.provider || null).subscribe(function (response) {
                 _this.onFacetsRequestSuccess(response);
+                // reset loading
+                _this.internalFilterState.facets[target].loading = false;
             });
         };
         MrSearchService.prototype.onResultsLoading = function () {
@@ -9827,8 +9880,26 @@
             this.getState$(FACETS_REQUEST_STATE_CONTEXT, 'success').subscribe(function (response) {
                 var responseFacets = response.facets;
                 Object.keys(responseFacets).forEach(function (id) {
+                    var _a = responseFacets[id], values = _a.values, total_count = _a.total_count;
+                    var _b = _this.internalFilterState.facets[id], limit = _b.limit, offset = _b.offset, stateValues = _b.values;
+                    if (offset > 0) {
+                        // delete loading element
+                        stateValues.values.pop();
+                        // merge new results
+                        stateValues.values = __spread(stateValues, values);
+                    }
+                    else {
+                        stateValues.values = __spread(values);
+                    }
+                    if ((offset + limit) < total_count) {
+                        stateValues.values.push({
+                            text: core$1._t('global#facet_loading_text'),
+                            classes: 'loading-text-link',
+                            payload: null,
+                        });
+                    }
                     _this.setState(FACET_STATE_CONTEXT, id, {
-                        links: responseFacets[id].values
+                        links: stateValues.values
                     });
                 });
             });
@@ -9843,6 +9914,35 @@
                 responseFacets[inputKey].values = responseFacets[inputKey].values.map(function (item) { return (__assign(__assign({}, item), { payload: item.payload && typeof item.payload === 'string' ? encodeURIComponent(item.payload) : item.payload })); });
             });
             this.setState(FACETS_REQUEST_STATE_CONTEXT, 'success', response);
+        };
+        MrSearchService.prototype.onFacetsScroll = function () {
+            var _this = this;
+            setTimeout(function () {
+                var facets = _this.config.facets;
+                facets.sections.forEach(function (_a) {
+                    var inputs = _a.inputs;
+                    inputs
+                        .filter(function (input) { return input; })
+                        .filter(function (input) { return input.type === 'link'; })
+                        .forEach(function (_a) {
+                        var id = _a.id;
+                        var scrollEl = document.querySelector("#" + id + " .n7-input-link");
+                        var scroll$ = rxjs.fromEvent(scrollEl, 'scroll');
+                        scroll$.pipe(operators.debounceTime(300)).subscribe(function (_a) {
+                            var target = _a.target;
+                            var _b = _this.internalFilterState.facets[id], limit = _b.limit, offset = _b.offset, total_count = _b.total_count, loading = _b.loading;
+                            var _c = target, scrollTop = _c.scrollTop, clientHeight = _c.clientHeight, scrollHeight = _c.scrollHeight;
+                            if ((scrollTop + clientHeight >= scrollHeight)
+                                && (offset + limit < total_count)
+                                && loading === false) {
+                                _this.internalFilterState.facets[id].loading = true;
+                                _this.internalFilterState.facets[id].offset = offset + limit;
+                                _this.doSingleFacetRequest(id);
+                            }
+                        });
+                    });
+                });
+            });
         };
         MrSearchService.prototype.notEquals = function (val1, val2) {
             if (Array.isArray(val1) && Array.isArray(val2)) {
@@ -10408,7 +10508,7 @@
         MrSearchFacetsLayoutComponent = __decorate([
             core.Component({
                 selector: 'mr-search-facets-layout',
-                template: "<div *ngIf=\"lb.dataSource.facets\" class=\"mr-facets__facets-wrapper {{ lb.dataSource.facets.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.facets.sections\" \n    class=\"mr-facets__single-facet {{ section.classes || '' }}\"\n    [ngClass]=\"lb.dataSource.searchService.getState$('section', section.id) | async\">\n        <n7-facet-header\n        *ngIf=\"section.header\"\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\n        [emit]=\"lb.widgets[section.header.id].emit\"\n        ></n7-facet-header>\n\n        <div [hidden]=\"section.header && !lb.widgets[section.header.id].ds.isOpen()\" class=\"mr-facets__single-facet-content\">\n            <div *ngFor=\"let input of section.inputs\" class=\"mr-facets__single-facet-inner-content {{ input.classes || '' }}\">\n                <ng-container [ngSwitch]=\"input.type\">\n    \n                    <!-- INPUT TEXT -->\n                    <n7-input-text \n                    *ngSwitchCase=\"'text'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n    \n                    <!-- INPUT CHECKBOX -->\n                    <n7-input-checkbox \n                    *ngSwitchCase=\"'checkbox'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                    \n                    <!-- INPUT SELECT -->\n                    <n7-input-select \n                    *ngSwitchCase=\"'select'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                    \n                    <!-- INPUT LINK -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'link'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n\n                    <!-- INPUT LINKMULTI -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'linkMulti'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n                \n                </ng-container>\n            </div>\n        </div>\n    </div>\n</div>"
+                template: "<div *ngIf=\"lb.dataSource.facets\" class=\"mr-facets__facets-wrapper {{ lb.dataSource.facets.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.facets.sections\" \n    class=\"mr-facets__single-facet {{ section.classes || '' }}\"\n    [ngClass]=\"lb.dataSource.searchService.getState$('section', section.id) | async\">\n        <n7-facet-header\n        *ngIf=\"section.header\"\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\n        [emit]=\"lb.widgets[section.header.id].emit\"\n        ></n7-facet-header>\n\n        <div [hidden]=\"section.header && !lb.widgets[section.header.id].ds.isOpen()\" class=\"mr-facets__single-facet-content\">\n            <div *ngFor=\"let input of section.inputs\" \n            [attr.id]=\"input.id\"\n            class=\"mr-facets__single-facet-inner-content {{ input.classes || '' }}\">\n                <ng-container [ngSwitch]=\"input.type\">\n    \n                    <!-- INPUT TEXT -->\n                    <n7-input-text \n                    *ngSwitchCase=\"'text'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n    \n                    <!-- INPUT CHECKBOX -->\n                    <n7-input-checkbox \n                    *ngSwitchCase=\"'checkbox'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                    \n                    <!-- INPUT SELECT -->\n                    <n7-input-select \n                    *ngSwitchCase=\"'select'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                    \n                    <!-- INPUT LINK -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'link'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n\n                    <!-- INPUT LINKMULTI -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'linkMulti'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n                \n                </ng-container>\n            </div>\n        </div>\n    </div>\n</div>"
             }),
             __metadata("design:paramtypes", [])
         ], MrSearchFacetsLayoutComponent);
