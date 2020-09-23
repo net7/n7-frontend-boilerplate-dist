@@ -1717,7 +1717,7 @@
         MainLayoutComponent = __decorate([
             core.Component({
                 selector: 'main-layout',
-                template: "<div class=\"n7-main-layout\" id=\"main-layout\">\n    <div class=\"n7-page-content\">\n        <n7-header\n            [data]=\"lb.widgets['header'].ds.out$ | async\"\n            [emit]=\"lb.widgets['header'].emit\">\n        </n7-header>\n        <main class=\"n7-content\">\n            <div class=\"n7-top-page-bar\">\n                <div class=\"n7-top-page-bar__main\"></div>\n            </div>\n            <div class=\"n7-alert-bar\">\n                <!--<n7-alert\n                [attr.id]=\"'main-layout-alert'\"\n                [data]=\"lb.dataSource.alertData$ | async\"\n                [emit]=\"lb.dataSource.closeAlert.bind(lb.dataSource)\"></n7-alert>-->\n            </div>\n            <ng-content></ng-content>\n        </main>\n    </div>\n    <n7-footer\n        [data]=\"lb.widgets['footer'].ds.out$ | async\" \n        [emit]=\"lb.widgets['footer'].emit\">\n    </n7-footer>\n</div>\n"
+                template: "<div class=\"n7-main-layout\" id=\"main-layout\">\n    <div class=\"n7-page-content\">\n        <n7-header\n            [data]=\"lb.widgets['header'].ds.out$ | async\"\n            [emit]=\"lb.widgets['header'].emit\">\n        </n7-header>\n        <main class=\"n7-content\">\n            <div class=\"n7-top-page-bar\">\n                <div class=\"n7-top-page-bar__main\"></div>\n            </div>\n            <div class=\"n7-alert-bar\">\n                <!--<n7-alert\n                [attr.id]=\"'main-layout-alert'\"\n                [data]=\"lb.dataSource.alertData$ | async\"\n                [emit]=\"lb.dataSource.closeAlert.bind(lb.dataSource)\"></n7-alert>-->\n            </div>\n            <ng-content></ng-content>\n        </main>\n    </div>\n    <n7-footer\n        [data]=\"lb.widgets['footer'].ds.out$ | async\"\n        [emit]=\"lb.widgets['footer'].emit\">\n    </n7-footer>\n</div>\n"
             }),
             __metadata("design:paramtypes", [router.Router,
                 router.ActivatedRoute,
@@ -8051,6 +8051,10 @@
                     });
                 }));
             }
+            // remove last link
+            if (items.length) {
+                items[items.length - 1].anchor = null;
+            }
             return { items: items };
         };
         return MrBreadcrumbsDS;
@@ -9342,7 +9346,7 @@
         MrResourceLayoutComponent = __decorate([
             core.Component({
                 selector: 'mr-resource-layout',
-                template: "<div class=\"mr-resource mr-layout\" \n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\"\n     [ngClass]=\"{\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\n      }\">\n    <!-- RESOURCE LAYOUT CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            <div class=\"mr-layout__loader\">\n                <n7-loader></n7-loader>\n            </div>\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            <div class=\"mr-layout__error\">\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\n                <p>{{ lb.dataSource.errorDescription }}</p>\n            </div>\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <ng-container *ngIf=\"lb.dataSource.pageConfig.sections as sections\">\n                <!-- Pass the list of blocks to render to the block template -->\n                <div class=\"mr-resource__top\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\n                </div>\n                <div class=\"mr-resource__content mr-side-margin\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\n                </div>\n            </ng-container>\n        </ng-container>\n\n    </ng-container>\n</div>\n\n<ng-template #blocks let-list>\n    <section *ngFor=\"let section of list\" class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\n        <ng-container [ngSwitch]=\"section.type\">\n\n            <!-- TABS -->\n            <ng-container *ngSwitchCase=\"'tabs'\">\n                <ng-container *ngFor=\"let tab of lb.widgets[section.id].ds.out$ | async\">\n                    <n7-anchor-wrapper [data]=\"tab.anchor\" [classes]=\"tab.classes\">\n                        <span class=\"mr-resource__tabs-item\">{{ tab.label }}</span>\n                    </n7-anchor-wrapper>\n                </ng-container>\n            </ng-container>\n\n            <!-- INNER TITLE -->\n            <ng-container *ngSwitchCase=\"'title'\">\n                <div class=\"mr-resource__title-content mr-side-margin\">\n                    <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-inner-title>\n                </div>\n            </ng-container>\n\n            <!-- IMAGE VIEWER -->\n            <ng-container *ngSwitchCase=\"'viewer'\">\n                <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                </n7-image-viewer>\n            </ng-container>\n\n            <!-- METADATA VIEWER -->\n            <ng-container *ngSwitchCase=\"'metadata'\">\n                <div class=\"mr-resource__metadata-content\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__metadata-title\">\n                        {{ section.title }}\n                    </h3>\n                    <mr-read-more [data]=\"lb.dataSource.readMoreConfig\">\n                        <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                            [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-metadata-viewer>\n                    </mr-read-more>\n                </div>\n            </ng-container>\n\n            <!-- COLLECTION -->\n            <ng-container *ngSwitchCase=\"'collection'\">\n                <div *ngIf=\"lb.widgets[section.id].ds.out$ | async as collection$\" class=\"mr-layout__maxwidth mr-items-preview\">\n                    <!-- <n7-inner-title [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-inner-title> -->\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__collection-title\">\n                        {{ section.title }}\n                    </h3>\n                    <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                        <n7-item-preview *ngFor=\"let item of (collection$ || {})?.items\"\n                            [data]=\"item\" [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n            </ng-container>\n\n            <!-- ITEM PREVIEW -->\n            <ng-container *ngSwitchCase=\"'preview'\">\n                <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__preview-title\">\n                    {{ section.title }}\n                </h3>\n                <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                </n7-item-preview>\n            </ng-container>\n\n            <!-- TEXT VIEWER -->\n            <ng-container *ngSwitchCase=\"'text-viewer'\">\n                <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__text-viewer-title\">\n                    {{ section.title }}\n                </h3>\n                <div class=\"text-viewer__mock\">n7-text-viewer</div>\n            </ng-container>\n\n            <!-- INFO BOX -->\n            <ng-container *ngSwitchCase=\"'info-box'\">\n                <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__info-box-title\">\n                    {{ section.title }}\n                </h3>\n                <div class=\"info-box__mock\">info-box</div>\n            </ng-container>\n\n            <!-- BREADCRUMBS -->\n            <ng-container *ngSwitchCase=\"'breadcrumbs'\">\n                <n7-breadcrumbs [data]=\"lb.widgets[section.id].ds.out$ | async\">\n                </n7-breadcrumbs>\n            </ng-container>\n        </ng-container>\n    </section>\n</ng-template>"
+                template: "<div class=\"mr-resource mr-layout\" \n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\"\n     [ngClass]=\"{\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\n      }\">\n    <!-- RESOURCE LAYOUT CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            <div class=\"mr-layout__loader\">\n                <n7-loader></n7-loader>\n            </div>\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            <div class=\"mr-layout__error\">\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\n                <p>{{ lb.dataSource.errorDescription }}</p>\n            </div>\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <ng-container *ngIf=\"lb.dataSource.pageConfig.sections as sections\">\n                <!-- Pass the list of blocks to render to the block template -->\n                <div class=\"mr-resource__top\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\n                </div>\n                <div class=\"mr-resource__content mr-side-margin\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\n                </div>\n            </ng-container>\n        </ng-container>\n\n    </ng-container>\n</div>\n\n<ng-template #blocks let-list>\n    <section *ngFor=\"let section of list\" class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\n        <ng-container [ngSwitch]=\"section.type\">\n\n            <!-- TABS -->\n            <ng-container *ngSwitchCase=\"'tabs'\">\n                <ng-container *ngFor=\"let tab of lb.widgets[section.id].ds.out$ | async\">\n                    <n7-anchor-wrapper [data]=\"tab.anchor\" [classes]=\"tab.classes\">\n                        <span class=\"mr-resource__tabs-item\">{{ tab.label }}</span>\n                    </n7-anchor-wrapper>\n                </ng-container>\n            </ng-container>\n\n            <!-- INNER TITLE -->\n            <ng-container *ngSwitchCase=\"'title'\">\n                <div class=\"mr-resource__title-content mr-side-margin\">\n                    <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-inner-title>\n                </div>\n            </ng-container>\n\n            <!-- IMAGE VIEWER -->\n            <ng-container *ngSwitchCase=\"'viewer'\">\n                <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                </n7-image-viewer>\n            </ng-container>\n\n            <!-- METADATA VIEWER -->\n            <ng-container *ngSwitchCase=\"'metadata'\">\n                <div class=\"mr-resource__metadata-content\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__metadata-title\">\n                        {{ section.title }}\n                    </h3>\n                    <mr-read-more [data]=\"lb.dataSource.readMoreConfig\">\n                        <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                            [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-metadata-viewer>\n                    </mr-read-more>\n                </div>\n            </ng-container>\n\n            <!-- COLLECTION -->\n            <ng-container *ngSwitchCase=\"'collection'\">\n                <div *ngIf=\"lb.widgets[section.id].ds.out$ | async as collection$\" class=\"mr-resource__collection-content\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title\">\n                        {{ section.title }}\n                    </h3>\n                    <div class=\"mr-resource__collection-grid {{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                        <n7-item-preview *ngFor=\"let item of collection$?.items\"\n                            [data]=\"item\" [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n            </ng-container>\n\n            <!-- ITEM PREVIEW -->\n            <ng-container *ngSwitchCase=\"'preview'\">\n                <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__preview-title\">\n                    {{ section.title }}\n                </h3>\n                <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                </n7-item-preview>\n            </ng-container>\n\n            <!-- TEXT VIEWER -->\n            <ng-container *ngSwitchCase=\"'text-viewer'\">\n                <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__text-viewer-title\">\n                    {{ section.title }}\n                </h3>\n                <div class=\"text-viewer__mock\">n7-text-viewer</div>\n            </ng-container>\n\n            <!-- INFO BOX -->\n            <ng-container *ngSwitchCase=\"'info-box'\">\n                <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__info-box-title\">\n                    {{ section.title }}\n                </h3>\n                <div class=\"info-box__mock\">info-box</div>\n            </ng-container>\n\n            <!-- BREADCRUMBS -->\n            <ng-container *ngSwitchCase=\"'breadcrumbs'\">\n                <n7-breadcrumbs [data]=\"lb.widgets[section.id].ds.out$ | async\">\n                </n7-breadcrumbs>\n            </ng-container>\n        </ng-container>\n    </section>\n</ng-template>\n"
             }),
             __metadata("design:paramtypes", [LayoutsConfigurationService,
                 router.ActivatedRoute,
@@ -9481,6 +9485,7 @@
             this.queryParamKeys = [];
             this.inputSchemas = {};
             this.contextState = {};
+            this.internalFilterKeys = [];
             this.internalFilterState = {
                 globalParams: {},
                 facets: {}
@@ -9557,7 +9562,7 @@
             var _this = this;
             // clear input states
             Object.keys(this.contextState[INPUT_STATE_CONTEXT])
-                .filter(function (id) { return !_this.internalFilterState.facets[id]; })
+                .filter(function (id) { return !_this.internalFilterKeys.includes(id); })
                 .forEach(function (id) {
                 _this.setState(INPUT_STATE_CONTEXT, id, null);
             });
@@ -9585,7 +9590,7 @@
                 var header = _a.header, inputs = _a.inputs;
                 __spread([header], inputs).filter(function (input) { return input; })
                     .forEach(function (_a) {
-                    var id = _a.id, queryParam = _a.queryParam, schema = _a.schema, limit = _a.limit, type = _a.type;
+                    var id = _a.id, queryParam = _a.queryParam, schema = _a.schema, limit = _a.limit, type = _a.type, target = _a.target;
                     if (!id) {
                         return;
                     }
@@ -9606,6 +9611,10 @@
                             offset: 0,
                             query: ''
                         };
+                    }
+                    // internal filters
+                    if (target) {
+                        _this.internalFilterKeys.push(id);
                     }
                 });
             });
@@ -10058,16 +10067,29 @@
         function FacetLinkDS() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.value = null;
+            _this.isUpdate = false;
             _this.getValue = function () { return _this.value; };
             return _this;
         }
         FacetLinkDS.prototype.transform = function (data) {
+            var links = data.links;
+            // empty state check
+            if (this.isUpdate && !links.length) {
+                return {
+                    links: [{
+                            text: core$1._t('global#facet_empty_text'),
+                            classes: 'empty-text-link',
+                            payload: null,
+                        }]
+                };
+            }
             return data;
         };
         FacetLinkDS.prototype.setValue = function (value, update) {
             var _this = this;
             if (update === void 0) { update = false; }
             this.value = value;
+            this.isUpdate = update;
             if (update) {
                 var links = this.input.links;
                 var updatedLinks = links.map(function (link) { return (__assign(__assign({}, link), { classes: _this.value === link.payload ? ACTIVE_CLASS$1 : '' })); });
@@ -10223,11 +10245,13 @@
                 var type = _a.type, payload = _a.payload;
                 switch (type) {
                     case _this.dataSource.id + ".change":
-                        _this.dataSource.toggleValue(payload);
-                        _this.emitOuter('change', {
-                            value: _this.dataSource.getValue(),
-                            id: _this.dataSource.id
-                        });
+                        if (payload) {
+                            _this.dataSource.toggleValue(payload);
+                            _this.emitOuter('change', {
+                                value: _this.dataSource.getValue(),
+                                id: _this.dataSource.id
+                            });
+                        }
                         break;
                     default:
                         break;
@@ -10243,16 +10267,29 @@
         function FacetLinkMultipleDS() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.value = [];
+            _this.isUpdate = false;
             _this.getValue = function () { return _this.value; };
             return _this;
         }
         FacetLinkMultipleDS.prototype.transform = function (data) {
+            var links = data.links;
+            // empty state check
+            if (this.isUpdate && !links.length) {
+                return {
+                    links: [{
+                            text: core$1._t('global#facet_empty_text'),
+                            classes: 'empty-text-link',
+                            payload: null,
+                        }]
+                };
+            }
             return data;
         };
         FacetLinkMultipleDS.prototype.setValue = function (value, update) {
             var _this = this;
             if (update === void 0) { update = false; }
             this.value = value;
+            this.isUpdate = update;
             if (update) {
                 var links = this.input.links;
                 var updatedLinks = links.map(function (link) { return (__assign(__assign({}, link), { classes: _this.value.includes(link.payload) ? ACTIVE_CLASS$2 : '' })); });
@@ -10287,11 +10324,13 @@
                 var type = _a.type, payload = _a.payload;
                 switch (type) {
                     case _this.dataSource.id + ".change":
-                        _this.dataSource.toggleValue(payload);
-                        _this.emitOuter('change', {
-                            value: _this.dataSource.getValue(),
-                            id: _this.dataSource.id
-                        });
+                        if (payload) {
+                            _this.dataSource.toggleValue(payload);
+                            _this.emitOuter('change', {
+                                value: _this.dataSource.getValue(),
+                                id: _this.dataSource.id
+                            });
+                        }
                         break;
                     default:
                         break;
@@ -10816,7 +10855,7 @@
         MrStaticLayoutComponent = __decorate([
             core.Component({
                 selector: 'mr-static-layout',
-                template: "<div class=\"mr-static mr-layout\"\n     *ngIf=\"lb.dataSource\"\n     [ngClass]=\"{\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\n      }\">\n    <!-- STATIC LAYOUT CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            <div class=\"mr-layout__loader\">\n                <n7-loader></n7-loader>\n            </div>\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            <div class=\"mr-layout__error\">\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\n                <p>{{ lb.dataSource.errorDescription }}</p>\n            </div>\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <h1 class=\"mr-static__title mr-generated-title-WP\">{{lb.dataSource.title}}</h1>\n            <n7-metadata-viewer \n            [data]=\"lb.widgets['mr-static-metadata'].ds.out$ | async\">\n            </n7-metadata-viewer>\n            <div class=\"mr-static__content mr-wp-content\" [innerHTML]=\"lb.dataSource.content | keepHtml\"></div>\n        </ng-container>\n    \n    </ng-container>\n</div>\n"
+                template: "<div class=\"mr-static mr-layout\"\n     *ngIf=\"lb.dataSource\"\n     [ngClass]=\"{\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\n      }\">\n    <!-- STATIC LAYOUT CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            <div class=\"mr-layout__loader\">\n                <n7-loader></n7-loader>\n            </div>\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            <div class=\"mr-layout__error\">\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\n                <p>{{ lb.dataSource.errorDescription }}</p>\n            </div>\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <div class=\"mr-static__top\">\n                <h1 class=\"mr-static__title mr-generated-title-WP\">{{lb.dataSource.title}}</h1>\n                <div class=\"mr-static__metadata\">\n                    <n7-metadata-viewer \n                    [data]=\"lb.widgets['mr-static-metadata'].ds.out$ | async\">\n                    </n7-metadata-viewer>\n                </div>\n            </div>\n            <div class=\"mr-static__content mr-wp-content\" [innerHTML]=\"lb.dataSource.content | keepHtml\"></div>\n        </ng-container>\n    \n    </ng-container>\n</div>\n"
             }),
             __metadata("design:paramtypes", [CommunicationService,
                 ConfigurationService,

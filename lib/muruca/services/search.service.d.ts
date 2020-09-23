@@ -15,6 +15,7 @@ export declare class MrSearchService {
     private queryParamKeys;
     private inputSchemas;
     private contextState;
+    private internalFilterKeys;
     private internalFilterState;
     private state$;
     private beforeHook;
