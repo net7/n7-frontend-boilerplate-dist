@@ -37,3 +37,4 @@ export { MrStaticLayoutComponent as ɵbh } from './lib/muruca/layouts/static-lay
 export { EscapeHtmlPipe as ɵz } from './lib/muruca/pipes/keep-html.pipe';
 export { MrLayoutStateService as ɵbc } from './lib/muruca/services/layout-state.service';
 export { MrSearchService as ɵbg } from './lib/muruca/services/search.service';
+export { SbExampleLayoutComponent as ɵbj } from './lib/sandbox/layout/example-layout/example-layout';

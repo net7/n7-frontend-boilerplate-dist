@@ -811,6 +811,22 @@
         browserIsIE: function () {
             return window.navigator.userAgent.match(/(MSIE|Trident)/);
         },
+        escapeQuotes: function (str) {
+            if (typeof str !== 'string') {
+                return '';
+            }
+            return str
+                .replace(/"/g, '\\\\\\"')
+                .replace(/'/g, '\\\\\'');
+        },
+        unescapeQuotes: function (str) {
+            if (typeof str !== 'string') {
+                return '';
+            }
+            return str
+                .replace(/\\\\\\"/g, '"')
+                .replace(/\\\\'/g, '\'');
+        },
         escapeDoubleQuotes: function (str) {
             if (str.search(/\\?(")([\w\s]+)\\?(")/g) >= 0) {
                 // match piece of string between double quotes
@@ -851,7 +867,7 @@
             };
         };
         AwFacetInputText.prototype.setActive = function (facetValue) {
-            this.output.value = helpers.unescapeDoubleQuotes(facetValue) || null;
+            this.output.value = helpers.unescapeQuotes(facetValue) || null;
         };
         return AwFacetInputText;
     }(AwFacetInput));
@@ -913,7 +929,7 @@
                     filter.value.push(value);
                 }
                 else {
-                    filter.value = !remove ? helpers.escapeDoubleQuotes(value) : null;
+                    filter.value = !remove ? helpers.escapeQuotes(value) : null;
                 }
             });
         };
@@ -1296,6 +1312,9 @@
             });
         };
         HeaderDS.prototype.onRouterChange = function () {
+            if (!this.output) {
+                return;
+            }
             var classes = this.output.classes;
             classes = classes || '';
             classes = classes.split(' ');
@@ -2005,7 +2024,7 @@
                 _this.one(id).update(data);
             };
             _this.drawPagination = function () {
-                if (!_this.myResponse.relatedItems)
+                if (!_this.getLinkedObjectItems())
                     return;
                 var _a = _this._getPaginationParams(), href = _a.href, queryParams = _a.queryParams;
                 _this.one('n7-smart-pagination').updateOptions({
@@ -2014,7 +2033,7 @@
                     queryParams: queryParams,
                 });
                 _this.one('n7-smart-pagination').update({
-                    totalPages: Math.ceil(_this.myResponse.relatedItems.length / _this.pageSize),
+                    totalPages: Math.ceil(_this.getLinkedObjectItems().length / _this.pageSize),
                     currentPage: _this.currentPage,
                     pageLimit: 5,
                     sizes: {
@@ -2040,30 +2059,20 @@
                     pagination: true,
                     size: _this.pageSize,
                 });
-                _this.one('aw-linked-objects').update({ items: _this.myResponse.relatedItems });
+                _this.one('aw-linked-objects').update({ items: _this.getLinkedObjectItems() });
             };
             _this.handleNavUpdate = function (tab) {
                 _this.selectedTab = tab;
                 _this.updateWidgets(_this.myResponse);
-                if (tab === 'oggetti-collegati') {
-                    _this.one('aw-linked-objects').updateOptions({
-                        context: _this.selectedTab,
-                        config: _this.configuration,
-                        page: _this.currentPage,
-                        pagination: true,
-                        paginationParams: _this._getPaginationParams(),
-                        size: _this.pageSize,
-                    });
-                    _this.one('aw-linked-objects').update({ items: _this.myResponse.relatedItems });
-                }
-                else if (tab === 'overview' && _this.myResponse.relatedItems) {
-                    _this.one('aw-linked-objects').updateOptions({
-                        size: 3,
-                        config: _this.configuration,
-                        context: 'entita',
-                    });
-                    _this.one('aw-linked-objects').update({ items: _this.myResponse.relatedItems });
-                }
+                _this.one('aw-linked-objects').updateOptions({
+                    context: _this.selectedTab,
+                    config: _this.configuration,
+                    page: _this.currentPage,
+                    pagination: true,
+                    paginationParams: _this._getPaginationParams(),
+                    size: _this.pageSize,
+                });
+                _this.one('aw-linked-objects').update({ items: _this.getLinkedObjectItems() });
             };
             return _this;
         }
@@ -2162,27 +2171,19 @@
             this.one('aw-entita-nav').updateOptions({
                 bubblesEnabled: this.bubblesEnabled,
                 config: this.configuration.get('entita-layout'),
-                hasMetadataFields: this.hasMetadataFields
+                hasMetadataFields: this.hasMetadataFields,
+                labels: this.configuration.get('labels')
             });
             this.one('aw-entita-metadata-viewer').update(this.getFields(res));
-            if (this.selectedTab === 'oggetti-collegati') {
-                this.one('aw-linked-objects').updateOptions({
-                    context: this.selectedTab,
-                    config: this.configuration,
-                    page: this.currentPage,
-                    pagination: true,
-                    paginationParams: this._getPaginationParams(),
-                    size: this.pageSize,
-                });
-            }
-            else {
-                this.one('aw-linked-objects').updateOptions({
-                    size: 3,
-                    config: this.configuration,
-                    context: 'entita',
-                });
-            }
-            res.relatedItems.forEach(function (el) {
+            this.one('aw-linked-objects').updateOptions({
+                context: this.selectedTab,
+                config: this.configuration,
+                page: this.currentPage,
+                pagination: true,
+                paginationParams: this._getPaginationParams(),
+                size: this.pageSize,
+            });
+            this.getLinkedObjectItems().forEach(function (el) {
                 el.relationName = res.label.length > 30
                     ? res.label.substr(0, 30) + "... "
                     : res.label;
@@ -2192,7 +2193,7 @@
                     ? res.label.substr(0, 30) + "... "
                     : res.label;
             });
-            this.one('aw-linked-objects').update({ items: res.relatedItems });
+            this.one('aw-linked-objects').update({ items: this.getLinkedObjectItems() });
             this.one('aw-related-entities').update(res.relatedEntities);
             this.drawPagination();
             // fallback text
@@ -2208,7 +2209,7 @@
                     this.configuration.get('paths').entitaBasePath,
                     this.currentId + "/",
                     this.currentSlug,
-                    '/oggetti-collegati/',
+                    "/" + this.selectedTab + "/",
                 ].join(''),
                 queryParams: {
                     page: this.currentPage,
@@ -2237,6 +2238,11 @@
                 metadataToShow: metadataToShow,
                 type: typeOfEntity
             });
+        };
+        AwEntitaLayoutDS.prototype.getLinkedObjectItems = function () {
+            return this.selectedTab === 'fondi-collegati'
+                ? this.myResponse.relatedLa
+                : this.myResponse.relatedItems;
         };
         return AwEntitaLayoutDS;
     }(layoutDataSource.LayoutDataSource));
@@ -3077,7 +3083,7 @@
             }
             var data = param.data, selected = param.selected;
             var navigation = { items: [], payload: 'entita-nav' };
-            var hasMetadataFields = this.options.hasMetadataFields;
+            var _a = this.options, hasMetadataFields = _a.hasMetadataFields, labels = _a.labels;
             /* navigation.items.push({
               text: 'OVERVIEW',
               anchor: { href: `${param.basePath}/overview` },
@@ -3112,6 +3118,13 @@
                     text: 'ENTITÀ COLLEGATE',
                     anchor: { href: param.basePath + "/entita-collegate" },
                     classes: selected === 'entita-collegate' ? 'is-selected' : '',
+                });
+            }
+            if (data.relatedLa) {
+                navigation.items.push({
+                    text: labels['aggregazioni-logiche-collegate'],
+                    anchor: { href: param.basePath + "/fondi-collegati" },
+                    classes: selected === 'fondi-collegati' ? 'is-selected' : '',
                 });
             }
             if (data.extraTab) {
@@ -4952,7 +4965,7 @@
         AwEntitaLayoutComponent = __decorate([
             core.Component({
                 selector: 'aw-entita-layout',
-                template: "<div class=\"aw-entity n7-side-auto-padding\"\n     *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div *ngIf=\"lb.dataSource.loading\"\n             class=\"aw-entity__sidebar-title-wrapper-loading\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <div *ngIf=\"!lb.dataSource.loading\"\n             class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <div *ngIf=\"lb.dataSource.loading\"\n             class=\"aw-entity__sidebar-nav-loading\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2]\"\n                                    [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-nav'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <n7-nav *ngIf=\"!lb.dataSource.loading\" \n        [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\"\n        [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <!-- lb.dataSource.selectedTab -->\n    <div *ngIf=\"lb.dataSource.loading\"\n         class=\"aw-entity__content-loading\">\n        <div class=\"aw-entity__content-loading-title\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\"></n7-content-placeholder>\n        </div>\n\n        <div class=\"aw-entity__content-loading-items\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                    [data]=\"{\n                blocks: [{ classes: 'entity-placeholder-item-preview' }]\n            }\"></n7-content-placeholder>\n        </div>\n    </div>\n\n    <div *ngIf=\"!lb.dataSource.loading\"\n         class=\"aw-entity__content\">\n        <section>\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\n                 class=\"aw-entity__content-section\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <a *ngIf=\"lb.dataSource.myResponse.wikiTab\"\n                       class=\"n7-btn n7-btn-light\"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/wiki']\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                    <a *ngIf=\"lb.dataSource.myResponse.extraTab\"\n                       class=\"n7-btn n7-btn-light\"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/maxxi']\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n            </div>\n\n            <ng-container *ngIf=\"(\n                ['overview', 'informazioni'].includes(lb.dataSource.selectedTab)\n            )\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n                    <div class=\"aw-entity__content-section-header\"\n                         *ngIf=\"lb.dataSource.selectedTab === 'overview'\">\n                        <h2 class=\"aw-entity__content-section-title\"\n                            *ngIf=\"lb.dataSource.selectedTab === 'overview'\">Informazioni</h2>\n                        <a *ngIf=\"lb.dataSource.selectedTab !== 'informazioni'\"\n                           class=\"n7-btn n7-btn-light\"\n                           [routerLink]=\"[lb.dataSource.getNavBasePath() + '/informazioni']\">\n                            TUTTE LE INFORMAZIONI <i class=\"n7-icon-angle-right\"></i>\n                        </a>\n                    </div>\n                    <p *ngIf=\"lb.dataSource.fallbackText\"\n                       class=\"aw-entity__content-section-empty\">\n                        {{ lb.dataSource.fallbackText }}\n                    </p>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async\">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                 *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews && lb.dataSource.myResponse.relatedItems\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <a *ngIf=\"lb.dataSource.selectedTab === 'overview' \"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/oggetti-collegati/']\"\n                       [queryParams]=\"{ page: 1 }\"\n                       class=\"n7-btn n7-btn-light\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <div class=\"aw-entity__content-item-previews aw-item-preview-list\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <div class=\"aw-item-preview-wrapper\">\n                            <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                            </n7-smart-breadcrumbs>\n                            <n7-item-preview [data]=\"preview\"\n                                             [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                            <!-- Relation -->\n                            <div class=\"aw-item-preview-relation\"\n                                 *ngIf=\"preview.relation.value\">\n                                <p class=\"aw-item-preview-relation__description\">Relazione con\n                                    <span class=\"aw-item-preview-relation__key\">{{preview.relation.key}}</span>:\n                                    <span class=\"aw-item-preview-relation__value\"> {{preview.relation.value}}</span>\n                                </p>\n                            </div>\n                        </div>\n                    </ng-container>\n                </div>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.selectedTab === 'oggetti-collegati'\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview aw-related-entities__{{lb.dataSource.selectedTab}}\"\n                 *ngIf=\"lb.dataSource.myResponse.relatedEntities\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <a *ngIf=\"lb.dataSource.selectedTab == 'overview'\"\n                       class=\"n7-btn n7-btn-light\"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/entita-collegate']\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n\n                <!-- ENTITA COLLEGATE -->\n                <section id=\"related-item-container\"\n                         class=\"aw-entity__section aw-entity__related\">\n                    <div class=\"aw-entity__inner-title\">\n                        {{lb.dataSource.relatedEntitiesHeader}}\n                    </div>\n                    <div class=\"aw-entity__related-items n7-grid-2 aw-item-preview-list\">\n                        <ng-container *ngFor=\"let preview of (lb.widgets['aw-related-entities'].ds.out$ | async)?.previews\">\n                            <div class=\"aw-item-preview-wrapper\">\n                                <n7-item-preview [data]=\"preview\"\n                                                [emit]=\"lb.widgets['aw-related-entities'].emit\">\n                                </n7-item-preview>\n                                <!-- Relation -->\n                                <div class=\"aw-item-preview-relation\"\n                                    *ngIf=\"preview.relation.value\">\n                                    <p class=\"aw-item-preview-relation__description\">Relazione con\n                                        <span class=\"aw-item-preview-relation__key\">{{preview.relation.key}}</span>:\n                                        <span class=\"aw-item-preview-relation__value\"> {{preview.relation.value}}</span>\n                                    </p>\n                                </div>\n                            </div>\n                        </ng-container>\n                    </div>\n                </section>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                 *ngIf=\"lb.dataSource.myResponse.extraTab\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n                 *ngIf=\"lb.dataSource.myResponse.wikiTab\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{ lb.dataSource.myResponse.wikiTab.url }}\n                </a>\n            </div>\n        </section>\n    </div>\n</div>\n"
+                template: "<div class=\"aw-entity n7-side-auto-padding\"\n     *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div *ngIf=\"lb.dataSource.loading\"\n             class=\"aw-entity__sidebar-title-wrapper-loading\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <div *ngIf=\"!lb.dataSource.loading\"\n             class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <div *ngIf=\"lb.dataSource.loading\"\n             class=\"aw-entity__sidebar-nav-loading\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2]\"\n                                    [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-nav'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <n7-nav *ngIf=\"!lb.dataSource.loading\" \n        [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\"\n        [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <!-- lb.dataSource.selectedTab -->\n    <div *ngIf=\"lb.dataSource.loading\"\n         class=\"aw-entity__content-loading\">\n        <div class=\"aw-entity__content-loading-title\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\"></n7-content-placeholder>\n        </div>\n\n        <div class=\"aw-entity__content-loading-items\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                    [data]=\"{\n                blocks: [{ classes: 'entity-placeholder-item-preview' }]\n            }\"></n7-content-placeholder>\n        </div>\n    </div>\n\n    <div *ngIf=\"!lb.dataSource.loading\"\n         class=\"aw-entity__content\">\n        <section>\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\n                 class=\"aw-entity__content-section\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <a *ngIf=\"lb.dataSource.myResponse.wikiTab\"\n                       class=\"n7-btn n7-btn-light\"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/wiki']\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                    <a *ngIf=\"lb.dataSource.myResponse.extraTab\"\n                       class=\"n7-btn n7-btn-light\"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/maxxi']\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n            </div>\n\n            <ng-container *ngIf=\"(\n                ['overview', 'informazioni'].includes(lb.dataSource.selectedTab)\n            )\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n                    <div class=\"aw-entity__content-section-header\"\n                         *ngIf=\"lb.dataSource.selectedTab === 'overview'\">\n                        <h2 class=\"aw-entity__content-section-title\"\n                            *ngIf=\"lb.dataSource.selectedTab === 'overview'\">Informazioni</h2>\n                        <a *ngIf=\"lb.dataSource.selectedTab !== 'informazioni'\"\n                           class=\"n7-btn n7-btn-light\"\n                           [routerLink]=\"[lb.dataSource.getNavBasePath() + '/informazioni']\">\n                            TUTTE LE INFORMAZIONI <i class=\"n7-icon-angle-right\"></i>\n                        </a>\n                    </div>\n                    <p *ngIf=\"lb.dataSource.fallbackText\"\n                       class=\"aw-entity__content-section-empty\">\n                        {{ lb.dataSource.fallbackText }}\n                    </p>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async\">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                 *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews && lb.dataSource.myResponse.relatedItems\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <a *ngIf=\"lb.dataSource.selectedTab === 'overview' \"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/oggetti-collegati/']\"\n                       [queryParams]=\"{ page: 1 }\"\n                       class=\"n7-btn n7-btn-light\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <div class=\"aw-entity__content-item-previews aw-item-preview-list\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <div class=\"aw-item-preview-wrapper\">\n                            <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                            </n7-smart-breadcrumbs>\n                            <n7-item-preview [data]=\"preview\"\n                                             [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                            <!-- Relation -->\n                            <div class=\"aw-item-preview-relation\"\n                                 *ngIf=\"preview.relation.value\">\n                                <p class=\"aw-item-preview-relation__description\">Relazione con\n                                    <span class=\"aw-item-preview-relation__key\">{{preview.relation.key}}</span>:\n                                    <span class=\"aw-item-preview-relation__value\"> {{preview.relation.value}}</span>\n                                </p>\n                            </div>\n                        </div>\n                    </ng-container>\n                </div>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.selectedTab === 'oggetti-collegati'\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                 *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews && lb.dataSource.myResponse.relatedLa\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'fondi-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">{{ lb.dataSource.configuration.get('labels')['aggregazioni-logiche-collegate'] }}</h2>\n\n                    <a *ngIf=\"lb.dataSource.selectedTab === 'overview' \"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/fondi-collegati/']\"\n                       [queryParams]=\"{ page: 1 }\"\n                       class=\"n7-btn n7-btn-light\">\n                        TUTTE LE FONDI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <div class=\"aw-entity__content-item-previews aw-item-preview-list\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <div class=\"aw-item-preview-wrapper\">\n                            <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                            </n7-smart-breadcrumbs>\n                            <n7-item-preview [data]=\"preview\"\n                                             [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                            <!-- Relation -->\n                            <div class=\"aw-item-preview-relation\"\n                                 *ngIf=\"preview.relation.value\">\n                                <p class=\"aw-item-preview-relation__description\">Relazione con\n                                    <span class=\"aw-item-preview-relation__key\">{{preview.relation.key}}</span>:\n                                    <span class=\"aw-item-preview-relation__value\"> {{preview.relation.value}}</span>\n                                </p>\n                            </div>\n                        </div>\n                    </ng-container>\n                </div>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.selectedTab === 'fondi-collegati'\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview aw-related-entities__{{lb.dataSource.selectedTab}}\"\n                 *ngIf=\"lb.dataSource.myResponse.relatedEntities\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <a *ngIf=\"lb.dataSource.selectedTab == 'overview'\"\n                       class=\"n7-btn n7-btn-light\"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/entita-collegate']\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n\n                <!-- ENTITA COLLEGATE -->\n                <section id=\"related-item-container\"\n                         class=\"aw-entity__section aw-entity__related\">\n                    <div class=\"aw-entity__inner-title\">\n                        {{lb.dataSource.relatedEntitiesHeader}}\n                    </div>\n                    <div class=\"aw-entity__related-items n7-grid-2 aw-item-preview-list\">\n                        <ng-container *ngFor=\"let preview of (lb.widgets['aw-related-entities'].ds.out$ | async)?.previews\">\n                            <div class=\"aw-item-preview-wrapper\">\n                                <n7-item-preview [data]=\"preview\"\n                                                [emit]=\"lb.widgets['aw-related-entities'].emit\">\n                                </n7-item-preview>\n                                <!-- Relation -->\n                                <div class=\"aw-item-preview-relation\"\n                                    *ngIf=\"preview.relation.value\">\n                                    <p class=\"aw-item-preview-relation__description\">Relazione con\n                                        <span class=\"aw-item-preview-relation__key\">{{preview.relation.key}}</span>:\n                                        <span class=\"aw-item-preview-relation__value\"> {{preview.relation.value}}</span>\n                                    </p>\n                                </div>\n                            </div>\n                        </ng-container>\n                    </div>\n                </section>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                 *ngIf=\"lb.dataSource.myResponse.extraTab\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n                 *ngIf=\"lb.dataSource.myResponse.wikiTab\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{ lb.dataSource.myResponse.wikiTab.url }}\n                </a>\n            </div>\n        </section>\n    </div>\n</div>\n"
             }),
             __metadata("design:paramtypes", [router.Router,
                 router.ActivatedRoute,
@@ -6045,7 +6058,7 @@
         };
         AwHomeLayoutDS.prototype.onHeroChange = function (value) {
             if (value) {
-                var escapedValue = helpers.escapeDoubleQuotes(value);
+                var escapedValue = helpers.escapeQuotes(value);
                 this.autocompleteChanged$.next(escapedValue);
                 this.homeAutocompleteIsLoading = true;
                 this.homeAutocompleteQuery = escapedValue;
@@ -6224,7 +6237,7 @@
                         break;
                     case 'aw-hero.enter':
                         {
-                            var query = payload.value;
+                            var query = helpers.escapeQuotes(payload.value);
                             _this.emitGlobal('navigate', {
                                 handler: 'router',
                                 path: [_this.configuration.get('paths').searchBasePath],
@@ -7447,7 +7460,7 @@
         },
         getEntityDetails: {
             queryName: 'getEntity',
-            queryBody: "{\n        getEntity(__PARAMS__){\n          overviewTab\n          label\n          id\n          typeOfEntity\n          fields {\n            ...\n            on KeyValueField {\n              key\n              value\n            }\n            ... on\n            KeyValueFieldGroup {\n              label\n              fields\n              {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n          extraTab\n          wikiTab {\n            text\n            url\n          }\n          relatedItems {\n            thumbnail\n            relation\n            item {\n              label\n              id\n              fields\n              {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n              breadcrumbs {\n                label\n                link\n              }\n            }\n            relatedTypesOfEntity {\n              type\n              count\n            }\n          }\n          relatedEntities {\n            entity {\n                id\n                label\n                typeOfEntity\n                relation\n            }\n            count\n          }\n        }\n      }\n      ",
+            queryBody: "{\n        getEntity(__PARAMS__){\n          overviewTab\n          label\n          id\n          typeOfEntity\n          relatedLa: relatedAl {\n            thumbnail\n            relation          \n            item {\n              label\n              id\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n          fields {\n            ...\n            on KeyValueField {\n              key\n              value\n            }\n            ... on\n            KeyValueFieldGroup {\n              label\n              fields\n              {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n          extraTab\n          wikiTab {\n            text\n            url\n          }\n          relatedItems {\n            thumbnail\n            relation\n            item {\n              label\n              id\n              fields\n              {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n              breadcrumbs {\n                label\n                link\n              }\n            }\n            relatedTypesOfEntity {\n              type\n              count\n            }\n          }\n          relatedEntities {\n            entity {\n                id\n                label\n                typeOfEntity\n                relation\n            }\n            count\n          }\n        }\n      }\n      ",
         },
         getItem: {
             queryName: 'getItem',
@@ -11067,6 +11080,125 @@
         return N7BoilerplateMurucaModule;
     }());
 
+    var SbExampleLayoutDS = /** @class */ (function (_super) {
+        __extends(SbExampleLayoutDS, _super);
+        function SbExampleLayoutDS() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        SbExampleLayoutDS.prototype.onInit = function () {
+            // TODO
+        };
+        return SbExampleLayoutDS;
+    }(layoutDataSource.LayoutDataSource));
+
+    var SbExampleLayoutEH = /** @class */ (function (_super) {
+        __extends(SbExampleLayoutEH, _super);
+        function SbExampleLayoutEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        SbExampleLayoutEH.prototype.listen = function () {
+            var _this = this;
+            this.innerEvents$.subscribe(function (_a) {
+                var type = _a.type, payload = _a.payload;
+                _this.dataSource.onInit();
+            });
+        };
+        return SbExampleLayoutEH;
+    }(core$1.EventHandler));
+
+    var SbDummyDS = /** @class */ (function (_super) {
+        __extends(SbDummyDS, _super);
+        function SbDummyDS() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        SbDummyDS.prototype.transform = function (data) {
+            return data;
+        };
+        return SbDummyDS;
+    }(core$1.DataSource));
+
+    var DS$4 = /*#__PURE__*/Object.freeze({
+        __proto__: null,
+        SbDummyDS: SbDummyDS
+    });
+
+    var SbDummyEH = /** @class */ (function (_super) {
+        __extends(SbDummyEH, _super);
+        function SbDummyEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        SbDummyEH.prototype.listen = function () {
+            // TODO
+        };
+        return SbDummyEH;
+    }(core$1.EventHandler));
+
+    var EH$4 = /*#__PURE__*/Object.freeze({
+        __proto__: null,
+        SbDummyEH: SbDummyEH
+    });
+
+    var SbExampleLayoutConfig = {
+        layoutId: 'sb-example-layout',
+        /**
+         * Array of components you want to use
+         * in this leyout
+         */
+        widgets: [],
+        layoutDS: SbExampleLayoutDS,
+        layoutEH: SbExampleLayoutEH,
+        widgetsDataSources: DS$4,
+        widgetsEventHandlers: EH$4,
+        options: {
+        // TODO
+        },
+    };
+
+    var SbExampleLayoutComponent = /** @class */ (function (_super) {
+        __extends(SbExampleLayoutComponent, _super);
+        function SbExampleLayoutComponent() {
+            return _super.call(this, SbExampleLayoutConfig) || this;
+        }
+        SbExampleLayoutComponent.prototype.initPayload = function () {
+            return {};
+        };
+        SbExampleLayoutComponent.prototype.ngOnInit = function () {
+            this.onInit();
+        };
+        SbExampleLayoutComponent.prototype.ngOnDestroy = function () {
+            this.onDestroy();
+        };
+        SbExampleLayoutComponent = __decorate([
+            core.Component({
+                selector: 'sb-example-layout',
+                template: "<div class=\"sb-example-layout\" id=\"example-layout\">\n    // TODO\n</div>"
+            }),
+            __metadata("design:paramtypes", [])
+        ], SbExampleLayoutComponent);
+        return SbExampleLayoutComponent;
+    }(AbstractLayout));
+
+    var COMPONENTS$4 = [
+        SbExampleLayoutComponent,
+    ];
+    var N7BoilerplateSandboxModule = /** @class */ (function () {
+        function N7BoilerplateSandboxModule() {
+        }
+        N7BoilerplateSandboxModule = __decorate([
+            core.NgModule({
+                declarations: COMPONENTS$4,
+                imports: [
+                    common.CommonModule,
+                    components.DvComponentsLibModule,
+                    N7BoilerplateCommonModule,
+                ],
+                providers: [],
+                exports: COMPONENTS$4,
+            })
+        ], N7BoilerplateSandboxModule);
+        return N7BoilerplateSandboxModule;
+    }());
+
     var N7BoilerplateLibModule = /** @class */ (function () {
         function N7BoilerplateLibModule() {
         }
@@ -11085,6 +11217,8 @@
                     N7BoilerplateDataVizModule,
                     // MR
                     N7BoilerplateMurucaModule,
+                    // SB
+                    N7BoilerplateSandboxModule,
                 ],
             })
         ], N7BoilerplateLibModule);
@@ -11459,11 +11593,18 @@
     exports.N7BoilerplateDataVizModule = N7BoilerplateDataVizModule;
     exports.N7BoilerplateLibModule = N7BoilerplateLibModule;
     exports.N7BoilerplateMurucaModule = N7BoilerplateMurucaModule;
+    exports.N7BoilerplateSandboxModule = N7BoilerplateSandboxModule;
     exports.Page404LayoutComponent = Page404LayoutComponent;
     exports.Page404LayoutConfig = Page404LayoutConfig;
     exports.Page404LayoutDS = Page404LayoutDS;
     exports.Page404LayoutEH = Page404LayoutEH;
     exports.RestProvider = RestProvider;
+    exports.SbDummyDS = SbDummyDS;
+    exports.SbDummyEH = SbDummyEH;
+    exports.SbExampleLayoutComponent = SbExampleLayoutComponent;
+    exports.SbExampleLayoutConfig = SbExampleLayoutConfig;
+    exports.SbExampleLayoutDS = SbExampleLayoutDS;
+    exports.SbExampleLayoutEH = SbExampleLayoutEH;
     exports.SearchFacetsLayoutConfig = SearchFacetsLayoutConfig;
     exports.SearchFacetsLayoutDS = SearchFacetsLayoutDS;
     exports.SearchFacetsLayoutEH = SearchFacetsLayoutEH;
@@ -11484,6 +11625,7 @@
     exports.ɵbg = MrSearchService;
     exports.ɵbh = MrStaticLayoutComponent;
     exports.ɵbi = ReadMoreComponent;
+    exports.ɵbj = SbExampleLayoutComponent;
     exports.ɵc = ConfigurationService;
     exports.ɵd = LayoutsConfigurationService;
     exports.ɵe = MainStateService;

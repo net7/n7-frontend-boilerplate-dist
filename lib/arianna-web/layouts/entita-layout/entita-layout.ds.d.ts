@@ -48,4 +48,5 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
         order: any;
         label: string;
     }[];
+    private getLinkedObjectItems;
 }

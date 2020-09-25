@@ -25,3 +25,7 @@ export * from './lib/muruca/layouts';
 export * from './lib/muruca/services/menu.service';
 export * from './lib/muruca/services/footer.service';
 export * from './lib/muruca/guards/dynamic-path.guard';
+export * from './lib/sandbox/n7-boilerplate-sandbox.module';
+export * from './lib/sandbox/data-sources';
+export * from './lib/sandbox/event-handlers';
+export * from './lib/sandbox/layout';

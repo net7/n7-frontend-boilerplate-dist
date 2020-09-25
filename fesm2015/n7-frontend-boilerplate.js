@@ -572,6 +572,22 @@ var helpers = {
     browserIsIE() {
         return window.navigator.userAgent.match(/(MSIE|Trident)/);
     },
+    escapeQuotes(str) {
+        if (typeof str !== 'string') {
+            return '';
+        }
+        return str
+            .replace(/"/g, '\\\\\\"')
+            .replace(/'/g, '\\\\\'');
+    },
+    unescapeQuotes(str) {
+        if (typeof str !== 'string') {
+            return '';
+        }
+        return str
+            .replace(/\\\\\\"/g, '"')
+            .replace(/\\\\'/g, '\'');
+    },
     escapeDoubleQuotes(str) {
         if (str.search(/\\?(")([\w\s]+)\\?(")/g) >= 0) {
             // match piece of string between double quotes
@@ -608,7 +624,7 @@ class AwFacetInputText extends AwFacetInput {
         };
     }
     setActive(facetValue) {
-        this.output.value = helpers.unescapeDoubleQuotes(facetValue) || null;
+        this.output.value = helpers.unescapeQuotes(facetValue) || null;
     }
 }
 
@@ -669,7 +685,7 @@ class AwSearchModel {
                 filter.value.push(value);
             }
             else {
-                filter.value = !remove ? helpers.escapeDoubleQuotes(value) : null;
+                filter.value = !remove ? helpers.escapeQuotes(value) : null;
             }
         });
     }
@@ -1016,6 +1032,9 @@ class HeaderDS extends DataSource {
         });
     }
     onRouterChange() {
+        if (!this.output) {
+            return;
+        }
         let { classes } = this.output;
         classes = classes || '';
         classes = classes.split(' ');
@@ -1617,7 +1636,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             this.one(id).update(data);
         };
         this.drawPagination = () => {
-            if (!this.myResponse.relatedItems)
+            if (!this.getLinkedObjectItems())
                 return;
             const { href, queryParams } = this._getPaginationParams();
             this.one('n7-smart-pagination').updateOptions({
@@ -1626,7 +1645,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                 queryParams,
             });
             this.one('n7-smart-pagination').update({
-                totalPages: Math.ceil(this.myResponse.relatedItems.length / this.pageSize),
+                totalPages: Math.ceil(this.getLinkedObjectItems().length / this.pageSize),
                 currentPage: this.currentPage,
                 pageLimit: 5,
                 sizes: {
@@ -1652,30 +1671,20 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                 pagination: true,
                 size: this.pageSize,
             });
-            this.one('aw-linked-objects').update({ items: this.myResponse.relatedItems });
+            this.one('aw-linked-objects').update({ items: this.getLinkedObjectItems() });
         };
         this.handleNavUpdate = (tab) => {
             this.selectedTab = tab;
             this.updateWidgets(this.myResponse);
-            if (tab === 'oggetti-collegati') {
-                this.one('aw-linked-objects').updateOptions({
-                    context: this.selectedTab,
-                    config: this.configuration,
-                    page: this.currentPage,
-                    pagination: true,
-                    paginationParams: this._getPaginationParams(),
-                    size: this.pageSize,
-                });
-                this.one('aw-linked-objects').update({ items: this.myResponse.relatedItems });
-            }
-            else if (tab === 'overview' && this.myResponse.relatedItems) {
-                this.one('aw-linked-objects').updateOptions({
-                    size: 3,
-                    config: this.configuration,
-                    context: 'entita',
-                });
-                this.one('aw-linked-objects').update({ items: this.myResponse.relatedItems });
-            }
+            this.one('aw-linked-objects').updateOptions({
+                context: this.selectedTab,
+                config: this.configuration,
+                page: this.currentPage,
+                pagination: true,
+                paginationParams: this._getPaginationParams(),
+                size: this.pageSize,
+            });
+            this.one('aw-linked-objects').update({ items: this.getLinkedObjectItems() });
         };
     }
     onInit({ configuration, mainState, router, route, location, options, titleService, communication, }) {
@@ -1768,27 +1777,19 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         this.one('aw-entita-nav').updateOptions({
             bubblesEnabled: this.bubblesEnabled,
             config: this.configuration.get('entita-layout'),
-            hasMetadataFields: this.hasMetadataFields
+            hasMetadataFields: this.hasMetadataFields,
+            labels: this.configuration.get('labels')
         });
         this.one('aw-entita-metadata-viewer').update(this.getFields(res));
-        if (this.selectedTab === 'oggetti-collegati') {
-            this.one('aw-linked-objects').updateOptions({
-                context: this.selectedTab,
-                config: this.configuration,
-                page: this.currentPage,
-                pagination: true,
-                paginationParams: this._getPaginationParams(),
-                size: this.pageSize,
-            });
-        }
-        else {
-            this.one('aw-linked-objects').updateOptions({
-                size: 3,
-                config: this.configuration,
-                context: 'entita',
-            });
-        }
-        res.relatedItems.forEach((el) => {
+        this.one('aw-linked-objects').updateOptions({
+            context: this.selectedTab,
+            config: this.configuration,
+            page: this.currentPage,
+            pagination: true,
+            paginationParams: this._getPaginationParams(),
+            size: this.pageSize,
+        });
+        this.getLinkedObjectItems().forEach((el) => {
             el.relationName = res.label.length > 30
                 ? `${res.label.substr(0, 30)}... `
                 : res.label;
@@ -1798,7 +1799,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                 ? `${res.label.substr(0, 30)}... `
                 : res.label;
         });
-        this.one('aw-linked-objects').update({ items: res.relatedItems });
+        this.one('aw-linked-objects').update({ items: this.getLinkedObjectItems() });
         this.one('aw-related-entities').update(res.relatedEntities);
         this.drawPagination();
         // fallback text
@@ -1814,7 +1815,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                 this.configuration.get('paths').entitaBasePath,
                 `${this.currentId}/`,
                 this.currentSlug,
-                '/oggetti-collegati/',
+                `/${this.selectedTab}/`,
             ].join(''),
             queryParams: {
                 page: this.currentPage,
@@ -1843,6 +1844,11 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             metadataToShow,
             type: typeOfEntity
         });
+    }
+    getLinkedObjectItems() {
+        return this.selectedTab === 'fondi-collegati'
+            ? this.myResponse.relatedLa
+            : this.myResponse.relatedItems;
     }
 }
 
@@ -2624,7 +2630,7 @@ class AwEntitaNavDS extends DataSource {
         }
         const { data, selected } = param;
         const navigation = { items: [], payload: 'entita-nav' };
-        const { hasMetadataFields } = this.options;
+        const { hasMetadataFields, labels } = this.options;
         /* navigation.items.push({
           text: 'OVERVIEW',
           anchor: { href: `${param.basePath}/overview` },
@@ -2659,6 +2665,13 @@ class AwEntitaNavDS extends DataSource {
                 text: 'ENTITÀ COLLEGATE',
                 anchor: { href: `${param.basePath}/entita-collegate` },
                 classes: selected === 'entita-collegate' ? 'is-selected' : '',
+            });
+        }
+        if (data.relatedLa) {
+            navigation.items.push({
+                text: labels['aggregazioni-logiche-collegate'],
+                anchor: { href: `${param.basePath}/fondi-collegati` },
+                classes: selected === 'fondi-collegati' ? 'is-selected' : '',
             });
         }
         if (data.extraTab) {
@@ -4315,7 +4328,7 @@ AwEntitaLayoutComponent.ctorParameters = () => [
 AwEntitaLayoutComponent = __decorate([
     Component({
         selector: 'aw-entita-layout',
-        template: "<div class=\"aw-entity n7-side-auto-padding\"\n     *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div *ngIf=\"lb.dataSource.loading\"\n             class=\"aw-entity__sidebar-title-wrapper-loading\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <div *ngIf=\"!lb.dataSource.loading\"\n             class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <div *ngIf=\"lb.dataSource.loading\"\n             class=\"aw-entity__sidebar-nav-loading\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2]\"\n                                    [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-nav'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <n7-nav *ngIf=\"!lb.dataSource.loading\" \n        [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\"\n        [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <!-- lb.dataSource.selectedTab -->\n    <div *ngIf=\"lb.dataSource.loading\"\n         class=\"aw-entity__content-loading\">\n        <div class=\"aw-entity__content-loading-title\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\"></n7-content-placeholder>\n        </div>\n\n        <div class=\"aw-entity__content-loading-items\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                    [data]=\"{\n                blocks: [{ classes: 'entity-placeholder-item-preview' }]\n            }\"></n7-content-placeholder>\n        </div>\n    </div>\n\n    <div *ngIf=\"!lb.dataSource.loading\"\n         class=\"aw-entity__content\">\n        <section>\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\n                 class=\"aw-entity__content-section\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <a *ngIf=\"lb.dataSource.myResponse.wikiTab\"\n                       class=\"n7-btn n7-btn-light\"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/wiki']\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                    <a *ngIf=\"lb.dataSource.myResponse.extraTab\"\n                       class=\"n7-btn n7-btn-light\"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/maxxi']\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n            </div>\n\n            <ng-container *ngIf=\"(\n                ['overview', 'informazioni'].includes(lb.dataSource.selectedTab)\n            )\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n                    <div class=\"aw-entity__content-section-header\"\n                         *ngIf=\"lb.dataSource.selectedTab === 'overview'\">\n                        <h2 class=\"aw-entity__content-section-title\"\n                            *ngIf=\"lb.dataSource.selectedTab === 'overview'\">Informazioni</h2>\n                        <a *ngIf=\"lb.dataSource.selectedTab !== 'informazioni'\"\n                           class=\"n7-btn n7-btn-light\"\n                           [routerLink]=\"[lb.dataSource.getNavBasePath() + '/informazioni']\">\n                            TUTTE LE INFORMAZIONI <i class=\"n7-icon-angle-right\"></i>\n                        </a>\n                    </div>\n                    <p *ngIf=\"lb.dataSource.fallbackText\"\n                       class=\"aw-entity__content-section-empty\">\n                        {{ lb.dataSource.fallbackText }}\n                    </p>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async\">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                 *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews && lb.dataSource.myResponse.relatedItems\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <a *ngIf=\"lb.dataSource.selectedTab === 'overview' \"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/oggetti-collegati/']\"\n                       [queryParams]=\"{ page: 1 }\"\n                       class=\"n7-btn n7-btn-light\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <div class=\"aw-entity__content-item-previews aw-item-preview-list\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <div class=\"aw-item-preview-wrapper\">\n                            <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                            </n7-smart-breadcrumbs>\n                            <n7-item-preview [data]=\"preview\"\n                                             [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                            <!-- Relation -->\n                            <div class=\"aw-item-preview-relation\"\n                                 *ngIf=\"preview.relation.value\">\n                                <p class=\"aw-item-preview-relation__description\">Relazione con\n                                    <span class=\"aw-item-preview-relation__key\">{{preview.relation.key}}</span>:\n                                    <span class=\"aw-item-preview-relation__value\"> {{preview.relation.value}}</span>\n                                </p>\n                            </div>\n                        </div>\n                    </ng-container>\n                </div>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.selectedTab === 'oggetti-collegati'\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview aw-related-entities__{{lb.dataSource.selectedTab}}\"\n                 *ngIf=\"lb.dataSource.myResponse.relatedEntities\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <a *ngIf=\"lb.dataSource.selectedTab == 'overview'\"\n                       class=\"n7-btn n7-btn-light\"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/entita-collegate']\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n\n                <!-- ENTITA COLLEGATE -->\n                <section id=\"related-item-container\"\n                         class=\"aw-entity__section aw-entity__related\">\n                    <div class=\"aw-entity__inner-title\">\n                        {{lb.dataSource.relatedEntitiesHeader}}\n                    </div>\n                    <div class=\"aw-entity__related-items n7-grid-2 aw-item-preview-list\">\n                        <ng-container *ngFor=\"let preview of (lb.widgets['aw-related-entities'].ds.out$ | async)?.previews\">\n                            <div class=\"aw-item-preview-wrapper\">\n                                <n7-item-preview [data]=\"preview\"\n                                                [emit]=\"lb.widgets['aw-related-entities'].emit\">\n                                </n7-item-preview>\n                                <!-- Relation -->\n                                <div class=\"aw-item-preview-relation\"\n                                    *ngIf=\"preview.relation.value\">\n                                    <p class=\"aw-item-preview-relation__description\">Relazione con\n                                        <span class=\"aw-item-preview-relation__key\">{{preview.relation.key}}</span>:\n                                        <span class=\"aw-item-preview-relation__value\"> {{preview.relation.value}}</span>\n                                    </p>\n                                </div>\n                            </div>\n                        </ng-container>\n                    </div>\n                </section>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                 *ngIf=\"lb.dataSource.myResponse.extraTab\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n                 *ngIf=\"lb.dataSource.myResponse.wikiTab\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{ lb.dataSource.myResponse.wikiTab.url }}\n                </a>\n            </div>\n        </section>\n    </div>\n</div>\n"
+        template: "<div class=\"aw-entity n7-side-auto-padding\"\n     *ngIf=\"lb.dataSource\">\n\n    <div class=\"aw-entity__sidebar\">\n        <!-- Custom header -->\n        <div *ngIf=\"lb.dataSource.loading\"\n             class=\"aw-entity__sidebar-title-wrapper-loading\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <div *ngIf=\"!lb.dataSource.loading\"\n             class=\"aw-entity__sidebar-title-wrapper color-{{lb.dataSource.navHeader.color}}\">\n            <h1 class=\"aw-entity__sidebar-title\">\n                <span class=\"aw-entity__sidebar-title-icon {{lb.dataSource.navHeader.icon}}\"></span>\n                <span class=\"aw-entity__sidebar-title-text\">{{lb.dataSource.navHeader.text}}</span>\n            </h1>\n        </div>\n        <!-- Navigation -->\n        <div *ngIf=\"lb.dataSource.loading\"\n             class=\"aw-entity__sidebar-nav-loading\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2]\"\n                                    [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-nav'\n                }]\n            }\">\n            </n7-content-placeholder>\n        </div>\n        <n7-nav *ngIf=\"!lb.dataSource.loading\" \n        [data]=\"lb.widgets['aw-entita-nav'].ds.out$ | async\"\n        [emit]=\"lb.widgets['aw-entita-nav'].emit\">\n        </n7-nav>\n    </div>\n\n    <!-- lb.dataSource.selectedTab -->\n    <div *ngIf=\"lb.dataSource.loading\"\n         class=\"aw-entity__content-loading\">\n        <div class=\"aw-entity__content-loading-title\">\n            <n7-content-placeholder [data]=\"{\n                blocks: [{\n                    classes: 'entity-placeholder-title'\n                }]\n            }\"></n7-content-placeholder>\n        </div>\n\n        <div class=\"aw-entity__content-loading-items\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                    [data]=\"{\n                blocks: [{ classes: 'entity-placeholder-item-preview' }]\n            }\"></n7-content-placeholder>\n        </div>\n    </div>\n\n    <div *ngIf=\"!lb.dataSource.loading\"\n         class=\"aw-entity__content\">\n        <section>\n            <div *ngIf=\"lb.dataSource.myResponse.wikiTab || lb.dataSource.myResponse.extraTab\"\n                 class=\"aw-entity__content-section\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'overview'\">\n                <div class=\"aw-entity__overview-description\">\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n                <div class=\"aw-entity-layout__button-wrapper\">\n                    <a *ngIf=\"lb.dataSource.myResponse.wikiTab\"\n                       class=\"n7-btn n7-btn-light\"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/wiki']\">\n                        DESCRIZIONE WIKIPEDIA <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                    <a *ngIf=\"lb.dataSource.myResponse.extraTab\"\n                       class=\"n7-btn n7-btn-light\"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/maxxi']\">\n                        DESCRIZIONE MAXXI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n            </div>\n\n            <ng-container *ngIf=\"(\n                ['overview', 'informazioni'].includes(lb.dataSource.selectedTab)\n            )\">\n                <div class=\"aw-entity__content-section aw-entity__content-section-overview\">\n                    <div class=\"aw-entity__content-section-header\"\n                         *ngIf=\"lb.dataSource.selectedTab === 'overview'\">\n                        <h2 class=\"aw-entity__content-section-title\"\n                            *ngIf=\"lb.dataSource.selectedTab === 'overview'\">Informazioni</h2>\n                        <a *ngIf=\"lb.dataSource.selectedTab !== 'informazioni'\"\n                           class=\"n7-btn n7-btn-light\"\n                           [routerLink]=\"[lb.dataSource.getNavBasePath() + '/informazioni']\">\n                            TUTTE LE INFORMAZIONI <i class=\"n7-icon-angle-right\"></i>\n                        </a>\n                    </div>\n                    <p *ngIf=\"lb.dataSource.fallbackText\"\n                       class=\"aw-entity__content-section-empty\">\n                        {{ lb.dataSource.fallbackText }}\n                    </p>\n                    <n7-metadata-viewer class=\"aw-entity-layout__metadata-viewer\"\n                                        [data]=\"lb.widgets['aw-entita-metadata-viewer'].ds.out$ | async\">\n                    </n7-metadata-viewer>\n                </div>\n            </ng-container>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                 *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews && lb.dataSource.myResponse.relatedItems\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'oggetti-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Oggetti collegati</h2>\n\n                    <a *ngIf=\"lb.dataSource.selectedTab === 'overview' \"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/oggetti-collegati/']\"\n                       [queryParams]=\"{ page: 1 }\"\n                       class=\"n7-btn n7-btn-light\">\n                        TUTTI GLI OGGETTI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <div class=\"aw-entity__content-item-previews aw-item-preview-list\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <div class=\"aw-item-preview-wrapper\">\n                            <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                            </n7-smart-breadcrumbs>\n                            <n7-item-preview [data]=\"preview\"\n                                             [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                            <!-- Relation -->\n                            <div class=\"aw-item-preview-relation\"\n                                 *ngIf=\"preview.relation.value\">\n                                <p class=\"aw-item-preview-relation__description\">Relazione con\n                                    <span class=\"aw-item-preview-relation__key\">{{preview.relation.key}}</span>:\n                                    <span class=\"aw-item-preview-relation__value\"> {{preview.relation.value}}</span>\n                                </p>\n                            </div>\n                        </div>\n                    </ng-container>\n                </div>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.selectedTab === 'oggetti-collegati'\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview\"\n                 *ngIf=\"(lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews && lb.dataSource.myResponse.relatedLa\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'fondi-collegati'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">{{ lb.dataSource.configuration.get('labels')['aggregazioni-logiche-collegate'] }}</h2>\n\n                    <a *ngIf=\"lb.dataSource.selectedTab === 'overview' \"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/fondi-collegati/']\"\n                       [queryParams]=\"{ page: 1 }\"\n                       class=\"n7-btn n7-btn-light\">\n                        TUTTE LE FONDI COLLEGATI <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n                <div class=\"aw-entity__content-item-previews aw-item-preview-list\">\n                    <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <div class=\"aw-item-preview-wrapper\">\n                            <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                            </n7-smart-breadcrumbs>\n                            <n7-item-preview [data]=\"preview\"\n                                             [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                            </n7-item-preview>\n                            <!-- Relation -->\n                            <div class=\"aw-item-preview-relation\"\n                                 *ngIf=\"preview.relation.value\">\n                                <p class=\"aw-item-preview-relation__description\">Relazione con\n                                    <span class=\"aw-item-preview-relation__key\">{{preview.relation.key}}</span>:\n                                    <span class=\"aw-item-preview-relation__value\"> {{preview.relation.value}}</span>\n                                </p>\n                            </div>\n                        </div>\n                    </ng-container>\n                </div>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.selectedTab === 'fondi-collegati'\"\n                                     [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                                     [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n\n            <div class=\"aw-entity__content-section aw-entity__content-section-overview aw-related-entities__{{lb.dataSource.selectedTab}}\"\n                 *ngIf=\"lb.dataSource.myResponse.relatedEntities\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'overview' && lb.dataSource.selectedTab != 'entita-collegate'\">\n                <div class=\"aw-entity__content-section-header\">\n                    <h2 class=\"aw-entity__content-section-title\">Entit\u00E0 collegate</h2>\n                    <a *ngIf=\"lb.dataSource.selectedTab == 'overview'\"\n                       class=\"n7-btn n7-btn-light\"\n                       [routerLink]=\"[lb.dataSource.getNavBasePath() + '/entita-collegate']\">\n                        TUTTE LE ENTIT\u00C0 COLLEGATE <i class=\"n7-icon-angle-right\"></i>\n                    </a>\n                </div>\n\n                <!-- ENTITA COLLEGATE -->\n                <section id=\"related-item-container\"\n                         class=\"aw-entity__section aw-entity__related\">\n                    <div class=\"aw-entity__inner-title\">\n                        {{lb.dataSource.relatedEntitiesHeader}}\n                    </div>\n                    <div class=\"aw-entity__related-items n7-grid-2 aw-item-preview-list\">\n                        <ng-container *ngFor=\"let preview of (lb.widgets['aw-related-entities'].ds.out$ | async)?.previews\">\n                            <div class=\"aw-item-preview-wrapper\">\n                                <n7-item-preview [data]=\"preview\"\n                                                [emit]=\"lb.widgets['aw-related-entities'].emit\">\n                                </n7-item-preview>\n                                <!-- Relation -->\n                                <div class=\"aw-item-preview-relation\"\n                                    *ngIf=\"preview.relation.value\">\n                                    <p class=\"aw-item-preview-relation__description\">Relazione con\n                                        <span class=\"aw-item-preview-relation__key\">{{preview.relation.key}}</span>:\n                                        <span class=\"aw-item-preview-relation__value\"> {{preview.relation.value}}</span>\n                                    </p>\n                                </div>\n                            </div>\n                        </ng-container>\n                    </div>\n                </section>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-maxxi\"\n                 *ngIf=\"lb.dataSource.myResponse.extraTab\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'maxxi'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Maxxi</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.extraTab}}\n                </div>\n            </div>\n            <div class=\"aw-entity__content-section aw-entity__content-section-wiki\"\n                 *ngIf=\"lb.dataSource.myResponse.wikiTab\"\n                 [hidden]=\"lb.dataSource.selectedTab != 'wiki'\">\n                <div class=\"aw-entity__content-section-header aw-entity__content-section-header-decorated\">\n                    <h2 class=\"aw-entity__content-section-title\">Descrizione Wikipedia</h2>\n                </div>\n                <div>\n                    {{lb.dataSource.myResponse.wikiTab.text}}\n                </div>\n                <a href=\"{{lb.dataSource.myResponse.wikiTabUrl}}\">\n                    {{ lb.dataSource.myResponse.wikiTab.url }}\n                </a>\n            </div>\n        </section>\n    </div>\n</div>\n"
     }),
     __metadata("design:paramtypes", [Router,
         ActivatedRoute,
@@ -5369,7 +5382,7 @@ class AwHomeLayoutDS extends LayoutDataSource {
     }
     onHeroChange(value) {
         if (value) {
-            const escapedValue = helpers.escapeDoubleQuotes(value);
+            const escapedValue = helpers.escapeQuotes(value);
             this.autocompleteChanged$.next(escapedValue);
             this.homeAutocompleteIsLoading = true;
             this.homeAutocompleteQuery = escapedValue;
@@ -5538,7 +5551,7 @@ class AwHomeLayoutEH extends EventHandler {
                     break;
                 case 'aw-hero.enter':
                     {
-                        const query = payload.value;
+                        const query = helpers.escapeQuotes(payload.value);
                         this.emitGlobal('navigate', {
                             handler: 'router',
                             path: [this.configuration.get('paths').searchBasePath],
@@ -6818,6 +6831,21 @@ var apolloConfig = {
           label
           id
           typeOfEntity
+          relatedLa: relatedAl {
+            thumbnail
+            relation          
+            item {
+              label
+              id
+              fields {
+                ...
+                on KeyValueField {
+                  key
+                  value
+                }
+              }
+            }
+          }
           fields {
             ...
             on KeyValueField {
@@ -10406,6 +10434,99 @@ N7BoilerplateMurucaModule = __decorate([
     })
 ], N7BoilerplateMurucaModule);
 
+class SbExampleLayoutDS extends LayoutDataSource {
+    onInit() {
+        // TODO
+    }
+}
+
+/* eslint-disable */
+class SbExampleLayoutEH extends EventHandler {
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            this.dataSource.onInit();
+        });
+    }
+}
+
+class SbDummyDS extends DataSource {
+    transform(data) {
+        return data;
+    }
+}
+
+var DS$4 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    SbDummyDS: SbDummyDS
+});
+
+class SbDummyEH extends EventHandler {
+    listen() {
+        // TODO
+    }
+}
+
+var EH$4 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    SbDummyEH: SbDummyEH
+});
+
+const SbExampleLayoutConfig = {
+    layoutId: 'sb-example-layout',
+    /**
+     * Array of components you want to use
+     * in this leyout
+     */
+    widgets: [],
+    layoutDS: SbExampleLayoutDS,
+    layoutEH: SbExampleLayoutEH,
+    widgetsDataSources: DS$4,
+    widgetsEventHandlers: EH$4,
+    options: {
+    // TODO
+    },
+};
+
+let SbExampleLayoutComponent = class SbExampleLayoutComponent extends AbstractLayout {
+    constructor() {
+        super(SbExampleLayoutConfig);
+    }
+    initPayload() {
+        return {};
+    }
+    ngOnInit() {
+        this.onInit();
+    }
+    ngOnDestroy() {
+        this.onDestroy();
+    }
+};
+SbExampleLayoutComponent = __decorate([
+    Component({
+        selector: 'sb-example-layout',
+        template: "<div class=\"sb-example-layout\" id=\"example-layout\">\n    // TODO\n</div>"
+    }),
+    __metadata("design:paramtypes", [])
+], SbExampleLayoutComponent);
+
+const COMPONENTS$4 = [
+    SbExampleLayoutComponent,
+];
+let N7BoilerplateSandboxModule = class N7BoilerplateSandboxModule {
+};
+N7BoilerplateSandboxModule = __decorate([
+    NgModule({
+        declarations: COMPONENTS$4,
+        imports: [
+            CommonModule,
+            DvComponentsLibModule,
+            N7BoilerplateCommonModule,
+        ],
+        providers: [],
+        exports: COMPONENTS$4,
+    })
+], N7BoilerplateSandboxModule);
+
 let N7BoilerplateLibModule = class N7BoilerplateLibModule {
 };
 N7BoilerplateLibModule = __decorate([
@@ -10423,6 +10544,8 @@ N7BoilerplateLibModule = __decorate([
             N7BoilerplateDataVizModule,
             // MR
             N7BoilerplateMurucaModule,
+            // SB
+            N7BoilerplateSandboxModule,
         ],
     })
 ], N7BoilerplateLibModule);
@@ -10627,6 +10750,8 @@ DynamicPathGuard = __decorate([
         Router])
 ], DynamicPathGuard);
 
+// example layout
+
 /*
  * Public API Surface of n7-boilerplate-lib
  */
@@ -10635,5 +10760,5 @@ DynamicPathGuard = __decorate([
  * Generated bundle index. Do not edit.
  */
 
-export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, LocalConfigService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrBreadcrumbsDS, MrCollectionDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrFooterService, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrResourceTabsDS, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageTitleDS, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrStaticMetadataDS, MrTextViewerDS, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrGlossaryLayoutComponent as ɵba, MrHomeLayoutComponent as ɵbb, MrLayoutStateService as ɵbc, MrResourceLayoutComponent as ɵbd, MrSearchFacetsLayoutComponent as ɵbe, MrSearchLayoutComponent as ɵbf, MrSearchService as ɵbg, MrStaticLayoutComponent as ɵbh, ReadMoreComponent as ɵbi, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, AwGalleryLayoutComponent as ɵl, AwSearchService as ɵm, AwHomeLayoutComponent as ɵn, AwMapLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwSearchLayoutComponent as ɵq, AwTimelineLayoutComponent as ɵr, BubbleChartWrapperComponent as ɵs, ChartTippyComponent as ɵt, SmartBreadcrumbsComponent as ɵu, AwFacetsWrapperComponent as ɵv, DataWidgetWrapperComponent as ɵw, DatepickerWrapperComponent as ɵx, DvExampleLayoutComponent as ɵy, EscapeHtmlPipe as ɵz };
+export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, LocalConfigService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrBreadcrumbsDS, MrCollectionDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrFooterService, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrResourceTabsDS, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageTitleDS, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrStaticMetadataDS, MrTextViewerDS, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, N7BoilerplateSandboxModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SbDummyDS, SbDummyEH, SbExampleLayoutComponent, SbExampleLayoutConfig, SbExampleLayoutDS, SbExampleLayoutEH, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrGlossaryLayoutComponent as ɵba, MrHomeLayoutComponent as ɵbb, MrLayoutStateService as ɵbc, MrResourceLayoutComponent as ɵbd, MrSearchFacetsLayoutComponent as ɵbe, MrSearchLayoutComponent as ɵbf, MrSearchService as ɵbg, MrStaticLayoutComponent as ɵbh, ReadMoreComponent as ɵbi, SbExampleLayoutComponent as ɵbj, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, AwGalleryLayoutComponent as ɵl, AwSearchService as ɵm, AwHomeLayoutComponent as ɵn, AwMapLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwSearchLayoutComponent as ɵq, AwTimelineLayoutComponent as ɵr, BubbleChartWrapperComponent as ɵs, ChartTippyComponent as ɵt, SmartBreadcrumbsComponent as ɵu, AwFacetsWrapperComponent as ɵv, DataWidgetWrapperComponent as ɵw, DatepickerWrapperComponent as ɵx, DvExampleLayoutComponent as ɵy, EscapeHtmlPipe as ɵz };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

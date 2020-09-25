@@ -1,0 +1,20 @@
+import { SbExampleLayoutDS } from './example-layout.ds';
+import { SbExampleLayoutEH } from './example-layout.eh';
+import * as DS from '../../data-sources';
+import * as EH from '../../event-handlers';
+export var SbExampleLayoutConfig = {
+    layoutId: 'sb-example-layout',
+    /**
+     * Array of components you want to use
+     * in this leyout
+     */
+    widgets: [],
+    layoutDS: SbExampleLayoutDS,
+    layoutEH: SbExampleLayoutEH,
+    widgetsDataSources: DS,
+    widgetsEventHandlers: EH,
+    options: {
+    // TODO
+    },
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZXhhbXBsZS1sYXlvdXQuY29uZmlnLmpzIiwic291cmNlUm9vdCI6Im5nOi8vQG43LWZyb250ZW5kL2JvaWxlcnBsYXRlLyIsInNvdXJjZXMiOlsibGliL3NhbmRib3gvbGF5b3V0L2V4YW1wbGUtbGF5b3V0L2V4YW1wbGUtbGF5b3V0LmNvbmZpZy50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxPQUFPLEVBQUUsaUJBQWlCLEVBQUUsTUFBTSxxQkFBcUIsQ0FBQztBQUN4RCxPQUFPLEVBQUUsaUJBQWlCLEVBQUUsTUFBTSxxQkFBcUIsQ0FBQztBQUN4RCxPQUFPLEtBQUssRUFBRSxNQUFNLG9CQUFvQixDQUFDO0FBQ3pDLE9BQU8sS0FBSyxFQUFFLE1BQU0sc0JBQXNCLENBQUM7QUFFM0MsTUFBTSxDQUFDLElBQU0scUJBQXFCLEdBQUc7SUFDbkMsUUFBUSxFQUFFLG1CQUFtQjtJQUM3Qjs7O09BR0c7SUFDSCxPQUFPLEVBQUUsRUFDUjtJQUNELFFBQVEsRUFBRSxpQkFBaUI7SUFDM0IsUUFBUSxFQUFFLGlCQUFpQjtJQUMzQixrQkFBa0IsRUFBRSxFQUFFO0lBQ3RCLG9CQUFvQixFQUFFLEVBQUU7SUFDeEIsT0FBTyxFQUFFO0lBQ1AsT0FBTztLQUNSO0NBQ0YsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IFNiRXhhbXBsZUxheW91dERTIH0gZnJvbSAnLi9leGFtcGxlLWxheW91dC5kcyc7XG5pbXBvcnQgeyBTYkV4YW1wbGVMYXlvdXRFSCB9IGZyb20gJy4vZXhhbXBsZS1sYXlvdXQuZWgnO1xuaW1wb3J0ICogYXMgRFMgZnJvbSAnLi4vLi4vZGF0YS1zb3VyY2VzJztcbmltcG9ydCAqIGFzIEVIIGZyb20gJy4uLy4uL2V2ZW50LWhhbmRsZXJzJztcblxuZXhwb3J0IGNvbnN0IFNiRXhhbXBsZUxheW91dENvbmZpZyA9IHtcbiAgbGF5b3V0SWQ6ICdzYi1leGFtcGxlLWxheW91dCcsXG4gIC8qKlxuICAgKiBBcnJheSBvZiBjb21wb25lbnRzIHlvdSB3YW50IHRvIHVzZVxuICAgKiBpbiB0aGlzIGxleW91dFxuICAgKi9cbiAgd2lkZ2V0czogW1xuICBdLFxuICBsYXlvdXREUzogU2JFeGFtcGxlTGF5b3V0RFMsXG4gIGxheW91dEVIOiBTYkV4YW1wbGVMYXlvdXRFSCxcbiAgd2lkZ2V0c0RhdGFTb3VyY2VzOiBEUyxcbiAgd2lkZ2V0c0V2ZW50SGFuZGxlcnM6IEVILFxuICBvcHRpb25zOiB7XG4gICAgLy8gVE9ET1xuICB9LFxufTtcbiJdfQ==
