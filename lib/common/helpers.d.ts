@@ -7,6 +7,6 @@ declare const _default: {
     unescapeQuotes(str: any): string;
     escapeDoubleQuotes(str: any): any;
     unescapeDoubleQuotes(str: any): any;
-    striptags(str: any): any;
+    striptags(str: any): string;
 };
 export default _default;

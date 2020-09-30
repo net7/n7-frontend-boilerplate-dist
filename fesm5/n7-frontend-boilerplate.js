@@ -649,6 +649,9 @@ var helpers = {
         return (str && str !== '') ? str.replace(/\\*(")/g, '$1') : str; // thanks @slevithan!
     },
     striptags: function (str) {
+        if (typeof str !== 'string') {
+            return '';
+        }
         return str.replace(/(<([^>]+)>)/gi, '');
     }
 };
@@ -8330,7 +8333,7 @@ var MrSearchPageTitleDS = /** @class */ (function (_super) {
         return {
             title: {
                 main: {
-                    text: title
+                    text: _t(title)
                 }
             }
         };
@@ -9053,7 +9056,7 @@ var MrResourceLayoutDS = /** @class */ (function (_super) {
         var resourceTitle = _a.title;
         var appName = this.configuration.get('name');
         var pageTitle = this.pageConfig.title;
-        this.mainState.update('headTitle', [appName, pageTitle, resourceTitle].join(' > '));
+        this.mainState.update('headTitle', [appName, _t(pageTitle), resourceTitle].join(' > '));
     };
     return MrResourceLayoutDS;
 }(LayoutDataSource$1));
@@ -10398,7 +10401,7 @@ var MrSearchLayoutDS = /** @class */ (function (_super) {
     MrSearchLayoutDS.prototype.updateHeadTitle = function () {
         var appName = this.configuration.get('name');
         var pageTitle = this.pageConfig.title;
-        this.mainState.update('headTitle', [appName, pageTitle].join(' > '));
+        this.mainState.update('headTitle', [appName, _t(pageTitle)].join(' > '));
     };
     MrSearchLayoutDS.prototype.addTranslations = function (config) {
         var _a;

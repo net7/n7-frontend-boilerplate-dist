@@ -599,6 +599,9 @@ var helpers = {
         return (str && str !== '') ? str.replace(/\\*(")/g, '$1') : str; // thanks @slevithan!
     },
     striptags(str) {
+        if (typeof str !== 'string') {
+            return '';
+        }
         return str.replace(/(<([^>]+)>)/gi, '');
     }
 };
@@ -8168,7 +8171,7 @@ class MrSearchPageTitleDS extends DataSource {
         return {
             title: {
                 main: {
-                    text: title
+                    text: _t(title)
                 }
             }
         };
@@ -8772,7 +8775,7 @@ class MrResourceLayoutDS extends LayoutDataSource$1 {
     updateHeadTitle({ title: resourceTitle }) {
         const appName = this.configuration.get('name');
         const pageTitle = this.pageConfig.title;
-        this.mainState.update('headTitle', [appName, pageTitle, resourceTitle].join(' > '));
+        this.mainState.update('headTitle', [appName, _t(pageTitle), resourceTitle].join(' > '));
     }
 }
 
@@ -9973,7 +9976,7 @@ class MrSearchLayoutDS extends LayoutDataSource$1 {
     updateHeadTitle() {
         const appName = this.configuration.get('name');
         const pageTitle = this.pageConfig.title;
-        this.mainState.update('headTitle', [appName, pageTitle].join(' > '));
+        this.mainState.update('headTitle', [appName, _t(pageTitle)].join(' > '));
     }
     addTranslations(config) {
         var _a;
