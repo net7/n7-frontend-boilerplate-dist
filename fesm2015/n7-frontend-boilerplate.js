@@ -7850,13 +7850,15 @@ class MrCollectionDS extends DataSource {
                 }
             },
             items: items.map((item) => {
-                // striptags
-                if (itemPreviewOptions.striptags) {
-                    item.text = helpers.striptags(item.text);
-                }
-                // limit
-                if (itemPreviewOptions.limit && (item.text.length > itemPreviewOptions.limit)) {
-                    item.text = `${item.text.substring(0, itemPreviewOptions.limit)}...`;
+                if (item.text) {
+                    // Sanitize HTML tags from the text content
+                    if (itemPreviewOptions.striptags) {
+                        item.text = helpers.striptags(item.text);
+                    }
+                    // Limit the length of the item preview text content
+                    if (itemPreviewOptions.limit && (item.text.length > itemPreviewOptions.limit)) {
+                        item.text = `${item.text.substring(0, itemPreviewOptions.limit)}...`;
+                    }
                 }
                 return Object.assign(Object.assign({}, item), { anchor: {
                         href: linksHelper.getRouterLink(item.link),
@@ -8920,7 +8922,7 @@ MrResourceLayoutComponent.ctorParameters = () => [
 MrResourceLayoutComponent = __decorate([
     Component({
         selector: 'mr-resource-layout',
-        template: "<div class=\"mr-resource mr-layout\" \n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\"\n     [ngClass]=\"{\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\n      }\">\n    <!-- RESOURCE LAYOUT CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            <div class=\"mr-layout__loader\">\n                <n7-loader></n7-loader>\n            </div>\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            <div class=\"mr-layout__error\">\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\n                <p>{{ lb.dataSource.errorDescription }}</p>\n            </div>\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <ng-container *ngIf=\"lb.dataSource.pageConfig.sections as sections\">\n                <!-- Pass the list of blocks to render to the block template -->\n                <div class=\"mr-resource__top\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\n                </div>\n                <div class=\"mr-resource__content mr-side-margin\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\n                </div>\n            </ng-container>\n        </ng-container>\n\n    </ng-container>\n</div>\n\n<ng-template #blocks let-list>\n    <ng-container *ngFor=\"let section of list\">\n        <section *ngIf=\"lb.widgets[section.id].ds.out$ | async\"\n        class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\n            <ng-container [ngSwitch]=\"section.type\">\n    \n                <!-- TABS -->\n                <ng-container *ngSwitchCase=\"'tabs'\">\n                    <ng-container *ngFor=\"let tab of lb.widgets[section.id].ds.out$ | async\">\n                        <n7-anchor-wrapper [data]=\"tab.anchor\" [classes]=\"tab.classes\">\n                            <span class=\"mr-resource__tabs-item\">{{ tab.label }}</span>\n                        </n7-anchor-wrapper>\n                    </ng-container>\n                </ng-container>\n    \n                <!-- INNER TITLE -->\n                <ng-container *ngSwitchCase=\"'title'\">\n                    <div class=\"mr-resource__title-content mr-side-margin\">\n                        <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                            [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-inner-title>\n                    </div>\n                </ng-container>\n    \n                <!-- IMAGE VIEWER -->\n                <ng-container *ngSwitchCase=\"'viewer'\">\n                    <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-image-viewer>\n                </ng-container>\n    \n                <!-- METADATA VIEWER -->\n                <ng-container *ngSwitchCase=\"'metadata'\">\n                    <div class=\"mr-resource__metadata-content\">\n                        <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__metadata-title\">\n                            {{ section.title }}\n                        </h3>\n                        <mr-read-more [data]=\"lb.dataSource.readMoreConfig\">\n                            <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                                [emit]=\"lb.widgets[section.id].emit\">\n                            </n7-metadata-viewer>\n                        </mr-read-more>\n                    </div>\n                </ng-container>\n    \n                <!-- COLLECTION -->\n                <ng-container *ngSwitchCase=\"'collection'\">\n                    <div *ngIf=\"lb.widgets[section.id].ds.out$ | async as collection$\" class=\"mr-resource__collection-content\">\n                        <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title\">\n                            {{ section.title }}\n                        </h3>\n                        <div class=\"mr-resource__collection-grid {{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                            <n7-item-preview *ngFor=\"let item of collection$?.items\"\n                                [data]=\"item\" [emit]=\"lb.widgets[section.id].emit\">\n                            </n7-item-preview>\n                        </div>\n                    </div>\n                </ng-container>\n    \n                <!-- ITEM PREVIEW -->\n                <ng-container *ngSwitchCase=\"'preview'\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__preview-title\">\n                        {{ section.title }}\n                    </h3>\n                    <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-item-preview>\n                </ng-container>\n    \n                <!-- TEXT VIEWER -->\n                <ng-container *ngSwitchCase=\"'text-viewer'\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__text-viewer-title\">\n                        {{ section.title }}\n                    </h3>\n                    <div class=\"text-viewer__mock\">n7-text-viewer</div>\n                </ng-container>\n    \n                <!-- INFO BOX -->\n                <ng-container *ngSwitchCase=\"'info-box'\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__info-box-title\">\n                        {{ section.title }}\n                    </h3>\n                    <div class=\"info-box__mock\">info-box</div>\n                </ng-container>\n    \n                <!-- BREADCRUMBS -->\n                <ng-container *ngSwitchCase=\"'breadcrumbs'\">\n                    <n7-breadcrumbs [data]=\"lb.widgets[section.id].ds.out$ | async\">\n                    </n7-breadcrumbs>\n                </ng-container>\n            </ng-container>\n        </section>\n    </ng-container>\n</ng-template>\n"
+        template: "<div class=\"mr-resource mr-layout\" \n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\"\n     [ngClass]=\"{\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\n      }\">\n    <!-- RESOURCE LAYOUT CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            <div class=\"mr-layout__loader\">\n                <n7-loader></n7-loader>\n            </div>\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            <div class=\"mr-layout__error\">\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\n                <p>{{ lb.dataSource.errorDescription }}</p>\n            </div>\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <ng-container *ngIf=\"lb.dataSource.pageConfig.sections as sections\">\n                <!-- Pass the list of blocks to render to the block template -->\n                <div class=\"mr-resource__top\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\n                </div>\n                <div class=\"mr-resource__content mr-side-margin\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\n                </div>\n            </ng-container>\n        </ng-container>\n\n    </ng-container>\n</div>\n\n<ng-template #blocks let-list>\n    <ng-container *ngFor=\"let section of list\">\n        <section *ngIf=\"lb.widgets[section.id].ds.out$ | async\"\n        class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\n            <ng-container [ngSwitch]=\"section.type\">\n    \n                <!-- TABS -->\n                <ng-container *ngSwitchCase=\"'tabs'\">\n                    <ng-container *ngFor=\"let tab of lb.widgets[section.id].ds.out$ | async\">\n                        <n7-anchor-wrapper [data]=\"tab.anchor\" [classes]=\"tab.classes\">\n                            <span class=\"mr-resource__tabs-item\">{{ tab.label }}</span>\n                        </n7-anchor-wrapper>\n                    </ng-container>\n                </ng-container>\n    \n                <!-- INNER TITLE -->\n                <ng-container *ngSwitchCase=\"'title'\">\n                    <div class=\"mr-resource__title-content mr-side-margin\">\n                        <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                            [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-inner-title>\n                    </div>\n                </ng-container>\n    \n                <!-- IMAGE VIEWER -->\n                <ng-container *ngSwitchCase=\"'viewer'\">\n                    <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-image-viewer>\n                </ng-container>\n    \n                <!-- METADATA VIEWER -->\n                <ng-container *ngSwitchCase=\"'metadata'\">\n                    <div class=\"mr-resource__metadata-content\">\n                        <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__metadata-title\">\n                            {{ section.title }}\n                        </h3>\n                        <mr-read-more [data]=\"lb.dataSource.readMoreConfig\">\n                            <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                                [emit]=\"lb.widgets[section.id].emit\">\n                            </n7-metadata-viewer>\n                        </mr-read-more>\n                    </div>\n                </ng-container>\n    \n                <!-- COLLECTION -->\n                <ng-container *ngSwitchCase=\"'collection'\">\n                    <ng-container *ngIf=\"lb.widgets[section.id].ds.out$ | async as collection$\">\n                        <div *ngIf=\"collection$.items?.length > 0\" class=\"mr-resource__collection-content\">\n                            <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title\">\n                                {{ section.title }}\n                            </h3>\n                            <div class=\"mr-resource__collection-grid {{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                                <n7-item-preview *ngFor=\"let item of collection$?.items\"\n                                    [data]=\"item\" [emit]=\"lb.widgets[section.id].emit\">\n                                </n7-item-preview>\n                            </div>\n                        </div>\n                    </ng-container>\n                </ng-container>\n    \n                <!-- ITEM PREVIEW -->\n                <ng-container *ngSwitchCase=\"'preview'\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__preview-title\">\n                        {{ section.title }}\n                    </h3>\n                    <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-item-preview>\n                </ng-container>\n    \n                <!-- TEXT VIEWER -->\n                <ng-container *ngSwitchCase=\"'text-viewer'\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__text-viewer-title\">\n                        {{ section.title }}\n                    </h3>\n                    <div class=\"text-viewer__mock\">n7-text-viewer</div>\n                </ng-container>\n    \n                <!-- INFO BOX -->\n                <ng-container *ngSwitchCase=\"'info-box'\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__info-box-title\">\n                        {{ section.title }}\n                    </h3>\n                    <div class=\"info-box__mock\">info-box</div>\n                </ng-container>\n    \n                <!-- BREADCRUMBS -->\n                <ng-container *ngSwitchCase=\"'breadcrumbs'\">\n                    <n7-breadcrumbs [data]=\"lb.widgets[section.id].ds.out$ | async\">\n                    </n7-breadcrumbs>\n                </ng-container>\n            </ng-container>\n        </section>\n    </ng-container>\n</ng-template>\n"
     }),
     __metadata("design:paramtypes", [LayoutsConfigurationService,
         ActivatedRoute,
@@ -9249,7 +9251,7 @@ let MrSearchService = class MrSearchService {
                     });
                 }
                 else {
-                    Object.keys(inputContext)
+                    Object.keys(params)
                         .filter((inputId) => this.queryParamKeys.includes(inputId))
                         .filter((inputId) => this.notEquals(inputContext[inputId], params[inputId]))
                         .forEach((inputId) => {
@@ -9353,8 +9355,9 @@ let MrSearchService = class MrSearchService {
             this.config.facets.sections.forEach(({ inputs }) => {
                 inputs.filter(({ type }) => type === 'link')
                     .forEach(({ id }) => {
-                    const offset = 0;
-                    const { limit, query } = this.internalFilterState.facets[id];
+                    // reset offset
+                    this.internalFilterState.facets[id].offset = 0;
+                    const { limit, query, offset } = this.internalFilterState.facets[id];
                     params.facets.push({
                         id, limit, offset, query
                     });
@@ -9375,31 +9378,32 @@ let MrSearchService = class MrSearchService {
         this.getState$(FACETS_REQUEST_STATE_CONTEXT, 'success').subscribe((response) => {
             const { facets: responseFacets } = response;
             Object.keys(responseFacets).forEach((id) => {
-                const { values, total_count } = responseFacets[id];
+                const { values: responseValues, filtered_total_count } = responseFacets[id];
                 const { limit, offset, values: stateValues } = this.internalFilterState.facets[id];
+                const filterState = this.internalFilterState.facets[id];
                 if (offset > 0) {
                     // delete loading element
-                    stateValues.values.pop();
+                    filterState.values.pop();
                     // merge new results
-                    stateValues.values = [
+                    filterState.values = [
                         ...stateValues,
-                        ...values
+                        ...responseValues
                     ];
                 }
                 else {
-                    stateValues.values = [
-                        ...values
+                    filterState.values = [
+                        ...responseValues
                     ];
                 }
-                if ((offset + limit) < total_count) {
-                    stateValues.values.push({
+                if ((offset + limit) < filtered_total_count) {
+                    filterState.values.push({
                         text: _t('global#facet_loading_text'),
                         classes: 'loading-text-link',
                         payload: null,
                     });
                 }
                 this.setState(FACET_STATE_CONTEXT, id, {
-                    links: stateValues.values
+                    links: filterState.values
                 });
             });
         });
@@ -9408,8 +9412,8 @@ let MrSearchService = class MrSearchService {
         const { facets: responseFacets } = response;
         Object.keys(responseFacets).forEach((inputKey) => {
             // update internal filter state
-            const { total_count } = responseFacets[inputKey];
-            this.internalFilterState.facets[inputKey].total_count = total_count;
+            const { filtered_total_count } = responseFacets[inputKey];
+            this.internalFilterState.facets[inputKey].filtered_total_count = filtered_total_count;
             responseFacets[inputKey].values = responseFacets[inputKey].values.map((item) => (Object.assign(Object.assign({}, item), { payload: item.payload && typeof item.payload === 'string' ? encodeURIComponent(item.payload) : item.payload })));
         });
         this.setState(FACETS_REQUEST_STATE_CONTEXT, 'success', response);
@@ -9422,13 +9426,13 @@ let MrSearchService = class MrSearchService {
                     .filter((input) => input)
                     .filter((input) => input.type === 'link')
                     .forEach(({ id }) => {
-                    const scrollEl = document.querySelector(`#${id} .n7-input-link`);
+                    const scrollEl = document.querySelector(`#facet-container-${id} .n7-input-link`);
                     const scroll$ = fromEvent(scrollEl, 'scroll');
                     scroll$.pipe(debounceTime(300)).subscribe(({ target }) => {
-                        const { limit, offset, total_count, loading } = this.internalFilterState.facets[id];
+                        const { limit, offset, loading, filtered_total_count, } = this.internalFilterState.facets[id];
                         const { scrollTop, clientHeight, scrollHeight } = target;
                         if ((scrollTop + clientHeight >= scrollHeight)
-                            && (offset + limit < total_count)
+                            && (offset + limit < filtered_total_count)
                             && loading === false) {
                             this.internalFilterState.facets[id].loading = true;
                             this.internalFilterState.facets[id].offset = offset + limit;
@@ -9911,7 +9915,7 @@ __decorate([
 MrSearchFacetsLayoutComponent = __decorate([
     Component({
         selector: 'mr-search-facets-layout',
-        template: "<div *ngIf=\"lb.dataSource.facets\" class=\"mr-facets__facets-wrapper {{ lb.dataSource.facets.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.facets.sections\" \n    class=\"mr-facets__single-facet {{ section.classes || '' }}\"\n    [ngClass]=\"lb.dataSource.searchService.getState$('section', section.id) | async\">\n        <n7-facet-header\n        *ngIf=\"section.header\"\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\n        [emit]=\"lb.widgets[section.header.id].emit\"\n        ></n7-facet-header>\n\n        <div [hidden]=\"section.header && !lb.widgets[section.header.id].ds.isOpen()\" class=\"mr-facets__single-facet-content\">\n            <div *ngFor=\"let input of section.inputs\" \n            [attr.id]=\"input.id\"\n            class=\"mr-facets__single-facet-inner-content {{ input.classes || '' }}\">\n                <ng-container [ngSwitch]=\"input.type\">\n    \n                    <!-- INPUT TEXT -->\n                    <n7-input-text \n                    *ngSwitchCase=\"'text'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n    \n                    <!-- INPUT CHECKBOX -->\n                    <n7-input-checkbox \n                    *ngSwitchCase=\"'checkbox'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                    \n                    <!-- INPUT SELECT -->\n                    <n7-input-select \n                    *ngSwitchCase=\"'select'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                    \n                    <!-- INPUT LINK -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'link'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n\n                    <!-- INPUT LINKMULTI -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'linkMulti'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n                \n                </ng-container>\n            </div>\n        </div>\n    </div>\n</div>"
+        template: "<div *ngIf=\"lb.dataSource.facets\" class=\"mr-facets__facets-wrapper {{ lb.dataSource.facets.classes || '' }}\">\n    <div *ngFor=\"let section of lb.dataSource.facets.sections\" \n    class=\"mr-facets__single-facet {{ section.classes || '' }}\"\n    [ngClass]=\"lb.dataSource.searchService.getState$('section', section.id) | async\">\n        <n7-facet-header\n        *ngIf=\"section.header\"\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\n        [emit]=\"lb.widgets[section.header.id].emit\"\n        ></n7-facet-header>\n\n        <div [hidden]=\"section.header && !lb.widgets[section.header.id].ds.isOpen()\" class=\"mr-facets__single-facet-content\">\n            <div *ngFor=\"let input of section.inputs\" \n            [attr.id]=\"'facet-container-' + input.id\"\n            class=\"mr-facets__single-facet-inner-content {{ input.classes || '' }}\">\n                <ng-container [ngSwitch]=\"input.type\">\n    \n                    <!-- INPUT TEXT -->\n                    <n7-input-text \n                    *ngSwitchCase=\"'text'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\n    \n                    <!-- INPUT CHECKBOX -->\n                    <n7-input-checkbox \n                    *ngSwitchCase=\"'checkbox'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\n                    \n                    <!-- INPUT SELECT -->\n                    <n7-input-select \n                    *ngSwitchCase=\"'select'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\n                    \n                    <!-- INPUT LINK -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'link'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n\n                    <!-- INPUT LINKMULTI -->\n                    <n7-input-link \n                    *ngSwitchCase=\"'linkMulti'\"\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\n                \n                </ng-container>\n            </div>\n        </div>\n    </div>\n</div>"
     }),
     __metadata("design:paramtypes", [])
 ], MrSearchFacetsLayoutComponent);
@@ -9954,11 +9958,11 @@ class MrSearchLayoutDS extends LayoutDataSource$1 {
         });
     }
     getPaginationParams(response) {
-        const { total_count: totalCount, page, limit } = response;
+        const { total_count: totalCount, offset, limit } = response;
         const { pagination: paginationConfig } = this.pageConfig;
         return {
             totalPages: Math.ceil(totalCount / limit),
-            currentPage: page,
+            currentPage: (offset + limit) / limit,
             pageLimit: paginationConfig.limit,
             sizes: {
                 list: paginationConfig.options,
@@ -10056,8 +10060,11 @@ class MrSearchLayoutEH extends EventHandler {
             defaultSort = pageConfig.sort.options[0].value;
         }
         // inputs listener
-        this.searchService.getState$(INPUT_STATE_CONTEXT).pipe(takeUntil(this.destroyed$)).subscribe(({ state }) => {
+        this.searchService.getState$(INPUT_STATE_CONTEXT).pipe(takeUntil(this.destroyed$)).subscribe(({ lastUpdated, state }) => {
             this.searchState = state;
+            if (lastUpdated !== 'page') {
+                this.searchService.setState(INPUT_STATE_CONTEXT, 'page', 1);
+            }
         });
         this.searchService.getState$(INPUT_STATE_CONTEXT, 'query').pipe(takeUntil(this.destroyed$)).subscribe((val) => {
             this.emitOuter('inputquerychange', val);
@@ -10089,14 +10096,18 @@ class MrSearchLayoutEH extends EventHandler {
             if (params.sort) {
                 results.sort = params.sort;
             }
+            // limit check
+            if (params.limit) {
+                results.limit = params.limit;
+            }
             // offset check
             if (params.page && params.page > 1) {
-                results.offset = results.limit * params.page;
+                results.offset = results.limit * (params.page - 1);
             }
             params.results = results;
             // cleanup
             Object.keys(params)
-                .filter((key) => ['sort', 'page'].includes(key))
+                .filter((key) => ['sort', 'page', 'limit'].includes(key))
                 .forEach((key) => {
                 delete params[key];
             });
