@@ -8137,6 +8137,10 @@
                 return null;
             }
             var header = data.header, items = data.items;
+            // items check
+            if (Array.isArray(items) && !items.length) {
+                return null;
+            }
             var _a = this.options, classes = _a.classes, itemPreview = _a.itemPreview;
             var itemPreviewOptions = lodash.merge(ITEM_PREVIEW_DEFAULTS, (itemPreview || {}));
             if ((header || {}).button) {
@@ -8461,12 +8465,27 @@
             var group = data.group.map(function (d) {
                 var items = d.items;
                 // Convert URLs to anchor elements and remove labels if necessary
-                items = d.items.map(function (_a) {
+                items = d.items
+                    .filter(function (_a) {
                     var label = _a.label, value = _a.value;
-                    if (_this.isUrl.test(value)) {
-                        return ({ label: hideLabels ? '' : label, value: _this.toUrl(value) });
+                    return label && value;
+                })
+                    .map(function (_a) {
+                    var label = _a.label, value = _a.value;
+                    var newItem = {};
+                    // value check
+                    if (value) {
+                        if (_this.isUrl.test(value)) {
+                            newItem.value = _this.toUrl(value);
+                        }
+                        else {
+                            newItem.value = value;
+                        }
                     }
-                    return ({ label: hideLabels ? '' : label, value: value });
+                    if (label && !hideLabels) {
+                        newItem.label = label;
+                    }
+                    return newItem;
                 });
                 return { items: items };
             });
@@ -10318,6 +10337,9 @@
                 var type = _a.type, payload = _a.payload;
                 switch (type) {
                     case _this.dataSource.id + ".change":
+                        if (typeof payload.value === 'string') {
+                            payload.value = payload.value.trim();
+                        }
                         _this.dataSource.setValue(payload.value);
                         _this.emitOuter('change', __assign(__assign({}, payload), { id: _this.dataSource.id }));
                         break;

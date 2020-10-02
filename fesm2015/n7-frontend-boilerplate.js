@@ -7825,6 +7825,10 @@ class MrCollectionDS extends DataSource {
             return null;
         }
         const { header, items } = data;
+        // items check
+        if (Array.isArray(items) && !items.length) {
+            return null;
+        }
         const { classes, itemPreview } = this.options;
         const itemPreviewOptions = merge$1(ITEM_PREVIEW_DEFAULTS, (itemPreview || {}));
         if ((header || {}).button) {
@@ -8112,11 +8116,23 @@ class MrMetadataDS extends DataSource {
         const group = data.group.map((d) => {
             let { items } = d;
             // Convert URLs to anchor elements and remove labels if necessary
-            items = d.items.map(({ label, value }) => {
-                if (this.isUrl.test(value)) {
-                    return ({ label: hideLabels ? '' : label, value: this.toUrl(value) });
+            items = d.items
+                .filter(({ label, value }) => label && value)
+                .map(({ label, value }) => {
+                const newItem = {};
+                // value check
+                if (value) {
+                    if (this.isUrl.test(value)) {
+                        newItem.value = this.toUrl(value);
+                    }
+                    else {
+                        newItem.value = value;
+                    }
                 }
-                return ({ label: hideLabels ? '' : label, value });
+                if (label && !hideLabels) {
+                    newItem.label = label;
+                }
+                return newItem;
             });
             return { items };
         });
@@ -9722,6 +9738,9 @@ class FacetTextEH extends EventHandler {
         this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case `${this.dataSource.id}.change`:
+                    if (typeof payload.value === 'string') {
+                        payload.value = payload.value.trim();
+                    }
                     this.dataSource.setValue(payload.value);
                     this.emitOuter('change', Object.assign(Object.assign({}, payload), { id: this.dataSource.id }));
                     break;
