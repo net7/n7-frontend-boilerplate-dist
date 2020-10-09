@@ -8113,32 +8113,38 @@ class MrMetadataDS extends DataSource {
     }
     transform(data) {
         const { hideLabels } = this.options;
-        const group = data.group.map((d) => {
-            let { items } = d;
-            // Convert URLs to anchor elements and remove labels if necessary
-            items = d.items
-                .filter(({ label, value }) => label && value)
-                .map(({ label, value }) => {
-                const newItem = {};
-                // value check
-                if (value) {
-                    if (this.isUrl.test(value)) {
-                        newItem.value = this.toUrl(value);
-                    }
-                    else {
-                        newItem.value = value;
-                    }
+        const { group } = data;
+        const result = { group: [] };
+        group.forEach(({ items }) => {
+            items.forEach(({ label, value }) => {
+                const itemLabel = label && !hideLabels ? label : null;
+                if (Array.isArray(value)) {
+                    result.group.push({
+                        group: [{
+                                title: itemLabel,
+                                items: value.map((childItem) => ({
+                                    label: childItem.label,
+                                    value: this.getItemValue(childItem.value)
+                                }))
+                            }]
+                    });
                 }
-                if (label && !hideLabels) {
-                    newItem.label = label;
+                else {
+                    result.group.push({
+                        group: [{
+                                items: [{
+                                        label: itemLabel,
+                                        value: this.getItemValue(value)
+                                    }]
+                            }]
+                    });
                 }
-                return newItem;
             });
-            return { items };
         });
-        // Overwrite the metadata group
-        data.group = group;
-        return data;
+        return result;
+    }
+    getItemValue(value) {
+        return this.isUrl.test(value) ? this.toUrl(value) : value;
     }
 }
 

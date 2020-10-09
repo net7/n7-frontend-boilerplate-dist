@@ -8251,36 +8251,40 @@ var MrMetadataDS = /** @class */ (function (_super) {
     MrMetadataDS.prototype.transform = function (data) {
         var _this = this;
         var hideLabels = this.options.hideLabels;
-        var group = data.group.map(function (d) {
-            var items = d.items;
-            // Convert URLs to anchor elements and remove labels if necessary
-            items = d.items
-                .filter(function (_a) {
+        var group = data.group;
+        var result = { group: [] };
+        group.forEach(function (_a) {
+            var items = _a.items;
+            items.forEach(function (_a) {
                 var label = _a.label, value = _a.value;
-                return label && value;
-            })
-                .map(function (_a) {
-                var label = _a.label, value = _a.value;
-                var newItem = {};
-                // value check
-                if (value) {
-                    if (_this.isUrl.test(value)) {
-                        newItem.value = _this.toUrl(value);
-                    }
-                    else {
-                        newItem.value = value;
-                    }
+                var itemLabel = label && !hideLabels ? label : null;
+                if (Array.isArray(value)) {
+                    result.group.push({
+                        group: [{
+                                title: itemLabel,
+                                items: value.map(function (childItem) { return ({
+                                    label: childItem.label,
+                                    value: _this.getItemValue(childItem.value)
+                                }); })
+                            }]
+                    });
                 }
-                if (label && !hideLabels) {
-                    newItem.label = label;
+                else {
+                    result.group.push({
+                        group: [{
+                                items: [{
+                                        label: itemLabel,
+                                        value: _this.getItemValue(value)
+                                    }]
+                            }]
+                    });
                 }
-                return newItem;
             });
-            return { items: items };
         });
-        // Overwrite the metadata group
-        data.group = group;
-        return data;
+        return result;
+    };
+    MrMetadataDS.prototype.getItemValue = function (value) {
+        return this.isUrl.test(value) ? this.toUrl(value) : value;
     };
     return MrMetadataDS;
 }(DataSource));
