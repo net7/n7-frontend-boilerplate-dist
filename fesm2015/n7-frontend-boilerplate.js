@@ -1,8 +1,8 @@
 import { __decorate, __param, __metadata } from 'tslib';
 import { ɵɵdefineInjectable, Injectable, Inject, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef, ApplicationInitStatus, Pipe } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { DvComponentsLibModule, TABLE_MOCK, MAP_MOCK, DATA_WIDGET_MOCK } from '@n7-frontend/components';
+import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK } from '@n7-frontend/components';
 import { ReplaySubject, empty, Subject, of, merge, fromEvent, BehaviorSubject, forkJoin } from 'rxjs';
 import { map, catchError, takeUntil, filter, tap, mapTo, debounceTime, switchMap, first, withLatestFrom, delay } from 'rxjs/operators';
 import { NavigationStart, Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -10,9 +10,10 @@ import { Title, DomSanitizer } from '@angular/platform-browser';
 import { LayoutBuilder, EventHandler, DataSource, LayoutDataSource as LayoutDataSource$1, _t } from '@n7-frontend/core';
 import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
 import tippy, { hideAll } from 'tippy.js';
-import { isEmpty, get, cloneDeep, merge as merge$1, xor } from 'lodash';
+import { isEmpty, get, max, min, cloneDeep, isNull, merge as merge$1, xor } from 'lodash';
 import slugify from 'slugify';
 import { DataSource as DataSource$1 } from '@n7-frontend/core/dist/data-source';
+import { icon, LatLngBounds, markerClusterGroup, marker } from 'leaflet';
 import * as moment from 'moment';
 
 let ConfigurationService = class ConfigurationService {
@@ -1690,14 +1691,13 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             this.one('aw-linked-objects').update({ items: this.getLinkedObjectItems() });
         };
     }
-    onInit({ configuration, mainState, router, route, location, options, titleService, communication, }) {
+    onInit({ configuration, mainState, router, route, options, titleService, communication, }) {
         this.route = route;
         this.communication = communication;
         this.configuration = configuration;
         this.mainState = mainState;
         this.options = options;
         this.router = router;
-        this.location = location;
         this.titleService = titleService;
         this.currentId = '';
         this.currentPage = +this.route.snapshot.queryParams.page;
@@ -3398,91 +3398,154 @@ class AwGalleryResultsDS extends DataSource {
     }
 }
 
+const MARKER_ICON = icon({
+    iconUrl: '/assets/pin.png',
+    iconSize: [30, 45.5],
+    popupAnchor: [0, -25],
+    className: 'marker-icon'
+});
+const MARKER_ICON_SELECTED = icon({
+    iconUrl: '/assets/pin-selected.png',
+    iconSize: [30, 45.5],
+    popupAnchor: [0, -25],
+    className: 'marker-icon-selected'
+});
 class AwMapDS extends DataSource {
     constructor() {
         super(...arguments);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        this.transform = (data) => MAP_MOCK;
+        this.markerOpen$ = new Subject();
+        this.markerClose$ = new Subject();
+        this.transform = (data) => ({
+            containerId: 'map-canvas',
+            tileLayers: [{
+                    url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
+                    options: {}
+                }],
+            initialView: {
+                center: [0, 0],
+                zoom: 13
+            },
+            _setInstance: (map) => {
+                this.map = map;
+                const bounds = new LatLngBounds(data.map(({ lat, lon }) => [lat, lon]));
+                this.map.fitBounds(bounds);
+                // adding markers
+                const markers = markerClusterGroup({
+                    showCoverageOnHover: false,
+                });
+                data.forEach(({ lat, lon, item }) => {
+                    const { label } = item;
+                    const marker$1 = marker([lat, lon], { icon: MARKER_ICON })
+                        .addTo(markers)
+                        .bindPopup(label)
+                        .on('click', ({ target }) => {
+                        const { icon } = target.options;
+                        const { className } = icon.options;
+                        if (className === 'marker-icon-selected') {
+                            this.markerOpen$.next(item);
+                        }
+                    });
+                    marker$1.getPopup().on('remove', ({ target }) => {
+                        target._source.setIcon(MARKER_ICON);
+                        this.markerClose$.next();
+                    });
+                    marker$1.getPopup().on('add', ({ target }) => {
+                        target._source.setIcon(MARKER_ICON_SELECTED);
+                    });
+                });
+                this.map.addLayer(markers);
+            }
+        });
     }
 }
 
+const ONE_YEAR = 31557600000;
+const YEARS_MARGIN = 100;
 class AwTimelineDS extends DataSource {
     constructor() {
         super(...arguments);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        this.transform = (data) => ({
-            containerID: 'timeline-component',
-            libOptions: {
-                height: '500px',
-                locale: 'it_IT',
-                cluster: {
-                    // titleTemplate: '{count}',
-                    // fitOnDoubleClick: true,
-                    clusterCriteria: (f, s) => f.content.charAt(0) === s.content.charAt(0)
+        this.timelineLoaded$ = new Subject();
+        this.transform = (data) => {
+            this.dataSet = data.map(({ id, start, end, item, label }) => ({
+                id,
+                item,
+                start: start ? moment(start).format('YYYY-MM-DD') : null,
+                end: end && end !== start ? moment(end).format('YYYY-MM-DD') : null,
+                content: this.getItemTemplate(label, item.label)
+            }));
+            const max = this.getMax();
+            const min = this.getMin();
+            return {
+                containerID: 'timeline-component',
+                libOptions: {
+                    max,
+                    min,
+                    start: min,
+                    end: max,
+                    align: 'left',
+                    minHeight: '100px',
+                    // height: '100px',
+                    locale: 'it_IT',
+                    cluster: {
+                        // fitOnDoubleClick: true,
+                        // clusterCriteria: (f, s) => f.content.charAt(0) === s.content.charAt(0),
+                        titleTemplate: '{count} eventi',
+                    },
+                    showCurrentTime: false,
+                    showTooltips: false,
+                    tooltip: {
+                        followMouse: false,
+                        template: (d, element) => `<div class="tooltip">${element.title}</div>`
+                    },
+                    width: '100%',
+                    // minHeight: '350px',
+                    // maxHeight: '800px',
+                    zoomMax: ONE_YEAR * 2000,
+                    zoomMin: ONE_YEAR / 12,
                 },
-                showTooltips: false,
-                tooltip: {
-                    followMouse: false,
-                    template: (d, element) => `<div class="tooltip">${element.title}</div>`
-                },
-                template: (d) => {
-                    const start = moment(d.start).format('DDMM') === '0101'
-                        ? moment(d.start).format('YYYY') : moment(d.start).format('DD MMMM YYYY');
-                    let end;
-                    if (d.end) {
-                        end = moment(d.end).format('DDMM') === '0101'
-                            ? moment(d.end).format('YYYY') : moment(d.end).format('DD MMMM YYYY');
-                    }
-                    const endHTML = d.end ? `- ${end}` : '';
-                    return (`<div class="dates"><em>${start}${endHTML}</em></div><div class="content">${d.content}</div>`);
-                },
-                width: '100%',
-                minHeight: '350px',
-                maxHeight: '800px',
-                // zoomMax: 31557600000, // one year
-                zoomFriction: 8
-            },
-            dataSet: [
-                {
-                    id: 1,
-                    content: 'Mostra internazionale di edilizia ospedaliera, Roma (1935)',
-                    start: '1935'
-                },
-                {
-                    id: 2,
-                    content: 'Mostra di edilizia ospedaliera, Fiuggi',
-                    start: '1942'
-                },
-                {
-                    id: 3,
-                    content: 'I Congresso mondiale di sociologia',
-                    start: '1951'
-                },
-                {
-                    id: 4,
-                    content: 'V Congresso mondiale di sociologia, Washington D.C. (1962)',
-                    start: '1962',
-                },
-                {
-                    id: 5,
-                    content: 'Mostra di edilizia pubblica, Pisa',
-                    start: '1967-06-16',
-                    end: '1967-06-21'
-                },
-                {
-                    id: 6,
-                    content: 'Strategia della tensione',
-                    start: '1975',
-                    end: '1984'
-                },
-                {
-                    id: 7,
-                    content: 'XX Congresso mondiale di sociologia, Roma',
-                    start: '1995'
+                dataSet: this.dataSet,
+                _setInstance: (timeline) => {
+                    this.timeline = timeline;
+                    this.timelineLoaded$.next();
+                    // fix cluster visualization
+                    setTimeout(() => {
+                        this.timeline.fit();
+                    });
                 }
-            ],
-            _setInstance: (timeline) => timeline
-        });
+            };
+        };
+    }
+    getItemTemplate(datesLabel, label) {
+        return (`
+      <div class="dates">
+        <em>${datesLabel}</em>
+      </div>
+      <div class="content">${label}</div>
+    `);
+    }
+    getMax() {
+        const maxDate = new Date(max(this.getAllDates()));
+        const year = maxDate.getFullYear();
+        const month = maxDate.getMonth();
+        const day = maxDate.getDate();
+        return new Date(year + YEARS_MARGIN, month, day);
+    }
+    getMin() {
+        const minDate = new Date(min(this.getAllDates()));
+        const year = minDate.getFullYear();
+        const month = minDate.getMonth();
+        const day = minDate.getDate();
+        return new Date(year - YEARS_MARGIN, month, day);
+    }
+    getAllDates() {
+        return [
+            ...this.dataSet
+                .filter(({ start }) => start)
+                .map(({ start }) => start),
+            ...this.dataSet
+                .filter(({ end }) => end)
+                .map(({ end }) => end)
+        ];
     }
 }
 
@@ -3986,6 +4049,63 @@ class AwGalleryResultsEH extends EventHandler {
     }
 }
 
+class AwMapEH extends EventHandler {
+    listen() {
+        this.outerEvents$.subscribe(({ type }) => {
+            switch (type) {
+                case 'aw-map-layout.init':
+                    this.listenToMarkers();
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+    listenToMarkers() {
+        this.dataSource.markerOpen$.subscribe((item) => {
+            this.emitOuter('markeropen', item);
+        });
+        this.dataSource.markerClose$.subscribe(() => {
+            this.emitOuter('markerclose');
+        });
+    }
+}
+
+class AwTimelineEH extends EventHandler {
+    listen() {
+        this.outerEvents$.subscribe(({ type }) => {
+            switch (type) {
+                case 'aw-timeline-layout.init':
+                    this.listenToTimeline();
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+    listenToTimeline() {
+        this.dataSource.timelineLoaded$
+            .pipe(first())
+            .subscribe(() => {
+            const { timeline, dataSet } = this.dataSource;
+            timeline.on('click', ({ item }) => {
+                const clicked = dataSet.find(({ id }) => item === id);
+                if (clicked) {
+                    this.emitOuter('click', {
+                        id: clicked.item.id,
+                        label: clicked.item.label
+                    });
+                }
+                else {
+                    this.emitOuter('click', {
+                        id: null
+                    });
+                }
+            });
+        });
+    }
+}
+
 class AwLinkedObjectsEH extends EventHandler {
     constructor() {
         super(...arguments);
@@ -4251,6 +4371,8 @@ var EH$1 = /*#__PURE__*/Object.freeze({
     AwSearchLayoutTabsEH: AwSearchLayoutTabsEH,
     AwFacetsWrapperEH: AwFacetsWrapperEH,
     AwGalleryResultsEH: AwGalleryResultsEH,
+    AwMapEH: AwMapEH,
+    AwTimelineEH: AwTimelineEH,
     AwLinkedObjectsEH: AwLinkedObjectsEH,
     AwAutocompleteWrapperEH: AwAutocompleteWrapperEH,
     AwBubbleChartEH: AwBubbleChartEH,
@@ -4283,11 +4405,10 @@ const AwEntitaLayoutConfig = {
 };
 
 let AwEntitaLayoutComponent = class AwEntitaLayoutComponent extends AbstractLayout {
-    constructor(router, route, location, configuration, layoutsConfiguration, communication, mainState, titleService) {
+    constructor(router, route, configuration, layoutsConfiguration, communication, mainState, titleService) {
         super(layoutsConfiguration.get('AwEntitaLayoutConfig') || AwEntitaLayoutConfig);
         this.router = router;
         this.route = route;
-        this.location = location;
         this.configuration = configuration;
         this.layoutsConfiguration = layoutsConfiguration;
         this.communication = communication;
@@ -4305,7 +4426,6 @@ let AwEntitaLayoutComponent = class AwEntitaLayoutComponent extends AbstractLayo
             mainState: this.mainState,
             router: this.router,
             route: this.route,
-            location: this.location,
             titleService: this.titleService,
             communication: this.communication,
             options: this.config.options || {},
@@ -4321,7 +4441,6 @@ let AwEntitaLayoutComponent = class AwEntitaLayoutComponent extends AbstractLayo
 AwEntitaLayoutComponent.ctorParameters = () => [
     { type: Router },
     { type: ActivatedRoute },
-    { type: Location },
     { type: ConfigurationService },
     { type: LayoutsConfigurationService },
     { type: CommunicationService },
@@ -4335,7 +4454,6 @@ AwEntitaLayoutComponent = __decorate([
     }),
     __metadata("design:paramtypes", [Router,
         ActivatedRoute,
-        Location,
         ConfigurationService,
         LayoutsConfigurationService,
         CommunicationService,
@@ -5779,147 +5897,116 @@ AwHomeLayoutComponent = __decorate([
         MainStateService])
 ], AwHomeLayoutComponent);
 
-const MAP_RESULTS = {
-    items: [{
-            item: {
-                id: '51f03166-2241-42cd-8a0f-642907478787', label: '"1 - Casa a S. Piero a Ponti - 1964 - Tipo A - Veduta" (1964)', icon: null, title: '"1 - Casa a S. Piero a Ponti - 1964 - Tipo A - Veduta" (1964)', subTitle: null, image: 'http://iipserver.hyperborea.com/fast/iipsrv1.fcgi?FIF=/mnt/links/unifi/BibliotecadiScienzeTecnologiche/FondoGiuseppeGiorgioGori1906-1969/Documentazionediprogetto/0095@0001_001_95.1.tif&WID=500&CVT=jpeg', text: '"1 - Casa a S. Piero a Ponti - 1964 - Tipo A - Veduta"', relatedTypesOfEntity: [{ type: 'luogo', count: 1 }], breadcrumbs: [{ label: 'complesso di fondi - Fondi archivistici delle biblioteche', link: 'c1f2126e-dbb3-45b5-82c0-dc639d605a8f' }, { label: 'fondo - Fondo Giuseppe Giorgio Gori (1906 - 1969)', link: '6a2449cc-5498-4c9c-a357-1c8f770dc045' }, { label: 'serie 3 - Documentazione di progetto', link: '9e4bd61f-7bf9-4b35-aa2c-ecc26530e2e2' }, { label: 'S. Piero a Ponti, Campi Bisenzio (FI), Progetto di una casa (1964)', link: '0b300620-900f-4899-b0fb-a6b21ebda1d8' }], fields: [{ key: 'fase', value: 'storico' }, { key: 'definizione_tipologia', value: 'tavola di progetto' }, { label: 'altra_intitolazione', fields: [] }, { key: 'descrizione_interna_tipologia', value: 'tavola definitiva' }, { key: 'estremo_remoto', value: '1964' }, { key: 'intitolazione', value: '"1 - Casa a S. Piero a Ponti - 1964 - Tipo A - Veduta"' }, { key: 'document_classification', value: 'a4.oc.ua.UA' }, { key: 'data_inizio', value: '19640101' }, { label: 'consistenza', fields: [{ key: 'consistenza.unitaMisura', value: '' }, { key: 'consistenza.quantita', value: '' }] }]
-            }
-        }, {
-            item: {
-                id: '99373c8b-fc30-41f1-8d03-3def498652e2', label: '"1 - Mercato dei fiori a Pescia - Proposta di copertura delle 10 piazzuole laterali - Prog. arch. G. Gori" ([1966])', icon: null, title: '"1 - Mercato dei fiori a Pescia - Proposta di copertura delle 10 piazzuole laterali - Prog. arch. G. Gori" ([1966])', subTitle: null, image: 'http://iipserver.hyperborea.com/fast/iipsrv1.fcgi?FIF=/mnt/links/unifi/BibliotecadiScienzeTecnologiche/FondoGiuseppeGiorgioGori1906-1969/Documentazionediprogetto/0058@0003@0001_008_58.3.1_particolare.tif&WID=500&CVT=jpeg', text: '"1 - Mercato dei fiori a Pescia - Proposta di copertura delle 10 piazzuole laterali - Prog. arch. G. Gori"', relatedTypesOfEntity: [{ type: 'luogo', count: 1 }], breadcrumbs: [{ label: 'complesso di fondi - Fondi archivistici delle biblioteche', link: 'c1f2126e-dbb3-45b5-82c0-dc639d605a8f' }, { label: 'fondo - Fondo Giuseppe Giorgio Gori (1906 - 1969)', link: '6a2449cc-5498-4c9c-a357-1c8f770dc045' }, { label: 'serie 3 - Documentazione di progetto', link: '9e4bd61f-7bf9-4b35-aa2c-ecc26530e2e2' }, { label: 'Pescia, Ampliamento del Mercato ortoflorofrutticolo (1957 - 1966)', link: '30b3b92e-596a-4706-97aa-a8c0d7e17097' }, { label: 'Pescia, Proposta di copertura delle 10 piazzuole laterali (1966)', link: '3c777533-60d3-4d68-b6b6-f50fef643bdf' }], fields: [{ key: 'fase', value: 'storico' }, { key: 'definizione_tipologia', value: 'tavola di progetto' }, { key: 'descrizione_interna', value: '<p>Con annotazioni a matita rossa</p>' }, { label: 'altra_intitolazione', fields: [{ key: 'intitolazioni.altraIntitolazione.intitolazione', value: 'Pianta, sezioni, veduta prospettica e assonometrica' }] }, { key: 'descrizione_interna_tipologia', value: 'tavola di studio 1:50' }, { key: 'estremo_remoto', value: '[1966]' }, { key: 'intitolazione', value: '"1 - Mercato dei fiori a Pescia - Proposta di copertura delle 10 piazzuole laterali - Prog. arch. G. Gori"' }, { key: 'document_classification', value: 'a4.oc.ua.UA' }, { key: 'data_inizio', value: '19660101' }, { label: 'consistenza', fields: [{ key: 'consistenza.unitaMisura', value: '' }, { key: 'consistenza.quantita', value: '' }] }]
-            }
-        }, {
-            item: {
-                id: '7c6dd66f-0ae7-44d2-a1fd-440ff18bb0f9', label: "\"1953 - Settembre - Bari - Padiglione dell'I.N.A. alla Fiera del Levante\" (1953)", icon: null, title: "\"1953 - Settembre - Bari - Padiglione dell'I.N.A. alla Fiera del Levante\" (1953)", subTitle: null, image: 'http://iipserver.hyperborea.com/fast/iipsrv1.fcgi?FIF=/mnt/links/unifi/BibliotecadiScienzeTecnologiche/FondoGiuseppeGiorgioGori1906-1969/Documentazionediprogetto/0037_002_37b.tif&WID=500&CVT=jpeg', text: "\"1953 - Settembre - Bari - Padiglione dell'I.N.A. alla Fiera del Levante\"", relatedTypesOfEntity: [{ type: 'luogo', count: 1 }, { type: 'organizzazione', count: 1 }], breadcrumbs: [{ label: 'complesso di fondi - Fondi archivistici delle biblioteche', link: 'c1f2126e-dbb3-45b5-82c0-dc639d605a8f' }, { label: 'fondo - Fondo Giuseppe Giorgio Gori (1906 - 1969)', link: '6a2449cc-5498-4c9c-a357-1c8f770dc045' }, { label: 'serie 3 - Documentazione di progetto', link: '9e4bd61f-7bf9-4b35-aa2c-ecc26530e2e2' }], fields: [{ key: 'legatura.epoca', value: '' }, { key: 'fase', value: 'storico' }, { label: 'altra_intitolazione', fields: [{ key: 'intitolazioni.altraIntitolazione.intitolazione', value: 'Bari, Padiglione INA alla Fiera del Levante' }] }, { key: 'intitolazione', value: "\"1953 - Settembre - Bari - Padiglione dell'I.N.A. alla Fiera del Levante\"" }, { key: 'document_classification', value: 'a4.oc.ua.UA' }, { key: 'data_inizio', value: '19530101' }, { key: 'legatura.datazione', value: '' }, { key: 'corredoRicerca.riferimento', value: "Fotocopie da Gori, 1961; ricerca \"Giorgio Giuseppe Gori. Operosità didattica e scientifica\" del corso di Storia dell'Architettura contemporanea della Facoltà di Architettura, a.a. 1991-1992" }, { key: 'definizione_tipologia', value: 'album' }, { key: 'descrizione_interna', value: '<p>3 fotografie b/n della mostra</p>' }, { key: 'corredoRicerca.descrizione', value: '' }, { key: 'corredoRicerca.tipologia', value: 'allegato' }, { key: 'estremo_remoto', value: '1953' }, { label: 'consistenza', fields: [{ key: 'consistenza.unitaMisura', value: '' }, { key: 'consistenza.quantita', value: '' }] }, { key: 'legatura.tipologia', value: 'cartoncino' }]
-            }
-        }, {
-            item: {
-                id: 'aee6d69c-e58c-4025-861f-7735d2dc1e1f', label: '"1956 - Cagliari - cattedrale" (1956)', icon: null, title: '"1956 - Cagliari - cattedrale" (1956)', subTitle: null, image: 'http://iipserver.hyperborea.com/fast/iipsrv1.fcgi?FIF=/mnt/links/unifi/BibliotecadiScienzeTecnologiche/ArchiviofotograficodiRestauro/FondoPieroSanpaolesi/provini/A105_0001_provini.tif&WID=500&CVT=jpeg', text: '"1956 - Cagliari - cattedrale"', relatedTypesOfEntity: [{ type: 'luogo', count: 1 }, { type: 'persona', count: 1 }], breadcrumbs: [{ label: 'complesso di fondi - Fondi archivistici delle biblioteche', link: 'c1f2126e-dbb3-45b5-82c0-dc639d605a8f' }, { label: 'fondo - Archivio fotografico di Restauro', link: 'd3c172a6-eb54-4ffc-9593-67a79fe1a192' }, { label: 'sezione - Fondo Piero Sanpaolesi', link: '056c2c9f-83d7-4700-ad24-1ef8c76b6b20' }, { label: 'serie - provini', link: 'f2b067ff-97b9-4944-bb13-deae3574bab9' }], fields: [{ key: 'fase', value: 'storico' }, { key: 'definizione_tipologia', value: 'scheda' }, { key: 'descrizione_interna', value: '<p>Leoni del recinto presbiteriale della Cattedrale di Cagliari (1-12)</p>' }, { label: 'altra_intitolazione', fields: [] }, { key: 'intitolazione', value: '"1956 - Cagliari - cattedrale"' }, { key: 'document_classification', value: 'a4.oc.ua.UA' }, { key: 'data_inizio', value: '19560101' }, { label: 'consistenza', fields: [{ key: 'consistenza.unitaMisura', value: 'stampe per contatto' }, { key: 'consistenza.quantita', value: '12.0' }] }, { key: 'supporto', value: 'in cartoncino' }, { key: 'estremo_recente', value: '1956' }, { key: 'descrizione_interna_trascrizione', value: "<p>[Sotto l'intitolazione] Recinto presbiteriale, leoni già appartenenti allo scomposto ambone del maestro Guglielmo</p>" }]
-            }
-        }, {
-            item: {
-                id: '26e0a2b9-d466-445f-a0d3-849c1159835d', label: '"4 - Ospedale Lotti a Pontedera - 1° lotto dei lavori. Asilo mortuario - Fianco sud 1:50 - arch. G. Gori arch. R. Pagnini, Firenze 29 apr. 1960" (1960 apr. 29)', icon: null, title: '"4 - Ospedale Lotti a Pontedera - 1° lotto dei lavori. Asilo mortuario - Fianco sud 1:50 - arch. G. Gori arch. R. Pagnini, Firenze 29 apr. 1960" (1960 apr. 29)', subTitle: null, image: 'http://iipserver.hyperborea.com/fast/iipsrv1.fcgi?FIF=/mnt/links/unifi/BibliotecadiScienzeTecnologiche/FondoGiuseppeGiorgioGori1906-1969/Documentazionediprogetto/0057@0004@0004_004_57.4.4a.tif&WID=500&CVT=jpeg', text: '"4 - Ospedale Lotti a Pontedera - 1° lotto dei lavori. Asilo mortuario - Fianco sud 1:50 - arch. G. Gori arch. R. Pagnini, Firenze 29 apr. 1960"', relatedTypesOfEntity: [{ type: 'luogo', count: 1 }, { type: 'persona', count: 1 }], breadcrumbs: [{ label: 'complesso di fondi - Fondi archivistici delle biblioteche', link: 'c1f2126e-dbb3-45b5-82c0-dc639d605a8f' }, { label: 'fondo - Fondo Giuseppe Giorgio Gori (1906 - 1969)', link: '6a2449cc-5498-4c9c-a357-1c8f770dc045' }, { label: 'serie 3 - Documentazione di progetto', link: '9e4bd61f-7bf9-4b35-aa2c-ecc26530e2e2' }, { label: "Pontedera (PI), Ampliamento dell'Ospedale Lotti, in coll. con R. Pagnini, M. Cammelli, V. Michelagnoli (1957 - 1962)", link: 'ceb3d67a-de23-4f58-b731-2a0135d09826' }, { label: "Pontedera (PI), Ampliamento dell'Ospedale Lotti - 1° lotto di lavori - Asilo mortuario (1960)", link: 'bf951503-1950-4a19-942e-54aea808942b' }], fields: [{ key: 'fase', value: 'storico' }, { key: 'definizione_tipologia', value: 'tavola di progetto' }, { label: 'altra_intitolazione', fields: [] }, { key: 'descrizione_interna_tipologia', value: 'tavola esecutiva' }, { key: 'estremo_remoto', value: '1960 apr. 29' }, { key: 'intitolazione', value: '"4 - Ospedale Lotti a Pontedera - 1° lotto dei lavori. Asilo mortuario - Fianco sud 1:50 - arch. G. Gori arch. R. Pagnini, Firenze 29 apr. 1960"' }, { key: 'document_classification', value: 'a4.oc.ua.UA' }, { key: 'data_inizio', value: '19600429' }, { label: 'consistenza', fields: [{ key: 'consistenza.unitaMisura', value: '' }, { key: 'consistenza.quantita', value: '' }] }]
-            }
-        }, {
-            item: {
-                id: '3bfa1b8d-dca2-46ac-95dc-13cd76f6b5a3', label: '"4 aprile 1948 - Lucca - San Martino - Tomba di Ilaria del Carretto - (J. della Quercia)" (4 aprile 1948)', icon: null, title: '"4 aprile 1948 - Lucca - San Martino - Tomba di Ilaria del Carretto - (J. della Quercia)" (4 aprile 1948)', subTitle: null, image: 'http://iipserver.hyperborea.com/fast/iipsrv1.fcgi?FIF=/mnt/links/unifi/BibliotecadiScienzeTecnologiche/ArchiviofotograficodiRestauro/FondoPieroSanpaolesi/provini/A9_0001_provini.tif&WID=500&CVT=jpeg', text: '"4 aprile 1948 - Lucca - San Martino - Tomba di Ilaria del Carretto - (J. della Quercia)"', relatedTypesOfEntity: [{ type: 'luogo', count: 1 }, { type: 'persona', count: 2 }], breadcrumbs: [{ label: 'complesso di fondi - Fondi archivistici delle biblioteche', link: 'c1f2126e-dbb3-45b5-82c0-dc639d605a8f' }, { label: 'fondo - Archivio fotografico di Restauro', link: 'd3c172a6-eb54-4ffc-9593-67a79fe1a192' }, { label: 'sezione - Fondo Piero Sanpaolesi', link: '056c2c9f-83d7-4700-ad24-1ef8c76b6b20' }, { label: 'serie - provini', link: 'f2b067ff-97b9-4944-bb13-deae3574bab9' }], fields: [{ key: 'fase', value: 'storico' }, { key: 'definizione_tipologia', value: 'scheda' }, { label: 'altra_intitolazione', fields: [] }, { key: 'intitolazione', value: '"4 aprile 1948 - Lucca - San Martino - Tomba di Ilaria del Carretto - (J. della Quercia)"' }, { key: 'document_classification', value: 'a4.oc.ua.UA' }, { label: 'consistenza', fields: [{ key: 'consistenza.unitaMisura', value: 'stampe per contatto' }, { key: 'consistenza.quantita', value: '12.0' }] }, { key: 'supporto', value: 'in cartoncino' }, { key: 'estremo_recente', value: '4 aprile 1948' }]
-            }
-        }, {
-            item: {
-                id: '12def6b6-68b9-4103-acd4-971c12ec2438', label: '"5 - Casa a S. Piero a Ponti - Tipo A - Retro 1:50" ([1964])', icon: null, title: '"5 - Casa a S. Piero a Ponti - Tipo A - Retro 1:50" ([1964])', subTitle: null, image: 'http://iipserver.hyperborea.com/fast/iipsrv1.fcgi?FIF=/mnt/links/unifi/BibliotecadiScienzeTecnologiche/FondoGiuseppeGiorgioGori1906-1969/Documentazionediprogetto/0095@0005_002_95.5bis.tif&WID=500&CVT=jpeg', text: '"5 - Casa a S. Piero a Ponti - Tipo A - Retro 1:50"', relatedTypesOfEntity: [{ type: 'luogo', count: 1 }], breadcrumbs: [{ label: 'complesso di fondi - Fondi archivistici delle biblioteche', link: 'c1f2126e-dbb3-45b5-82c0-dc639d605a8f' }, { label: 'fondo - Fondo Giuseppe Giorgio Gori (1906 - 1969)', link: '6a2449cc-5498-4c9c-a357-1c8f770dc045' }, { label: 'serie 3 - Documentazione di progetto', link: '9e4bd61f-7bf9-4b35-aa2c-ecc26530e2e2' }, { label: 'S. Piero a Ponti, Campi Bisenzio (FI), Progetto di una casa (1964)', link: '0b300620-900f-4899-b0fb-a6b21ebda1d8' }], fields: [{ key: 'fase', value: 'storico' }, { key: 'definizione_tipologia', value: 'tavola di progetto' }, { label: 'altra_intitolazione', fields: [] }, { key: 'descrizione_interna_tipologia', value: 'tavola definitiva' }, { key: 'estremo_remoto', value: '[1964]' }, { key: 'intitolazione', value: '"5 - Casa a S. Piero a Ponti - Tipo A - Retro 1:50"' }, { key: 'document_classification', value: 'a4.oc.ua.UA' }, { key: 'data_inizio', value: '19640101' }, { label: 'consistenza', fields: [{ key: 'consistenza.unitaMisura', value: '' }, { key: 'consistenza.quantita', value: '' }] }]
-            }
-        }, {
-            item: {
-                id: 'f93752c0-1ccb-449d-8a4c-41afe4789190', label: '"50 - INA. Cassa Vecchia Roma. Fabbrica Go. Veduta prospettica della piazza" (1960 gen. 27)', icon: null, title: '"50 - INA. Cassa Vecchia Roma. Fabbrica Go. Veduta prospettica della piazza" (1960 gen. 27)', subTitle: null, image: 'http://iipserver.hyperborea.com/fast/iipsrv1.fcgi?FIF=/mnt/links/unifi/BibliotecadiScienzeTecnologiche/FondoGiuseppeGiorgioGori1906-1969/Documentazionediprogetto/0055@0008_003_55.8.tif&WID=500&CVT=jpeg', text: '"50 - INA. Cassa Vecchia Roma. Fabbrica Go. Veduta prospettica della piazza"', relatedTypesOfEntity: [{ type: 'luogo', count: 1 }, { type: 'organizzazione', count: 1 }], breadcrumbs: [{ label: 'complesso di fondi - Fondi archivistici delle biblioteche', link: 'c1f2126e-dbb3-45b5-82c0-dc639d605a8f' }, { label: 'fondo - Fondo Giuseppe Giorgio Gori (1906 - 1969)', link: '6a2449cc-5498-4c9c-a357-1c8f770dc045' }, { label: 'serie 3 - Documentazione di progetto', link: '9e4bd61f-7bf9-4b35-aa2c-ecc26530e2e2' }, { label: 'Roma, Palazzina INA in via Cassia Vecchia (1957 - 1961)', link: '3c52efe4-631d-4959-9cc3-6abd4fa8014c' }], fields: [{ key: 'fase', value: 'storico' }, { key: 'definizione_tipologia', value: 'tavola di progetto' }, { key: 'descrizione_interna', value: '<p>La tavola reca i timbri "Prof. Dott. Giuseppe Gori architetto" e la data "27 gen. 1960"</p>' }, { label: 'altra_intitolazione', fields: [] }, { key: 'estremo_remoto', value: '1960 gen. 27' }, { key: 'intitolazione', value: '"50 - INA. Cassa Vecchia Roma. Fabbrica Go. Veduta prospettica della piazza"' }, { key: 'document_classification', value: 'a4.oc.ua.UA' }, { key: 'data_inizio', value: '19600127' }, { label: 'consistenza', fields: [{ key: 'consistenza.unitaMisura', value: '' }, { key: 'consistenza.quantita', value: '' }] }]
-            }
-        }, {
-            item: {
-                id: '0dc555d7-852b-4e22-8673-223bc0ec4815', label: '"58 - INA. Cassa Vecchia Roma. Fabbrica Go. Gli aggetti delle facciate - Prospetto rapp. 1:100" (1960 gen. 27)', icon: null, title: '"58 - INA. Cassa Vecchia Roma. Fabbrica Go. Gli aggetti delle facciate - Prospetto rapp. 1:100" (1960 gen. 27)', subTitle: null, image: 'http://iipserver.hyperborea.com/fast/iipsrv1.fcgi?FIF=/mnt/links/unifi/BibliotecadiScienzeTecnologiche/FondoGiuseppeGiorgioGori1906-1969/Documentazionediprogetto/0055@0009_004_55.9.tif&WID=500&CVT=jpeg', text: '"58 - INA. Cassa Vecchia Roma. Fabbrica Go. Gli aggetti delle facciate - Prospetto rapp. 1:100"', relatedTypesOfEntity: [{ type: 'luogo', count: 1 }, { type: 'organizzazione', count: 1 }], breadcrumbs: [{ label: 'complesso di fondi - Fondi archivistici delle biblioteche', link: 'c1f2126e-dbb3-45b5-82c0-dc639d605a8f' }, { label: 'fondo - Fondo Giuseppe Giorgio Gori (1906 - 1969)', link: '6a2449cc-5498-4c9c-a357-1c8f770dc045' }, { label: 'serie 3 - Documentazione di progetto', link: '9e4bd61f-7bf9-4b35-aa2c-ecc26530e2e2' }, { label: 'Roma, Palazzina INA in via Cassia Vecchia (1957 - 1961)', link: '3c52efe4-631d-4959-9cc3-6abd4fa8014c' }], fields: [{ key: 'fase', value: 'storico' }, { key: 'definizione_tipologia', value: 'tavola di progetto' }, { key: 'descrizione_interna', value: '<p>La tavola, acquerellata a colori, reca il timbro "27 gen. 1960"</p>' }, { label: 'altra_intitolazione', fields: [] }, { key: 'estremo_remoto', value: '1960 gen. 27' }, { key: 'intitolazione', value: '"58 - INA. Cassa Vecchia Roma. Fabbrica Go. Gli aggetti delle facciate - Prospetto rapp. 1:100"' }, { key: 'document_classification', value: 'a4.oc.ua.UA' }, { key: 'data_inizio', value: '19600127' }, { label: 'consistenza', fields: [{ key: 'consistenza.unitaMisura', value: '' }, { key: 'consistenza.quantita', value: '' }] }]
-            }
-        }, {
-            item: {
-                id: '2dbaebed-ff6f-4ee2-95b4-cf37d0f9b0be', label: '"59 - INA. Cassa Vecchia Roma. Fabbrica Go. Gli aggetti delle facciate - Fianco sulla strada 1:100 -  Fianco sull’interno 1:100" (1960 gen. 27)', icon: null, title: '"59 - INA. Cassa Vecchia Roma. Fabbrica Go. Gli aggetti delle facciate - Fianco sulla strada 1:100 -  Fianco sull’interno 1:100" (1960 gen. 27)', subTitle: null, image: 'http://iipserver.hyperborea.com/fast/iipsrv1.fcgi?FIF=/mnt/links/unifi/BibliotecadiScienzeTecnologiche/FondoGiuseppeGiorgioGori1906-1969/Documentazionediprogetto/0055@0010_001_55.10.tif&WID=500&CVT=jpeg', text: '"59 - INA. Cassa Vecchia Roma. Fabbrica Go. Gli aggetti delle facciate - Fianco sulla strada 1:100 -  Fianco sull’interno 1:100"', relatedTypesOfEntity: [{ type: 'luogo', count: 1 }, { type: 'organizzazione', count: 1 }], breadcrumbs: [{ label: 'complesso di fondi - Fondi archivistici delle biblioteche', link: 'c1f2126e-dbb3-45b5-82c0-dc639d605a8f' }, { label: 'fondo - Fondo Giuseppe Giorgio Gori (1906 - 1969)', link: '6a2449cc-5498-4c9c-a357-1c8f770dc045' }, { label: 'serie 3 - Documentazione di progetto', link: '9e4bd61f-7bf9-4b35-aa2c-ecc26530e2e2' }, { label: 'Roma, Palazzina INA in via Cassia Vecchia (1957 - 1961)', link: '3c52efe4-631d-4959-9cc3-6abd4fa8014c' }], fields: [{ key: 'fase', value: 'storico' }, { key: 'definizione_tipologia', value: 'tavola di progetto' }, { key: 'descrizione_interna', value: '<p>La tavola, acquerellata a colori, reca i timbri "Prof. Dott. Giuseppe Gori architetto" e la data "27 gen. 1960"</p>' }, { label: 'altra_intitolazione', fields: [] }, { key: 'estremo_remoto', value: '1960 gen. 27' }, { key: 'intitolazione', value: '"59 - INA. Cassa Vecchia Roma. Fabbrica Go. Gli aggetti delle facciate - Fianco sulla strada 1:100 -  Fianco sull’interno 1:100"' }, { key: 'document_classification', value: 'a4.oc.ua.UA' }, { key: 'data_inizio', value: '19600127' }, { label: 'consistenza', fields: [{ key: 'consistenza.unitaMisura', value: '' }, { key: 'consistenza.quantita', value: '' }] }]
-            }
-        }, {
-            item: {
-                id: 'b2144875-82e3-4ac3-a6de-d9616fc3fe17', label: '"A S.E. Arrigo Serpieri per ricordo della visita alla bonifica Delia-Nivolelli, Mazara del Vallo 21 aprile 1933-XI" (1933)', icon: null, title: '"A S.E. Arrigo Serpieri per ricordo della visita alla bonifica Delia-Nivolelli, Mazara del Vallo 21 aprile 1933-XI" (1933)', subTitle: null, image: 'http://iipserver.hyperborea.com/fast/iipsrv1.fcgi?FIF=/mnt/links/unifi/BibliotecadiScienzeTecnologiche/FondofotograficodiAgraria/Bonifiche/6_0025_c12verso.tif&WID=500&CVT=jpeg', text: '"A S.E. Arrigo Serpieri per ricordo della visita alla bonifica Delia-Nivolelli, Mazara del Vallo 21 aprile 1933-XI"', relatedTypesOfEntity: [{ type: 'luogo', count: 1 }, { type: 'organizzazione', count: 2 }, { type: 'persona', count: 1 }], breadcrumbs: [{ label: 'complesso di fondi - Fondi archivistici delle biblioteche', link: 'c1f2126e-dbb3-45b5-82c0-dc639d605a8f' }, { label: 'fondo - Fondo fotografico di Agraria', link: 'bfd06ffa-c74e-4e81-8229-1f7de1038180' }, { label: 'serie - Bonifiche', link: '6670c137-bb53-4eb3-9e56-bd93a764d9b3' }], fields: [{ key: 'legatura.epoca', value: 'originale' }, { key: 'fase', value: 'storico' }, { label: 'altra_intitolazione', fields: [] }, { key: 'documentazioneGrafica.tecnicaEsecutiva', value: '' }, { key: 'descrizione_interna_tipologia', value: 'album fotografico' }, { key: 'documentazioneGrafica.tipologia', value: 'materiale fotografico' }, { key: 'intitolazione', value: '"A S.E. Arrigo Serpieri per ricordo della visita alla bonifica Delia-Nivolelli, Mazara del Vallo 21 aprile 1933-XI"' }, { key: 'document_classification', value: 'a4.oc.ua.UA' }, { key: 'data_inizio', value: '19330101' }, { key: 'legatura.datazione', value: '' }, { key: 'definizione_tipologia', value: 'album' }, { key: 'descrizione_interna', value: "<p>L'album contiene 26 fotografie in b/n di diversi formati, con veline e didascalie manoscritte. Le fotografie documentano i lavori della bonifica Delia-Nivolelli nel comune di Mazara del Vallo (TP) e la visita di Arrigo Serpieri a Mazara il 21 aprile 1933.<br />Molte fotografie riportano sul verso, a lapis, il testo della didascalia; alcune sono stampate su carta che riporta l'intestazione del fotografo: \"Foto-Termini-Trapani\". La fotografia a c. 13r. ha sul verso il timbro \"Consorzio della bonifica Nivolelli, Mazara del Vallo\".</p>" }, { key: 'stato_conservazione', value: 'mediocre' }, { key: 'estremo_remoto', value: '1933' }, { key: 'larghezza', value: '332.0' }, { label: 'consistenza', fields: [{ key: 'consistenza.unitaMisura', value: 'carte' }, { key: 'consistenza.quantita', value: '24.0' }] }, { key: 'legatura.tipologia', value: 'cuoio istoriato con lacci in cuoio' }, { key: 'altezza', value: '250.0' }, { key: 'spessore', value: '35.0' }]
-            }
-        }, {
-            item: {
-                id: '30681189-7ce0-4db0-be0a-6eedccde364b', label: '"Abbadia San Salvatore (Siena). Borgo Medievale - Arco di una porta in "peperino" (trachite)"', icon: null, title: '"Abbadia San Salvatore (Siena). Borgo Medievale - Arco di una porta in "peperino" (trachite)"', subTitle: null, image: 'http://iipserver.hyperborea.com/fast/iipsrv1.fcgi?FIF=/mnt/links/unifi/BibliotecadiScienzeTecnologiche/FondoFrancescoRodolico/Soggettiarchitettonici/Toscana/0162_0001_AbbadiaSanSalvatore.tif&WID=500&CVT=jpeg', text: '"Abbadia San Salvatore (Siena). Borgo Medievale - Arco di una porta in "peperino" (trachite)"', relatedTypesOfEntity: [{ type: 'luogo', count: 1 }], breadcrumbs: [{ label: 'complesso di fondi - Fondi archivistici delle biblioteche', link: 'c1f2126e-dbb3-45b5-82c0-dc639d605a8f' }, { label: 'fondo - Fondo Francesco Rodolico', link: '1cbf9ac3-a603-443c-b05e-518de387692d' }, { label: 'serie - Soggetti architettonici', link: '5a611c85-7cbe-445a-bad9-47f41c9c3f2e' }, { label: 'sottoserie - "Toscana"', link: '2a823690-9de5-4faf-8fae-f5ba152a05ac' }], fields: [{ key: 'fase', value: 'storico' }, { key: 'condizionamento.epoca', value: '' }, { label: 'altra_intitolazione', fields: [] }, { key: 'documentazioneGrafica.tecnicaEsecutiva', value: '' }, { key: 'condizionamento.datazione', value: '' }, { key: 'descrizione_interna_tipologia', value: 'Negativi e fotografie' }, { key: 'documentazioneGrafica.tipologia', value: 'materiale fotografico' }, { key: 'intitolazione', value: '"Abbadia San Salvatore (Siena). Borgo Medievale - Arco di una porta in "peperino" (trachite)"' }, { key: 'document_classification', value: 'a4.oc.ua.UA' }, { key: 'condizionamento.materia', value: 'cartone' }, { key: 'definizione_tipologia', value: 'busta' }, { key: 'descrizione_interna', value: "<p>1 negativo 24x36 mm; 1 stampa su carta al bromuro d'argento 80x110 mm</p>" }, { key: 'stato_conservazione', value: 'buono' }, { key: 'condizionamento.tipologia', value: 'scatola' }, { label: 'consistenza', fields: [{ key: 'consistenza.unitaMisura', value: '' }, { key: 'consistenza.quantita', value: '' }] }, { key: 'supporto', value: 'in carta' }]
-            }
-        }]
-};
-
 class AwMapLayoutDS extends LayoutDataSource {
-    onInit({ configuration, mainState, router, route, location, options, titleService, communication, }) {
-        this.route = route;
+    constructor() {
+        super(...arguments);
+        this.pageSize = 10;
+        this.state$ = new BehaviorSubject('EMPTY');
+        this.currentPage = 1;
+    }
+    onInit({ configuration, mainState, options, titleService, communication, }) {
         this.communication = communication;
         this.configuration = configuration;
         this.mainState = mainState;
         this.options = options;
-        this.router = router;
-        this.location = location;
         this.titleService = titleService;
         this.mainState.update('headTitle', 'Arianna4View - Mappa');
+        // navigation update
+        this.mainState.updateCustom('currentNav', 'mappa');
+        this.communication.request$('getMapObjects').subscribe((response) => {
+            this.one('aw-map').update(response);
+        });
+    }
+    onMarkerOpen({ id, label }) {
+        // loading results
+        this.state$.next('LOADING');
+        this.communication.request$('getEntityDetails', {
+            params: {
+                entityId: id,
+            }
+        }).subscribe(({ relatedItems }) => {
+            // clear loading
+            this.state$.next('SUCCESS');
+            this.relatedItems = relatedItems;
+            this.total = relatedItems.length;
+            let text = `<strong>${this.total}</strong> Oggetti collegati a<br><span class="aw-multimedia__results-title-big">${label}</span>`;
+            if (this.total === 1) {
+                text = `<strong>${this.total}</strong> Oggetto collegato a<br><span class="aw-multimedia__results-title-big">${label}</span>`;
+            }
+            this.one('aw-scheda-inner-title').update({
+                title: {
+                    main: { text }
+                }
+            });
+            // update items
+            this.updateItems();
+            // update pagination
+            this.updatePagination();
+        });
+    }
+    onMarkerClose() {
+        // reset
+        this.state$.next('EMPTY');
+        this.pageSize = 10;
+        this.currentPage = 1;
+        this.relatedItems = [];
+        this.total = 0;
         this.one('aw-scheda-inner-title').update({
             title: {
-                main: {
-                    text: '1.252 Oggetti culturali collegati a Firenze'
-                }
+                main: { text: '' }
             }
         });
+        this.one('aw-linked-objects').update({ items: [] });
+    }
+    onPaginationChange({ value }) {
+        this.pageSize = +value;
+        this.updateItems();
+        this.updatePagination();
+    }
+    onPaginationClick({ page }) {
+        if (typeof page === 'number' && page !== this.currentPage) {
+            this.currentPage = page;
+            this.updateItems();
+            this.updatePagination();
+        }
+    }
+    updateItems() {
         this.one('aw-linked-objects').updateOptions({
             context: 'map',
             config: this.configuration,
-            page: 1,
-            // pagination: true,
-            // paginationParams: this._getPaginationParams(),
-            // dynamicPagination: {
-            //   total: totalCount,
-            // },
-            size: 10,
+            page: this.currentPage,
+            pagination: true,
+            size: this.pageSize,
         });
-        this.one('aw-linked-objects').update(MAP_RESULTS);
+        this.one('aw-linked-objects').update({ items: this.relatedItems });
+    }
+    updatePagination() {
+        this.one('n7-smart-pagination').updateOptions({
+            mode: 'payload'
+        });
+        this.one('n7-smart-pagination').update({
+            totalPages: Math.ceil(this.total / this.pageSize),
+            currentPage: this.currentPage,
+            pageLimit: 5,
+            sizes: {
+                list: [10, 25, 50],
+                active: this.pageSize,
+            },
+        });
     }
 }
 
-// import { map } from 'rxjs/operators';
-// import helpers from '../../../common/helpers';
 class AwMapLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.destroyed$ = new Subject();
-        // private listenRoute(selectedItem = '', forceReload = false) {
-        //   // listen for "page" query param changes
-        //   this.route.queryParams.pipe(
-        //     map((params: any) => params.page),
-        //   ).subscribe((page) => {
-        //     if (this.dataSource.currentPage !== page) {
-        //       this.dataSource.currentPage = page;
-        //       this.dataSource.handlePageNavigation();
-        //     }
-        //   });
-        //   // get URL parameters with angular's paramMap
-        //   this.route.paramMap.subscribe((params) => {
-        //     // look for id
-        //     if (params.get('id')) {
-        //       if (this.dataSource.currentId === params.get('id') && !forceReload) {
-        //         if (this.dataSource.selectedTab !== params.get('tab')) {
-        //           this.dataSource.handleNavUpdate(params.get('tab'));
-        //         }
-        //         return;
-        //       }
-        //       // get item from response with id === id and return as promise
-        //       this.dataSource.loadItem(params.get('id'), params.get('slug'), params.get('tab'))
-        //         .subscribe((res) => {
-        //           if (res) {
-        //             this.dataSource.loadContent(res);
-        //             // remove the entity of this page
-        //             const entities = res.relatedEntities
-        //               .filter((entity) => entity.id !== params.get('id'));
-        //             this.dataSource.updateWidgets(res);
-        //             if (selectedItem) {
-        //               this.emitOuter('selectItem', selectedItem);
-        //             }
-        //             this.emitOuter('filterbubbleresponse', entities);
-        //           }
-        //         });
-        //     } else {
-        //       this.dataSource.loadItem();
-        //     }
-        //   });
-        // }
     }
     listen() {
         this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'aw-map-layout.init':
                     this.dataSource.onInit(payload);
-                    this.configuration = payload.configuration;
-                    this.route = payload.route;
-                    // this.entityId = this.route.snapshot.params.id || '';
-                    // this.listenRoute(this.entityId);
+                    this.emitOuter('init', payload);
                     break;
                 case 'aw-map-layout.destroy':
                     this.destroyed$.next();
@@ -5928,21 +6015,38 @@ class AwMapLayoutEH extends EventHandler {
                     break;
             }
         });
-        // this.outerEvents$.subscribe(({ type, payload }) => {
-        //   switch (type) {
-        //     default:
-        //       break;
-        //   }
-        // });
+        this.outerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'aw-map.markeropen':
+                    this.dataSource.onMarkerOpen(payload);
+                    break;
+                case 'aw-map.markerclose':
+                    this.dataSource.onMarkerClose();
+                    break;
+                case 'n7-smart-pagination.change':
+                    this.dataSource.onPaginationChange(payload);
+                    break;
+                case 'n7-smart-pagination.click':
+                    this.dataSource.onPaginationClick(payload);
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 }
 
 const AwMapLayoutConfig = {
     layoutId: 'aw-map-layout',
     widgets: [
-        { id: 'aw-map', hasStaticData: true },
+        { id: 'aw-map' },
         { id: 'aw-scheda-inner-title' },
-        { id: 'aw-linked-objects' }
+        { id: 'aw-linked-objects' },
+        {
+            id: 'n7-smart-pagination',
+            dataSource: SmartPaginationDS,
+            eventHandler: SmartPaginationEH,
+        }
     ],
     layoutDS: AwMapLayoutDS,
     layoutEH: AwMapLayoutEH,
@@ -5954,11 +6058,8 @@ const AwMapLayoutConfig = {
 };
 
 let AwMapLayoutComponent = class AwMapLayoutComponent extends AbstractLayout {
-    constructor(router, route, location, configuration, layoutsConfiguration, communication, mainState, titleService) {
+    constructor(configuration, layoutsConfiguration, communication, mainState, titleService) {
         super(layoutsConfiguration.get('AwMapLayoutConfig') || AwMapLayoutConfig);
-        this.router = router;
-        this.route = route;
-        this.location = location;
         this.configuration = configuration;
         this.layoutsConfiguration = layoutsConfiguration;
         this.communication = communication;
@@ -5974,8 +6075,6 @@ let AwMapLayoutComponent = class AwMapLayoutComponent extends AbstractLayout {
         return {
             configuration: this.configuration,
             mainState: this.mainState,
-            router: this.router,
-            route: this.route,
             titleService: this.titleService,
             communication: this.communication,
             options: this.config.options || {},
@@ -5989,9 +6088,6 @@ let AwMapLayoutComponent = class AwMapLayoutComponent extends AbstractLayout {
     }
 };
 AwMapLayoutComponent.ctorParameters = () => [
-    { type: Router },
-    { type: ActivatedRoute },
-    { type: Location },
     { type: ConfigurationService },
     { type: LayoutsConfigurationService },
     { type: CommunicationService },
@@ -6001,12 +6097,9 @@ AwMapLayoutComponent.ctorParameters = () => [
 AwMapLayoutComponent = __decorate([
     Component({
         selector: 'aw-map-layout',
-        template: "<div class=\"aw-map\"\n     id=\"map-layout\"\n     *ngIf=\"lb.dataSource\">\n     <n7-inner-title [data]=\"{\n               title: {\n                    main: {\n                         text: 'I luoghi dell\\'archivio'\n                    }\n               }\n          }\">\n     </n7-inner-title>\n     <n7-map [data]=\"lb.widgets['aw-map'].ds.out$ | async\">\n     </n7-map>\n     <!-- RESULT LIST -->\n     <ng-container *ngIf=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n          <n7-inner-title\n               [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n          </n7-inner-title>\n     </ng-container>\n     \n     <ng-container *ngIf=\"lb.widgets['aw-linked-objects'].ds.out$ | async\">\n          <div *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n               <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n               </n7-smart-breadcrumbs>\n               <n7-item-preview [data]=\"preview\"\n                                [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n               </n7-item-preview>\n          </div>\n     </ng-container>\n</div>\n"
+        template: "<div class=\"aw-multimedia\" id=\"map-layout\" *ngIf=\"lb.dataSource\">\n    <n7-inner-title [data]=\"{\n        title: {\n            main: {\n                    text: 'I luoghi dell\\'archivio'\n            }\n        }\n    }\">\n    </n7-inner-title>\n\n    <!-- Map -->\n    <div class=\"aw-multimedia__map\">\n        <n7-map [data]=\"lb.widgets['aw-map'].ds.out$ | async\"></n7-map>\n    </div>\n    <!-- END // Map -->\n\n    <!-- RESULTS -->\n    <div class=\"aw-multimedia__results\">\n        <div class=\"aw-multimedia__loader\" *ngIf=\"(lb.dataSource.state$ | async) === 'LOADING'\">\n            <ng-container>\n                <n7-loader></n7-loader>\n            </ng-container>\n        </div>\n\n        <div class=\"aw-multimedia__empty\" *ngIf=\"(lb.dataSource.state$ | async) === 'EMPTY'\">\n            <ng-container>\n                <p class=\"aw-multimedia__empty-text\">Clicca su un luogo della mappa per vedere tutti gli oggetti collegati.</p>\n            </ng-container>\n        </div>\n        \n        <ng-container *ngIf=\"(lb.dataSource.state$ | async) === 'SUCCESS'\">\n            <div class=\"aw-multimedia__results-title\">\n                <n7-inner-title \n                    [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n                </n7-inner-title>\n            </div>\n            <div class=\"aw-multimedia__results-wrapper\">\n                <div>\n                    <div class=\"aw-item-preview-wrapper\" *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs \n                            [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview \n                            [data]=\"preview\" \n                            [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.total > 0\"\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </ng-container>\n    </div>\n</div>"
     }),
-    __metadata("design:paramtypes", [Router,
-        ActivatedRoute,
-        Location,
-        ConfigurationService,
+    __metadata("design:paramtypes", [ConfigurationService,
         LayoutsConfigurationService,
         CommunicationService,
         MainStateService,
@@ -6445,36 +6538,135 @@ AwSearchLayoutComponent = __decorate([
         ActivatedRoute])
 ], AwSearchLayoutComponent);
 
+const timelineMock = [
+    {
+        id: 'c67b3a8b-5ec9-4c82-b77c-6142e49cfad4',
+        content: 'Mostra internazionale di edilizia ospedaliera, Roma (1935)',
+        start: '1935'
+    },
+    {
+        id: 'b788bca1-ce11-4618-b283-a654d16b4a10',
+        content: 'Mostra di edilizia ospedaliera, Fiuggi',
+        start: '1942'
+    },
+    {
+        id: '5dae76e3-7bde-46e5-8371-a689e38378a4',
+        content: 'I Congresso mondiale di sociologia',
+        start: '1951'
+    }
+];
 class AwTimelineLayoutDS extends LayoutDataSource {
-    onInit({ configuration, mainState, router, route, location, options, titleService, communication, }) {
-        this.route = route;
+    constructor() {
+        super(...arguments);
+        this.pageSize = 10;
+        this.state$ = new BehaviorSubject('EMPTY');
+        this.currentPage = 1;
+    }
+    onInit({ configuration, mainState, options, titleService, communication, }) {
         this.communication = communication;
         this.configuration = configuration;
         this.mainState = mainState;
         this.options = options;
-        this.router = router;
-        this.location = location;
         this.titleService = titleService;
         this.mainState.update('headTitle', 'Arianna4View - Timeline');
+        // navigation update
+        this.mainState.updateCustom('currentNav', 'timeline');
+        this.communication.request$('getEventObjects', {
+            params: {},
+            onError: (err) => {
+                console.warn(err);
+                // FIXME: togliere
+                this.one('aw-timeline').update(timelineMock);
+            }
+        }).subscribe((response) => {
+            this.one('aw-timeline').update(response);
+        });
+    }
+    onTimelineClick({ id, label }) {
+        if (isNull(id)) {
+            this.currentId = null;
+            this.clearResults();
+        }
+        else {
+            // loading results
+            this.state$.next('LOADING');
+            this.communication.request$('getEntityDetails', {
+                params: {
+                    entityId: id,
+                }
+            }).subscribe(({ relatedItems }) => {
+                // clear loading
+                this.state$.next('SUCCESS');
+                this.relatedItems = relatedItems;
+                this.total = relatedItems.length;
+                let text = `<strong>${this.total}</strong> Oggetti collegati a<br><span class="aw-multimedia__results-title-big">${label}</span>`;
+                if (this.total === 1) {
+                    text = `<strong>${this.total}</strong> Oggetto collegato a<br><span class="aw-multimedia__results-title-big">${label}</span>`;
+                }
+                this.one('aw-scheda-inner-title').update({
+                    title: {
+                        main: { text }
+                    }
+                });
+                // update items
+                this.updateItems();
+                // update pagination
+                this.updatePagination();
+            });
+        }
+    }
+    clearResults() {
+        if (!this.relatedItems) {
+            return;
+        }
+        // reset
+        this.state$.next('EMPTY');
+        this.pageSize = 10;
+        this.currentPage = 1;
+        this.relatedItems = [];
+        this.total = 0;
         this.one('aw-scheda-inner-title').update({
             title: {
-                main: {
-                    text: '<strong>68</strong> Oggetti culturali collegati a "V Congresso mondiale di sociologia, Washington D.C. (1962)"'
-                }
+                main: { text: '' }
             }
         });
+        this.one('aw-linked-objects').update({ items: [] });
+    }
+    onPaginationChange({ value }) {
+        this.pageSize = +value;
+        this.updateItems();
+        this.updatePagination();
+    }
+    onPaginationClick({ page }) {
+        if (typeof page === 'number' && page !== this.currentPage) {
+            this.currentPage = page;
+            this.updateItems();
+            this.updatePagination();
+        }
+    }
+    updateItems() {
         this.one('aw-linked-objects').updateOptions({
             context: 'map',
             config: this.configuration,
-            page: 1,
-            // pagination: true,
-            // paginationParams: this._getPaginationParams(),
-            // dynamicPagination: {
-            //   total: totalCount,
-            // },
-            size: 10,
+            page: this.currentPage,
+            pagination: true,
+            size: this.pageSize,
         });
-        this.one('aw-linked-objects').update(MAP_RESULTS);
+        this.one('aw-linked-objects').update({ items: this.relatedItems });
+    }
+    updatePagination() {
+        this.one('n7-smart-pagination').updateOptions({
+            mode: 'payload'
+        });
+        this.one('n7-smart-pagination').update({
+            totalPages: Math.ceil(this.total / this.pageSize),
+            currentPage: this.currentPage,
+            pageLimit: 5,
+            sizes: {
+                list: [10, 25, 50],
+                active: this.pageSize,
+            },
+        });
     }
 }
 
@@ -6488,11 +6680,25 @@ class AwTimelineLayoutEH extends EventHandler {
             switch (type) {
                 case 'aw-timeline-layout.init':
                     this.dataSource.onInit(payload);
-                    this.configuration = payload.configuration;
-                    this.route = payload.route;
+                    this.emitOuter('init', payload);
                     break;
                 case 'aw-timeline-layout.destroy':
                     this.destroyed$.next();
+                    break;
+                default:
+                    break;
+            }
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'aw-timeline.click':
+                    this.dataSource.onTimelineClick(payload);
+                    break;
+                case 'n7-smart-pagination.change':
+                    this.dataSource.onPaginationChange(payload);
+                    break;
+                case 'n7-smart-pagination.click':
+                    this.dataSource.onPaginationClick(payload);
                     break;
                 default:
                     break;
@@ -6504,9 +6710,14 @@ class AwTimelineLayoutEH extends EventHandler {
 const AwTimelineLayoutConfig = {
     layoutId: 'aw-timeline-layout',
     widgets: [
-        { id: 'aw-timeline', hasStaticData: true },
+        { id: 'aw-timeline' },
         { id: 'aw-scheda-inner-title' },
-        { id: 'aw-linked-objects' }
+        { id: 'aw-linked-objects' },
+        {
+            id: 'n7-smart-pagination',
+            dataSource: SmartPaginationDS,
+            eventHandler: SmartPaginationEH,
+        }
     ],
     layoutDS: AwTimelineLayoutDS,
     layoutEH: AwTimelineLayoutEH,
@@ -6518,11 +6729,8 @@ const AwTimelineLayoutConfig = {
 };
 
 let AwTimelineLayoutComponent = class AwTimelineLayoutComponent extends AbstractLayout {
-    constructor(router, route, location, configuration, layoutsConfiguration, communication, mainState, titleService) {
+    constructor(configuration, layoutsConfiguration, communication, mainState, titleService) {
         super(layoutsConfiguration.get('AwTimelineLayoutConfig') || AwTimelineLayoutConfig);
-        this.router = router;
-        this.route = route;
-        this.location = location;
         this.configuration = configuration;
         this.layoutsConfiguration = layoutsConfiguration;
         this.communication = communication;
@@ -6538,8 +6746,6 @@ let AwTimelineLayoutComponent = class AwTimelineLayoutComponent extends Abstract
         return {
             configuration: this.configuration,
             mainState: this.mainState,
-            router: this.router,
-            route: this.route,
             titleService: this.titleService,
             communication: this.communication,
             options: this.config.options || {},
@@ -6553,9 +6759,6 @@ let AwTimelineLayoutComponent = class AwTimelineLayoutComponent extends Abstract
     }
 };
 AwTimelineLayoutComponent.ctorParameters = () => [
-    { type: Router },
-    { type: ActivatedRoute },
-    { type: Location },
     { type: ConfigurationService },
     { type: LayoutsConfigurationService },
     { type: CommunicationService },
@@ -6565,12 +6768,9 @@ AwTimelineLayoutComponent.ctorParameters = () => [
 AwTimelineLayoutComponent = __decorate([
     Component({
         selector: 'aw-timeline-layout',
-        template: "<div class=\"aw-map\"\n     id=\"map-layout\"\n     *ngIf=\"lb.dataSource\">\n  <n7-inner-title [data]=\"{\n               title: {\n                    main: {\n                         text: 'Gli eventi dell\\'archivio'\n                    }\n               }\n          }\">\n  </n7-inner-title>\n  <n7-timeline [data]=\"lb.widgets['aw-timeline'].ds.out$ | async\"></n7-timeline>\n  <ng-container *ngTemplateOutlet=\"results\"></ng-container>\n</div>\n\n<ng-template #results>\n  <!-- RESULT LIST -->\n  <ng-container *ngIf=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n    <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n    </n7-inner-title>\n  </ng-container>\n\n  <ng-container *ngIf=\"lb.widgets['aw-linked-objects'].ds.out$ | async\">\n    <div *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n      <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n      </n7-smart-breadcrumbs>\n      <n7-item-preview [data]=\"preview\"\n                       [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n      </n7-item-preview>\n    </div>\n  </ng-container>\n</ng-template>\n"
+        template: "<div class=\"aw-multimedia\" id=\"timeline-layout\" *ngIf=\"lb.dataSource\">\n    <n7-inner-title [data]=\"{\n               title: {\n                    main: {\n                         text: 'Gli eventi dell\\'archivio'\n                    }\n               }\n          }\">\n    </n7-inner-title>\n    \n    <!-- Timeline -->\n    <div class=\"aw-multimedia__timeline\">\n        <n7-timeline [data]=\"lb.widgets['aw-timeline'].ds.out$ | async\"></n7-timeline>\n    </div>\n    <!-- END // Timeline -->\n    \n    <!-- RESULTS -->\n    <div class=\"aw-multimedia__results\">\n        <div class=\"aw-multimedia__loader\" *ngIf=\"(lb.dataSource.state$ | async) === 'LOADING'\">\n            <ng-container>\n                <n7-loader></n7-loader>\n            </ng-container>\n        </div>\n\n        <div class=\"aw-multimedia__empty\" *ngIf=\"(lb.dataSource.state$ | async) === 'EMPTY'\">\n            <ng-container>\n                <p class=\"aw-multimedia__empty-text\">Clicca su un evento della timeline per vedere tutti gli oggetti culturali collegati.</p>\n            </ng-container>\n        </div>\n        \n        <ng-container *ngIf=\"(lb.dataSource.state$ | async) === 'SUCCESS'\">\n            <div class=\"aw-multimedia__results-title\">\n                <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n                </n7-inner-title>\n            </div>\n            <div class=\"aw-multimedia__results-wrapper\">\n                <div>\n                    <div class=\"aw-item-preview-wrapper\" *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                        <n7-smart-breadcrumbs [data]=\"preview.breadcrumbs\">\n                        </n7-smart-breadcrumbs>\n                        <n7-item-preview [data]=\"preview\" [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                        </n7-item-preview>\n                    </div>\n                </div>\n                <n7-smart-pagination *ngIf=\"lb.dataSource.total > 0\"\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </ng-container>\n    </div>\n</div>"
     }),
-    __metadata("design:paramtypes", [Router,
-        ActivatedRoute,
-        Location,
-        ConfigurationService,
+    __metadata("design:paramtypes", [ConfigurationService,
         LayoutsConfigurationService,
         CommunicationService,
         MainStateService,
@@ -7280,6 +7480,42 @@ var apolloConfig = {
           typeOfEntity
         }
       }`,
+    },
+    getMapObjects: {
+        queryName: 'getMapObjects',
+        queryBody: `{
+      getMapObjects{
+        lat
+        lon
+        item {
+          ...on Item {
+              id
+              label
+          }
+          ...on Entity {
+              id
+              label
+          }
+        }
+      }
+    }`,
+    },
+    getEventObjects: {
+        queryName: 'getEventObjects',
+        queryBody: `{
+      getEventObjects{
+        id
+        start
+        end
+        label
+        item {
+          ... on Entity {
+            id
+            label
+          }
+        }
+      }
+    }`,
     },
 };
 
@@ -10799,5 +11035,5 @@ DynamicPathGuard = __decorate([
  * Generated bundle index. Do not edit.
  */
 
-export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, LocalConfigService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrBreadcrumbsDS, MrCollectionDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrFooterService, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrResourceTabsDS, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageTitleDS, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrStaticMetadataDS, MrTextViewerDS, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, N7BoilerplateSandboxModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SbDummyDS, SbDummyEH, SbExampleLayoutComponent, SbExampleLayoutConfig, SbExampleLayoutDS, SbExampleLayoutEH, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrGlossaryLayoutComponent as ɵba, MrHomeLayoutComponent as ɵbb, MrLayoutStateService as ɵbc, MrResourceLayoutComponent as ɵbd, MrSearchFacetsLayoutComponent as ɵbe, MrSearchLayoutComponent as ɵbf, MrSearchService as ɵbg, MrStaticLayoutComponent as ɵbh, ReadMoreComponent as ɵbi, SbExampleLayoutComponent as ɵbj, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, AwGalleryLayoutComponent as ɵl, AwSearchService as ɵm, AwHomeLayoutComponent as ɵn, AwMapLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwSearchLayoutComponent as ɵq, AwTimelineLayoutComponent as ɵr, BubbleChartWrapperComponent as ɵs, ChartTippyComponent as ɵt, SmartBreadcrumbsComponent as ɵu, AwFacetsWrapperComponent as ɵv, DataWidgetWrapperComponent as ɵw, DatepickerWrapperComponent as ɵx, DvExampleLayoutComponent as ɵy, EscapeHtmlPipe as ɵz };
+export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapEH, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineEH, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, LocalConfigService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrBreadcrumbsDS, MrCollectionDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrFooterService, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrResourceTabsDS, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageTitleDS, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrStaticMetadataDS, MrTextViewerDS, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, N7BoilerplateSandboxModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SbDummyDS, SbDummyEH, SbExampleLayoutComponent, SbExampleLayoutConfig, SbExampleLayoutDS, SbExampleLayoutEH, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrGlossaryLayoutComponent as ɵba, MrHomeLayoutComponent as ɵbb, MrLayoutStateService as ɵbc, MrResourceLayoutComponent as ɵbd, MrSearchFacetsLayoutComponent as ɵbe, MrSearchLayoutComponent as ɵbf, MrSearchService as ɵbg, MrStaticLayoutComponent as ɵbh, ReadMoreComponent as ɵbi, SbExampleLayoutComponent as ɵbj, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, AwGalleryLayoutComponent as ɵl, AwSearchService as ɵm, AwHomeLayoutComponent as ɵn, AwMapLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwSearchLayoutComponent as ɵq, AwTimelineLayoutComponent as ɵr, BubbleChartWrapperComponent as ɵs, ChartTippyComponent as ɵt, SmartBreadcrumbsComponent as ɵu, AwFacetsWrapperComponent as ɵv, DataWidgetWrapperComponent as ɵw, DatepickerWrapperComponent as ɵx, DvExampleLayoutComponent as ɵy, EscapeHtmlPipe as ɵz };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

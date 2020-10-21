@@ -39,5 +39,13 @@ declare const _default: {
         queryName: string;
         queryBody: string;
     };
+    getMapObjects: {
+        queryName: string;
+        queryBody: string;
+    };
+    getEventObjects: {
+        queryName: string;
+        queryBody: string;
+    };
 };
 export default _default;

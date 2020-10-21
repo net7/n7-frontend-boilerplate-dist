@@ -1,5 +1,4 @@
 import { OnInit, OnDestroy } from '@angular/core';
-import { Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { AbstractLayout } from '../../../common/models/abstract-layout';
@@ -10,19 +9,17 @@ import { CommunicationService } from '../../../common/services/communication.ser
 export declare class AwEntitaLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private router;
     private route;
-    private location;
     private configuration;
     private layoutsConfiguration;
     private communication;
     private mainState;
     private titleService;
-    constructor(router: Router, route: ActivatedRoute, location: Location, configuration: ConfigurationService, layoutsConfiguration: LayoutsConfigurationService, communication: CommunicationService, mainState: MainStateService, titleService: Title);
+    constructor(router: Router, route: ActivatedRoute, configuration: ConfigurationService, layoutsConfiguration: LayoutsConfigurationService, communication: CommunicationService, mainState: MainStateService, titleService: Title);
     protected initPayload(): {
         configuration: ConfigurationService;
         mainState: MainStateService;
         router: Router;
         route: ActivatedRoute;
-        location: Location;
         titleService: Title;
         communication: CommunicationService;
         options: any;

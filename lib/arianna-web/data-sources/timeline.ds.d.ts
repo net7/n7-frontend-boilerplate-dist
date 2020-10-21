@@ -1,13 +1,23 @@
 import { DataSource } from '@n7-frontend/core';
+import { Subject } from 'rxjs';
 export declare class AwTimelineDS extends DataSource {
+    timeline: any;
+    timelineLoaded$: Subject<void>;
+    dataSet: any;
     protected transform: (data: any) => {
         containerID: string;
         libOptions: {
-            height: string;
+            max: Date;
+            min: Date;
+            start: Date;
+            end: Date;
+            align: string;
+            minHeight: string;
             locale: string;
             cluster: {
-                clusterCriteria: (f: any, s: any) => boolean;
+                titleTemplate: string;
             };
+            showCurrentTime: boolean;
             showTooltips: boolean;
             tooltip: {
                 followMouse: boolean;
@@ -15,23 +25,15 @@ export declare class AwTimelineDS extends DataSource {
                     title: string;
                 }) => string;
             };
-            template: (d: any) => string;
             width: string;
-            minHeight: string;
-            maxHeight: string;
-            zoomFriction: number;
+            zoomMax: number;
+            zoomMin: number;
         };
-        dataSet: ({
-            id: number;
-            content: string;
-            start: string;
-            end?: undefined;
-        } | {
-            id: number;
-            content: string;
-            start: string;
-            end: string;
-        })[];
-        _setInstance: (timeline: any) => any;
+        dataSet: any;
+        _setInstance: (timeline: any) => void;
     };
+    getItemTemplate(datesLabel: any, label: any): string;
+    getMax(): Date;
+    getMin(): Date;
+    getAllDates(): any[];
 }

@@ -4,7 +4,6 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
     protected configuration: any;
     protected mainState: any;
     protected router: any;
-    protected location: any;
     protected titleService: any;
     protected route: any;
     options: any;
@@ -22,12 +21,11 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
     private communication;
     fallbackText: string;
     loading: boolean;
-    onInit({ configuration, mainState, router, route, location, options, titleService, communication, }: {
+    onInit({ configuration, mainState, router, route, options, titleService, communication, }: {
         configuration: any;
         mainState: any;
         router: any;
         route: any;
-        location: any;
         options: any;
         titleService: any;
         communication: any;
