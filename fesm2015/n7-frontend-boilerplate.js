@@ -8356,20 +8356,14 @@ class MrMetadataDS extends DataSource {
                 const itemLabel = label && !hideLabels ? label : null;
                 if (Array.isArray(value)) {
                     result.group.push({
-                        group: [{
-                                title: itemLabel,
-                                items: value.map((childItem) => ({
-                                    label: childItem.label,
-                                    value: this.getItemValue(childItem.value)
-                                }))
-                            }]
+                        group: [Object.assign({ title: _t(itemLabel) }, this.getItemGroup(value))]
                     });
                 }
                 else {
                     result.group.push({
                         group: [{
                                 items: [{
-                                        label: itemLabel,
+                                        label: _t(itemLabel),
                                         value: this.getItemValue(value)
                                     }]
                             }]
@@ -8378,6 +8372,19 @@ class MrMetadataDS extends DataSource {
             });
         });
         return result;
+    }
+    getItemGroup(value) {
+        if (Array.isArray(value) && Array.isArray(value[0])) {
+            return {
+                group: value.map((val) => (Object.assign({}, this.getItemGroup(val))))
+            };
+        }
+        return {
+            items: value.map((childItem) => ({
+                label: _t(childItem.label),
+                value: this.getItemValue(childItem.value)
+            }))
+        };
     }
     getItemValue(value) {
         return this.isUrl.test(value) ? this.toUrl(value) : value;

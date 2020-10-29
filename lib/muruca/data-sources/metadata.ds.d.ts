@@ -5,5 +5,6 @@ export declare class MrMetadataDS extends DataSource {
     /** Turn a string into an anchor element */
     toUrl: (string: string) => string;
     protected transform(data: any): any;
+    private getItemGroup;
     private getItemValue;
 }

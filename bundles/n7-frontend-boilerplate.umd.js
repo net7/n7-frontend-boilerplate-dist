@@ -8722,20 +8722,14 @@
                     var itemLabel = label && !hideLabels ? label : null;
                     if (Array.isArray(value)) {
                         result.group.push({
-                            group: [{
-                                    title: itemLabel,
-                                    items: value.map(function (childItem) { return ({
-                                        label: childItem.label,
-                                        value: _this.getItemValue(childItem.value)
-                                    }); })
-                                }]
+                            group: [__assign({ title: core$1._t(itemLabel) }, _this.getItemGroup(value))]
                         });
                     }
                     else {
                         result.group.push({
                             group: [{
                                     items: [{
-                                            label: itemLabel,
+                                            label: core$1._t(itemLabel),
                                             value: _this.getItemValue(value)
                                         }]
                                 }]
@@ -8744,6 +8738,20 @@
                 });
             });
             return result;
+        };
+        MrMetadataDS.prototype.getItemGroup = function (value) {
+            var _this = this;
+            if (Array.isArray(value) && Array.isArray(value[0])) {
+                return {
+                    group: value.map(function (val) { return (__assign({}, _this.getItemGroup(val))); })
+                };
+            }
+            return {
+                items: value.map(function (childItem) { return ({
+                    label: core$1._t(childItem.label),
+                    value: _this.getItemValue(childItem.value)
+                }); })
+            };
         };
         MrMetadataDS.prototype.getItemValue = function (value) {
             return this.isUrl.test(value) ? this.toUrl(value) : value;
