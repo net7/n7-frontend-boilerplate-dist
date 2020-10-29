@@ -15,8 +15,8 @@ export declare class MrResourceLayoutDS extends LayoutDataSource {
         limit: number;
         label: string;
     };
-    errorTitle: any;
-    errorDescription: any;
+    errorTitle: string;
+    errorDescription: string;
     onInit(payload: any): void;
     /** Request the configured widgets data */
     pageRequest$(id: any, onError: (err: any) => void): Observable<any>;

@@ -6,8 +6,8 @@ export declare class MrStaticLayoutDS extends LayoutDataSource {
     private mainState;
     content: string | null;
     title: string | null;
-    errorTitle: any;
-    errorDescription: any;
+    errorTitle: string;
+    errorDescription: string;
     onInit(payload: any): void;
     pageRequest$(slug: string, onError: (err: any) => void): Observable<any>;
     handleResponse(response: any): void;

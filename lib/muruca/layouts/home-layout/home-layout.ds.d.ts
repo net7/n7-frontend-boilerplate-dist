@@ -6,8 +6,8 @@ export declare class MrHomeLayoutDS extends LayoutDataSource {
     private layoutState;
     private configId;
     private pageConfig;
-    errorTitle: any;
-    errorDescription: any;
+    errorTitle: string;
+    errorDescription: string;
     onInit(payload: any): void;
     doRequest(): void;
     initSections(response: any): void;
