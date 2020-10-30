@@ -14,9 +14,6 @@ export declare class AwTimelineDS extends DataSource {
             align: string;
             minHeight: string;
             locale: string;
-            cluster: {
-                titleTemplate: string;
-            };
             showCurrentTime: boolean;
             showTooltips: boolean;
             tooltip: {

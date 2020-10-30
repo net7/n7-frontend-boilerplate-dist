@@ -3991,7 +3991,7 @@
     }(core$1.DataSource));
 
     var ONE_YEAR = 31557600000;
-    var YEARS_MARGIN = 100;
+    var YEARS_MARGIN = 30;
     var AwTimelineDS = /** @class */ (function (_super) {
         __extends(AwTimelineDS, _super);
         function AwTimelineDS() {
@@ -4021,11 +4021,11 @@
                         minHeight: '100px',
                         // height: '100px',
                         locale: 'it_IT',
-                        cluster: {
-                            // fitOnDoubleClick: true,
-                            // clusterCriteria: (f, s) => f.content.charAt(0) === s.content.charAt(0),
-                            titleTemplate: '{count} eventi',
-                        },
+                        // cluster: {
+                        // fitOnDoubleClick: true,
+                        // clusterCriteria: (f, s) => f.content.charAt(0) === s.content.charAt(0),
+                        //   titleTemplate: '{count} eventi',
+                        // },
                         showCurrentTime: false,
                         showTooltips: false,
                         tooltip: {

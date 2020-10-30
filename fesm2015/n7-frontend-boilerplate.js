@@ -3460,7 +3460,7 @@ class AwMapDS extends DataSource {
 }
 
 const ONE_YEAR = 31557600000;
-const YEARS_MARGIN = 100;
+const YEARS_MARGIN = 30;
 class AwTimelineDS extends DataSource {
     constructor() {
         super(...arguments);
@@ -3486,11 +3486,11 @@ class AwTimelineDS extends DataSource {
                     minHeight: '100px',
                     // height: '100px',
                     locale: 'it_IT',
-                    cluster: {
-                        // fitOnDoubleClick: true,
-                        // clusterCriteria: (f, s) => f.content.charAt(0) === s.content.charAt(0),
-                        titleTemplate: '{count} eventi',
-                    },
+                    // cluster: {
+                    // fitOnDoubleClick: true,
+                    // clusterCriteria: (f, s) => f.content.charAt(0) === s.content.charAt(0),
+                    //   titleTemplate: '{count} eventi',
+                    // },
                     showCurrentTime: false,
                     showTooltips: false,
                     tooltip: {
