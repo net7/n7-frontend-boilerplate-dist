@@ -11350,7 +11350,7 @@
         ReadMoreComponent = __decorate([
             core.Component({
                 selector: 'mr-read-more',
-                template: "<div class=\"mr-read-more {{this.state}}\"\n     *ngIf=\"data\"\n     #root>\n     <!-- Child component -->\n     <ng-content class=\"content\"></ng-content>\n     <div [hidden]=\"!collapsed.value\"\n          (click)=\"handleToggle()\">\n          {{ data.label }}\n     </div>\n</div>\n"
+                template: "<div class=\"mr-read-more {{this.state}}\"\n     *ngIf=\"data\"\n     #root>\n     <!-- Child component -->\n     <ng-content class=\"content\"></ng-content>\n     <div [hidden]=\"!collapsed.value\"\n          (click)=\"handleToggle()\"\n          class=\"mr-read-more__btn\">\n          <span class=\"n7-icon-plus\"></span>\n          {{ data.label }}\n     </div>\n</div>\n"
             })
         ], ReadMoreComponent);
         return ReadMoreComponent;
