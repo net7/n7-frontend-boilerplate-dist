@@ -22,3 +22,7 @@ export * from './resource-layout/resource-layout';
 export * from './resource-layout/resource-layout.ds';
 export * from './resource-layout/resource-layout.eh';
 export * from './resource-layout/resource-layout.config';
+export * from './advanced-search-layout/advanced-search-layout';
+export * from './advanced-search-layout/advanced-search-layout.ds';
+export * from './advanced-search-layout/advanced-search-layout.eh';
+export * from './advanced-search-layout/advanced-search-layout.config';

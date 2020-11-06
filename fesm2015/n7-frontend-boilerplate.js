@@ -1,5 +1,5 @@
 import { __decorate, __param, __metadata } from 'tslib';
-import { ɵɵdefineInjectable, Injectable, Inject, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef, ApplicationInitStatus, Pipe } from '@angular/core';
+import { ɵɵdefineInjectable, Injectable, Inject, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef, ApplicationInitStatus, Pipe, ContentChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK } from '@n7-frontend/components';
@@ -7,12 +7,10 @@ import { ReplaySubject, empty, Subject, of, merge, fromEvent, BehaviorSubject, f
 import { map, catchError, takeUntil, filter, tap, mapTo, debounceTime, switchMap, first, withLatestFrom, delay } from 'rxjs/operators';
 import { NavigationStart, Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Title, DomSanitizer } from '@angular/platform-browser';
-import { LayoutBuilder, EventHandler, DataSource, LayoutDataSource as LayoutDataSource$1, _t, translate } from '@n7-frontend/core';
-import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
+import { LayoutBuilder, LayoutDataSource, EventHandler, DataSource, _t, translate } from '@n7-frontend/core';
 import tippy, { hideAll } from 'tippy.js';
-import { isEmpty, get, max, min, cloneDeep, isNull, merge as merge$1, xor } from 'lodash';
+import { isEmpty, get, max, min, cloneDeep, isNull, xor, merge as merge$1 } from 'lodash';
 import slugify from 'slugify';
-import { DataSource as DataSource$1 } from '@n7-frontend/core/dist/data-source';
 import { icon, LatLngBounds, markerClusterGroup, marker } from 'leaflet';
 import * as moment from 'moment';
 
@@ -1197,7 +1195,7 @@ class SmartPaginationDS extends DataSource {
         };
     }
     transform(data) {
-        const { totalPages, currentPage, pageLimit, sizes, } = data;
+        const { totalPages, currentPage, pageLimit, sizes } = data;
         const { mode, href, queryParams } = this.options;
         // ===== WARNINGS =====
         if (!['href', 'payload'].includes(mode)) {
@@ -1211,7 +1209,7 @@ class SmartPaginationDS extends DataSource {
             last,
             links,
             select: sizes ? {
-                label: 'Numero di risultati',
+                label: sizes.label || 'Numero di risultati',
                 options: sizes.list.map((s) => ({
                     text: s,
                     selected: s === sizes.active,
@@ -2171,7 +2169,7 @@ class AwLinkedObjectsDS extends DataSource {
     }
 }
 
-class AwAutocompleteWrapperDS extends DataSource$1 {
+class AwAutocompleteWrapperDS extends DataSource {
     constructor() {
         super(...arguments);
         this.stringTrim = (string, limit) => {
@@ -2714,7 +2712,7 @@ class AwEntitaMetadataViewerDS extends DataSource {
     }
 }
 
-class AwTreeDS extends DataSource$1 {
+class AwTreeDS extends DataSource {
     constructor() {
         super(...arguments);
         this.transform = (data) => data;
@@ -7962,1309 +7960,13 @@ N7BoilerplateDataVizModule = __decorate([
     })
 ], N7BoilerplateDataVizModule);
 
-let EscapeHtmlPipe = class EscapeHtmlPipe {
-    constructor(sanitizer) {
-        this.sanitizer = sanitizer;
-    }
-    transform(content) {
-        return this.sanitizer.bypassSecurityTrustHtml(content);
-    }
-};
-EscapeHtmlPipe.ctorParameters = () => [
-    { type: DomSanitizer }
-];
-EscapeHtmlPipe = __decorate([
-    Pipe({ name: 'keepHtml', pure: false }),
-    __metadata("design:paramtypes", [DomSanitizer])
-], EscapeHtmlPipe);
-
-class MrGlossaryLayoutDS extends LayoutDataSource$1 {
-    // private communication;
-    onInit() {
-        // this.communication = payload.communication;
-    }
-}
-
-class MrGlossaryLayoutEH extends EventHandler {
-    listen() {
-        this.innerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case 'mr-glossary-layout.init':
-                    this.dataSource.onInit(payload);
-                    break;
-                default:
-                    console.warn('unhandled inner event of type', type);
-                    break;
-            }
-        });
-        /*
-          this.outerEvents$.subscribe(({ type, payload }) => {
-          });
-        */
-    }
-}
-
-class MrBreadcrumbsDS extends DataSource {
-    transform(data) {
-        let items = [];
-        if (Array.isArray(data) && data.length) {
-            let { base } = this.options || {};
-            base = Array.isArray(base) ? base : [];
-            items = [
-                ...base.map(({ link, title }) => ({
-                    label: _t(title),
-                    anchor: { href: link }
-                })),
-                ...data.map(({ link, title }) => ({
-                    label: title,
-                    anchor: { href: link }
-                }))
-            ];
-        }
-        // remove last link
-        if (items.length) {
-            items[items.length - 1].anchor = null;
-        }
-        return { items };
-    }
-}
-
-const extractQueryParams = (queryParams) => {
-    const params = {};
-    queryParams.split('&').forEach((param) => {
-        const [key, value] = param.split('=');
-        params[key] = value;
-    });
-    return params;
-};
-const ɵ0$1 = extractQueryParams;
-var linksHelper = {
-    getQueryParams(href) {
-        const queryParams = href.split('?')[1] ? extractQueryParams(href.split('?')[1]) : null;
-        return this.isExternalLink(href) ? null : queryParams;
-    },
-    getRouterLink(href) {
-        return this.isExternalLink(href) ? href : href.split('?')[0];
-    },
-    isExternalLink(href) {
-        return /^http(?:s)?:\/{2}\S+$/.test(href);
-    }
-};
-
-const ITEM_PREVIEW_DEFAULTS = {
-    limit: 100,
-    striptags: true
-};
-class MrCollectionDS extends DataSource {
-    transform(data) {
-        if (data === undefined) {
-            return null;
-        }
-        const { header, items } = data;
-        // items check
-        if (Array.isArray(items) && !items.length) {
-            return null;
-        }
-        const { classes, itemPreview } = this.options;
-        const itemPreviewOptions = merge$1(ITEM_PREVIEW_DEFAULTS, (itemPreview || {}));
-        if ((header || {}).button) {
-            const { link, text } = header.button;
-            header.button = [{
-                    text,
-                    anchor: {
-                        href: linksHelper.getRouterLink(link),
-                        queryParams: linksHelper.getQueryParams(link)
-                    }
-                }];
-        }
-        return {
-            header: {
-                title: {
-                    main: {
-                        text: header.title,
-                        classes: 'bold'
-                    },
-                    secondary: header.subtitle ? {
-                        text: header.subtitle,
-                    } : null
-                },
-                actions: {
-                    buttons: header.button
-                }
-            },
-            items: items.map((item) => {
-                if (item.text) {
-                    // Sanitize HTML tags from the text content
-                    if (itemPreviewOptions.striptags) {
-                        item.text = helpers.striptags(item.text);
-                    }
-                    // Limit the length of the item preview text content
-                    if (itemPreviewOptions.limit && (item.text.length > itemPreviewOptions.limit)) {
-                        item.text = `${item.text.substring(0, itemPreviewOptions.limit)}...`;
-                    }
-                }
-                return Object.assign(Object.assign({}, item), { anchor: {
-                        href: linksHelper.getRouterLink(item.link),
-                        queryParams: linksHelper.getQueryParams(item.link)
-                    }, classes: classes || '' });
-            })
-        };
-    }
-}
-
-class MrFiltersDS extends DataSource {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    transform(data) {
-        return data;
-    }
-}
-
-class MrHeroDS extends DataSource {
-    transform(data) {
-        const { classes, background } = this.options;
-        const { text, image, title, button } = data;
-        const backgroundImage = background ? image : null;
-        return {
-            text,
-            title,
-            classes,
-            backgroundImage,
-            image: !backgroundImage ? image : null,
-            button: button && button.link ? Object.assign(Object.assign({}, button), { anchor: {
-                    href: linksHelper.getRouterLink(button.link),
-                    queryParams: linksHelper.getQueryParams(button.link)
-                } }) : null
-        };
-    }
-}
-
-class MrImageViewerDS extends DataSource {
-    transform(data) {
-        const { images, thumbs } = data;
-        return {
-            images,
-            thumbs,
-            viewerId: this.id,
-            libOptions: {
-                /* SHOW GROUP */
-                showNavigator: false,
-                autoHideControls: false,
-                /* SHOW BUTTONS */
-                showRotationControl: false,
-                showSequenceControl: true,
-                showHomeControl: true,
-                showZoomControl: true,
-                /* SEQUENCE */
-                sequenceMode: true,
-                showReferenceStrip: true,
-                navigationControlAnchor: 'TOP_RIGHT',
-            },
-            _setViewer(viewer) {
-                this.viewer = viewer;
-            }
-        };
-    }
-}
-
-class MrInfoBoxDS extends DataSource {
-    transform(data) {
-        return data;
-    }
-}
-
-class MrInnerTitleDS extends DataSource {
-    transform(data) {
-        const { title, description, button } = data;
-        return {
-            title: {
-                main: {
-                    text: title,
-                    classes: 'bold'
-                },
-                secondary: {
-                    text: description,
-                    classes: 'italic'
-                }
-            },
-            actions: button && button.link ? {
-                buttons: [
-                    {
-                        anchor: {
-                            href: linksHelper.getRouterLink(button.link),
-                            queryParams: linksHelper.getQueryParams(button.link)
-                        },
-                        text: button.text,
-                        classes: 'n7-btn-cta'
-                    }
-                ]
-            } : null
-        };
-    }
-}
-
-const ITEM_PREVIEW_DEFAULTS$1 = {
-    limit: 100,
-    striptags: true
-};
-class MrItemPreviewDS extends DataSource {
-    transform(data) {
-        const { classes, itemPreview } = this.options;
-        const itemPreviewOptions = merge$1(ITEM_PREVIEW_DEFAULTS$1, (itemPreview || {}));
-        // striptags
-        if (itemPreviewOptions.striptags) {
-            data.text = helpers.striptags(data.text);
-        }
-        // limit
-        if (itemPreviewOptions.limit && (data.text.length > itemPreviewOptions.limit)) {
-            data.text = `${data.text.substring(0, itemPreviewOptions.limit)}...`;
-        }
-        return Object.assign(Object.assign({}, data), { anchor: {
-                href: linksHelper.getRouterLink(data.link),
-                queryParams: linksHelper.getQueryParams(data.link)
-            }, classes: classes || '' });
-    }
-}
-
-class MrItemPreviewsDS extends DataSource {
-    constructor() {
-        super(...arguments);
-        // ===== MOCK DATA =====
-        this.mock = {
-            resources: [
-                {
-                    image: 'https://i.imgur.com/8bNcgR6.png',
-                    title: 'Unattributed version',
-                    text: 'A japanese colored version',
-                    metadata: [{
-                            classes: 'metadata',
-                            items: [
-                                { label: 'Artista', value: 'Massimo Berruti' },
-                                { label: 'Tecnica', value: 'Fotografia' },
-                                { label: 'Galleria', value: 'Galleria Tonelli' },
-                            ]
-                        }]
-                }, {
-                    image: 'https://i.imgur.com/52UFqca.png',
-                    title: 'Yudi Shanhai Quantu',
-                    text: 'Complete Map of all mountains and seas',
-                }, {
-                    image: 'https://i.imgur.com/sLu7u2v.png',
-                    title: 'Reconstruction of D\'Elia\'s map',
-                    text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
-                    metadata: [{
-                            classes: 'metadata',
-                            items: [
-                                { label: 'Artista', value: 'Massimo Berruti' },
-                                { label: 'Tecnica', value: 'Fotografia' },
-                                { label: 'Galleria', value: 'Galleria Tonelli' },
-                            ]
-                        }]
-                }, {
-                    image: 'https://i.imgur.com/8bNcgR6.png',
-                    title: 'Unattributed version',
-                    text: 'A japanese colored version',
-                }
-            ],
-            collections: [
-                {
-                    image: 'https://i.imgur.com/8bNcgR6.png',
-                    title: 'Unattributed version',
-                    text: 'A japanese colored version',
-                }, {
-                    image: 'https://i.imgur.com/52UFqca.png',
-                    title: 'Yudi Shanhai Quantu',
-                    text: 'Complete Map of all mountains and seas',
-                }, {
-                    image: 'https://i.imgur.com/sLu7u2v.png',
-                    title: 'Reconstruction of D\'Elia\'s map',
-                    text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
-                }
-            ],
-            search: [
-                {
-                    image: 'https://i.imgur.com/52UFqca.png',
-                    title: 'Yudi Shanhai Quantu',
-                    text: 'Complete Map of all mountains and seas',
-                }, {
-                    image: 'https://i.imgur.com/52UFqca.png',
-                    title: 'World Map based on Matteo Ricci 1850',
-                    text: 'Complete Map fo all mountains and seas',
-                }, {
-                    image: '',
-                    title: 'Reconstruction of D\'Elia\'s map',
-                    text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
-                }, {
-                    image: '',
-                    title: 'Unattributed version',
-                    text: 'A japanese colored version',
-                }, {
-                    image: '',
-                    title: 'Matteo Ricci\'s way from Macau to Beijing',
-                    text: 'A japanese colored version',
-                }, {
-                    image: '',
-                    title: 'The 400-year-old map that shows China as the centre of the world',
-                    text: 'A japanese colored version',
-                }, {
-                    image: 'https://i.imgur.com/52UFqca.png',
-                    title: 'Yudi Shanhai Quantu',
-                    text: 'Complete Map of all mountains and seas',
-                }, {
-                    image: 'https://i.imgur.com/52UFqca.png',
-                    title: 'World Map based on Matteo Ricci 1850',
-                    text: 'Complete Map fo all mountains and seas',
-                }, {
-                    image: '',
-                    title: 'Reconstruction of D\'Elia\'s map',
-                    text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
-                }, {
-                    image: '',
-                    title: 'Unattributed version',
-                    text: 'A japanese colored version',
-                }, {
-                    image: '',
-                    title: 'Matteo Ricci\'s way from Macau to Beijing',
-                    text: 'A japanese colored version',
-                }, {
-                    image: '',
-                    title: 'The 400-year-old map that shows China as the centre of the world',
-                    text: 'A japanese colored version',
-                }
-            ]
-        };
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    transform(data) {
-        return this.mock[this.options.source];
-    }
-}
-
-class MrMetadataDS extends DataSource {
-    constructor() {
-        super(...arguments);
-        /** Test if a string is a valid URL */
-        this.isUrl = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/;
-        /** Turn a string into an anchor element */
-        this.toUrl = (string) => `<a href="${string}" target="_blank">${string}<a>`;
-    }
-    transform(data) {
-        const { hideLabels } = this.options;
-        const { group } = data;
-        const result = { group: [] };
-        group.forEach(({ items }) => {
-            items.forEach(({ label, value }) => {
-                const itemLabel = label && !hideLabels ? label : null;
-                if (Array.isArray(value)) {
-                    result.group.push({
-                        group: [Object.assign({ title: _t(itemLabel) }, this.getItemGroup(value))]
-                    });
-                }
-                else {
-                    result.group.push({
-                        group: [{
-                                items: [{
-                                        label: _t(itemLabel),
-                                        value: this.getItemValue(value)
-                                    }]
-                            }]
-                    });
-                }
-            });
-        });
-        return result;
-    }
-    getItemGroup(value) {
-        if (Array.isArray(value) && Array.isArray(value[0])) {
-            return {
-                group: value.map((val) => (Object.assign({}, this.getItemGroup(val))))
-            };
-        }
-        return {
-            items: value.map((childItem) => ({
-                label: _t(childItem.label),
-                value: this.getItemValue(childItem.value)
-            }))
-        };
-    }
-    getItemValue(value) {
-        return this.isUrl.test(value) ? this.toUrl(value) : value;
-    }
-}
-
-class MrNavDS extends DataSource {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    transform(data) {
-        const items = [];
-        data.nav.forEach((el) => {
-            items.push({
-                text: el.title,
-                anchor: {
-                    href: `http://localhost:4200/mr/static/${el.id}`,
-                    target: '_blank',
-                    payload: el.id
-                }
-            });
-        });
-        return {
-            items,
-        };
-    }
-}
-
-class MrTextViewerDS extends DataSource {
-    transform(data) {
-        return data;
-    }
-}
-
-class MrResourceTabsDS extends DataSource {
-    transform(data) {
-        const { currentTab, root, slug, id: resourceId } = this.options;
-        return data.map(({ id, label }) => ({
-            label: _t(label),
-            classes: currentTab === id ? 'is-active' : '',
-            anchor: {
-                href: `/${root}/${resourceId}/${slug}/${id}`
-            }
-        }));
-    }
-}
-
-class MrContentDS extends DataSource {
-    transform(data) {
-        return data;
-    }
-}
-
-class MrSearchPageTitleDS extends DataSource {
-    transform() {
-        const { title } = this.options.config;
-        return {
-            title: {
-                main: {
-                    text: _t(title)
-                }
-            }
-        };
-    }
-}
-
-class MrSearchResultsTitleDS extends DataSource {
-    transform(data) {
-        const { totalResultsText, sort } = this.options.config;
-        const { total_count: totalCount, sort: currentSort } = data;
-        const mainText = _t(totalResultsText, { total: totalCount }, (key, { total }) => {
-            if (total === 0) {
-                return `${key}_0`;
-            }
-            if (total === 1) {
-                return `${key}_1`;
-            }
-            return key;
-        });
-        return {
-            title: {
-                main: {
-                    text: mainText
-                }
-            },
-            actions: {
-                select: {
-                    label: sort.label,
-                    options: sort.options.map(({ label, value, selected, disabled }) => ({
-                        value,
-                        disabled,
-                        selected: currentSort ? value === currentSort : selected,
-                        text: label
-                    })),
-                    payload: 'sort'
-                }
-            }
-        };
-    }
-    OnInputQueryChange(value) {
-        const { sort } = this.options.config;
-        sort.options.forEach((option) => {
-            if (option.value === '_score') {
-                option.disabled = !value;
-            }
-        });
-        this.update(this.input);
-    }
-}
-
-const ITEM_PREVIEW_DEFAULTS$2 = {
-    limit: 100,
-    striptags: true
-};
-class MrSearchResultsDS extends DataSource {
-    transform(data) {
-        const { results } = data;
-        const { itemPreview } = this.options.config;
-        const itemPreviewOptions = merge$1(ITEM_PREVIEW_DEFAULTS$2, (itemPreview || {}));
-        return results.map((item) => {
-            // striptags
-            if (itemPreviewOptions.striptags) {
-                item.text = helpers.striptags(item.text);
-            }
-            // limit
-            if (itemPreviewOptions.limit && (item.text.length > itemPreviewOptions.limit)) {
-                item.text = `${item.text.substring(0, itemPreviewOptions.limit)}...`;
-            }
-            return Object.assign(Object.assign({}, item), { classes: itemPreviewOptions.classes, anchor: {
-                    href: linksHelper.getRouterLink(item.link),
-                    queryParams: linksHelper.getQueryParams(item.link),
-                    target: '_blank'
-                } });
-        });
-    }
-}
-
-class MrSearchTagsDS extends DataSource {
-    constructor() {
-        super(...arguments);
-        this.hasFilters = false;
-    }
-    transform(data) {
-        const { state, linksResponse, facetsConfig } = data;
-        const { facets } = linksResponse;
-        const tags = [];
-        // inputs config
-        facetsConfig.sections.forEach(({ inputs }) => {
-            inputs
-                .filter(({ queryParam }) => queryParam)
-                .forEach(({ id }) => {
-                if (state[id]) {
-                    const values = Array.isArray(state[id]) ? state[id] : [state[id]];
-                    values
-                        .forEach((value) => {
-                        let text = value;
-                        if (facets[id]) {
-                            const selectedFacet = facets[id].values.find(({ payload }) => payload === value);
-                            if (selectedFacet) {
-                                text = selectedFacet.text;
-                            }
-                        }
-                        tags.push({
-                            text,
-                            icon: 'n7-icon-close',
-                            payload: {
-                                id,
-                                value
-                            }
-                        });
-                    });
-                }
-            });
-        });
-        this.hasFilters = !!tags.length;
-        return tags;
-    }
-}
-
-var dateHelper = {
-    format(date, format) {
-        return moment(date).format(format);
-    }
-};
-
-class MrStaticMetadataDS extends DataSource {
-    transform(data) {
-        const items = ['authors', 'date', 'time_to_read']
-            .filter((metakey) => data[metakey])
-            .map((metakey) => {
-            const itemValue = metakey === 'date' ? dateHelper.format(data[metakey], _t('global#date_human')) : data[metakey];
-            return {
-                label: _t(`resource#${metakey}`),
-                value: itemValue
-            };
-        });
-        return { group: [{ items }] };
-    }
-}
-
-var DS$3 = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    MrBreadcrumbsDS: MrBreadcrumbsDS,
-    MrCollectionDS: MrCollectionDS,
-    MrFiltersDS: MrFiltersDS,
-    MrHeroDS: MrHeroDS,
-    MrImageViewerDS: MrImageViewerDS,
-    MrInfoBoxDS: MrInfoBoxDS,
-    MrInnerTitleDS: MrInnerTitleDS,
-    MrItemPreviewDS: MrItemPreviewDS,
-    MrItemPreviewsDS: MrItemPreviewsDS,
-    MrMetadataDS: MrMetadataDS,
-    MrNavDS: MrNavDS,
-    MrTextViewerDS: MrTextViewerDS,
-    MrResourceTabsDS: MrResourceTabsDS,
-    MrContentDS: MrContentDS,
-    MrSearchPageTitleDS: MrSearchPageTitleDS,
-    MrSearchResultsTitleDS: MrSearchResultsTitleDS,
-    MrSearchResultsDS: MrSearchResultsDS,
-    MrSearchTagsDS: MrSearchTagsDS,
-    MrStaticMetadataDS: MrStaticMetadataDS
-});
-
-class MrDummyEH extends EventHandler {
-    listen() {
-        // TODO
-    }
-}
-
-class MrFiltersEH extends EventHandler {
-    listen() {
-        // TODO
-    }
-}
-
-class MrNavEH extends EventHandler {
-    listen() {
-        this.innerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case 'dv-nav.click':
-                    this.emitOuter('navclick', payload);
-                    break;
-                default:
-                    console.warn('unhandled event of type', type);
-                    break;
-            }
-        });
-    }
-}
-
-class MrSearchTagsEH extends EventHandler {
-    listen() {
-        this.innerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case 'mr-search-tags.click':
-                    this.emitOuter('click', payload);
-                    break;
-                default:
-                    break;
-            }
-        });
-    }
-}
-
-class MrSearchResultsTitleEH extends EventHandler {
-    listen() {
-        this.innerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case 'mr-search-results-title.change':
-                    this.emitOuter('change', payload);
-                    break;
-                default:
-                    break;
-            }
-        });
-        this.outerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case 'mr-search-layout.inputquerychange':
-                    this.dataSource.OnInputQueryChange(payload);
-                    break;
-                default:
-                    break;
-            }
-        });
-    }
-}
-
-var EH$3 = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    MrDummyEH: MrDummyEH,
-    MrFiltersEH: MrFiltersEH,
-    MrNavEH: MrNavEH,
-    MrSearchTagsEH: MrSearchTagsEH,
-    MrSearchResultsTitleEH: MrSearchResultsTitleEH
-});
-
-const MrGlossaryLayoutConfig = {
-    layoutId: 'n7-glossary-layout',
-    widgets: [
-    // {
-    //   id: 'title',          ← Insert a component here.
-    //   hasStaticData: true,  ← Renders the widget before this.one().update is called.
-    // }
-    ],
-    layoutDS: MrGlossaryLayoutDS,
-    layoutEH: MrGlossaryLayoutEH,
-    widgetsDataSources: DS$3,
-    widgetsEventHandlers: EH$3,
-    layoutOptions: {}
-};
-
-let MrGlossaryLayoutComponent = class MrGlossaryLayoutComponent extends AbstractLayout {
-    constructor(layoutsConfiguration) {
-        super(layoutsConfiguration.get('MrGlossaryLayoutConfig') || MrGlossaryLayoutConfig);
-    }
-    initPayload() {
-        return {
-            options: this.config.options || {}
-        };
-    }
-    ngOnInit() {
-        this.onInit();
-    }
-    ngOnDestroy() {
-        this.onDestroy();
-    }
-};
-MrGlossaryLayoutComponent.ctorParameters = () => [
-    { type: LayoutsConfigurationService }
-];
-MrGlossaryLayoutComponent = __decorate([
-    Component({
-        selector: 'mr-glossary-layout',
-        template: "<div class=\"glossary-layout\" *ngIf=\"lb.dataSource\">\n    Hello, from Glossary layout!\n</div>\n"
-    }),
-    __metadata("design:paramtypes", [LayoutsConfigurationService])
-], MrGlossaryLayoutComponent);
-
-var LayoutState;
-(function (LayoutState) {
-    LayoutState["IDLE"] = "IDLE";
-    LayoutState["LOADING"] = "LOADING";
-    LayoutState["SUCCESS"] = "SUCCESS";
-    LayoutState["EMPTY"] = "EMPTY";
-    LayoutState["ERROR"] = "ERROR";
-})(LayoutState || (LayoutState = {}));
-let MrLayoutStateService = class MrLayoutStateService {
-    constructor() {
-        this.stateContainers = {};
-    }
-    add(id) {
-        const ids = Array.isArray(id) ? id : [id];
-        ids.forEach((key) => {
-            this.stateContainers[key] = new ReplaySubject();
-            // initial state
-            this.stateContainers[key].next(LayoutState.IDLE);
-        });
-    }
-    get$(id) {
-        if (!this.stateContainers[id]) {
-            throw Error(`Layout state id '${id}' does not exists`);
-        }
-        return this.stateContainers[id];
-    }
-    set(id, newState) {
-        if (!this.stateContainers[id]) {
-            throw Error(`Layout state id '${id}' does not exists`);
-        }
-        this.stateContainers[id].next(newState);
-    }
-};
-MrLayoutStateService = __decorate([
-    Injectable()
-], MrLayoutStateService);
-
-class MrHomeLayoutDS extends LayoutDataSource$1 {
-    constructor() {
-        super(...arguments);
-        this.errorTitle = _t('global#layout_error_title');
-        this.errorDescription = _t('global#layout_error_description');
-    }
-    onInit(payload) {
-        this.configuration = payload.configuration;
-        this.communication = payload.communication;
-        this.mainState = payload.mainState;
-        this.layoutState = payload.layoutState;
-        this.configId = payload.configId;
-        this.pageConfig = this.configuration.get(this.configId) || {};
-        this.doRequest();
-        // update head title
-        this.updateHeadTitle();
-    }
-    doRequest() {
-        const { sections } = this.pageConfig;
-        if (!isEmpty(sections)) {
-            this.layoutState.set('content', LayoutState.LOADING);
-            this.communication.request$('home', {
-                method: 'POST',
-                params: sections.map(({ id }) => id),
-                onError: (err) => {
-                    console.warn(`Error loading ${this.configId} sections`, err.message);
-                    this.layoutState.set('content', LayoutState.ERROR);
-                }
-            }).subscribe((response) => {
-                this.layoutState.set('content', LayoutState.SUCCESS);
-                this.initSections(response);
-            });
-        }
-        else {
-            console.warn(`There are no sections configured for ${this.configId} layout`);
-        }
-    }
-    initSections(response) {
-        const { sections } = this.pageConfig;
-        if (sections) {
-            sections.forEach(({ id }) => {
-                const widgetDataSource = this.getWidgetDataSource(id);
-                const responseData = response[id];
-                // set id
-                widgetDataSource.id = id;
-                // update data
-                if (responseData) {
-                    this.one(id).update(responseData);
-                }
-            });
-        }
-    }
-    updateHeadTitle() {
-        const appName = this.configuration.get('name');
-        const pageTitle = this.pageConfig.title;
-        this.mainState.update('headTitle', [appName, pageTitle].join(' > '));
-    }
-}
-
-class MrHomeLayoutEH extends EventHandler {
-    listen() {
-        this.innerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case 'mr-home-layout.init':
-                    this.dataSource.onInit(payload);
-                    break;
-                default:
-                    break;
-            }
-        });
-        this.outerEvents$.subscribe(({ type }) => {
-            switch (type) {
-                default:
-                    break;
-            }
-        });
-    }
-}
-
-const MrHomeLayoutConfig = {
-    layoutId: 'mr-home-layout',
-    widgets: [],
-    layoutDS: MrHomeLayoutDS,
-    layoutEH: MrHomeLayoutEH,
-    widgetsDataSources: DS$3,
-    widgetsEventHandlers: EH$3,
-    options: {
-    // TODO
-    },
-};
-
-class MrSliderDS extends DataSource {
-    transform(data) {
-        return data;
-    }
-}
-
-class MrSliderEH extends EventHandler {
-    listen() {
-        // this.innerEvents$.subscribe(({ type, payload }) => {
-        //   switch (type) {
-        //     case `${this.dataSource.id}.<event-type>`:
-        //       // TODO
-        //       break;
-        //     default:
-        //       break;
-        //   }
-        // });
-    }
-}
-
-class MrCollectionEH extends EventHandler {
-    listen() {
-        // this.innerEvents$.subscribe(({ type, payload }) => {
-        //   switch (type) {
-        //     case `${this.dataSource.id}.<event-type>`:
-        //       // TODO
-        //       break;
-        //     default:
-        //       break;
-        //   }
-        // });
-    }
-}
-
-class MrHeroEH extends EventHandler {
-    listen() {
-        // this.innerEvents$.subscribe(({ type, payload }) => {
-        //   switch (type) {
-        //     case `${this.dataSource.id}.<event-type>`:
-        //       // TODO
-        //       break;
-        //     default:
-        //       break;
-        //   }
-        // });
-    }
-}
-
-const DATASOURCE_MAP = {
-    slider: MrSliderDS,
-    collection: MrCollectionDS,
-    hero: MrHeroDS,
-    content: MrContentDS,
-};
-const EVENTHANDLER_MAP = {
-    slider: MrSliderEH,
-    collection: MrCollectionEH,
-    hero: MrHeroEH,
-};
-let MrHomeLayoutComponent = class MrHomeLayoutComponent extends AbstractLayout {
-    constructor(layoutsConfiguration, activatedRoute, configuration, communication, mainState, layoutState) {
-        super(layoutsConfiguration.get('MrHomeLayoutConfig') || MrHomeLayoutConfig);
-        this.activatedRoute = activatedRoute;
-        this.configuration = configuration;
-        this.communication = communication;
-        this.mainState = mainState;
-        this.layoutState = layoutState;
-    }
-    initPayload() {
-        return {
-            configId: this.configId,
-            mainState: this.mainState,
-            configuration: this.configuration,
-            communication: this.communication,
-            layoutState: this.layoutState,
-            options: this.config.options || {}
-        };
-    }
-    ngOnInit() {
-        this.activatedRoute.data.subscribe((data) => {
-            this.configId = data.configId;
-            this.layoutState.add('content');
-            this.loadWidgets();
-            this.onInit();
-        });
-    }
-    ngOnDestroy() {
-        this.onDestroy();
-    }
-    loadWidgets() {
-        const homeConfig = this.configuration.get(this.configId) || {};
-        const { sections } = homeConfig;
-        this.widgets = [];
-        if (sections) {
-            sections.forEach(({ id, type, options }) => {
-                this.widgets.push({
-                    id,
-                    options,
-                    dataSource: DATASOURCE_MAP[type],
-                    eventHandler: EVENTHANDLER_MAP[type]
-                });
-            });
-        }
-    }
-};
-MrHomeLayoutComponent.ctorParameters = () => [
-    { type: LayoutsConfigurationService },
-    { type: ActivatedRoute },
-    { type: ConfigurationService },
-    { type: CommunicationService },
-    { type: MainStateService },
-    { type: MrLayoutStateService }
-];
-MrHomeLayoutComponent = __decorate([
-    Component({
-        selector: 'mr-home-layout',
-        template: "<div class=\"mr-home mr-layout\"\n     *ngIf=\"lb.dataSource\"\n     [ngClass]=\"{\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\n      }\">\n    <!-- HOME CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            <div class=\"mr-layout__loader\">\n                <n7-loader></n7-loader>\n            </div>\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            <div class=\"mr-layout__error\">\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\n                <p>{{ lb.dataSource.errorDescription }}</p>\n            </div>\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <section *ngFor=\"let section of lb.dataSource.pageConfig.sections\" class=\"{{ 'mr-layout__' + section.type }}\">\n                <ng-container [ngSwitch]=\"section.type\">\n        \n                    <!-- SLIDER -->\n                    <ng-container *ngSwitchCase=\"'slider'\">\n                        <n7-carousel \n                        [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-carousel> \n                    </ng-container>\n        \n                    <!-- COLLECTION -->\n                    <ng-container *ngSwitchCase=\"'collection'\">\n                        <div class=\"mr-layout__maxwidth mr-items-preview\">\n                            <n7-inner-title \n                            [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                            [emit]=\"lb.widgets[section.id].emit\">\n                            </n7-inner-title>\n                            <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                                <n7-item-preview\n                                *ngFor=\"let item of (lb.widgets[section.id].ds.out$ | async)?.items\"\n                                [data]=\"item\"\n                                [emit]=\"lb.widgets[section.id].emit\">\n                                </n7-item-preview>\n                            </div>\n                        </div>\n                    </ng-container>\n        \n                    <!-- HERO -->\n                    <ng-container *ngSwitchCase=\"'hero'\">\n                        <n7-hero \n                        [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-hero> \n                    </ng-container>\n        \n                    <!-- CONTENT -->\n                    <ng-container *ngSwitchCase=\"'content'\">\n                        <div [innerHTML]=\"lb.widgets[section.id].ds.out$ | async\"></div>\n                    </ng-container>\n                \n                </ng-container>\n            </section>\n        </ng-container>\n\n    </ng-container>\n</div>\n"
-    }),
-    __metadata("design:paramtypes", [LayoutsConfigurationService,
-        ActivatedRoute,
-        ConfigurationService,
-        CommunicationService,
-        MainStateService,
-        MrLayoutStateService])
-], MrHomeLayoutComponent);
-
-class MrResourceLayoutDS extends LayoutDataSource$1 {
-    constructor() {
-        super(...arguments);
-        /** Stores "max height" for the read-more-wrapper from configuration */
-        this.readMoreConfig = {
-            limit: 130,
-            label: _t('readmore#label')
-        };
-        this.errorTitle = _t('global#layout_error_title');
-        this.errorDescription = _t('global#layout_error_description');
-    }
-    onInit(payload) {
-        this.configuration = payload.configuration;
-        this.communication = payload.communication;
-        this.mainState = payload.mainState;
-        this.configId = payload.configId;
-        this.pageConfig = this.configuration.get(this.configId);
-        this.tabConfig = this.configuration.get('tabs')[this.pageConfig.tabs];
-        this.readMoreConfig.limit = this.configuration.get(this.configId).maxHeight;
-        // add translations
-        ['top', 'content'].forEach((type) => {
-            this.pageConfig.sections[type] = this.pageConfig.sections[type].map((section) => (Object.assign(Object.assign({}, section), { title: _t(section.title) })));
-        });
-    }
-    /** Request the configured widgets data */
-    pageRequest$(id, onError) {
-        const { top, content } = this.pageConfig.sections;
-        const sections = top.concat(content);
-        return this.communication.request$('resource', {
-            onError,
-            method: 'POST',
-            params: {
-                id,
-                type: this.pageConfig.type,
-                sections: sections.map((s) => s.id),
-            }
-        });
-    }
-    handleResponse(response) {
-        this.initSections(response);
-        this.updateHeadTitle(response);
-    }
-    /** Load all the configured widgets */
-    initSections(response) {
-        const { top, content } = this.pageConfig.sections;
-        const sections = top.concat(content);
-        sections.forEach(({ id }) => {
-            const widgetDataSource = this.getWidgetDataSource(id);
-            if (!widgetDataSource)
-                return;
-            const responseSection = response.sections[id];
-            // set id
-            widgetDataSource.id = id;
-            // update data
-            if (responseSection) {
-                this.one(id).update(responseSection);
-            }
-        });
-        // update tabs
-        if (this.tabConfig) {
-            const tabSection = sections.find(({ type }) => type === 'tabs');
-            this.one(tabSection.id).updateOptions({
-                id: this.id,
-                root: this.pageConfig.tabs,
-                slug: this.slug,
-                currentTab: this.tab
-            });
-            this.one(tabSection.id).update(this.tabConfig);
-        }
-    }
-    updateHeadTitle({ title: resourceTitle }) {
-        const appName = this.configuration.get('name');
-        const pageTitle = this.pageConfig.title;
-        this.mainState.update('headTitle', [appName, _t(pageTitle), resourceTitle].join(' > '));
-    }
-}
-
-class MrResourceLayoutEH extends EventHandler {
-    constructor() {
-        super(...arguments);
-        this.destroy$ = new Subject();
-    }
-    listen() {
-        this.innerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case 'mr-resource-layout.init':
-                    {
-                        this.route = payload.route;
-                        const { slug, id } = this.route.snapshot.params;
-                        const { url } = this.route.snapshot;
-                        this.dataSource.tab = url[url.length - 1].path;
-                        this.dataSource.slug = slug;
-                        this.dataSource.id = id;
-                        this.layoutState = payload.layoutState;
-                        this.dataSource.onInit(payload);
-                        this.listenRoute();
-                    }
-                    break;
-                case 'mr-resource-layout.destroy':
-                    this.destroy$.next();
-                    break;
-                default:
-                    console.warn('unhandled inner event of type', type);
-                    break;
-            }
-        });
-    }
-    listenRoute() {
-        this.route.paramMap.pipe(takeUntil(this.destroy$), tap(() => {
-            this.layoutState.set('content', LayoutState.LOADING);
-        }), map((params) => params.get('id')), switchMap((id) => this.dataSource.pageRequest$(id, (err) => {
-            console.warn(`Error loading resource layout for ${id}`, err.message);
-            this.dataSource.id = id;
-            this.layoutState.set('content', LayoutState.ERROR);
-        }))).subscribe((response) => {
-            this.layoutState.set('content', LayoutState.SUCCESS);
-            this.dataSource.handleResponse(response);
-        });
-    }
-}
-
-const MrResourceLayoutConfig = {
-    layoutId: 'mr-resource-layout',
-    widgets: [
-        { id: 'mr-read-more' }
-    ],
-    layoutDS: MrResourceLayoutDS,
-    layoutEH: MrResourceLayoutEH,
-    widgetsDataSources: DS$3,
-    widgetsEventHandlers: EH$3,
-    options: {
-    // TODO
-    },
-};
-
-class MrImageViewerEH extends EventHandler {
-    listen() {
-        // this.innerEvents$.subscribe(({ type, payload }) => {
-        //   switch (type) {
-        //     case `${this.dataSource.id}.<event-type>`:
-        //       // TODO
-        //       break;
-        //     default:
-        //       break;
-        //   }
-        // });
-    }
-}
-
-const DATASOURCE_MAP$1 = {
-    breadcrumbs: MrBreadcrumbsDS,
-    collection: MrCollectionDS,
-    info: MrInfoBoxDS,
-    metadata: MrMetadataDS,
-    preview: MrItemPreviewDS,
-    text: MrTextViewerDS,
-    title: MrInnerTitleDS,
-    viewer: MrImageViewerDS,
-    tabs: MrResourceTabsDS
-};
-const EVENTHANDLER_MAP$1 = {
-    viewer: MrImageViewerEH,
-};
-let MrResourceLayoutComponent = class MrResourceLayoutComponent extends AbstractLayout {
-    constructor(layoutsConfiguration, activatedRoute, configuration, communication, mainState, route, layoutState) {
-        super(layoutsConfiguration.get('MrResourceLayoutConfig') || MrResourceLayoutConfig);
-        this.activatedRoute = activatedRoute;
-        this.configuration = configuration;
-        this.communication = communication;
-        this.mainState = mainState;
-        this.route = route;
-        this.layoutState = layoutState;
-    }
-    initPayload() {
-        return {
-            configId: this.configId,
-            configuration: this.configuration,
-            communication: this.communication,
-            mainState: this.mainState,
-            layoutState: this.layoutState,
-            options: this.config.options || {},
-            route: this.route
-        };
-    }
-    ngOnInit() {
-        this.activatedRoute.data.subscribe((data) => {
-            this.layoutState.add('content');
-            this.configId = data.configId;
-            this.loadWidgets();
-            this.onInit();
-        });
-    }
-    ngOnDestroy() {
-        this.onDestroy();
-    }
-    loadWidgets() {
-        const { top, content } = this.configuration.get(this.configId).sections;
-        const sections = top.concat(content);
-        this.widgets = [];
-        if (sections) {
-            sections.forEach(({ id, type, options }) => {
-                this.widgets.push({
-                    id,
-                    options,
-                    dataSource: DATASOURCE_MAP$1[type],
-                    eventHandler: EVENTHANDLER_MAP$1[type]
-                });
-            });
-        }
-    }
-};
-MrResourceLayoutComponent.ctorParameters = () => [
-    { type: LayoutsConfigurationService },
-    { type: ActivatedRoute },
-    { type: ConfigurationService },
-    { type: CommunicationService },
-    { type: MainStateService },
-    { type: ActivatedRoute },
-    { type: MrLayoutStateService }
-];
-MrResourceLayoutComponent = __decorate([
-    Component({
-        selector: 'mr-resource-layout',
-        template: "<div class=\"mr-resource mr-layout\" \n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\"\n     [ngClass]=\"{\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\n      }\">\n    <!-- RESOURCE LAYOUT CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            <div class=\"mr-layout__loader\">\n                <n7-loader></n7-loader>\n            </div>\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            <div class=\"mr-layout__error\">\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\n                <p>{{ lb.dataSource.errorDescription }}</p>\n            </div>\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <ng-container *ngIf=\"lb.dataSource.pageConfig.sections as sections\">\n                <!-- Pass the list of blocks to render to the block template -->\n                <div class=\"mr-resource__top\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\n                </div>\n                <div class=\"mr-resource__content mr-side-margin\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\n                </div>\n            </ng-container>\n        </ng-container>\n\n    </ng-container>\n</div>\n\n<ng-template #blocks let-list>\n    <ng-container *ngFor=\"let section of list\">\n        <section *ngIf=\"lb.widgets[section.id].ds.out$ | async\"\n        class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\n            <ng-container [ngSwitch]=\"section.type\">\n    \n                <!-- TABS -->\n                <ng-container *ngSwitchCase=\"'tabs'\">\n                    <ng-container *ngFor=\"let tab of lb.widgets[section.id].ds.out$ | async\">\n                        <n7-anchor-wrapper [data]=\"tab.anchor\" [classes]=\"tab.classes\">\n                            <span class=\"mr-resource__tabs-item\">{{ tab.label }}</span>\n                        </n7-anchor-wrapper>\n                    </ng-container>\n                </ng-container>\n    \n                <!-- INNER TITLE -->\n                <ng-container *ngSwitchCase=\"'title'\">\n                    <div class=\"mr-resource__title-content mr-side-margin\">\n                        <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                            [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-inner-title>\n                    </div>\n                </ng-container>\n    \n                <!-- IMAGE VIEWER -->\n                <ng-container *ngSwitchCase=\"'viewer'\">\n                    <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-image-viewer>\n                </ng-container>\n    \n                <!-- METADATA VIEWER -->\n                <ng-container *ngSwitchCase=\"'metadata'\">\n                    <div class=\"mr-resource__metadata-content\">\n                        <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__metadata-title\">\n                            {{ section.title }}\n                        </h3>\n                        <mr-read-more [data]=\"lb.dataSource.readMoreConfig\">\n                            <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                                [emit]=\"lb.widgets[section.id].emit\">\n                            </n7-metadata-viewer>\n                        </mr-read-more>\n                    </div>\n                </ng-container>\n    \n                <!-- COLLECTION -->\n                <ng-container *ngSwitchCase=\"'collection'\">\n                    <ng-container *ngIf=\"lb.widgets[section.id].ds.out$ | async as collection$\">\n                        <div *ngIf=\"collection$.items?.length > 0\" class=\"mr-resource__collection-content\">\n                            <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title\">\n                                {{ section.title }}\n                            </h3>\n                            <div class=\"mr-resource__collection-grid {{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                                <n7-item-preview *ngFor=\"let item of collection$?.items\"\n                                    [data]=\"item\" [emit]=\"lb.widgets[section.id].emit\">\n                                </n7-item-preview>\n                            </div>\n                        </div>\n                    </ng-container>\n                </ng-container>\n    \n                <!-- ITEM PREVIEW -->\n                <ng-container *ngSwitchCase=\"'preview'\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__preview-title\">\n                        {{ section.title }}\n                    </h3>\n                    <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-item-preview>\n                </ng-container>\n    \n                <!-- TEXT VIEWER -->\n                <ng-container *ngSwitchCase=\"'text-viewer'\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__text-viewer-title\">\n                        {{ section.title }}\n                    </h3>\n                    <div class=\"text-viewer__mock\">n7-text-viewer</div>\n                </ng-container>\n    \n                <!-- INFO BOX -->\n                <ng-container *ngSwitchCase=\"'info-box'\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__info-box-title\">\n                        {{ section.title }}\n                    </h3>\n                    <div class=\"info-box__mock\">info-box</div>\n                </ng-container>\n    \n                <!-- BREADCRUMBS -->\n                <ng-container *ngSwitchCase=\"'breadcrumbs'\">\n                    <n7-breadcrumbs [data]=\"lb.widgets[section.id].ds.out$ | async\">\n                    </n7-breadcrumbs>\n                </ng-container>\n            </ng-container>\n        </section>\n    </ng-container>\n</ng-template>\n"
-    }),
-    __metadata("design:paramtypes", [LayoutsConfigurationService,
-        ActivatedRoute,
-        ConfigurationService,
-        CommunicationService,
-        MainStateService,
-        ActivatedRoute,
-        MrLayoutStateService])
-], MrResourceLayoutComponent);
-
-class SearchFacetsLayoutDS extends LayoutDataSource$1 {
-    constructor() {
-        super(...arguments);
-        this.inputsDS = {};
-    }
-    onInit(payload) {
-        this.searchService = payload.searchService;
-        this.searchConfig = this.searchService.getConfig();
-        this.facets = this.searchConfig.facets;
-        this.initInputs();
-    }
-    initInputs() {
-        // set components data
-        this.facets.sections.forEach(({ header, inputs }) => {
-            [header, ...inputs]
-                .filter((input) => input)
-                .forEach((input) => {
-                // set id
-                const widgetDataSource = this.getWidgetDataSource(input.id);
-                widgetDataSource.id = input.id;
-                // caching DS for next updates
-                this.inputsDS[input.id] = widgetDataSource;
-                // first update
-                widgetDataSource.update(input.data);
-            });
-        });
-    }
-    updateInputValue(id, newValue) {
-        const ds = this.inputsDS[id];
-        ds.setValue(newValue, ds.value !== newValue);
-    }
-    updateInputData(id, newData) {
-        const ds = this.inputsDS[id];
-        ds.update(Object.assign(Object.assign({}, ds.input), newData));
-        // refresh selected
-        ds.setValue(ds.value, true);
-    }
-    clearInput(id) {
-        const ds = this.inputsDS[id];
-        ds.clear();
-        ds.setValue(ds.value, true);
-    }
-    clearInputs() {
-        Object.keys(this.inputsDS).forEach((id) => {
-            this.clearInput(id);
-        });
-    }
-}
-
 const hasValue = (value) => {
     if (Array.isArray(value)) {
         return value.length > 0;
     }
     return !!value;
 };
-const ɵ0$2 = hasValue;
+const ɵ0$1 = hasValue;
 var searchHelper = {
     stateToQueryParams(state, schemas) {
         const queryParams = {};
@@ -9738,6 +8440,1365 @@ MrSearchService = __decorate([
         CommunicationService])
 ], MrSearchService);
 
+var LayoutState;
+(function (LayoutState) {
+    LayoutState["IDLE"] = "IDLE";
+    LayoutState["LOADING"] = "LOADING";
+    LayoutState["SUCCESS"] = "SUCCESS";
+    LayoutState["EMPTY"] = "EMPTY";
+    LayoutState["ERROR"] = "ERROR";
+})(LayoutState || (LayoutState = {}));
+let MrLayoutStateService = class MrLayoutStateService {
+    constructor() {
+        this.stateContainers = {};
+    }
+    add(id) {
+        const ids = Array.isArray(id) ? id : [id];
+        ids.forEach((key) => {
+            this.stateContainers[key] = new ReplaySubject();
+            // initial state
+            this.stateContainers[key].next(LayoutState.IDLE);
+        });
+    }
+    get$(id) {
+        if (!this.stateContainers[id]) {
+            throw Error(`Layout state id '${id}' does not exists`);
+        }
+        return this.stateContainers[id];
+    }
+    set(id, newState) {
+        if (!this.stateContainers[id]) {
+            throw Error(`Layout state id '${id}' does not exists`);
+        }
+        this.stateContainers[id].next(newState);
+    }
+};
+MrLayoutStateService = __decorate([
+    Injectable()
+], MrLayoutStateService);
+
+let EscapeHtmlPipe = class EscapeHtmlPipe {
+    constructor(sanitizer) {
+        this.sanitizer = sanitizer;
+    }
+    transform(content) {
+        return this.sanitizer.bypassSecurityTrustHtml(content);
+    }
+};
+EscapeHtmlPipe.ctorParameters = () => [
+    { type: DomSanitizer }
+];
+EscapeHtmlPipe = __decorate([
+    Pipe({ name: 'keepHtml', pure: false }),
+    __metadata("design:paramtypes", [DomSanitizer])
+], EscapeHtmlPipe);
+
+class MrGlossaryLayoutDS extends LayoutDataSource {
+    // private communication;
+    onInit() {
+        // this.communication = payload.communication;
+    }
+}
+
+class MrGlossaryLayoutEH extends EventHandler {
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'mr-glossary-layout.init':
+                    this.dataSource.onInit(payload);
+                    break;
+                default:
+                    console.warn('unhandled inner event of type', type);
+                    break;
+            }
+        });
+        /*
+          this.outerEvents$.subscribe(({ type, payload }) => {
+          });
+        */
+    }
+}
+
+class MrBreadcrumbsDS extends DataSource {
+    transform(data) {
+        let items = [];
+        if (Array.isArray(data) && data.length) {
+            let { base } = this.options || {};
+            base = Array.isArray(base) ? base : [];
+            items = [
+                ...base.map(({ link, title }) => ({
+                    label: _t(title),
+                    anchor: { href: link }
+                })),
+                ...data.map(({ link, title }) => ({
+                    label: title,
+                    anchor: { href: link }
+                }))
+            ];
+        }
+        // remove last link
+        if (items.length) {
+            items[items.length - 1].anchor = null;
+        }
+        return { items };
+    }
+}
+
+const extractQueryParams = (queryParams) => {
+    const params = {};
+    queryParams.split('&').forEach((param) => {
+        const [key, value] = param.split('=');
+        params[key] = value;
+    });
+    return params;
+};
+const ɵ0$2 = extractQueryParams;
+var linksHelper = {
+    getQueryParams(href) {
+        const queryParams = href.split('?')[1] ? extractQueryParams(href.split('?')[1]) : null;
+        return this.isExternalLink(href) ? null : queryParams;
+    },
+    getRouterLink(href) {
+        return this.isExternalLink(href) ? href : href.split('?')[0];
+    },
+    isExternalLink(href) {
+        return /^http(?:s)?:\/{2}\S+$/.test(href);
+    }
+};
+
+const ITEM_PREVIEW_DEFAULTS = {
+    limit: 100,
+    striptags: true
+};
+class MrCollectionDS extends DataSource {
+    transform(data) {
+        if (data === undefined) {
+            return null;
+        }
+        const { header, items } = data;
+        // items check
+        if (Array.isArray(items) && !items.length) {
+            return null;
+        }
+        const { classes, itemPreview } = this.options;
+        const itemPreviewOptions = merge$1(ITEM_PREVIEW_DEFAULTS, (itemPreview || {}));
+        if ((header || {}).button) {
+            const { link, text } = header.button;
+            header.button = [{
+                    text,
+                    anchor: {
+                        href: linksHelper.getRouterLink(link),
+                        queryParams: linksHelper.getQueryParams(link)
+                    }
+                }];
+        }
+        return {
+            header: {
+                title: {
+                    main: {
+                        text: header.title,
+                        classes: 'bold'
+                    },
+                    secondary: header.subtitle ? {
+                        text: header.subtitle,
+                    } : null
+                },
+                actions: {
+                    buttons: header.button
+                }
+            },
+            items: items.map((item) => {
+                if (item.text) {
+                    // Sanitize HTML tags from the text content
+                    if (itemPreviewOptions.striptags) {
+                        item.text = helpers.striptags(item.text);
+                    }
+                    // Limit the length of the item preview text content
+                    if (itemPreviewOptions.limit && (item.text.length > itemPreviewOptions.limit)) {
+                        item.text = `${item.text.substring(0, itemPreviewOptions.limit)}...`;
+                    }
+                }
+                return Object.assign(Object.assign({}, item), { anchor: {
+                        href: linksHelper.getRouterLink(item.link),
+                        queryParams: linksHelper.getQueryParams(item.link)
+                    }, classes: classes || '' });
+            })
+        };
+    }
+}
+
+class MrFiltersDS extends DataSource {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    transform(data) {
+        return data;
+    }
+}
+
+class MrHeroDS extends DataSource {
+    transform(data) {
+        const { classes, background } = this.options;
+        const { text, image, title, button } = data;
+        const backgroundImage = background ? image : null;
+        return {
+            text,
+            title,
+            classes,
+            backgroundImage,
+            image: !backgroundImage ? image : null,
+            button: button && button.link ? Object.assign(Object.assign({}, button), { anchor: {
+                    href: linksHelper.getRouterLink(button.link),
+                    queryParams: linksHelper.getQueryParams(button.link)
+                } }) : null
+        };
+    }
+}
+
+class MrImageViewerDS extends DataSource {
+    transform(data) {
+        const { images, thumbs } = data;
+        return {
+            images,
+            thumbs,
+            viewerId: this.id,
+            libOptions: {
+                /* SHOW GROUP */
+                showNavigator: false,
+                autoHideControls: false,
+                /* SHOW BUTTONS */
+                showRotationControl: false,
+                showSequenceControl: true,
+                showHomeControl: true,
+                showZoomControl: true,
+                /* SEQUENCE */
+                sequenceMode: true,
+                showReferenceStrip: true,
+                navigationControlAnchor: 'TOP_RIGHT',
+            },
+            _setViewer(viewer) {
+                this.viewer = viewer;
+            }
+        };
+    }
+}
+
+class MrInfoBoxDS extends DataSource {
+    transform(data) {
+        return data;
+    }
+}
+
+class MrInnerTitleDS extends DataSource {
+    transform(data) {
+        const { title, description, button } = data;
+        return {
+            title: {
+                main: {
+                    text: title,
+                    classes: 'bold'
+                },
+                secondary: {
+                    text: description,
+                    classes: 'italic'
+                }
+            },
+            actions: button && button.link ? {
+                buttons: [
+                    {
+                        anchor: {
+                            href: linksHelper.getRouterLink(button.link),
+                            queryParams: linksHelper.getQueryParams(button.link)
+                        },
+                        text: button.text,
+                        classes: 'n7-btn-cta'
+                    }
+                ]
+            } : null
+        };
+    }
+}
+
+const ITEM_PREVIEW_DEFAULTS$1 = {
+    limit: 100,
+    striptags: true
+};
+class MrItemPreviewDS extends DataSource {
+    transform(data) {
+        const { classes, itemPreview } = this.options;
+        const itemPreviewOptions = merge$1(ITEM_PREVIEW_DEFAULTS$1, (itemPreview || {}));
+        // striptags
+        if (itemPreviewOptions.striptags) {
+            data.text = helpers.striptags(data.text);
+        }
+        // limit
+        if (itemPreviewOptions.limit && (data.text.length > itemPreviewOptions.limit)) {
+            data.text = `${data.text.substring(0, itemPreviewOptions.limit)}...`;
+        }
+        return Object.assign(Object.assign({}, data), { anchor: {
+                href: linksHelper.getRouterLink(data.link),
+                queryParams: linksHelper.getQueryParams(data.link)
+            }, classes: classes || '' });
+    }
+}
+
+class MrItemPreviewsDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        // ===== MOCK DATA =====
+        this.mock = {
+            resources: [
+                {
+                    image: 'https://i.imgur.com/8bNcgR6.png',
+                    title: 'Unattributed version',
+                    text: 'A japanese colored version',
+                    metadata: [{
+                            classes: 'metadata',
+                            items: [
+                                { label: 'Artista', value: 'Massimo Berruti' },
+                                { label: 'Tecnica', value: 'Fotografia' },
+                                { label: 'Galleria', value: 'Galleria Tonelli' },
+                            ]
+                        }]
+                }, {
+                    image: 'https://i.imgur.com/52UFqca.png',
+                    title: 'Yudi Shanhai Quantu',
+                    text: 'Complete Map of all mountains and seas',
+                }, {
+                    image: 'https://i.imgur.com/sLu7u2v.png',
+                    title: 'Reconstruction of D\'Elia\'s map',
+                    text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
+                    metadata: [{
+                            classes: 'metadata',
+                            items: [
+                                { label: 'Artista', value: 'Massimo Berruti' },
+                                { label: 'Tecnica', value: 'Fotografia' },
+                                { label: 'Galleria', value: 'Galleria Tonelli' },
+                            ]
+                        }]
+                }, {
+                    image: 'https://i.imgur.com/8bNcgR6.png',
+                    title: 'Unattributed version',
+                    text: 'A japanese colored version',
+                }
+            ],
+            collections: [
+                {
+                    image: 'https://i.imgur.com/8bNcgR6.png',
+                    title: 'Unattributed version',
+                    text: 'A japanese colored version',
+                }, {
+                    image: 'https://i.imgur.com/52UFqca.png',
+                    title: 'Yudi Shanhai Quantu',
+                    text: 'Complete Map of all mountains and seas',
+                }, {
+                    image: 'https://i.imgur.com/sLu7u2v.png',
+                    title: 'Reconstruction of D\'Elia\'s map',
+                    text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
+                }
+            ],
+            search: [
+                {
+                    image: 'https://i.imgur.com/52UFqca.png',
+                    title: 'Yudi Shanhai Quantu',
+                    text: 'Complete Map of all mountains and seas',
+                }, {
+                    image: 'https://i.imgur.com/52UFqca.png',
+                    title: 'World Map based on Matteo Ricci 1850',
+                    text: 'Complete Map fo all mountains and seas',
+                }, {
+                    image: '',
+                    title: 'Reconstruction of D\'Elia\'s map',
+                    text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
+                }, {
+                    image: '',
+                    title: 'Unattributed version',
+                    text: 'A japanese colored version',
+                }, {
+                    image: '',
+                    title: 'Matteo Ricci\'s way from Macau to Beijing',
+                    text: 'A japanese colored version',
+                }, {
+                    image: '',
+                    title: 'The 400-year-old map that shows China as the centre of the world',
+                    text: 'A japanese colored version',
+                }, {
+                    image: 'https://i.imgur.com/52UFqca.png',
+                    title: 'Yudi Shanhai Quantu',
+                    text: 'Complete Map of all mountains and seas',
+                }, {
+                    image: 'https://i.imgur.com/52UFqca.png',
+                    title: 'World Map based on Matteo Ricci 1850',
+                    text: 'Complete Map fo all mountains and seas',
+                }, {
+                    image: '',
+                    title: 'Reconstruction of D\'Elia\'s map',
+                    text: 'A digital collage of the map portions from Pasquale D\'Elia "mappamondo"',
+                }, {
+                    image: '',
+                    title: 'Unattributed version',
+                    text: 'A japanese colored version',
+                }, {
+                    image: '',
+                    title: 'Matteo Ricci\'s way from Macau to Beijing',
+                    text: 'A japanese colored version',
+                }, {
+                    image: '',
+                    title: 'The 400-year-old map that shows China as the centre of the world',
+                    text: 'A japanese colored version',
+                }
+            ]
+        };
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    transform(data) {
+        return this.mock[this.options.source];
+    }
+}
+
+class MrMetadataDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        /** Test if a string is a valid URL */
+        this.isUrl = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/;
+        /** Turn a string into an anchor element */
+        this.toUrl = (string) => `<a href="${string}" target="_blank">${string}<a>`;
+    }
+    transform(data) {
+        const { hideLabels } = this.options;
+        const { group } = data;
+        if (!(group || []).length) {
+            return null;
+        }
+        const result = { group: [] };
+        group.forEach(({ items }) => {
+            items.forEach(({ label, value }) => {
+                const itemLabel = label && !hideLabels ? label : null;
+                if (Array.isArray(value)) {
+                    result.group.push({
+                        group: [Object.assign({ title: _t(itemLabel) }, this.getItemGroup(value))]
+                    });
+                }
+                else {
+                    result.group.push({
+                        group: [{
+                                items: [{
+                                        label: _t(itemLabel),
+                                        value: this.getItemValue(value)
+                                    }]
+                            }]
+                    });
+                }
+            });
+        });
+        return result;
+    }
+    getItemGroup(value) {
+        if (Array.isArray(value) && Array.isArray(value[0])) {
+            return {
+                group: value.map((val) => (Object.assign({}, this.getItemGroup(val))))
+            };
+        }
+        return {
+            items: value.map((childItem) => ({
+                label: _t(childItem.label),
+                value: this.getItemValue(childItem.value)
+            }))
+        };
+    }
+    getItemValue(value) {
+        return this.isUrl.test(value) ? this.toUrl(value) : value;
+    }
+}
+
+class MrNavDS extends DataSource {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    transform(data) {
+        const items = [];
+        data.nav.forEach((el) => {
+            items.push({
+                text: el.title,
+                anchor: {
+                    href: `http://localhost:4200/mr/static/${el.id}`,
+                    target: '_blank',
+                    payload: el.id
+                }
+            });
+        });
+        return {
+            items,
+        };
+    }
+}
+
+class MrTextViewerDS extends DataSource {
+    transform(data) {
+        return data;
+    }
+}
+
+class MrResourceTabsDS extends DataSource {
+    transform(data) {
+        const { currentTab, root, slug, id: resourceId } = this.options;
+        return data.map(({ id, label }) => ({
+            label: _t(label),
+            classes: currentTab === id ? 'is-active' : '',
+            anchor: {
+                href: `/${root}/${resourceId}/${slug}/${id}`
+            }
+        }));
+    }
+}
+
+class MrContentDS extends DataSource {
+    transform(data) {
+        return data;
+    }
+}
+
+class MrSearchPageTitleDS extends DataSource {
+    transform() {
+        const { title } = this.options.config;
+        return {
+            title: {
+                main: {
+                    text: _t(title)
+                }
+            }
+        };
+    }
+}
+
+class MrSearchResultsTitleDS extends DataSource {
+    transform(data) {
+        const { totalResultsText, sort } = this.options.config;
+        const { total_count: totalCount, sort: currentSort } = data;
+        const mainText = _t(totalResultsText, { total: totalCount }, (key, { total }) => {
+            if (total === 0) {
+                return `${key}_0`;
+            }
+            if (total === 1) {
+                return `${key}_1`;
+            }
+            return key;
+        });
+        return {
+            title: {
+                main: {
+                    text: mainText
+                }
+            },
+            actions: {
+                select: {
+                    label: sort.label,
+                    options: sort.options.map(({ label, value, selected, disabled }) => ({
+                        value,
+                        disabled,
+                        selected: currentSort ? value === currentSort : selected,
+                        text: label
+                    })),
+                    payload: 'sort'
+                }
+            }
+        };
+    }
+    OnInputQueryChange(value) {
+        const { sort } = this.options.config;
+        sort.options.forEach((option) => {
+            if (option.value === '_score') {
+                option.disabled = !value;
+            }
+        });
+        this.update(this.input);
+    }
+}
+
+const ITEM_PREVIEW_DEFAULTS$2 = {
+    limit: 100,
+    striptags: true
+};
+class MrSearchResultsDS extends DataSource {
+    transform(data) {
+        const { results } = data;
+        const { itemPreview } = this.options.config;
+        const itemPreviewOptions = merge$1(ITEM_PREVIEW_DEFAULTS$2, (itemPreview || {}));
+        return results.map((item) => {
+            // striptags
+            if (itemPreviewOptions.striptags) {
+                item.text = helpers.striptags(item.text);
+            }
+            // limit
+            if (itemPreviewOptions.limit && (item.text.length > itemPreviewOptions.limit)) {
+                item.text = `${item.text.substring(0, itemPreviewOptions.limit)}...`;
+            }
+            // metadata
+            const metadata = [];
+            if (Array.isArray(item.metadata)) {
+                item.metadata.forEach((group) => {
+                    const items = [];
+                    (group.items || []).forEach((metadataItem) => {
+                        items.push(Object.assign(Object.assign({}, metadataItem), { label: _t(metadataItem.label) }));
+                    });
+                    metadata.push({ items });
+                });
+            }
+            return Object.assign(Object.assign({}, item), { metadata, classes: itemPreviewOptions.classes, anchor: {
+                    href: linksHelper.getRouterLink(item.link),
+                    queryParams: linksHelper.getQueryParams(item.link),
+                    target: '_blank'
+                } });
+        });
+    }
+}
+
+class MrSearchTagsDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.hasFilters = false;
+    }
+    transform(data) {
+        const { state, linksResponse, facetsConfig } = data;
+        const { facets } = linksResponse;
+        const tags = [];
+        // inputs config
+        facetsConfig.sections.forEach(({ inputs }) => {
+            inputs
+                .filter(({ queryParam }) => queryParam)
+                .forEach(({ id }) => {
+                if (state[id]) {
+                    const values = Array.isArray(state[id]) ? state[id] : [state[id]];
+                    values
+                        .forEach((value) => {
+                        let text = value;
+                        if (facets[id]) {
+                            const selectedFacet = facets[id].values.find(({ payload }) => payload === value);
+                            if (selectedFacet) {
+                                text = selectedFacet.text;
+                            }
+                        }
+                        tags.push({
+                            text,
+                            icon: 'n7-icon-close',
+                            payload: {
+                                id,
+                                value
+                            }
+                        });
+                    });
+                }
+            });
+        });
+        this.hasFilters = !!tags.length;
+        return tags;
+    }
+}
+
+var dateHelper = {
+    format(date, format) {
+        return moment(date).format(format);
+    }
+};
+
+class MrStaticMetadataDS extends DataSource {
+    transform(data) {
+        const items = ['authors', 'date', 'time_to_read']
+            .filter((metakey) => data[metakey])
+            .map((metakey) => {
+            const itemValue = metakey === 'date' ? dateHelper.format(data[metakey], _t('global#date_human')) : data[metakey];
+            return {
+                label: _t(`resource#${metakey}`),
+                value: itemValue
+            };
+        });
+        return { group: [{ items }] };
+    }
+}
+
+const ICON_OPEN = 'n7-icon-angle-up';
+const ICON_CLOSE = 'n7-icon-angle-down';
+class MrFormWrapperAccordionDS extends DataSource {
+    transform(data) {
+        const { form } = data;
+        const { groups } = form.config;
+        // set accordion headers
+        data.form.config.groups = groups.map((group) => (Object.assign(Object.assign({}, group), { options: Object.assign(Object.assign({}, group.options), { text: group.options.label, payload: group.id, iconRight: group.options.isOpen ? ICON_OPEN : ICON_CLOSE, isOpen: group.options.isOpen }) })));
+        return data;
+    }
+    onReset() {
+        const { form } = this.output;
+        const inputs = form.getInputs();
+        Object.keys(inputs).forEach((id) => {
+            inputs[id].clear();
+        });
+    }
+    toggleGroup(groupId) {
+        this.output.form.config.groups.forEach((group) => {
+            if (group.id === groupId) {
+                const { isOpen } = group.options;
+                group.options.iconRight = isOpen ? ICON_CLOSE : ICON_OPEN;
+                group.options.isOpen = !group.options.isOpen;
+            }
+        });
+    }
+}
+
+var DS$3 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    MrBreadcrumbsDS: MrBreadcrumbsDS,
+    MrCollectionDS: MrCollectionDS,
+    MrFiltersDS: MrFiltersDS,
+    MrHeroDS: MrHeroDS,
+    MrImageViewerDS: MrImageViewerDS,
+    MrInfoBoxDS: MrInfoBoxDS,
+    MrInnerTitleDS: MrInnerTitleDS,
+    MrItemPreviewDS: MrItemPreviewDS,
+    MrItemPreviewsDS: MrItemPreviewsDS,
+    MrMetadataDS: MrMetadataDS,
+    MrNavDS: MrNavDS,
+    MrTextViewerDS: MrTextViewerDS,
+    MrResourceTabsDS: MrResourceTabsDS,
+    MrContentDS: MrContentDS,
+    MrSearchPageTitleDS: MrSearchPageTitleDS,
+    MrSearchResultsTitleDS: MrSearchResultsTitleDS,
+    MrSearchResultsDS: MrSearchResultsDS,
+    MrSearchTagsDS: MrSearchTagsDS,
+    MrStaticMetadataDS: MrStaticMetadataDS,
+    MrFormWrapperAccordionDS: MrFormWrapperAccordionDS
+});
+
+class MrDummyEH extends EventHandler {
+    listen() {
+        // TODO
+    }
+}
+
+class MrFiltersEH extends EventHandler {
+    listen() {
+        // TODO
+    }
+}
+
+class MrNavEH extends EventHandler {
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'dv-nav.click':
+                    this.emitOuter('navclick', payload);
+                    break;
+                default:
+                    console.warn('unhandled event of type', type);
+                    break;
+            }
+        });
+    }
+}
+
+class MrSearchTagsEH extends EventHandler {
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'mr-search-tags.click':
+                    this.emitOuter('click', payload);
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+}
+
+class MrSearchResultsTitleEH extends EventHandler {
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'mr-search-results-title.change':
+                    this.emitOuter('change', payload);
+                    break;
+                default:
+                    break;
+            }
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'mr-search-layout.inputquerychange':
+                    this.dataSource.OnInputQueryChange(payload);
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+}
+
+class MrFormWrapperAccordionEH extends EventHandler {
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'mr-form-wrapper-accordion.submit': {
+                    const { form } = this.dataSource.output;
+                    this.emitOuter('submit', {
+                        state: form.getState()
+                    });
+                    break;
+                }
+                case 'mr-form-wrapper-accordion.reset':
+                    this.dataSource.onReset();
+                    this.emitOuter('reset');
+                    break;
+                case 'mr-form-wrapper-accordion.click':
+                    this.dataSource.toggleGroup(payload);
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+}
+
+var EH$3 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    MrDummyEH: MrDummyEH,
+    MrFiltersEH: MrFiltersEH,
+    MrNavEH: MrNavEH,
+    MrSearchTagsEH: MrSearchTagsEH,
+    MrSearchResultsTitleEH: MrSearchResultsTitleEH,
+    MrFormWrapperAccordionEH: MrFormWrapperAccordionEH
+});
+
+const MrGlossaryLayoutConfig = {
+    layoutId: 'n7-glossary-layout',
+    widgets: [
+    // {
+    //   id: 'title',          ← Insert a component here.
+    //   hasStaticData: true,  ← Renders the widget before this.one().update is called.
+    // }
+    ],
+    layoutDS: MrGlossaryLayoutDS,
+    layoutEH: MrGlossaryLayoutEH,
+    widgetsDataSources: DS$3,
+    widgetsEventHandlers: EH$3,
+    layoutOptions: {}
+};
+
+let MrGlossaryLayoutComponent = class MrGlossaryLayoutComponent extends AbstractLayout {
+    constructor(layoutsConfiguration) {
+        super(layoutsConfiguration.get('MrGlossaryLayoutConfig') || MrGlossaryLayoutConfig);
+    }
+    initPayload() {
+        return {
+            options: this.config.options || {}
+        };
+    }
+    ngOnInit() {
+        this.onInit();
+    }
+    ngOnDestroy() {
+        this.onDestroy();
+    }
+};
+MrGlossaryLayoutComponent.ctorParameters = () => [
+    { type: LayoutsConfigurationService }
+];
+MrGlossaryLayoutComponent = __decorate([
+    Component({
+        selector: 'mr-glossary-layout',
+        template: "<div class=\"glossary-layout\" *ngIf=\"lb.dataSource\">\n    Hello, from Glossary layout!\n</div>\n"
+    }),
+    __metadata("design:paramtypes", [LayoutsConfigurationService])
+], MrGlossaryLayoutComponent);
+
+class MrHomeLayoutDS extends LayoutDataSource {
+    constructor() {
+        super(...arguments);
+        this.errorTitle = _t('global#layout_error_title');
+        this.errorDescription = _t('global#layout_error_description');
+    }
+    onInit(payload) {
+        this.configuration = payload.configuration;
+        this.communication = payload.communication;
+        this.mainState = payload.mainState;
+        this.layoutState = payload.layoutState;
+        this.configId = payload.configId;
+        this.pageConfig = this.configuration.get(this.configId) || {};
+        this.doRequest();
+        // update head title
+        this.updateHeadTitle();
+    }
+    doRequest() {
+        const { sections } = this.pageConfig;
+        if (!isEmpty(sections)) {
+            this.layoutState.set('content', LayoutState.LOADING);
+            this.communication.request$('home', {
+                method: 'POST',
+                params: sections.map(({ id }) => id),
+                onError: (err) => {
+                    console.warn(`Error loading ${this.configId} sections`, err.message);
+                    this.layoutState.set('content', LayoutState.ERROR);
+                }
+            }).subscribe((response) => {
+                this.layoutState.set('content', LayoutState.SUCCESS);
+                this.initSections(response);
+            });
+        }
+        else {
+            console.warn(`There are no sections configured for ${this.configId} layout`);
+        }
+    }
+    initSections(response) {
+        const { sections } = this.pageConfig;
+        if (sections) {
+            sections.forEach(({ id }) => {
+                const widgetDataSource = this.getWidgetDataSource(id);
+                const responseData = response[id];
+                // set id
+                widgetDataSource.id = id;
+                // update data
+                if (responseData) {
+                    this.one(id).update(responseData);
+                }
+            });
+        }
+    }
+    updateHeadTitle() {
+        const appName = this.configuration.get('name');
+        const pageTitle = this.pageConfig.title;
+        this.mainState.update('headTitle', [appName, pageTitle].join(' > '));
+    }
+}
+
+class MrHomeLayoutEH extends EventHandler {
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'mr-home-layout.init':
+                    this.dataSource.onInit(payload);
+                    break;
+                default:
+                    break;
+            }
+        });
+        this.outerEvents$.subscribe(({ type }) => {
+            switch (type) {
+                default:
+                    break;
+            }
+        });
+    }
+}
+
+const MrHomeLayoutConfig = {
+    layoutId: 'mr-home-layout',
+    widgets: [],
+    layoutDS: MrHomeLayoutDS,
+    layoutEH: MrHomeLayoutEH,
+    widgetsDataSources: DS$3,
+    widgetsEventHandlers: EH$3,
+    options: {
+    // TODO
+    },
+};
+
+class MrSliderDS extends DataSource {
+    transform(data) {
+        return data;
+    }
+}
+
+class MrSliderEH extends EventHandler {
+    listen() {
+        // this.innerEvents$.subscribe(({ type, payload }) => {
+        //   switch (type) {
+        //     case `${this.dataSource.id}.<event-type>`:
+        //       // TODO
+        //       break;
+        //     default:
+        //       break;
+        //   }
+        // });
+    }
+}
+
+class MrCollectionEH extends EventHandler {
+    listen() {
+        // this.innerEvents$.subscribe(({ type, payload }) => {
+        //   switch (type) {
+        //     case `${this.dataSource.id}.<event-type>`:
+        //       // TODO
+        //       break;
+        //     default:
+        //       break;
+        //   }
+        // });
+    }
+}
+
+class MrHeroEH extends EventHandler {
+    listen() {
+        // this.innerEvents$.subscribe(({ type, payload }) => {
+        //   switch (type) {
+        //     case `${this.dataSource.id}.<event-type>`:
+        //       // TODO
+        //       break;
+        //     default:
+        //       break;
+        //   }
+        // });
+    }
+}
+
+const DATASOURCE_MAP = {
+    slider: MrSliderDS,
+    collection: MrCollectionDS,
+    hero: MrHeroDS,
+    content: MrContentDS,
+};
+const EVENTHANDLER_MAP = {
+    slider: MrSliderEH,
+    collection: MrCollectionEH,
+    hero: MrHeroEH,
+};
+let MrHomeLayoutComponent = class MrHomeLayoutComponent extends AbstractLayout {
+    constructor(layoutsConfiguration, activatedRoute, configuration, communication, mainState, layoutState) {
+        super(layoutsConfiguration.get('MrHomeLayoutConfig') || MrHomeLayoutConfig);
+        this.activatedRoute = activatedRoute;
+        this.configuration = configuration;
+        this.communication = communication;
+        this.mainState = mainState;
+        this.layoutState = layoutState;
+    }
+    initPayload() {
+        return {
+            configId: this.configId,
+            mainState: this.mainState,
+            configuration: this.configuration,
+            communication: this.communication,
+            layoutState: this.layoutState,
+            options: this.config.options || {}
+        };
+    }
+    ngOnInit() {
+        this.activatedRoute.data.subscribe((data) => {
+            this.configId = data.configId;
+            this.layoutState.add('content');
+            this.loadWidgets();
+            this.onInit();
+        });
+    }
+    ngOnDestroy() {
+        this.onDestroy();
+    }
+    loadWidgets() {
+        const homeConfig = this.configuration.get(this.configId) || {};
+        const { sections } = homeConfig;
+        this.widgets = [];
+        if (sections) {
+            sections.forEach(({ id, type, options }) => {
+                this.widgets.push({
+                    id,
+                    options,
+                    dataSource: DATASOURCE_MAP[type],
+                    eventHandler: EVENTHANDLER_MAP[type]
+                });
+            });
+        }
+    }
+};
+MrHomeLayoutComponent.ctorParameters = () => [
+    { type: LayoutsConfigurationService },
+    { type: ActivatedRoute },
+    { type: ConfigurationService },
+    { type: CommunicationService },
+    { type: MainStateService },
+    { type: MrLayoutStateService }
+];
+MrHomeLayoutComponent = __decorate([
+    Component({
+        selector: 'mr-home-layout',
+        template: "<div class=\"mr-home mr-layout\"\n     *ngIf=\"lb.dataSource\"\n     [ngClass]=\"{\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\n      }\">\n    <!-- HOME CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            <div class=\"mr-layout__loader\">\n                <n7-loader></n7-loader>\n            </div>\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            <div class=\"mr-layout__error\">\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\n                <p>{{ lb.dataSource.errorDescription }}</p>\n            </div>\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <section *ngFor=\"let section of lb.dataSource.pageConfig.sections\" class=\"{{ 'mr-layout__' + section.type }}\">\n                <ng-container [ngSwitch]=\"section.type\">\n        \n                    <!-- SLIDER -->\n                    <ng-container *ngSwitchCase=\"'slider'\">\n                        <n7-carousel \n                        [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-carousel> \n                    </ng-container>\n        \n                    <!-- COLLECTION -->\n                    <ng-container *ngSwitchCase=\"'collection'\">\n                        <div class=\"mr-layout__maxwidth mr-items-preview\">\n                            <n7-inner-title \n                            [data]=\"(lb.widgets[section.id].ds.out$ | async)?.header\"\n                            [emit]=\"lb.widgets[section.id].emit\">\n                            </n7-inner-title>\n                            <div class=\"{{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                                <n7-item-preview\n                                *ngFor=\"let item of (lb.widgets[section.id].ds.out$ | async)?.items\"\n                                [data]=\"item\"\n                                [emit]=\"lb.widgets[section.id].emit\">\n                                </n7-item-preview>\n                            </div>\n                        </div>\n                    </ng-container>\n        \n                    <!-- HERO -->\n                    <ng-container *ngSwitchCase=\"'hero'\">\n                        <n7-hero \n                        [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                        [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-hero> \n                    </ng-container>\n        \n                    <!-- CONTENT -->\n                    <ng-container *ngSwitchCase=\"'content'\">\n                        <div [innerHTML]=\"lb.widgets[section.id].ds.out$ | async\"></div>\n                    </ng-container>\n                \n                </ng-container>\n            </section>\n        </ng-container>\n\n    </ng-container>\n</div>\n"
+    }),
+    __metadata("design:paramtypes", [LayoutsConfigurationService,
+        ActivatedRoute,
+        ConfigurationService,
+        CommunicationService,
+        MainStateService,
+        MrLayoutStateService])
+], MrHomeLayoutComponent);
+
+class MrResourceLayoutDS extends LayoutDataSource {
+    constructor() {
+        super(...arguments);
+        this.errorTitle = _t('global#layout_error_title');
+        this.errorDescription = _t('global#layout_error_description');
+    }
+    onInit(payload) {
+        this.configuration = payload.configuration;
+        this.communication = payload.communication;
+        this.mainState = payload.mainState;
+        this.configId = payload.configId;
+        this.pageConfig = this.configuration.get(this.configId);
+        this.tabConfig = this.configuration.get('tabs')[this.pageConfig.tabs];
+        // add translations
+        ['top', 'content'].forEach((type) => {
+            this.pageConfig.sections[type] = this.pageConfig.sections[type].map((section) => (Object.assign(Object.assign({}, section), { title: _t(section.title) })));
+        });
+    }
+    /** Request the configured widgets data */
+    pageRequest$(id, onError) {
+        const { top, content } = this.pageConfig.sections;
+        const sections = top.concat(content);
+        return this.communication.request$('resource', {
+            onError,
+            method: 'POST',
+            params: {
+                id,
+                type: this.pageConfig.type,
+                sections: sections.map((s) => s.id),
+            }
+        });
+    }
+    handleResponse(response) {
+        this.initSections(response);
+        this.updateHeadTitle(response);
+    }
+    /** Load all the configured widgets */
+    initSections(response) {
+        const { top, content } = this.pageConfig.sections;
+        const sections = top.concat(content);
+        sections.forEach(({ id }) => {
+            const widgetDataSource = this.getWidgetDataSource(id);
+            if (!widgetDataSource)
+                return;
+            const responseSection = response.sections[id];
+            // set id
+            widgetDataSource.id = id;
+            // update data
+            if (responseSection) {
+                this.one(id).update(responseSection);
+            }
+        });
+        // update tabs
+        if (this.tabConfig) {
+            const tabSection = sections.find(({ type }) => type === 'tabs');
+            this.one(tabSection.id).updateOptions({
+                id: this.id,
+                root: this.pageConfig.tabs,
+                slug: this.slug,
+                currentTab: this.tab
+            });
+            this.one(tabSection.id).update(this.tabConfig);
+        }
+    }
+    updateHeadTitle({ title: resourceTitle }) {
+        const appName = this.configuration.get('name');
+        const pageTitle = this.pageConfig.title;
+        this.mainState.update('headTitle', [appName, _t(pageTitle), resourceTitle].join(' > '));
+    }
+}
+
+class MrResourceLayoutEH extends EventHandler {
+    constructor() {
+        super(...arguments);
+        this.destroy$ = new Subject();
+    }
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'mr-resource-layout.init':
+                    {
+                        this.route = payload.route;
+                        const { slug, id } = this.route.snapshot.params;
+                        const { url } = this.route.snapshot;
+                        this.dataSource.tab = url[url.length - 1].path;
+                        this.dataSource.slug = slug;
+                        this.dataSource.id = id;
+                        this.layoutState = payload.layoutState;
+                        this.dataSource.onInit(payload);
+                        this.listenRoute();
+                    }
+                    break;
+                case 'mr-resource-layout.destroy':
+                    this.destroy$.next();
+                    break;
+                default:
+                    console.warn('unhandled inner event of type', type);
+                    break;
+            }
+        });
+    }
+    listenRoute() {
+        this.route.paramMap.pipe(takeUntil(this.destroy$), tap(() => {
+            this.layoutState.set('content', LayoutState.LOADING);
+        }), map((params) => params.get('id')), switchMap((id) => this.dataSource.pageRequest$(id, (err) => {
+            console.warn(`Error loading resource layout for ${id}`, err.message);
+            this.dataSource.id = id;
+            this.layoutState.set('content', LayoutState.ERROR);
+        }))).subscribe((response) => {
+            this.layoutState.set('content', LayoutState.SUCCESS);
+            this.dataSource.handleResponse(response);
+        });
+    }
+}
+
+const MrResourceLayoutConfig = {
+    layoutId: 'mr-resource-layout',
+    widgets: [
+        { id: 'mr-read-more' }
+    ],
+    layoutDS: MrResourceLayoutDS,
+    layoutEH: MrResourceLayoutEH,
+    widgetsDataSources: DS$3,
+    widgetsEventHandlers: EH$3,
+    options: {
+    // TODO
+    },
+};
+
+class MrImageViewerEH extends EventHandler {
+    listen() {
+        // this.innerEvents$.subscribe(({ type, payload }) => {
+        //   switch (type) {
+        //     case `${this.dataSource.id}.<event-type>`:
+        //       // TODO
+        //       break;
+        //     default:
+        //       break;
+        //   }
+        // });
+    }
+}
+
+const DATASOURCE_MAP$1 = {
+    breadcrumbs: MrBreadcrumbsDS,
+    collection: MrCollectionDS,
+    info: MrInfoBoxDS,
+    metadata: MrMetadataDS,
+    preview: MrItemPreviewDS,
+    text: MrTextViewerDS,
+    title: MrInnerTitleDS,
+    viewer: MrImageViewerDS,
+    tabs: MrResourceTabsDS
+};
+const EVENTHANDLER_MAP$1 = {
+    viewer: MrImageViewerEH,
+};
+let MrResourceLayoutComponent = class MrResourceLayoutComponent extends AbstractLayout {
+    constructor(layoutsConfiguration, activatedRoute, configuration, communication, mainState, route, layoutState) {
+        super(layoutsConfiguration.get('MrResourceLayoutConfig') || MrResourceLayoutConfig);
+        this.activatedRoute = activatedRoute;
+        this.configuration = configuration;
+        this.communication = communication;
+        this.mainState = mainState;
+        this.route = route;
+        this.layoutState = layoutState;
+    }
+    initPayload() {
+        return {
+            configId: this.configId,
+            configuration: this.configuration,
+            communication: this.communication,
+            mainState: this.mainState,
+            layoutState: this.layoutState,
+            options: this.config.options || {},
+            route: this.route
+        };
+    }
+    ngOnInit() {
+        this.activatedRoute.data.subscribe((data) => {
+            this.layoutState.add('content');
+            this.configId = data.configId;
+            this.loadWidgets();
+            this.onInit();
+        });
+    }
+    ngOnDestroy() {
+        this.onDestroy();
+    }
+    loadWidgets() {
+        const { top, content } = this.configuration.get(this.configId).sections;
+        const sections = top.concat(content);
+        this.widgets = [];
+        if (sections) {
+            sections.forEach(({ id, type, options }) => {
+                this.widgets.push({
+                    id,
+                    options,
+                    dataSource: DATASOURCE_MAP$1[type],
+                    eventHandler: EVENTHANDLER_MAP$1[type]
+                });
+            });
+        }
+    }
+};
+MrResourceLayoutComponent.ctorParameters = () => [
+    { type: LayoutsConfigurationService },
+    { type: ActivatedRoute },
+    { type: ConfigurationService },
+    { type: CommunicationService },
+    { type: MainStateService },
+    { type: ActivatedRoute },
+    { type: MrLayoutStateService }
+];
+MrResourceLayoutComponent = __decorate([
+    Component({
+        selector: 'mr-resource-layout',
+        template: "<div class=\"mr-resource mr-layout\" \n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\"\n     [ngClass]=\"{\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\n      }\">\n    <!-- RESOURCE LAYOUT CONTENT -->\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\n        <!-- loading -->\n        <ng-container *ngSwitchCase=\"'LOADING'\">\n            <div class=\"mr-layout__loader\">\n                <n7-loader></n7-loader>\n            </div>\n        </ng-container>\n\n        <!-- error -->\n        <ng-container *ngSwitchCase=\"'ERROR'\">\n            <div class=\"mr-layout__error\">\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\n                <p>{{ lb.dataSource.errorDescription }}</p>\n            </div>\n        </ng-container>\n\n        <!-- success -->\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n            <ng-container *ngIf=\"lb.dataSource.pageConfig.sections as sections\">\n                <!-- Pass the list of blocks to render to the block template -->\n                <div class=\"mr-resource__top\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\n                </div>\n                <div class=\"mr-resource__content mr-side-margin\">\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\n                </div>\n            </ng-container>\n        </ng-container>\n\n    </ng-container>\n</div>\n\n<ng-template #blocks let-list>\n    <ng-container *ngFor=\"let section of list\">\n        <section *ngIf=\"lb.widgets[section.id].ds.out$ | async\"\n        class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\n            <ng-container [ngSwitch]=\"section.type\">\n    \n                <!-- TABS -->\n                <ng-container *ngSwitchCase=\"'tabs'\">\n                    <ng-container *ngFor=\"let tab of lb.widgets[section.id].ds.out$ | async\">\n                        <n7-anchor-wrapper [data]=\"tab.anchor\" [classes]=\"tab.classes\">\n                            <span class=\"mr-resource__tabs-item\">{{ tab.label }}</span>\n                        </n7-anchor-wrapper>\n                    </ng-container>\n                </ng-container>\n    \n                <!-- INNER TITLE -->\n                <ng-container *ngSwitchCase=\"'title'\">\n                    <div class=\"mr-resource__title-content mr-side-margin\">\n                        <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                            [emit]=\"lb.widgets[section.id].emit\">\n                        </n7-inner-title>\n                    </div>\n                </ng-container>\n    \n                <!-- IMAGE VIEWER -->\n                <ng-container *ngSwitchCase=\"'viewer'\">\n                    <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-image-viewer>\n                </ng-container>\n    \n                <!-- METADATA VIEWER -->\n                <ng-container *ngSwitchCase=\"'metadata'\">\n                    <div class=\"mr-resource__metadata-content\">\n                        <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__metadata-title\">\n                            {{ section.title }}\n                        </h3>\n                        <mr-read-more [data]=\"section.readmore\">\n                            <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\n                                [emit]=\"lb.widgets[section.id].emit\">\n                            </n7-metadata-viewer>\n                        </mr-read-more>\n                    </div>\n                </ng-container>\n    \n                <!-- COLLECTION -->\n                <ng-container *ngSwitchCase=\"'collection'\">\n                    <ng-container *ngIf=\"lb.widgets[section.id].ds.out$ | async as collection$\">\n                        <div *ngIf=\"collection$.items?.length > 0\" class=\"mr-resource__collection-content\">\n                            <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title\">\n                                {{ section.title }}\n                            </h3>\n                            <div class=\"mr-resource__collection-grid {{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                                <n7-item-preview *ngFor=\"let item of collection$?.items\"\n                                    [data]=\"item\" [emit]=\"lb.widgets[section.id].emit\">\n                                </n7-item-preview>\n                            </div>\n                        </div>\n                    </ng-container>\n                </ng-container>\n    \n                <!-- ITEM PREVIEW -->\n                <ng-container *ngSwitchCase=\"'preview'\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__preview-title\">\n                        {{ section.title }}\n                    </h3>\n                    <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\n                    </n7-item-preview>\n                </ng-container>\n    \n                <!-- TEXT VIEWER -->\n                <ng-container *ngSwitchCase=\"'text-viewer'\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__text-viewer-title\">\n                        {{ section.title }}\n                    </h3>\n                    <div class=\"text-viewer__mock\">n7-text-viewer</div>\n                </ng-container>\n    \n                <!-- INFO BOX -->\n                <ng-container *ngSwitchCase=\"'info-box'\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__info-box-title\">\n                        {{ section.title }}\n                    </h3>\n                    <div class=\"info-box__mock\">info-box</div>\n                </ng-container>\n    \n                <!-- BREADCRUMBS -->\n                <ng-container *ngSwitchCase=\"'breadcrumbs'\">\n                    <n7-breadcrumbs [data]=\"lb.widgets[section.id].ds.out$ | async\">\n                    </n7-breadcrumbs>\n                </ng-container>\n            </ng-container>\n        </section>\n    </ng-container>\n</ng-template>\n"
+    }),
+    __metadata("design:paramtypes", [LayoutsConfigurationService,
+        ActivatedRoute,
+        ConfigurationService,
+        CommunicationService,
+        MainStateService,
+        ActivatedRoute,
+        MrLayoutStateService])
+], MrResourceLayoutComponent);
+
+class SearchFacetsLayoutDS extends LayoutDataSource {
+    constructor() {
+        super(...arguments);
+        this.inputsDS = {};
+    }
+    onInit(payload) {
+        this.searchService = payload.searchService;
+        this.searchConfig = this.searchService.getConfig();
+        this.facets = this.searchConfig.facets;
+        this.initInputs();
+    }
+    initInputs() {
+        // set components data
+        this.facets.sections.forEach(({ header, inputs }) => {
+            [header, ...inputs]
+                .filter((input) => input)
+                .forEach((input) => {
+                // set id
+                const widgetDataSource = this.getWidgetDataSource(input.id);
+                widgetDataSource.id = input.id;
+                // caching DS for next updates
+                this.inputsDS[input.id] = widgetDataSource;
+                // first update
+                widgetDataSource.update(input.data);
+            });
+        });
+    }
+    updateInputValue(id, newValue) {
+        const ds = this.inputsDS[id];
+        ds.setValue(newValue, ds.value !== newValue);
+    }
+    updateInputData(id, newData) {
+        const ds = this.inputsDS[id];
+        ds.update(Object.assign(Object.assign({}, ds.input), newData));
+        // refresh selected
+        ds.setValue(ds.value, true);
+    }
+    clearInput(id) {
+        const ds = this.inputsDS[id];
+        ds.clear();
+        ds.setValue(ds.value, true);
+    }
+    clearInputs() {
+        Object.keys(this.inputsDS).forEach((id) => {
+            this.clearInput(id);
+        });
+    }
+}
+
 class SearchFacetsLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
@@ -9942,15 +10003,15 @@ class FacetLinkDS extends DataSource {
     }
 }
 
-const ICON_OPEN = 'n7-icon-angle-up';
-const ICON_CLOSE = 'n7-icon-angle-down';
+const ICON_OPEN$1 = 'n7-icon-angle-up';
+const ICON_CLOSE$1 = 'n7-icon-angle-down';
 class FacetHeaderDS extends DataSource {
     constructor() {
         super(...arguments);
         this.getValue = () => this.value;
     }
     transform(data) {
-        return Object.assign(Object.assign({}, data), { text: _t(data.text), iconRight: data.iconRight || ICON_OPEN });
+        return Object.assign(Object.assign({}, data), { text: _t(data.text), iconRight: data.iconRight || ICON_OPEN$1 });
     }
     setValue(value, update = false) {
         this.value = value;
@@ -9960,11 +10021,11 @@ class FacetHeaderDS extends DataSource {
     }
     toggle() {
         let { iconRight } = this.output;
-        iconRight = iconRight === ICON_OPEN ? ICON_CLOSE : ICON_OPEN;
+        iconRight = iconRight === ICON_OPEN$1 ? ICON_CLOSE$1 : ICON_OPEN$1;
         this.update(Object.assign(Object.assign({}, this.input), { iconRight }));
     }
     isOpen() {
-        return this.output.iconRight === ICON_OPEN;
+        return this.output.iconRight === ICON_OPEN$1;
     }
     clear() {
         this.value = null;
@@ -10199,7 +10260,7 @@ MrSearchFacetsLayoutComponent = __decorate([
     __metadata("design:paramtypes", [])
 ], MrSearchFacetsLayoutComponent);
 
-class MrSearchLayoutDS extends LayoutDataSource$1 {
+class MrSearchLayoutDS extends LayoutDataSource {
     constructor() {
         super(...arguments);
         this.totalResultsText = null;
@@ -10244,6 +10305,7 @@ class MrSearchLayoutDS extends LayoutDataSource$1 {
             currentPage: (offset + limit) / limit,
             pageLimit: paginationConfig.limit,
             sizes: {
+                label: paginationConfig.selectLabel ? _t(paginationConfig.selectLabel) : null,
                 list: paginationConfig.options,
                 active: limit,
             },
@@ -10487,7 +10549,7 @@ MrSearchLayoutComponent.ctorParameters = () => [
 MrSearchLayoutComponent = __decorate([
     Component({
         selector: 'mr-search-layout',
-        template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth mr-side-margin\">\n\n        <div class=\"mr-search__title\">\n            <n7-inner-title\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <aside class=\"mr-facets\">\n                <div class=\"mr-facets__contents\">\n                    <h2 class=\"mr-facets__title\" \n                        *ngIf=\"lb.dataSource.pageConfig['facetsTitle']\">\n                        {{ lb.dataSource.pageConfig['facetsTitle'] }}\n                    </h2>\n                    <mr-search-facets-layout \n                    [searchService]=\"lb.dataSource.searchService\">\n                    </mr-search-facets-layout>\n                </div>\n            </aside>\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    <n7-inner-title\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\n                    </n7-inner-title>\n                </div>\n                <div *ngIf=\"(\n                    lb.dataSource.pageConfig['filtersTitle'] && \n                    lb.widgets['mr-search-tags'].ds.hasFilters\n                )\" \n                class=\"mr-search__results-filters\">\n                    <span class=\"mr-search__results-filters-title\">{{ lb.dataSource.pageConfig['filtersTitle'] }}</span>\n                    <div class=\"mr-search__results-filters-wrapper\">\n                        <n7-tag *ngFor=\"let tag of (lb.widgets['mr-search-tags'].ds.out$ | async)\"\n                        [data]=\"tag\"\n                        [emit]=\"lb.widgets['mr-search-tags'].emit\">\n                        </n7-tag>\n                    </div>\n                </div>\n                <main class=\"mr-search__results\">\n                    <!-- SEARCH RESULTS -->\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\n                        \n                        <!-- loading -->\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\n                            <div class=\"mr-search__results-loading n7-grid-{{ lb.dataSource.pageConfig.grid || 1 }}\">\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                                    blocks: [\n                                        { classes: 'search-result-placeholder-title' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' }\n                                    ]\n                                }\"></n7-content-placeholder>\n                            </div>\n                        </ng-container>\n                        \n                        <!-- success: items > 0 -->\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n                            <div class=\"n7-grid-{{ lb.dataSource.pageConfig.grid || 1 }}\">\n                                <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\n                                [data]=\"item\">\n                                </n7-item-preview>\n                            </div>\n                        </ng-container>\n\n                        <!-- empty: items === 0 -->\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\n                            <div class=\"mr-search__results-fallback\">\n                                <p class=\"mr-search__results-fallback-string\">\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\n                                </p>\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\n                                </button>\n                            </div>\n                        </ng-container>\n\n                        <!-- error: request problem -->\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\n                            <p class=\"mr-search__results-ko-string\">\n                                {{ lb.dataSource.pageConfig.ko.text }}\n                            </p>\n                            <button class=\"n7-btn mr-search__results-ko-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                {{ lb.dataSource.pageConfig.ko.button }}\n                            </button>\n                        </ng-container>\n                        \n                    </ng-container>\n                </main>               \n                <n7-smart-pagination\n                *ngIf=\"(layoutState.get$('results') | async) === 'SUCCESS'\"\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
+        template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth mr-side-margin\">\n\n        <div class=\"mr-search__title\">\n            <n7-inner-title\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\">\n            </n7-inner-title>\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <aside class=\"mr-facets\">\n                <div class=\"mr-facets__contents\">\n                    <h2 class=\"mr-facets__title\" \n                        *ngIf=\"lb.dataSource.pageConfig['facetsTitle']\">\n                        {{ lb.dataSource.pageConfig['facetsTitle'] }}\n                    </h2>\n                    <mr-search-facets-layout \n                    [searchService]=\"lb.dataSource.searchService\">\n                    </mr-search-facets-layout>\n                </div>\n            </aside>\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    <n7-inner-title\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\n                    </n7-inner-title>\n                </div>\n                <div *ngIf=\"(\n                    lb.dataSource.pageConfig['filtersTitle'] && \n                    lb.widgets['mr-search-tags'].ds.hasFilters\n                )\" \n                class=\"mr-search__results-filters\">\n                    <span class=\"mr-search__results-filters-title\">{{ lb.dataSource.pageConfig['filtersTitle'] }}</span>\n                    <div class=\"mr-search__results-filters-wrapper\">\n                        <n7-tag *ngFor=\"let tag of (lb.widgets['mr-search-tags'].ds.out$ | async)\"\n                        [data]=\"tag\"\n                        [emit]=\"lb.widgets['mr-search-tags'].emit\">\n                        </n7-tag>\n                    </div>\n                </div>\n                <main class=\"mr-search__results\">\n                    <!-- SEARCH RESULTS -->\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\n                        \n                        <!-- loading -->\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\n                            <div class=\"mr-search__results-loading n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                                    blocks: [\n                                        { classes: 'search-result-placeholder-title' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' }\n                                    ]\n                                }\"></n7-content-placeholder>\n                            </div>\n                        </ng-container>\n                        \n                        <!-- success: items > 0 -->\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n                            <div class=\"n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\n                                <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\n                                [data]=\"item\">\n                                </n7-item-preview>\n                            </div>\n                        </ng-container>\n\n                        <!-- empty: items === 0 -->\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\n                            <div class=\"mr-search__results-fallback\">\n                                <p class=\"mr-search__results-fallback-string\">\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\n                                </p>\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\n                                </button>\n                            </div>\n                        </ng-container>\n\n                        <!-- error: request problem -->\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\n                            <p class=\"mr-search__results-ko-string\">\n                                {{ lb.dataSource.pageConfig.ko.text }}\n                            </p>\n                            <button class=\"n7-btn mr-search__results-ko-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                {{ lb.dataSource.pageConfig.ko.button }}\n                            </button>\n                        </ng-container>\n                        \n                    </ng-container>\n                </main>               \n                <n7-smart-pagination\n                *ngIf=\"(layoutState.get$('results') | async) === 'SUCCESS'\"\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
     }),
     __metadata("design:paramtypes", [LayoutsConfigurationService,
         Router,
@@ -10499,7 +10561,7 @@ MrSearchLayoutComponent = __decorate([
         MainStateService])
 ], MrSearchLayoutComponent);
 
-class MrStaticLayoutDS extends LayoutDataSource$1 {
+class MrStaticLayoutDS extends LayoutDataSource {
     constructor() {
         super(...arguments);
         this.errorTitle = _t('global#layout_error_title');
@@ -10629,17 +10691,410 @@ MrStaticLayoutComponent = __decorate([
         LayoutsConfigurationService])
 ], MrStaticLayoutComponent);
 
+class MrInputTextDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.state = {
+            value: null,
+            disabled: false,
+            hidden: false,
+        };
+        this.getState = () => this.state;
+    }
+    transform(data) {
+        return Object.assign(Object.assign({}, data), { placeholder: _t(data.placeholder) });
+    }
+    setState(newState) {
+        this.state = Object.assign(Object.assign({}, this.state), newState);
+        this.refresh();
+    }
+    clear() {
+        this.setState({ value: null });
+    }
+    refresh() {
+        const { value, hidden, disabled } = this.state;
+        // render value
+        this.output.value = value;
+        // fix element update
+        const el = document.getElementById(this.id);
+        if (el) {
+            el.value = value;
+        }
+        // render disabled
+        this.output.disabled = disabled;
+        // render hidden
+        this.output.classes = hidden ? 'is-hidden' : '';
+    }
+}
+
+class MrInputTextEH extends EventHandler {
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case `${this.dataSource.id}.change`: {
+                    const { value } = payload;
+                    // set new value
+                    this.dataSource.setState({ value });
+                    // emit changed signal
+                    this.changed$.next({
+                        id: this.dataSource.id,
+                        state: this.dataSource.getState()
+                    });
+                    break;
+                }
+                default:
+                    break;
+            }
+        });
+    }
+}
+
+class MrInputSelectDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.state = {
+            value: null,
+            disabled: false,
+            hidden: false,
+        };
+        this.getState = () => this.state;
+    }
+    transform(data) {
+        return Object.assign(Object.assign({}, data), { options: this.getOptions(data.options) });
+    }
+    setState(newState) {
+        this.state = Object.assign(Object.assign({}, this.state), newState);
+        this.refresh();
+    }
+    clear() {
+        this.setState({ value: null });
+    }
+    refresh() {
+        const { hidden, disabled } = this.state;
+        // render value
+        this.output.options = this.getOptions(this.output.options);
+        // render disabled
+        this.output.disabled = disabled;
+        // render hidden
+        this.output.classes = hidden ? 'is-hidden' : '';
+    }
+    getOptions(options) {
+        const { value } = this.state;
+        return options.map((option) => (Object.assign(Object.assign({}, option), { label: _t(option.label), selected: value === option.value })));
+    }
+}
+
+class MrInputSelectEH extends EventHandler {
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case `${this.dataSource.id}.change`: {
+                    const { value } = payload;
+                    // set new value
+                    this.dataSource.setState({ value });
+                    // emit changed signal
+                    this.changed$.next({
+                        id: this.dataSource.id,
+                        state: this.dataSource.getState()
+                    });
+                    break;
+                }
+                default:
+                    break;
+            }
+        });
+    }
+}
+
+// eslint-disable-next-line max-len
+class MrInputCheckboxDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.state = {
+            value: [],
+            disabled: false,
+            hidden: false,
+        };
+        this.getState = () => this.state;
+    }
+    transform(data) {
+        return Object.assign(Object.assign({}, data), { checkboxes: this.getCheckboxes(data.checkboxes) });
+    }
+    setState(newState) {
+        this.state = Object.assign(Object.assign({}, this.state), newState);
+        this.refresh();
+    }
+    clear() {
+        this.setState({ value: [] });
+    }
+    refresh() {
+        const { hidden } = this.state;
+        // render value
+        this.output.checkboxes = this.getCheckboxes(this.output.checkboxes);
+        // render hidden
+        this.output.classes = hidden ? 'is-hidden' : '';
+    }
+    toggleValue({ inputPayload, value: isChecked }) {
+        const { value } = this.state;
+        const exists = !!(value.includes(inputPayload));
+        if (isChecked && !exists) {
+            value.push(inputPayload);
+        }
+        else if (!isChecked && exists) {
+            value.splice(value.indexOf(inputPayload), 1);
+        }
+        this.setState({ value });
+    }
+    getCheckboxes(checkboxes) {
+        const { value, disabled } = this.state;
+        return checkboxes.map((checkbox) => (Object.assign(Object.assign({}, checkbox), { disabled, label: _t(checkbox.label), checked: !!(value.includes(checkbox.payload)) })));
+    }
+}
+
+class MrInputCheckboxEH extends EventHandler {
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case `${this.dataSource.id}.change`: {
+                    // update value
+                    this.dataSource.toggleValue(payload);
+                    // emit changed signal
+                    this.changed$.next({
+                        id: this.dataSource.id,
+                        state: this.dataSource.getState()
+                    });
+                    break;
+                }
+                default:
+                    break;
+            }
+        });
+    }
+}
+
+class MrFormModel {
+    constructor() {
+        this.loaded$ = new ReplaySubject();
+        this.inputs = {};
+        this.inputTypes = {
+            text: {
+                ds: MrInputTextDS,
+                eh: MrInputTextEH
+            },
+            select: {
+                ds: MrInputSelectDS,
+                eh: MrInputSelectEH
+            },
+            checkbox: {
+                ds: MrInputCheckboxDS,
+                eh: MrInputCheckboxEH
+            }
+        };
+        this.changed$ = new Subject();
+        this.getInput = (id) => this.inputs[id].ds;
+        this.getInputs = () => {
+            const inputs = {};
+            Object.keys(this.inputs).forEach((id) => {
+                inputs[id] = this.getInput(id);
+            });
+            return inputs;
+        };
+    }
+    init(config) {
+        this.config = config;
+        // init inputs
+        this.initInputs();
+        // emit signal
+        this.loaded$.next(true);
+    }
+    getState() {
+        const state = {};
+        Object.keys(this.inputs).forEach((key) => {
+            state[key] = this.inputs[key].ds.getState();
+        });
+        return state;
+    }
+    addInputType(type, ds, eh) {
+        if (this.inputTypes[type]) {
+            throw Error(`input type ${type} already exists!`);
+        }
+        this.inputTypes[type] = { ds, eh };
+    }
+    initInputs() {
+        const { sections } = this.config;
+        sections.forEach((section) => {
+            section.inputs.forEach(({ id, type, options, state, data }) => {
+                const DSClass = this.inputTypes[type].ds;
+                const EHClass = this.inputTypes[type].eh;
+                const DSInstance = new DSClass(options || {});
+                const EHInstance = new EHClass();
+                // set datasource id
+                DSInstance.id = id;
+                // set initial data
+                if (data) {
+                    DSInstance.update(data);
+                }
+                // set state
+                if (state) {
+                    DSInstance.setState(state);
+                }
+                // set eventhandler hostid
+                EHInstance.hostId = id;
+                // attach datasource to eventhandler
+                EHInstance.dataSource = DSInstance;
+                // attach changed$ to eventhandler
+                EHInstance.changed$ = this.changed$;
+                // listen to input events
+                EHInstance.listen();
+                // save it to input
+                this.inputs[id] = {
+                    ds: DSInstance,
+                    eh: EHInstance,
+                    emit: (t, p) => EHInstance.emitInner(t, p)
+                };
+            });
+        });
+    }
+}
+
+class MrAdvancedSearchLayoutDS extends LayoutDataSource {
+    onInit(payload) {
+        this.configuration = payload.configuration;
+        this.mainState = payload.mainState;
+        this.configId = payload.configId;
+        this.pageConfig = this.configuration.get(this.configId);
+        // init form
+        this.form = new MrFormModel();
+        // form init
+        this.form.init(this.pageConfig.formConfig);
+        this.one('mr-form-wrapper-accordion').update({
+            form: this.form
+        });
+        // update head title
+        this.updateHeadTitle();
+    }
+    updateHeadTitle() {
+        const appName = this.configuration.get('name');
+        const pageTitle = this.pageConfig.title;
+        this.mainState.update('headTitle', [appName, _t(pageTitle)].join(' > '));
+    }
+    onSubmit({ state }) {
+        // do nothing
+        console.warn('onSubmit: to be implemented on project', state);
+    }
+    onReset() {
+        // do nothing
+    }
+}
+
+class MrAdvancedSearchLayoutEH extends EventHandler {
+    constructor() {
+        super(...arguments);
+        this.destroy$ = new Subject();
+    }
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'mr-advanced-search-layout.init':
+                    this.dataSource.onInit(payload);
+                    this.listenFormChanges();
+                    break;
+                case 'mr-advanced-search-layout.destroy':
+                    this.destroy$.next();
+                    break;
+                default:
+                    console.warn('unhandled inner event of type', type);
+                    break;
+            }
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'mr-form-wrapper-accordion.submit':
+                    this.dataSource.onSubmit(payload);
+                    break;
+                case 'mr-form-wrapper-accordion.reset':
+                    this.dataSource.onReset();
+                    break;
+                default:
+                    console.warn('unhandled inner event of type', type);
+                    break;
+            }
+        });
+    }
+    listenFormChanges() {
+        this.dataSource.form.changed$.subscribe(({ id, state }) => {
+            // eslint-disable-next-line no-console
+            console.log('changed$', { id, state });
+        });
+    }
+}
+
+const MrAdvancedSearchLayoutConfig = {
+    layoutId: 'mr-advanced-search-layout',
+    widgets: [{
+            id: 'mr-form-wrapper-accordion'
+        }],
+    layoutDS: MrAdvancedSearchLayoutDS,
+    layoutEH: MrAdvancedSearchLayoutEH,
+    widgetsDataSources: DS$3,
+    widgetsEventHandlers: EH$3,
+    layoutOptions: {}
+};
+
+let MrAdvancedSearchLayoutComponent = class MrAdvancedSearchLayoutComponent extends AbstractLayout {
+    constructor(router, activatedRoute, mainState, configuration, layoutsConfiguration) {
+        super(layoutsConfiguration.get('MrAdvancedSearchLayoutConfig') || MrAdvancedSearchLayoutConfig);
+        this.router = router;
+        this.activatedRoute = activatedRoute;
+        this.mainState = mainState;
+        this.configuration = configuration;
+    }
+    initPayload() {
+        return {
+            configId: this.configId,
+            configuration: this.configuration,
+            mainState: this.mainState,
+            router: this.router,
+            activatedRoute: this.activatedRoute,
+            options: this.config.options || {},
+        };
+    }
+    ngOnInit() {
+        this.activatedRoute.data.subscribe((data) => {
+            this.configId = data.configId;
+            this.onInit();
+        });
+    }
+    ngOnDestroy() {
+        this.onDestroy();
+    }
+};
+MrAdvancedSearchLayoutComponent.ctorParameters = () => [
+    { type: Router },
+    { type: ActivatedRoute },
+    { type: MainStateService },
+    { type: ConfigurationService },
+    { type: LayoutsConfigurationService }
+];
+MrAdvancedSearchLayoutComponent = __decorate([
+    Component({
+        selector: 'mr-advanced-search-layout',
+        template: "<div *ngIf=\"lb.dataSource\" class=\"mr-advanced-search-layout mr-layout\">\n    <mr-form-wrapper-accordion \n        [data]=\"lb.widgets['mr-form-wrapper-accordion'].ds.out$ | async\"\n        [emit]=\"lb.widgets['mr-form-wrapper-accordion'].emit\">\n    </mr-form-wrapper-accordion>\n</div>"
+    }),
+    __metadata("design:paramtypes", [Router,
+        ActivatedRoute,
+        MainStateService,
+        ConfigurationService,
+        LayoutsConfigurationService])
+], MrAdvancedSearchLayoutComponent);
+
 //---------------------------
+const HEIGHT_MARGIN = 50;
 let ReadMoreComponent = class ReadMoreComponent {
     constructor() {
-        // CSS Classes
-        this.state = 'is-expanded';
-        this.collapsed = new BehaviorSubject(false);
+        this.collapsed = true;
+        this.hasReadmore = false;
         this._loaded = false;
-        // onClick(type, payload) {
-        //   if (!this.emit) return;
-        //   this.emit(type, payload);
-        // }
     }
     /**
      * Determine if the view is taller than the given height limit,
@@ -10650,26 +11105,28 @@ let ReadMoreComponent = class ReadMoreComponent {
             return;
         if (this.root && this.root.nativeElement.clientHeight > 0) {
             this._loaded = true;
-            const height = this.root.nativeElement.clientHeight;
-            const { limit } = this.data;
-            this.data.height = height;
-            if (height > limit) {
+            this.clientHeight = this.root.nativeElement.clientHeight;
+            const { height, labels } = this.data;
+            // translate labels
+            Object.keys(labels).forEach((key) => {
+                this.data.labels[key] = _t(labels[key]);
+            });
+            if (this.clientHeight > (height + HEIGHT_MARGIN)) {
                 setTimeout(() => {
-                    this.toggleClass();
-                    this.collapsed.next(true);
+                    this.hasReadmore = true;
+                    this.updateWrapperHeight();
                 });
             }
         }
     }
-    toggleClass() {
-        if (this.state === 'is-collapsed')
-            this.state = 'is-expanded';
-        if (this.state === 'is-expanded')
-            this.state = 'is-collapsed';
-    }
     handleToggle() {
-        const v = this.collapsed.value;
-        this.collapsed.next(!v);
+        this.collapsed = !this.collapsed;
+        this.updateWrapperHeight();
+    }
+    updateWrapperHeight() {
+        this.wrapperHeight = this.collapsed
+            ? this.data.height
+            : this.clientHeight;
     }
 };
 __decorate([
@@ -10687,9 +11144,72 @@ __decorate([
 ReadMoreComponent = __decorate([
     Component({
         selector: 'mr-read-more',
-        template: "<div class=\"mr-read-more {{this.state}}\"\n     *ngIf=\"data\"\n     #root>\n     <!-- Child component -->\n     <ng-content class=\"content\"></ng-content>\n     <div [hidden]=\"!collapsed.value\"\n          (click)=\"handleToggle()\"\n          class=\"mr-read-more__btn\">\n          <span class=\"n7-icon-plus\"></span>\n          {{ data.label }}\n     </div>\n</div>\n"
+        template: "<div #root *ngIf=\"data\" class=\"mr-read-more\"\n    [ngClass]=\"{\n        'is-collapsed': !!(hasReadmore && collapsed),\n        'is-expanded': !!(hasReadmore && !collapsed)\n    }\">\n        <div class=\"mr-read-more__content\"\n        [ngStyle]=\"{\n            height: hasReadmore ? wrapperHeight + 'px' : false\n        }\">\n            <!-- Child component -->\n            <ng-content class=\"content\"></ng-content>\n        </div>\n        <div *ngIf=\"hasReadmore\" class=\"mr-read-more__btn\" (click)=\"handleToggle()\">\n            <span class=\"n7-icon-{{ collapsed ? 'plus' : 'minus' }}\"></span>\n            <span class=\"mr-read-more__btn-text\">{{ collapsed ? data.labels.more : data.labels.less }}</span>\n        </div>\n</div>\n"
     })
 ], ReadMoreComponent);
+
+let MrFormComponent = class MrFormComponent {
+    ngOnInit() {
+        if (this.group) {
+            this.sections = this.form.config.sections
+                .filter(({ id }) => this.group.sections.includes(id));
+        }
+        else {
+            this.sections = this.form.config.sections;
+        }
+        // translations
+        this.sections = this.sections.map((section) => (Object.assign(Object.assign({}, section), { title: _t(section.title), description: _t(section.description) })));
+    }
+};
+__decorate([
+    Input(),
+    __metadata("design:type", MrFormModel)
+], MrFormComponent.prototype, "form", void 0);
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], MrFormComponent.prototype, "group", void 0);
+__decorate([
+    ContentChild(TemplateRef),
+    __metadata("design:type", TemplateRef)
+], MrFormComponent.prototype, "templateRef", void 0);
+MrFormComponent = __decorate([
+    Component({
+        selector: 'mr-form',
+        template: "<div *ngIf=\"form.loaded$ | async\" class=\"mr-form {{ group?.classes || '' }}\">\n    <div *ngFor=\"let section of sections\" class=\"mr-form__section {{ section.classes || '' }}\">\n        <h3 *ngIf=\"section.title\" class=\"mr-form__section-title\">{{ section.title }}</h3>\n        <p *ngIf=\"section.description\" class=\"mr-form__section-description\">{{ section.description }}</p>\n\n        <div class=\"mr-form__section-content\">\n            <div *ngFor=\"let input of section.inputs\" class=\"mr-form__input {{ input.classes || '' }}\">\n                <ng-container [ngSwitch]=\"input.type\">\n\n                    <!-- INPUT TEXT -->\n                    <n7-input-text *ngSwitchCase=\"'text'\" \n                        [data]=\"form.inputs[input.id].ds.out$ | async\"\n                        [emit]=\"form.inputs[input.id].emit\"></n7-input-text>\n\n                    <!-- INPUT CHECKBOX -->\n                    <n7-input-checkbox *ngSwitchCase=\"'checkbox'\" \n                        [data]=\"form.inputs[input.id].ds.out$ | async\"\n                        [emit]=\"form.inputs[input.id].emit\"></n7-input-checkbox>\n\n                    <!-- INPUT SELECT -->\n                    <n7-input-select *ngSwitchCase=\"'select'\" \n                        [data]=\"form.inputs[input.id].ds.out$ | async\"\n                        [emit]=\"form.inputs[input.id].emit\"></n7-input-select>\n\n                    <!-- DEFAULT (external template) -->\n                    <ng-container *ngSwitchDefault>\n                        <ng-template *ngTemplateOutlet=\"\n                        templateRef; \n                        context: { \n                            type: input.type, \n                            input: form.inputs[input.id] \n                        }\"></ng-template>\n                    </ng-container>\n\n                </ng-container>\n            </div>\n        </div>\n    </div>\n</div>"
+    })
+], MrFormComponent);
+
+let MrFormWrapperAccordionComponent = class MrFormWrapperAccordionComponent {
+    constructor() {
+        this.fakeEmit = (type, payload) => {
+            if (!this.emit) {
+                return;
+            }
+            this.emit(type, payload);
+        };
+    }
+    onReset() {
+        this.fakeEmit('reset');
+    }
+    onSubmit() {
+        this.fakeEmit('submit');
+    }
+};
+__decorate([
+    Input(),
+    __metadata("design:type", Object)
+], MrFormWrapperAccordionComponent.prototype, "data", void 0);
+__decorate([
+    Input(),
+    __metadata("design:type", Function)
+], MrFormWrapperAccordionComponent.prototype, "emit", void 0);
+MrFormWrapperAccordionComponent = __decorate([
+    Component({
+        selector: 'mr-form-wrapper-accordion',
+        template: "<div *ngIf=\"data\" class=\"mr-form-wrapper mr-form-wrapper-accordion\">\n    <ng-container *ngFor=\"let group of data.form.config.groups; index as $i\">\n        <div class=\"mr-form-wrapper__header\">\n            <n7-facet-header\n            *ngIf=\"group.options\"\n            [data]=\"group.options\"\n            [emit]=\"fakeEmit\"\n            ></n7-facet-header>\n        </div>\n\n        <div *ngIf=\"group.options.isOpen\" class=\"mr-form-wrapper__content\" [attr.id]=\"group.id\">\n            <mr-form [form]=\"data.form\" [group]=\"group\">\n                <!-- CUSTOM INPUTS -->\n                <!-- <ng-template let-type=\"type\" let-input=\"input\">\n                    <ng-container [ngSwitch]=\"type\">\n                        \n                        <n7-tag *ngSwitchCase=\"'tag'\" \n                            [data]=\"input.ds.out$ | async\"\n                            [emit]=\"input.emit\"></n7-tag>\n    \n                    </ng-container>\n                </ng-template> -->\n            </mr-form>\n        </div>\n    </ng-container>\n    \n    <div class=\"mr-form-wrapper__actions\">\n        <a class=\"n7-btn n7-btn-danger\" (click)=\"onReset()\">RESET</a>\n        <a class=\"n7-btn n7-btn-info\" (click)=\"onSubmit()\">SUBMIT</a>\n    </div>\n</div>"
+    })
+], MrFormWrapperAccordionComponent);
 
 const COMPONENTS$3 = [
     // Layout components
@@ -10699,8 +11219,11 @@ const COMPONENTS$3 = [
     MrSearchFacetsLayoutComponent,
     MrSearchLayoutComponent,
     MrStaticLayoutComponent,
+    MrAdvancedSearchLayoutComponent,
     // Custom components
-    ReadMoreComponent
+    ReadMoreComponent,
+    MrFormComponent,
+    MrFormWrapperAccordionComponent
 ];
 let N7BoilerplateMurucaModule = class N7BoilerplateMurucaModule {
 };
@@ -11088,5 +11611,5 @@ DynamicPathGuard = __decorate([
  * Generated bundle index. Do not edit.
  */
 
-export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapEH, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineEH, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, LocalConfigService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrBreadcrumbsDS, MrCollectionDS, MrContentDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrFooterService, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrResourceTabsDS, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageTitleDS, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrStaticMetadataDS, MrTextViewerDS, MrTranslationsLoaderService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, N7BoilerplateSandboxModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, RestProvider, SbDummyDS, SbDummyEH, SbExampleLayoutComponent, SbExampleLayoutConfig, SbExampleLayoutDS, SbExampleLayoutEH, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrGlossaryLayoutComponent as ɵba, MrHomeLayoutComponent as ɵbb, MrLayoutStateService as ɵbc, MrResourceLayoutComponent as ɵbd, MrSearchFacetsLayoutComponent as ɵbe, MrSearchLayoutComponent as ɵbf, MrSearchService as ɵbg, MrStaticLayoutComponent as ɵbh, ReadMoreComponent as ɵbi, SbExampleLayoutComponent as ɵbj, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, AwGalleryLayoutComponent as ɵl, AwSearchService as ɵm, AwHomeLayoutComponent as ɵn, AwMapLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwSearchLayoutComponent as ɵq, AwTimelineLayoutComponent as ɵr, BubbleChartWrapperComponent as ɵs, ChartTippyComponent as ɵt, SmartBreadcrumbsComponent as ɵu, AwFacetsWrapperComponent as ɵv, DataWidgetWrapperComponent as ɵw, DatepickerWrapperComponent as ɵx, DvExampleLayoutComponent as ɵy, EscapeHtmlPipe as ɵz };
+export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapEH, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineEH, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, LocalConfigService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrAdvancedSearchLayoutComponent, MrAdvancedSearchLayoutConfig, MrAdvancedSearchLayoutDS, MrAdvancedSearchLayoutEH, MrBreadcrumbsDS, MrCollectionDS, MrContentDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrFooterService, MrFormComponent, MrFormWrapperAccordionComponent, MrFormWrapperAccordionDS, MrFormWrapperAccordionEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrResourceTabsDS, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageTitleDS, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrStaticMetadataDS, MrTextViewerDS, MrTranslationsLoaderService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, N7BoilerplateSandboxModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, ReadMoreComponent, RestProvider, SbDummyDS, SbDummyEH, SbExampleLayoutComponent, SbExampleLayoutConfig, SbExampleLayoutDS, SbExampleLayoutEH, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrGlossaryLayoutComponent as ɵba, MrHomeLayoutComponent as ɵbb, MrLayoutStateService as ɵbc, MrResourceLayoutComponent as ɵbd, MrSearchFacetsLayoutComponent as ɵbe, MrSearchLayoutComponent as ɵbf, MrSearchService as ɵbg, MrStaticLayoutComponent as ɵbh, MrAdvancedSearchLayoutComponent as ɵbi, ReadMoreComponent as ɵbj, MrFormComponent as ɵbk, MrFormWrapperAccordionComponent as ɵbl, SbExampleLayoutComponent as ɵbm, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, AwGalleryLayoutComponent as ɵl, AwSearchService as ɵm, AwHomeLayoutComponent as ɵn, AwMapLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwSearchLayoutComponent as ɵq, AwTimelineLayoutComponent as ɵr, BubbleChartWrapperComponent as ɵs, ChartTippyComponent as ɵt, SmartBreadcrumbsComponent as ɵu, AwFacetsWrapperComponent as ɵv, DataWidgetWrapperComponent as ɵw, DatepickerWrapperComponent as ɵx, DvExampleLayoutComponent as ɵy, EscapeHtmlPipe as ɵz };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

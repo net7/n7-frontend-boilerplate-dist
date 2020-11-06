@@ -79,7 +79,7 @@ export declare class SmartPaginationDS extends DataSource {
         };
         links: any[];
         select: {
-            label: string;
+            label: any;
             options: any;
             payload: string;
         };

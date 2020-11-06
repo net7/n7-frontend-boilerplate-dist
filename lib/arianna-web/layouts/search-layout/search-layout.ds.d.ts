@@ -1,4 +1,4 @@
-import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
+import { LayoutDataSource } from '@n7-frontend/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 export declare class AwSearchLayoutDS extends LayoutDataSource {
     layoutId: string;

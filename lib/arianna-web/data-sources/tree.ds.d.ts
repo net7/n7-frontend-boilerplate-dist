@@ -1,4 +1,4 @@
-import { DataSource } from '@n7-frontend/core/dist/data-source';
+import { DataSource } from '@n7-frontend/core';
 export declare class AwTreeDS extends DataSource {
     static dataCache: any;
     private basePath;

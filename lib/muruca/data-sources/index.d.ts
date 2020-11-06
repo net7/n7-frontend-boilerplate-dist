@@ -17,3 +17,4 @@ export * from './search/search-results-title.ds';
 export * from './search/search-results.ds';
 export * from './search/search-tags.ds';
 export * from './static-metadata.ds';
+export * from './form-wrapper-accordion.ds';

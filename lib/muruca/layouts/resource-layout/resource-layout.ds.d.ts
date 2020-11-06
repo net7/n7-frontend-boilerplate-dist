@@ -10,11 +10,6 @@ export declare class MrResourceLayoutDS extends LayoutDataSource {
     id: string;
     tab: string;
     slug: string;
-    /** Stores "max height" for the read-more-wrapper from configuration */
-    readMoreConfig: {
-        limit: number;
-        label: string;
-    };
     errorTitle: any;
     errorDescription: any;
     onInit(payload: any): void;

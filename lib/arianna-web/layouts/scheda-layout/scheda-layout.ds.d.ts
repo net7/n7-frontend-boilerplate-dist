@@ -1,4 +1,4 @@
-import { LayoutDataSource } from '@n7-frontend/core/dist/layout-data-source';
+import { LayoutDataSource } from '@n7-frontend/core';
 export declare class AwSchedaLayoutDS extends LayoutDataSource {
     static tree: any;
     private destroyed$;
