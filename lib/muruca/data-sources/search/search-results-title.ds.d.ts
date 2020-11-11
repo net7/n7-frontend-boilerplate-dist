@@ -3,7 +3,7 @@ export declare class MrSearchResultsTitleDS extends DataSource {
     protected transform(data: any): {
         title: {
             main: {
-                text: any;
+                text: string;
             };
         };
         actions: {

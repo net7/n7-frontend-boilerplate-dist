@@ -3,7 +3,7 @@ export declare class MrSearchPageTitleDS extends DataSource {
     protected transform(): {
         title: {
             main: {
-                text: any;
+                text: string;
             };
         };
     };
