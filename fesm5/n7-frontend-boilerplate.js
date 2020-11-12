@@ -9,7 +9,7 @@ import { NavigationStart, Router, ActivatedRoute, RouterModule } from '@angular/
 import { Title, DomSanitizer } from '@angular/platform-browser';
 import { LayoutBuilder, LayoutDataSource, EventHandler, DataSource, _t, translate } from '@n7-frontend/core';
 import tippy, { hideAll } from 'tippy.js';
-import { isEmpty, get, max, min, cloneDeep, isNull, xor, merge as merge$1 } from 'lodash';
+import { isEmpty, get, max, min, cloneDeep, isNull, xor, merge as merge$1, clone } from 'lodash';
 import slugify from 'slugify';
 import { icon, LatLngBounds, markerClusterGroup, marker } from 'leaflet';
 import * as moment from 'moment';
@@ -9064,10 +9064,10 @@ var MrMetadataDS = /** @class */ (function (_super) {
                 else {
                     result.group.push({
                         group: [{
-                                items: [{
+                                items: value ? [{
                                         label: _t(itemLabel),
                                         value: _this.getItemValue(value)
-                                    }]
+                                    }] : []
                             }]
                     });
                 }
@@ -9083,7 +9083,9 @@ var MrMetadataDS = /** @class */ (function (_super) {
             };
         }
         return {
-            items: value.map(function (childItem) { return ({
+            items: value
+                .filter(function (childItem) { return !!childItem.value; })
+                .map(function (childItem) { return ({
                 label: _t(childItem.label),
                 value: _this.getItemValue(childItem.value)
             }); })
@@ -9246,15 +9248,17 @@ var MrSearchResultsDS = /** @class */ (function (_super) {
     MrSearchResultsDS.prototype.transform = function (data) {
         var results = data.results;
         var itemPreview = this.options.config.itemPreview;
-        var itemPreviewOptions = merge$1(ITEM_PREVIEW_DEFAULTS$2, (itemPreview || {}));
+        var itemPreviewOptions = merge$1(clone(ITEM_PREVIEW_DEFAULTS$2), (itemPreview || {}));
         return results.map(function (item) {
-            // striptags
-            if (itemPreviewOptions.striptags) {
-                item.text = helpers.striptags(item.text);
-            }
-            // limit
-            if (itemPreviewOptions.limit && (item.text.length > itemPreviewOptions.limit)) {
-                item.text = item.text.substring(0, itemPreviewOptions.limit) + "...";
+            if (typeof item.text === 'string') {
+                // striptags
+                if (itemPreviewOptions.striptags) {
+                    item.text = helpers.striptags(item.text);
+                }
+                // limit
+                if (itemPreviewOptions.limit && (item.text.length > itemPreviewOptions.limit)) {
+                    item.text = item.text.substring(0, itemPreviewOptions.limit) + "...";
+                }
             }
             // metadata
             var metadata = [];
