@@ -9870,7 +9870,12 @@ var MrResourceLayoutDS = /** @class */ (function (_super) {
         this.mainState = payload.mainState;
         this.configId = payload.configId;
         this.pageConfig = this.configuration.get(this.configId);
-        this.tabConfig = this.configuration.get('tabs')[this.pageConfig.tabs];
+        // tabs config
+        var tabs = this.configuration.get('tabs');
+        var pageTabs = this.pageConfig.tabs;
+        if (tabs && pageTabs) {
+            this.tabConfig = tabs[pageTabs];
+        }
         // add translations
         ['top', 'content'].forEach(function (type) {
             _this.pageConfig.sections[type] = _this.pageConfig.sections[type].map(function (section) { return (__assign(__assign({}, section), { title: _t(section.title) })); });
