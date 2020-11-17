@@ -9276,10 +9276,10 @@
                     else {
                         result.group.push({
                             group: [{
-                                    items: [{
+                                    items: value ? [{
                                             label: core$1._t(itemLabel),
                                             value: _this.getItemValue(value)
-                                        }]
+                                        }] : []
                                 }]
                         });
                     }
@@ -9295,7 +9295,9 @@
                 };
             }
             return {
-                items: value.map(function (childItem) { return ({
+                items: value
+                    .filter(function (childItem) { return !!childItem.value; })
+                    .map(function (childItem) { return ({
                     label: core$1._t(childItem.label),
                     value: _this.getItemValue(childItem.value)
                 }); })
@@ -9458,15 +9460,17 @@
         MrSearchResultsDS.prototype.transform = function (data) {
             var results = data.results;
             var itemPreview = this.options.config.itemPreview;
-            var itemPreviewOptions = lodash.merge(ITEM_PREVIEW_DEFAULTS$2, (itemPreview || {}));
+            var itemPreviewOptions = lodash.merge(lodash.clone(ITEM_PREVIEW_DEFAULTS$2), (itemPreview || {}));
             return results.map(function (item) {
-                // striptags
-                if (itemPreviewOptions.striptags) {
-                    item.text = helpers.striptags(item.text);
-                }
-                // limit
-                if (itemPreviewOptions.limit && (item.text.length > itemPreviewOptions.limit)) {
-                    item.text = item.text.substring(0, itemPreviewOptions.limit) + "...";
+                if (typeof item.text === 'string') {
+                    // striptags
+                    if (itemPreviewOptions.striptags) {
+                        item.text = helpers.striptags(item.text);
+                    }
+                    // limit
+                    if (itemPreviewOptions.limit && (item.text.length > itemPreviewOptions.limit)) {
+                        item.text = item.text.substring(0, itemPreviewOptions.limit) + "...";
+                    }
                 }
                 // metadata
                 var metadata = [];

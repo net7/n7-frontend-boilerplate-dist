@@ -9,7 +9,7 @@ import { NavigationStart, Router, ActivatedRoute, RouterModule } from '@angular/
 import { Title, DomSanitizer } from '@angular/platform-browser';
 import { LayoutBuilder, LayoutDataSource, EventHandler, DataSource, _t, translate } from '@n7-frontend/core';
 import tippy, { hideAll } from 'tippy.js';
-import { isEmpty, get, max, min, cloneDeep, isNull, xor, merge as merge$1 } from 'lodash';
+import { isEmpty, get, max, min, cloneDeep, isNull, xor, merge as merge$1, clone } from 'lodash';
 import slugify from 'slugify';
 import { icon, LatLngBounds, markerClusterGroup, marker } from 'leaflet';
 import * as moment from 'moment';
@@ -8880,10 +8880,10 @@ class MrMetadataDS extends DataSource {
                 else {
                     result.group.push({
                         group: [{
-                                items: [{
+                                items: value ? [{
                                         label: _t(itemLabel),
                                         value: this.getItemValue(value)
-                                    }]
+                                    }] : []
                             }]
                     });
                 }
@@ -8898,7 +8898,9 @@ class MrMetadataDS extends DataSource {
             };
         }
         return {
-            items: value.map((childItem) => ({
+            items: value
+                .filter((childItem) => !!childItem.value)
+                .map((childItem) => ({
                 label: _t(childItem.label),
                 value: this.getItemValue(childItem.value)
             }))
@@ -9019,15 +9021,17 @@ class MrSearchResultsDS extends DataSource {
     transform(data) {
         const { results } = data;
         const { itemPreview } = this.options.config;
-        const itemPreviewOptions = merge$1(ITEM_PREVIEW_DEFAULTS$2, (itemPreview || {}));
+        const itemPreviewOptions = merge$1(clone(ITEM_PREVIEW_DEFAULTS$2), (itemPreview || {}));
         return results.map((item) => {
-            // striptags
-            if (itemPreviewOptions.striptags) {
-                item.text = helpers.striptags(item.text);
-            }
-            // limit
-            if (itemPreviewOptions.limit && (item.text.length > itemPreviewOptions.limit)) {
-                item.text = `${item.text.substring(0, itemPreviewOptions.limit)}...`;
+            if (typeof item.text === 'string') {
+                // striptags
+                if (itemPreviewOptions.striptags) {
+                    item.text = helpers.striptags(item.text);
+                }
+                // limit
+                if (itemPreviewOptions.limit && (item.text.length > itemPreviewOptions.limit)) {
+                    item.text = `${item.text.substring(0, itemPreviewOptions.limit)}...`;
+                }
             }
             // metadata
             const metadata = [];
