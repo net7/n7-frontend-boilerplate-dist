@@ -40,5 +40,6 @@ export declare class MrSearchService {
     private onResultsLoading;
     private onFacetsRequestSuccess;
     private onFacetsScroll;
+    isQueryParamKey: (input: any) => boolean;
     notEquals(val1: any, val2: any): boolean;
 }

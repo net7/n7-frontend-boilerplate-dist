@@ -199,7 +199,7 @@ let RestProvider = class RestProvider {
             throw Error(`No config found for requestId "${requestId}"`);
         }
         if (method === 'POST' || method === 'PUT') {
-            return this.http[method.toLowerCase()](providerConfig.baseUrl + point, params, httpOptions);
+            return this.http[method.toLowerCase()](providerConfig.baseUrl + point + urlParams, params, httpOptions);
         }
         if (method === 'GET' || method === 'DELETE') {
             return this.http[method.toLowerCase()](providerConfig.baseUrl + point + urlParams, httpOptions);
@@ -8039,6 +8039,7 @@ let MrSearchService = class MrSearchService {
         this.state$ = {};
         this.beforeHook = {};
         this.getConfig = () => this.config;
+        this.isQueryParamKey = (input) => this.queryParamKeys.includes(input);
     }
     init(searchId, config) {
         this.searchId = searchId;
@@ -10410,7 +10411,7 @@ class MrSearchLayoutEH extends EventHandler {
             defaultSort = pageConfig.sort.options[0].value;
         }
         // inputs listener
-        this.searchService.getState$(INPUT_STATE_CONTEXT).pipe(takeUntil(this.destroyed$)).subscribe(({ lastUpdated, state }) => {
+        this.searchService.getState$(INPUT_STATE_CONTEXT).pipe(filter(({ lastUpdated }) => this.searchService.isQueryParamKey(lastUpdated)), takeUntil(this.destroyed$)).subscribe(({ lastUpdated, state }) => {
             this.searchState = state;
             if (lastUpdated !== 'page') {
                 this.searchService.setState(INPUT_STATE_CONTEXT, 'page', 1);
@@ -11477,19 +11478,37 @@ let MrMenuService = class MrMenuService {
     _handleResponse(response) {
         if (response) {
             const headerConfig = this.configuration.get('header');
-            headerConfig.nav.items = response.map(({ label, slug, isStatic }) => {
+            headerConfig.nav.items = response.map(({ label, slug, isStatic, subpages }) => {
                 const href = `/${slug}`;
                 // dynamic path control
                 if (!isStatic) {
                     this.dynamicPaths.push(href);
                 }
-                return {
+                const item = {
                     text: label,
                     anchor: { href },
                     _meta: {
                         id: href
                     }
                 };
+                if (subpages !== undefined) {
+                    item.subnav = [];
+                    subpages.forEach((el) => {
+                        let subHref = '';
+                        if (!el.isStatic) {
+                            subHref = `/${el.slug}`;
+                            this.dynamicPaths.push(subHref);
+                        }
+                        item.subnav.push({
+                            text: el.label,
+                            anchor: { href: subHref },
+                            _meta: {
+                                id: subHref
+                            }
+                        });
+                    });
+                }
+                return item;
             });
             this.configuration.set('header', headerConfig);
         }

@@ -208,7 +208,7 @@ var RestProvider = /** @class */ (function () {
             throw Error("No config found for requestId \"" + requestId + "\"");
         }
         if (method === 'POST' || method === 'PUT') {
-            return this.http[method.toLowerCase()](providerConfig.baseUrl + point, params, httpOptions);
+            return this.http[method.toLowerCase()](providerConfig.baseUrl + point + urlParams, params, httpOptions);
         }
         if (method === 'GET' || method === 'DELETE') {
             return this.http[method.toLowerCase()](providerConfig.baseUrl + point + urlParams, httpOptions);
@@ -8132,6 +8132,7 @@ var MrSearchService = /** @class */ (function () {
         this.state$ = {};
         this.beforeHook = {};
         this.getConfig = function () { return _this.config; };
+        this.isQueryParamKey = function (input) { return _this.queryParamKeys.includes(input); };
     }
     MrSearchService.prototype.init = function (searchId, config) {
         this.searchId = searchId;
@@ -10877,7 +10878,10 @@ var MrSearchLayoutEH = /** @class */ (function (_super) {
             defaultSort = pageConfig.sort.options[0].value;
         }
         // inputs listener
-        this.searchService.getState$(INPUT_STATE_CONTEXT).pipe(takeUntil(this.destroyed$)).subscribe(function (_a) {
+        this.searchService.getState$(INPUT_STATE_CONTEXT).pipe(filter(function (_a) {
+            var lastUpdated = _a.lastUpdated;
+            return _this.searchService.isQueryParamKey(lastUpdated);
+        }), takeUntil(this.destroyed$)).subscribe(function (_a) {
             var lastUpdated = _a.lastUpdated, state = _a.state;
             _this.searchState = state;
             if (lastUpdated !== 'page') {
@@ -12069,19 +12073,37 @@ var MrMenuService = /** @class */ (function () {
         if (response) {
             var headerConfig = this.configuration.get('header');
             headerConfig.nav.items = response.map(function (_a) {
-                var label = _a.label, slug = _a.slug, isStatic = _a.isStatic;
+                var label = _a.label, slug = _a.slug, isStatic = _a.isStatic, subpages = _a.subpages;
                 var href = "/" + slug;
                 // dynamic path control
                 if (!isStatic) {
                     _this.dynamicPaths.push(href);
                 }
-                return {
+                var item = {
                     text: label,
                     anchor: { href: href },
                     _meta: {
                         id: href
                     }
                 };
+                if (subpages !== undefined) {
+                    item.subnav = [];
+                    subpages.forEach(function (el) {
+                        var subHref = '';
+                        if (!el.isStatic) {
+                            subHref = "/" + el.slug;
+                            _this.dynamicPaths.push(subHref);
+                        }
+                        item.subnav.push({
+                            text: el.label,
+                            anchor: { href: subHref },
+                            _meta: {
+                                id: subHref
+                            }
+                        });
+                    });
+                }
+                return item;
             });
             this.configuration.set('header', headerConfig);
         }
