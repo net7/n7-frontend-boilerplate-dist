@@ -30,6 +30,7 @@ export { DvExampleLayoutComponent as ɵy } from './lib/data-viz/layout/example-l
 export { MrFormWrapperAccordionComponent as ɵbl } from './lib/muruca/components/form-wrapper-accordion/form-wrapper-accordion';
 export { MrFormComponent as ɵbk } from './lib/muruca/components/form/form';
 export { ReadMoreComponent as ɵbj } from './lib/muruca/components/read-more/read-more';
+export { MrSearchPageDescriptionComponent as ɵbm } from './lib/muruca/components/search-page-description/search-page-description';
 export { MrAdvancedSearchLayoutComponent as ɵbi } from './lib/muruca/layouts/advanced-search-layout/advanced-search-layout';
 export { MrGlossaryLayoutComponent as ɵba } from './lib/muruca/layouts/glossary-layout/glossary-layout';
 export { MrHomeLayoutComponent as ɵbb } from './lib/muruca/layouts/home-layout/home-layout';
@@ -40,4 +41,4 @@ export { MrStaticLayoutComponent as ɵbh } from './lib/muruca/layouts/static-lay
 export { EscapeHtmlPipe as ɵz } from './lib/muruca/pipes/keep-html.pipe';
 export { MrLayoutStateService as ɵbc } from './lib/muruca/services/layout-state.service';
 export { MrSearchService as ɵbg } from './lib/muruca/services/search.service';
-export { SbExampleLayoutComponent as ɵbm } from './lib/sandbox/layout/example-layout/example-layout';
+export { SbExampleLayoutComponent as ɵbn } from './lib/sandbox/layout/example-layout/example-layout';
