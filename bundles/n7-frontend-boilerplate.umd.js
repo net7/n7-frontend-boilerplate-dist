@@ -9931,7 +9931,23 @@
             return _super !== null && _super.apply(this, arguments) || this;
         }
         MrSliderDS.prototype.transform = function (data) {
-            return data;
+            var slides = data.slides;
+            return {
+                slides: slides,
+                containerId: "carousel-" + this.id,
+                // classes: 'demo',
+                libOptions: {
+                    count: 1,
+                    move: 1,
+                    // touch: true,
+                    // mode: 'align',
+                    buttons: true,
+                    dots: true,
+                    rewind: true,
+                    autoplay: 0,
+                    animation: 500,
+                },
+            };
         };
         return MrSliderDS;
     }(core$1.DataSource));

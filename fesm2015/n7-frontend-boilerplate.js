@@ -9408,7 +9408,23 @@ const MrHomeLayoutConfig = {
 
 class MrSliderDS extends DataSource {
     transform(data) {
-        return data;
+        const { slides } = data;
+        return {
+            slides,
+            containerId: `carousel-${this.id}`,
+            // classes: 'demo',
+            libOptions: {
+                count: 1,
+                move: 1,
+                // touch: true,
+                // mode: 'align',
+                buttons: true,
+                dots: true,
+                rewind: true,
+                autoplay: 0,
+                animation: 500,
+            },
+        };
     }
 }
 
