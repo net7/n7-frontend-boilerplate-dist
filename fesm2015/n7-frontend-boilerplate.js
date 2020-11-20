@@ -8393,7 +8393,12 @@ let MrSearchService = class MrSearchService {
             // update internal filter state
             const { filtered_total_count } = responseFacets[inputKey];
             this.internalFilterState.facets[inputKey].filtered_total_count = filtered_total_count;
-            responseFacets[inputKey].values = responseFacets[inputKey].values.map((item) => (Object.assign(Object.assign({}, item), { payload: item.payload && typeof item.payload === 'string' ? encodeURIComponent(item.payload) : item.payload })));
+            // responseFacets[inputKey].values = responseFacets[inputKey].values.map((item) => ({
+            //   ...item,
+            //   payload: item.payload && typeof item.payload === 'string'
+            //     ? encodeURIComponent(item.payload)
+            //     : item.payload
+            // }));
         });
         this.setState(FACETS_REQUEST_STATE_CONTEXT, 'success', response);
     }

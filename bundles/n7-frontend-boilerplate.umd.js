@@ -8718,7 +8718,12 @@
                 // update internal filter state
                 var filtered_total_count = responseFacets[inputKey].filtered_total_count;
                 _this.internalFilterState.facets[inputKey].filtered_total_count = filtered_total_count;
-                responseFacets[inputKey].values = responseFacets[inputKey].values.map(function (item) { return (__assign(__assign({}, item), { payload: item.payload && typeof item.payload === 'string' ? encodeURIComponent(item.payload) : item.payload })); });
+                // responseFacets[inputKey].values = responseFacets[inputKey].values.map((item) => ({
+                //   ...item,
+                //   payload: item.payload && typeof item.payload === 'string'
+                //     ? encodeURIComponent(item.payload)
+                //     : item.payload
+                // }));
             });
             this.setState(FACETS_REQUEST_STATE_CONTEXT, 'success', response);
         };
