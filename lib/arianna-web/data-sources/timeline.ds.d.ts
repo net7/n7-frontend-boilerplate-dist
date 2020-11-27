@@ -4,6 +4,7 @@ export declare class AwTimelineDS extends DataSource {
     timeline: any;
     timelineLoaded$: Subject<void>;
     dataSet: any;
+    timelineControlsVisible: boolean;
     protected transform: (data: any) => {
         containerID: string;
         libOptions: {
