@@ -2649,6 +2649,13 @@ class AwEntitaNavDS extends DataSource {
             anchor: { href: `${param.basePath}/informazioni` },
             classes: selected === 'informazioni' ? 'is-selected' : '',
         });
+        if (data.relatedLa) {
+            navigation.items.push({
+                text: labels['aggregazioni-logiche-collegate'],
+                anchor: { href: `${param.basePath}/fondi-collegati` },
+                classes: selected === 'fondi-collegati' ? 'is-selected' : '',
+            });
+        }
         if (data.relatedItems) {
             navigation.items.push({
                 text: 'OGGETTI COLLEGATI',
@@ -2666,13 +2673,6 @@ class AwEntitaNavDS extends DataSource {
                 text: 'ENTITÀ COLLEGATE',
                 anchor: { href: `${param.basePath}/entita-collegate` },
                 classes: selected === 'entita-collegate' ? 'is-selected' : '',
-            });
-        }
-        if (data.relatedLa) {
-            navigation.items.push({
-                text: labels['aggregazioni-logiche-collegate'],
-                anchor: { href: `${param.basePath}/fondi-collegati` },
-                classes: selected === 'fondi-collegati' ? 'is-selected' : '',
             });
         }
         if (data.extraTab) {
