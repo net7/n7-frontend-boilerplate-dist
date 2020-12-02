@@ -1332,8 +1332,14 @@
                 } });
         };
         HeaderDS.prototype.onCurrentNavChange = function (payload) {
+            var _this = this;
             this.output.nav.items.forEach(function (item) {
-                item.classes = item._meta.id === payload ? ACTIVE_CLASS : '';
+                _this.updateItemClass(item, payload);
+                if (item.subnav) {
+                    item.subnav.forEach(function (subNavItem) {
+                        _this.updateItemClass(subNavItem, payload);
+                    });
+                }
             });
         };
         HeaderDS.prototype.onRouterChange = function () {
@@ -1362,6 +1368,19 @@
                 }
                 this.output.classes = classes.join(' ');
             }
+        };
+        HeaderDS.prototype.updateItemClass = function (item, payload) {
+            var itemClasses = [];
+            if (item.classes) {
+                itemClasses = itemClasses.concat(item.classes.split(' '));
+            }
+            if (item._meta.id === payload && !itemClasses.includes(ACTIVE_CLASS)) {
+                itemClasses.push(ACTIVE_CLASS);
+            }
+            else if (itemClasses.includes(ACTIVE_CLASS)) {
+                itemClasses.splice(itemClasses.indexOf(ACTIVE_CLASS, 1));
+            }
+            item.classes = itemClasses.join(' ');
         };
         return HeaderDS;
     }(core$1.DataSource));
@@ -1964,31 +1983,43 @@
         return "<a href=\"" + basePath + id + "/" + slug + "\">" + label + "</a>";
     };
     var ɵ3 = getLink;
-    var getRepeater = function (fields, labels, metadataToShow, type) {
+    var getRepeater = function (fields, labels, metadataToShow, type, parentLabel) {
         var html = [];
         fields
             .filter(function (_a) {
-            var key = _a.key, value = _a.value;
-            return metadataToShow.includes(key) && !metadataIsEmpty(value);
+            var subFields = _a.fields;
+            return subFields;
         })
-            .map(function (_a) {
-            var key = _a.key, value = _a.value;
-            return ({
-                key: key,
-                value: value,
-                order: metadataToShow.indexOf(key),
-                label: helpers.prettifySnakeCase(key, labels[type + "." + key])
-            });
-        })
-            .sort(function (a, b) { return a.order - b.order; })
             .forEach(function (_a) {
-            var label = _a.label, value = _a.value;
-            html.push("<dt>" + label + "</dt>");
-            html.push("<dd>" + value + "</dd>");
+            var subFields = _a.fields;
+            var subHtml = [];
+            subFields
+                .filter(function (_a) {
+                var key = _a.key, value = _a.value;
+                return metadataToShow.includes(parentLabel + "." + key) && !metadataIsEmpty(value);
+            })
+                .map(function (_a) {
+                var key = _a.key, value = _a.value;
+                return ({
+                    key: key,
+                    value: value,
+                    order: metadataToShow.indexOf(parentLabel + "." + key),
+                    label: helpers.prettifySnakeCase(key, labels[type + "." + parentLabel + "." + key])
+                });
+            })
+                .sort(function (a, b) { return a.order - b.order; })
+                .forEach(function (_a) {
+                var label = _a.label, value = _a.value;
+                subHtml.push("<div>");
+                subHtml.push("<dt>" + label + "</dt>");
+                subHtml.push("<dd>" + value + "</dd>");
+                subHtml.push("</div>");
+            });
+            if (subHtml.length) {
+                html.push("<dl>" + subHtml.join('') + "</dl>");
+            }
         });
-        return html.length
-            ? "<dl>" + html.join('') + "</dl>"
-            : null;
+        return html.length ? html.join('') : null;
     };
     var ɵ4 = getRepeater;
     var metadataHelper = {
@@ -2004,19 +2035,22 @@
                             result.push({ key: label, value: getLink(fields, paths) });
                         }
                         else if (isRepeater(fields)) {
-                            result.push({ key: label, value: getRepeater(fields, labels, metadataToShow, type) });
+                            result.push({
+                                key: label,
+                                value: getRepeater(fields, labels, metadataToShow, type, label)
+                            });
                         }
                         // default
                     }
-                    else {
+                    else if (metadataToShow.includes(key)) {
                         result.push({ key: key, value: value });
                     }
                 });
             }
             return result
                 .filter(function (_a) {
-                var key = _a.key, value = _a.value;
-                return metadataToShow.includes(key) && !metadataIsEmpty(value);
+                var value = _a.value;
+                return !metadataIsEmpty(value);
             })
                 .map(function (_a) {
                 var key = _a.key, value = _a.value;
@@ -7739,7 +7773,7 @@
         },
         getEntityDetails: {
             queryName: 'getEntity',
-            queryBody: "{\n        getEntity(__PARAMS__){\n          overviewTab\n          label\n          id\n          typeOfEntity\n          relatedLa: relatedAl {\n            thumbnail\n            relation          \n            item {\n              label\n              id\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n          fields {\n            ...\n            on KeyValueField {\n              key\n              value\n            }\n            ... on\n            KeyValueFieldGroup {\n              label\n              fields\n              {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n          extraTab\n          wikiTab {\n            text\n            url\n          }\n          relatedItems {\n            thumbnail\n            relation\n            item {\n              label\n              id\n              fields\n              {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n              breadcrumbs {\n                label\n                link\n              }\n            }\n            relatedTypesOfEntity {\n              type\n              count\n            }\n          }\n          relatedEntities {\n            entity {\n                id\n                label\n                typeOfEntity\n                relation\n            }\n            count\n          }\n        }\n      }\n      ",
+            queryBody: "{\n        getEntity(__PARAMS__){\n          overviewTab\n          label\n          id\n          typeOfEntity\n          relatedLa: relatedAl {\n            thumbnail\n            relation          \n            item {\n              label\n              id\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n          fields {\n            ... on KeyValueField {\n              key\n              value\n            }\n            ... on KeyValueFieldGroup {\n              label\n              fields {\n                ... on KeyValueField {\n                  key\n                  value\n                }\n                ... on KeyValueFieldGroup {\n                  label\n                  fields {\n                    ... on KeyValueField {\n                      key\n                      value\n                    }\n                  }\n                }\n              }\n            }\n          }\n          extraTab\n          wikiTab {\n            text\n            url\n          }\n          relatedItems {\n            thumbnail\n            relation\n            item {\n              label\n              id\n              fields\n              {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n              breadcrumbs {\n                label\n                link\n              }\n            }\n            relatedTypesOfEntity {\n              type\n              count\n            }\n          }\n          relatedEntities {\n            entity {\n                id\n                label\n                typeOfEntity\n                relation\n            }\n            count\n          }\n        }\n      }\n      ",
         },
         getItem: {
             queryName: 'getItem',
@@ -7747,7 +7781,7 @@
         },
         getNode: {
             queryName: 'getNode',
-            queryBody: "{\n        getNode(__PARAMS__) {\n          ... on Item {\n            id\n            label\n            title\n            subTitle\n            image\n            images\n            text\n            document_type\n            fields {\n              ...\n              on KeyValueField {\n                key\n                value\n              }\n              ... on KeyValueFieldGroup {\n                label\n                fields {\n                  ...\n                  on KeyValueField {\n                    key\n                    value\n                  }\n                }\n              }\n            }\n            relatedEntities {\n                count\n                entity{\n                  id\n                  label\n                  typeOfEntity\n                  relation\n                }\n            }\n            relatedItems {\n              thumbnail\n              item {\n                label\n                id\n                fields {\n                  ...\n                  on KeyValueField {\n                    key\n                    value\n                  }\n                  ... on KeyValueFieldGroup {\n                    label\n                    fields {\n                      ...\n                      on KeyValueField {\n                        key\n                        value\n                      }\n                    }\n                  }\n                }\n                relatedTypesOfEntity {\n                  type\n                  count\n                }\n              }\n            }\n            breadcrumbs {\n              label\n              link\n            }\n          }\n          ... on Node {\n            id\n            label\n            img\n            document_type\n            fields {\n              ...\n              on KeyValueField {\n                key\n                value\n              }\n              ... on KeyValueFieldGroup {\n                label\n                fields {\n                  ...\n                  on KeyValueField {\n                    key\n                    value\n                  }\n                }\n              }\n            }\n            relatedEntities {\n              count\n              entity {\n                id\n                label\n                typeOfEntity\n                relation\n              }\n            }\n            breadcrumbs {\n              label\n              link\n            }\n          }\n        }\n      }",
+            queryBody: "{\n        getNode(__PARAMS__) {\n          ... on Item {\n            id\n            label\n            title\n            subTitle\n            image\n            images\n            text\n            document_type\n            fields {\n              ... on KeyValueField {\n                key\n                value\n              }\n              ... on KeyValueFieldGroup {\n                label\n                fields {\n                  ... on KeyValueField {\n                    key\n                    value\n                  }\n                  ... on KeyValueFieldGroup {\n                    label\n                    fields {\n                      ... on KeyValueField {\n                        key\n                        value\n                      }\n                    }\n                  }\n                }\n              }\n            }\n            relatedEntities {\n                count\n                entity{\n                  id\n                  label\n                  typeOfEntity\n                  relation\n                }\n            }\n            relatedItems {\n              thumbnail\n              item {\n                label\n                id\n                fields {\n                  ...\n                  on KeyValueField {\n                    key\n                    value\n                  }\n                  ... on KeyValueFieldGroup {\n                    label\n                    fields {\n                      ...\n                      on KeyValueField {\n                        key\n                        value\n                      }\n                    }\n                  }\n                }\n                relatedTypesOfEntity {\n                  type\n                  count\n                }\n              }\n            }\n            breadcrumbs {\n              label\n              link\n            }\n          }\n          ... on Node {\n            id\n            label\n            img\n            document_type\n            fields {\n              ... on KeyValueField {\n                key\n                value\n              }\n              ... on KeyValueFieldGroup {\n                label\n                fields {\n                  ... on KeyValueField {\n                    key\n                    value\n                  }\n                  ... on KeyValueFieldGroup {\n                    label\n                    fields {\n                      ... on KeyValueField {\n                        key\n                        value\n                      }\n                    }\n                  }\n                }\n              }\n            }\n            relatedEntities {\n              count\n              entity {\n                id\n                label\n                typeOfEntity\n                relation\n              }\n            }\n            breadcrumbs {\n              label\n              link\n            }\n          }\n        }\n      }",
         },
         autoComplete: {
             queryName: 'autoComplete',
@@ -8826,6 +8860,57 @@
         return MrLayoutStateService;
     }());
 
+    var MrResourceModalService = /** @class */ (function () {
+        function MrResourceModalService(configuration, communication) {
+            this.configuration = configuration;
+            this.communication = communication;
+            this.state$ = new rxjs.Subject();
+            // default state
+            this.state$.next({ status: 'IDLE' });
+        }
+        MrResourceModalService.prototype.open = function (resourceId, configId) {
+            var _this = this;
+            this.state$.next({ status: 'LOADING' });
+            var config = this.configuration.get("resource-modal-" + configId);
+            // add translations
+            ['top', 'content'].forEach(function (type) {
+                config.sections[type] = config.sections[type].map(function (section) { return (__assign(__assign({}, section), { title: core$1._t(section.title) })); });
+            });
+            this.pageRequest$(resourceId, config, function (err) {
+                console.warn("Error loading resource modal for " + resourceId, err.message);
+                _this.state$.next({ status: 'ERROR' });
+            }).subscribe(function (response) {
+                _this.state$.next({ response: response, config: config, status: 'SUCCESS', });
+            });
+        };
+        MrResourceModalService.prototype.close = function () {
+            this.state$.next({ status: 'IDLE' });
+        };
+        MrResourceModalService.prototype.pageRequest$ = function (id, config, onError) {
+            var _a = config.sections, top = _a.top, content = _a.content;
+            var sections = top.concat(content);
+            return this.communication.request$('resource', {
+                onError: onError,
+                method: 'POST',
+                params: {
+                    id: id,
+                    type: config.type,
+                    sections: sections.map(function (s) { return s.id; }),
+                }
+            });
+        };
+        MrResourceModalService.ctorParameters = function () { return [
+            { type: ConfigurationService },
+            { type: CommunicationService }
+        ]; };
+        MrResourceModalService = __decorate([
+            core.Injectable(),
+            __metadata("design:paramtypes", [ConfigurationService,
+                CommunicationService])
+        ], MrResourceModalService);
+        return MrResourceModalService;
+    }());
+
     var EscapeHtmlPipe = /** @class */ (function () {
         function EscapeHtmlPipe(sanitizer) {
             this.sanitizer = sanitizer;
@@ -8982,6 +9067,7 @@
                     }
                 },
                 items: items.map(function (item) {
+                    var anchor = null;
                     if (item.text) {
                         // Sanitize HTML tags from the text content
                         if (itemPreviewOptions.striptags) {
@@ -8992,10 +9078,18 @@
                             item.text = item.text.substring(0, itemPreviewOptions.limit) + "...";
                         }
                     }
-                    return __assign(__assign({}, item), { anchor: {
+                    if (item.link) {
+                        anchor = {
                             href: linksHelper.getRouterLink(item.link),
                             queryParams: linksHelper.getQueryParams(item.link)
-                        }, classes: classes || '' });
+                        };
+                    }
+                    if (item.payload) {
+                        anchor = {
+                            payload: __assign({}, item.payload)
+                        };
+                    }
+                    return __assign(__assign({}, item), { anchor: anchor, classes: classes || '' });
                 })
             };
         };
@@ -10067,15 +10161,21 @@
             return _super !== null && _super.apply(this, arguments) || this;
         }
         MrCollectionEH.prototype.listen = function () {
-            // this.innerEvents$.subscribe(({ type, payload }) => {
-            //   switch (type) {
-            //     case `${this.dataSource.id}.<event-type>`:
-            //       // TODO
-            //       break;
-            //     default:
-            //       break;
-            //   }
-            // });
+            var _this = this;
+            this.innerEvents$.subscribe(function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case _this.dataSource.id + ".click": {
+                        var action = payload.action;
+                        if (action === 'resource-modal') {
+                            _this.emitOuter('openresourcemodal', payload);
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            });
         };
         return MrCollectionEH;
     }(core$1.EventHandler));
@@ -10284,6 +10384,7 @@
                     case 'mr-resource-layout.init':
                         {
                             _this.route = payload.route;
+                            _this.modalService = payload.modalService;
                             var _b = _this.route.snapshot.params, slug = _b.slug, id = _b.id;
                             var url = _this.route.snapshot.url;
                             _this.dataSource.tab = url[url.length - 1].path;
@@ -10300,6 +10401,13 @@
                     default:
                         console.warn('unhandled inner event of type', type);
                         break;
+                }
+            });
+            this.outerEvents$.subscribe(function (_a) {
+                var type = _a.type, payload = _a.payload;
+                if (type.indexOf('openresourcemodal') !== -1) {
+                    var id = payload.id, resourceType = payload.type;
+                    _this.modalService.open(id, resourceType);
                 }
             });
         };
@@ -10365,10 +10473,11 @@
     };
     var EVENTHANDLER_MAP$1 = {
         viewer: MrImageViewerEH,
+        collection: MrCollectionEH,
     };
     var MrResourceLayoutComponent = /** @class */ (function (_super) {
         __extends(MrResourceLayoutComponent, _super);
-        function MrResourceLayoutComponent(layoutsConfiguration, activatedRoute, configuration, communication, mainState, route, layoutState) {
+        function MrResourceLayoutComponent(layoutsConfiguration, activatedRoute, configuration, communication, mainState, route, layoutState, modalService) {
             var _this = _super.call(this, layoutsConfiguration.get('MrResourceLayoutConfig') || MrResourceLayoutConfig) || this;
             _this.activatedRoute = activatedRoute;
             _this.configuration = configuration;
@@ -10376,6 +10485,7 @@
             _this.mainState = mainState;
             _this.route = route;
             _this.layoutState = layoutState;
+            _this.modalService = modalService;
             return _this;
         }
         MrResourceLayoutComponent.prototype.initPayload = function () {
@@ -10385,6 +10495,7 @@
                 communication: this.communication,
                 mainState: this.mainState,
                 layoutState: this.layoutState,
+                modalService: this.modalService,
                 options: this.config.options || {},
                 route: this.route
             };
@@ -10425,7 +10536,8 @@
             { type: CommunicationService },
             { type: MainStateService },
             { type: router.ActivatedRoute },
-            { type: MrLayoutStateService }
+            { type: MrLayoutStateService },
+            { type: MrResourceModalService }
         ]; };
         MrResourceLayoutComponent = __decorate([
             core.Component({
@@ -10438,7 +10550,8 @@
                 CommunicationService,
                 MainStateService,
                 router.ActivatedRoute,
-                MrLayoutStateService])
+                MrLayoutStateService,
+                MrResourceModalService])
         ], MrResourceLayoutComponent);
         return MrResourceLayoutComponent;
     }(AbstractLayout));
@@ -12175,6 +12288,88 @@
         return MrSearchPageDescriptionComponent;
     }());
 
+    var DATASOURCE_MAP$3 = {
+        collection: MrCollectionDS,
+        metadata: MrMetadataDS,
+        preview: MrItemPreviewDS,
+        title: MrInnerTitleDS,
+    };
+    var MrResourceModalComponent = /** @class */ (function () {
+        function MrResourceModalComponent(router, modalService) {
+            this.router = router;
+            this.modalService = modalService;
+            this.destroy$ = new rxjs.Subject();
+            this.status = 'IDLE';
+            this.widgets = {};
+            this.errorTitle = core$1._t('global#layout_error_title');
+            this.errorDescription = core$1._t('global#layout_error_description');
+        }
+        MrResourceModalComponent.prototype.ngOnInit = function () {
+            var _this = this;
+            this.modalService.state$
+                .pipe(operators.takeUntil(this.destroy$))
+                .subscribe(function (_a) {
+                var status = _a.status, config = _a.config, response = _a.response;
+                _this.status = status;
+                _this.config = config;
+                if (status === 'SUCCESS') {
+                    _this.loadWidgets(config, response);
+                }
+            });
+            // on router change close
+            this.router.events.pipe(operators.takeUntil(this.destroy$), operators.filter(function () { return !lodash.isEmpty(_this.widgets); }), operators.filter(function (event) { return event instanceof router.NavigationStart; })).subscribe(function () {
+                _this.onClose();
+            });
+        };
+        MrResourceModalComponent.prototype.ngOnDestroy = function () {
+            // reset
+            this.onClose();
+            this.destroy$.next();
+        };
+        MrResourceModalComponent.prototype.onClose = function (target) {
+            if (target && target.className !== 'mr-resource-modal__overlay') {
+                return;
+            }
+            this.widgets = {};
+            this.modalService.close();
+        };
+        MrResourceModalComponent.prototype.loadWidgets = function (config, response) {
+            var _this = this;
+            var _a = config.sections, top = _a.top, content = _a.content;
+            var sections = top.concat(content);
+            if (sections) {
+                sections.forEach(function (_a) {
+                    var id = _a.id, type = _a.type, options = _a.options;
+                    var data = response.sections[id];
+                    _this.widgets[id] = {
+                        ds: new DATASOURCE_MAP$3[type]()
+                    };
+                    // update options
+                    if (options) {
+                        _this.widgets[id].ds.options = options;
+                    }
+                    // update data
+                    if (data) {
+                        _this.widgets[id].ds.update(data);
+                    }
+                });
+            }
+        };
+        MrResourceModalComponent.ctorParameters = function () { return [
+            { type: router.Router },
+            { type: MrResourceModalService }
+        ]; };
+        MrResourceModalComponent = __decorate([
+            core.Component({
+                selector: 'mr-resource-modal',
+                template: "<div *ngIf=\"status !== 'IDLE'\" class=\"mr-resource mr-resource-modal mr-layout\" [ngClass]=\"{\n        'is-loading': status === 'LOADING',\n        'is-error': status === 'ERROR'\n      }\">\n    <div class=\"mr-resource-modal__overlay\" (click)=\"onClose($event.target)\">\n        <div class=\"mr-resource-modal__container\">\n            <!-- RESOURCE MODAL CLOSE BTN -->\n            <div class=\"mr-resource__close\">\n                <a (click)=\"onClose()\"><span class=\"n7-icon-close\"></span></a>\n            </div>\n        \n            <!-- RESOURCE MODAL CONTENT -->\n            <ng-container [ngSwitch]=\"status\">\n                <!-- loading -->\n                <ng-container *ngSwitchCase=\"'LOADING'\">\n                    <div class=\"mr-layout__loader\">\n                        <n7-loader></n7-loader>\n                    </div>\n                </ng-container>\n        \n                <!-- error -->\n                <ng-container *ngSwitchCase=\"'ERROR'\">\n                    <div class=\"mr-layout__error\">\n                        <h2>{{ errorTitle }}</h2>\n                        <p>{{ errorDescription }}</p>\n                    </div>\n                </ng-container>\n        \n                <!-- success -->\n                <ng-container *ngSwitchCase=\"'SUCCESS'\">\n                    <ng-container *ngIf=\"config.sections as sections\">\n                        <!-- Pass the list of blocks to render to the block template -->\n                        <div class=\"mr-resource__top\">\n                            <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\n                        </div>\n                        <div class=\"mr-resource__content mr-side-margin\">\n                            <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\n                        </div>\n                    </ng-container>\n                </ng-container>\n        \n            </ng-container>\n        </div>\n    </div>\n</div>\n\n<ng-template #blocks let-list>\n    <ng-container *ngFor=\"let section of list\">\n        <section *ngIf=\"widgets[section.id].ds && (widgets[section.id].ds.out$ | async)\"\n            class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\n            <ng-container [ngSwitch]=\"section.type\">\n\n                <!-- INNER TITLE -->\n                <ng-container *ngSwitchCase=\"'title'\">\n                    <div class=\"mr-resource__title-content mr-side-margin\">\n                        <n7-inner-title [data]=\"widgets[section.id].ds.out$ | async\">\n                        </n7-inner-title>\n                    </div>\n                </ng-container>\n\n                <!-- METADATA VIEWER -->\n                <ng-container *ngSwitchCase=\"'metadata'\">\n                    <div class=\"mr-resource__metadata-content\">\n                        <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__metadata-title\">\n                            {{ section.title }}\n                        </h3>\n                        <mr-read-more [data]=\"section.readmore\">\n                            <n7-metadata-viewer [data]=\"widgets[section.id].ds.out$ | async\">\n                            </n7-metadata-viewer>\n                        </mr-read-more>\n                    </div>\n                </ng-container>\n\n                <!-- COLLECTION -->\n                <ng-container *ngSwitchCase=\"'collection'\">\n                    <ng-container *ngIf=\"widgets[section.id].ds.out$ | async as collection$\">\n                        <div *ngIf=\"collection$.items?.length > 0\" class=\"mr-resource__collection-content\">\n                            <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title\">\n                                {{ section.title }}\n                            </h3>\n                            <div\n                                class=\"mr-resource__collection-grid {{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                                <n7-item-preview *ngFor=\"let item of collection$?.items\" [data]=\"item\">\n                                </n7-item-preview>\n                            </div>\n                        </div>\n                    </ng-container>\n                </ng-container>\n\n                <!-- ITEM PREVIEW -->\n                <ng-container *ngSwitchCase=\"'preview'\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__preview-title\">\n                        {{ section.title }}\n                    </h3>\n                    <n7-item-preview [data]=\"widgets[section.id].ds.out$ | async\">\n                    </n7-item-preview>\n                </ng-container>\n\n            </ng-container>\n        </section>\n    </ng-container>\n</ng-template>\n"
+            }),
+            __metadata("design:paramtypes", [router.Router,
+                MrResourceModalService])
+        ], MrResourceModalComponent);
+        return MrResourceModalComponent;
+    }());
+
     var COMPONENTS$3 = [
         // Layout components
         MrGlossaryLayoutComponent,
@@ -12188,7 +12383,8 @@
         ReadMoreComponent,
         MrFormComponent,
         MrFormWrapperAccordionComponent,
-        MrSearchPageDescriptionComponent
+        MrSearchPageDescriptionComponent,
+        MrResourceModalComponent
     ];
     var N7BoilerplateMurucaModule = /** @class */ (function () {
         function N7BoilerplateMurucaModule() {
@@ -12206,7 +12402,8 @@
                 ],
                 providers: [
                     MrSearchService,
-                    MrLayoutStateService
+                    MrLayoutStateService,
+                    MrResourceModalService
                 ],
                 entryComponents: COMPONENTS$3,
                 exports: COMPONENTS$3,
@@ -12474,13 +12671,14 @@
             if (response) {
                 var headerConfig = this.configuration.get('header');
                 headerConfig.nav.items = response.map(function (_a) {
-                    var label = _a.label, slug = _a.slug, isStatic = _a.isStatic, subpages = _a.subpages;
+                    var label = _a.label, slug = _a.slug, isStatic = _a.isStatic, subpages = _a.subpages, classes = _a.classes;
                     var href = "/" + slug;
                     // dynamic path control
                     if (!isStatic) {
                         _this.dynamicPaths.push(href);
                     }
                     var item = {
+                        classes: classes,
                         text: label,
                         anchor: { href: href },
                         _meta: {
@@ -12495,6 +12693,7 @@
                                 _this.dynamicPaths.push(subHref);
                             }
                             item.subnav.push({
+                                classes: el.classes || null,
                                 text: el.label,
                                 anchor: { href: subHref },
                                 _meta: {
@@ -12773,6 +12972,7 @@
     exports.MrResourceLayoutConfig = MrResourceLayoutConfig;
     exports.MrResourceLayoutDS = MrResourceLayoutDS;
     exports.MrResourceLayoutEH = MrResourceLayoutEH;
+    exports.MrResourceModalComponent = MrResourceModalComponent;
     exports.MrResourceTabsDS = MrResourceTabsDS;
     exports.MrSearchFacetsLayoutComponent = MrSearchFacetsLayoutComponent;
     exports.MrSearchLayoutComponent = MrSearchLayoutComponent;
@@ -12829,16 +13029,18 @@
     exports.ɵbb = MrHomeLayoutComponent;
     exports.ɵbc = MrLayoutStateService;
     exports.ɵbd = MrResourceLayoutComponent;
-    exports.ɵbe = MrSearchFacetsLayoutComponent;
-    exports.ɵbf = MrSearchLayoutComponent;
-    exports.ɵbg = MrSearchService;
-    exports.ɵbh = MrStaticLayoutComponent;
-    exports.ɵbi = MrAdvancedSearchLayoutComponent;
-    exports.ɵbj = ReadMoreComponent;
-    exports.ɵbk = MrFormComponent;
-    exports.ɵbl = MrFormWrapperAccordionComponent;
-    exports.ɵbm = MrSearchPageDescriptionComponent;
-    exports.ɵbn = SbExampleLayoutComponent;
+    exports.ɵbe = MrResourceModalService;
+    exports.ɵbf = MrSearchFacetsLayoutComponent;
+    exports.ɵbg = MrSearchLayoutComponent;
+    exports.ɵbh = MrSearchService;
+    exports.ɵbi = MrStaticLayoutComponent;
+    exports.ɵbj = MrAdvancedSearchLayoutComponent;
+    exports.ɵbk = ReadMoreComponent;
+    exports.ɵbl = MrFormComponent;
+    exports.ɵbm = MrFormWrapperAccordionComponent;
+    exports.ɵbn = MrSearchPageDescriptionComponent;
+    exports.ɵbo = MrResourceModalComponent;
+    exports.ɵbp = SbExampleLayoutComponent;
     exports.ɵc = ConfigurationService;
     exports.ɵd = LayoutsConfigurationService;
     exports.ɵe = MainStateService;

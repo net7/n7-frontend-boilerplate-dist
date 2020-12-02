@@ -10,6 +10,7 @@ declare type collectionResponse = {
         link?: string;
         title?: string;
         type?: string;
+        payload?: any;
     }[];
 };
 export declare class MrCollectionDS extends DataSource {

@@ -5,4 +5,5 @@ export declare class HeaderDS extends DataSource {
     onCurrentNavChange(payload: any): void;
     onRouterChange(): void;
     onClick(payload: any): void;
+    private updateItemClass;
 }

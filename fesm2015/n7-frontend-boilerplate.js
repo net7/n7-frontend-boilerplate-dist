@@ -1030,7 +1030,12 @@ class HeaderDS extends DataSource {
     }
     onCurrentNavChange(payload) {
         this.output.nav.items.forEach((item) => {
-            item.classes = item._meta.id === payload ? ACTIVE_CLASS : '';
+            this.updateItemClass(item, payload);
+            if (item.subnav) {
+                item.subnav.forEach((subNavItem) => {
+                    this.updateItemClass(subNavItem, payload);
+                });
+            }
         });
     }
     onRouterChange() {
@@ -1059,6 +1064,19 @@ class HeaderDS extends DataSource {
             }
             this.output.classes = classes.join(' ');
         }
+    }
+    updateItemClass(item, payload) {
+        let itemClasses = [];
+        if (item.classes) {
+            itemClasses = itemClasses.concat(item.classes.split(' '));
+        }
+        if (item._meta.id === payload && !itemClasses.includes(ACTIVE_CLASS)) {
+            itemClasses.push(ACTIVE_CLASS);
+        }
+        else if (itemClasses.includes(ACTIVE_CLASS)) {
+            itemClasses.splice(itemClasses.indexOf(ACTIVE_CLASS, 1));
+        }
+        item.classes = itemClasses.join(' ');
     }
 }
 
@@ -1569,24 +1587,32 @@ const getLink = (fields, paths) => {
     return `<a href="${basePath}${id}/${slug}">${label}</a>`;
 };
 const ɵ3 = getLink;
-const getRepeater = (fields, labels, metadataToShow, type) => {
+const getRepeater = (fields, labels, metadataToShow, type, parentLabel) => {
     const html = [];
     fields
-        .filter(({ key, value }) => metadataToShow.includes(key) && !metadataIsEmpty(value))
-        .map(({ key, value }) => ({
-        key,
-        value,
-        order: metadataToShow.indexOf(key),
-        label: helpers.prettifySnakeCase(key, labels[`${type}.${key}`])
-    }))
-        .sort((a, b) => a.order - b.order)
-        .forEach(({ label, value }) => {
-        html.push(`<dt>${label}</dt>`);
-        html.push(`<dd>${value}</dd>`);
+        .filter(({ fields: subFields }) => subFields)
+        .forEach(({ fields: subFields }) => {
+        const subHtml = [];
+        subFields
+            .filter(({ key, value }) => metadataToShow.includes(`${parentLabel}.${key}`) && !metadataIsEmpty(value))
+            .map(({ key, value }) => ({
+            key,
+            value,
+            order: metadataToShow.indexOf(`${parentLabel}.${key}`),
+            label: helpers.prettifySnakeCase(key, labels[`${type}.${parentLabel}.${key}`])
+        }))
+            .sort((a, b) => a.order - b.order)
+            .forEach(({ label, value }) => {
+            subHtml.push(`<div>`);
+            subHtml.push(`<dt>${label}</dt>`);
+            subHtml.push(`<dd>${value}</dd>`);
+            subHtml.push(`</div>`);
+        });
+        if (subHtml.length) {
+            html.push(`<dl>${subHtml.join('')}</dl>`);
+        }
     });
-    return html.length
-        ? `<dl>${html.join('')}</dl>`
-        : null;
+    return html.length ? html.join('') : null;
 };
 const ɵ4 = getRepeater;
 var metadataHelper = {
@@ -1600,17 +1626,20 @@ var metadataHelper = {
                         result.push({ key: label, value: getLink(fields, paths) });
                     }
                     else if (isRepeater(fields)) {
-                        result.push({ key: label, value: getRepeater(fields, labels, metadataToShow, type) });
+                        result.push({
+                            key: label,
+                            value: getRepeater(fields, labels, metadataToShow, type, label)
+                        });
                     }
                     // default
                 }
-                else {
+                else if (metadataToShow.includes(key)) {
                     result.push({ key, value });
                 }
             });
         }
         return result
-            .filter(({ key, value }) => metadataToShow.includes(key) && !metadataIsEmpty(value))
+            .filter(({ value }) => !metadataIsEmpty(value))
             .map(({ key, value }) => ({
             key,
             value,
@@ -7059,20 +7088,25 @@ var apolloConfig = {
             }
           }
           fields {
-            ...
-            on KeyValueField {
+            ... on KeyValueField {
               key
               value
             }
-            ... on
-            KeyValueFieldGroup {
+            ... on KeyValueFieldGroup {
               label
-              fields
-              {
-                ...
-                on KeyValueField {
+              fields {
+                ... on KeyValueField {
                   key
                   value
+                }
+                ... on KeyValueFieldGroup {
+                  label
+                  fields {
+                    ... on KeyValueField {
+                      key
+                      value
+                    }
+                  }
                 }
               }
             }
@@ -7188,18 +7222,25 @@ var apolloConfig = {
             text
             document_type
             fields {
-              ...
-              on KeyValueField {
+              ... on KeyValueField {
                 key
                 value
               }
               ... on KeyValueFieldGroup {
                 label
                 fields {
-                  ...
-                  on KeyValueField {
+                  ... on KeyValueField {
                     key
                     value
+                  }
+                  ... on KeyValueFieldGroup {
+                    label
+                    fields {
+                      ... on KeyValueField {
+                        key
+                        value
+                      }
+                    }
                   }
                 }
               }
@@ -7252,18 +7293,25 @@ var apolloConfig = {
             img
             document_type
             fields {
-              ...
-              on KeyValueField {
+              ... on KeyValueField {
                 key
                 value
               }
               ... on KeyValueFieldGroup {
                 label
                 fields {
-                  ...
-                  on KeyValueField {
+                  ... on KeyValueField {
                     key
                     value
+                  }
+                  ... on KeyValueFieldGroup {
+                    label
+                    fields {
+                      ... on KeyValueField {
+                        key
+                        value
+                      }
+                    }
                   }
                 }
               }
@@ -8494,6 +8542,55 @@ MrLayoutStateService = __decorate([
     Injectable()
 ], MrLayoutStateService);
 
+let MrResourceModalService = class MrResourceModalService {
+    constructor(configuration, communication) {
+        this.configuration = configuration;
+        this.communication = communication;
+        this.state$ = new Subject();
+        // default state
+        this.state$.next({ status: 'IDLE' });
+    }
+    open(resourceId, configId) {
+        this.state$.next({ status: 'LOADING' });
+        const config = this.configuration.get(`resource-modal-${configId}`);
+        // add translations
+        ['top', 'content'].forEach((type) => {
+            config.sections[type] = config.sections[type].map((section) => (Object.assign(Object.assign({}, section), { title: _t(section.title) })));
+        });
+        this.pageRequest$(resourceId, config, (err) => {
+            console.warn(`Error loading resource modal for ${resourceId}`, err.message);
+            this.state$.next({ status: 'ERROR' });
+        }).subscribe((response) => {
+            this.state$.next({ response, config, status: 'SUCCESS', });
+        });
+    }
+    close() {
+        this.state$.next({ status: 'IDLE' });
+    }
+    pageRequest$(id, config, onError) {
+        const { top, content } = config.sections;
+        const sections = top.concat(content);
+        return this.communication.request$('resource', {
+            onError,
+            method: 'POST',
+            params: {
+                id,
+                type: config.type,
+                sections: sections.map((s) => s.id),
+            }
+        });
+    }
+};
+MrResourceModalService.ctorParameters = () => [
+    { type: ConfigurationService },
+    { type: CommunicationService }
+];
+MrResourceModalService = __decorate([
+    Injectable(),
+    __metadata("design:paramtypes", [ConfigurationService,
+        CommunicationService])
+], MrResourceModalService);
+
 let EscapeHtmlPipe = class EscapeHtmlPipe {
     constructor(sanitizer) {
         this.sanitizer = sanitizer;
@@ -8625,6 +8722,7 @@ class MrCollectionDS extends DataSource {
                 }
             },
             items: items.map((item) => {
+                let anchor = null;
                 if (item.text) {
                     // Sanitize HTML tags from the text content
                     if (itemPreviewOptions.striptags) {
@@ -8635,10 +8733,18 @@ class MrCollectionDS extends DataSource {
                         item.text = `${item.text.substring(0, itemPreviewOptions.limit)}...`;
                     }
                 }
-                return Object.assign(Object.assign({}, item), { anchor: {
+                if (item.link) {
+                    anchor = {
                         href: linksHelper.getRouterLink(item.link),
                         queryParams: linksHelper.getQueryParams(item.link)
-                    }, classes: classes || '' });
+                    };
+                }
+                if (item.payload) {
+                    anchor = {
+                        payload: Object.assign({}, item.payload)
+                    };
+                }
+                return Object.assign(Object.assign({}, item), { anchor, classes: classes || '' });
             })
         };
     }
@@ -9515,15 +9621,19 @@ class MrSliderEH extends EventHandler {
 
 class MrCollectionEH extends EventHandler {
     listen() {
-        // this.innerEvents$.subscribe(({ type, payload }) => {
-        //   switch (type) {
-        //     case `${this.dataSource.id}.<event-type>`:
-        //       // TODO
-        //       break;
-        //     default:
-        //       break;
-        //   }
-        // });
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case `${this.dataSource.id}.click`: {
+                    const { action } = payload;
+                    if (action === 'resource-modal') {
+                        this.emitOuter('openresourcemodal', payload);
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+        });
     }
 }
 
@@ -9706,6 +9816,7 @@ class MrResourceLayoutEH extends EventHandler {
                 case 'mr-resource-layout.init':
                     {
                         this.route = payload.route;
+                        this.modalService = payload.modalService;
                         const { slug, id } = this.route.snapshot.params;
                         const { url } = this.route.snapshot;
                         this.dataSource.tab = url[url.length - 1].path;
@@ -9722,6 +9833,12 @@ class MrResourceLayoutEH extends EventHandler {
                 default:
                     console.warn('unhandled inner event of type', type);
                     break;
+            }
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
+            if (type.indexOf('openresourcemodal') !== -1) {
+                const { id, type: resourceType } = payload;
+                this.modalService.open(id, resourceType);
             }
         });
     }
@@ -9780,9 +9897,10 @@ const DATASOURCE_MAP$1 = {
 };
 const EVENTHANDLER_MAP$1 = {
     viewer: MrImageViewerEH,
+    collection: MrCollectionEH,
 };
 let MrResourceLayoutComponent = class MrResourceLayoutComponent extends AbstractLayout {
-    constructor(layoutsConfiguration, activatedRoute, configuration, communication, mainState, route, layoutState) {
+    constructor(layoutsConfiguration, activatedRoute, configuration, communication, mainState, route, layoutState, modalService) {
         super(layoutsConfiguration.get('MrResourceLayoutConfig') || MrResourceLayoutConfig);
         this.activatedRoute = activatedRoute;
         this.configuration = configuration;
@@ -9790,6 +9908,7 @@ let MrResourceLayoutComponent = class MrResourceLayoutComponent extends Abstract
         this.mainState = mainState;
         this.route = route;
         this.layoutState = layoutState;
+        this.modalService = modalService;
     }
     initPayload() {
         return {
@@ -9798,6 +9917,7 @@ let MrResourceLayoutComponent = class MrResourceLayoutComponent extends Abstract
             communication: this.communication,
             mainState: this.mainState,
             layoutState: this.layoutState,
+            modalService: this.modalService,
             options: this.config.options || {},
             route: this.route
         };
@@ -9836,7 +9956,8 @@ MrResourceLayoutComponent.ctorParameters = () => [
     { type: CommunicationService },
     { type: MainStateService },
     { type: ActivatedRoute },
-    { type: MrLayoutStateService }
+    { type: MrLayoutStateService },
+    { type: MrResourceModalService }
 ];
 MrResourceLayoutComponent = __decorate([
     Component({
@@ -9849,7 +9970,8 @@ MrResourceLayoutComponent = __decorate([
         CommunicationService,
         MainStateService,
         ActivatedRoute,
-        MrLayoutStateService])
+        MrLayoutStateService,
+        MrResourceModalService])
 ], MrResourceLayoutComponent);
 
 class SearchFacetsLayoutDS extends LayoutDataSource {
@@ -11386,6 +11508,83 @@ MrSearchPageDescriptionComponent = __decorate([
     })
 ], MrSearchPageDescriptionComponent);
 
+const DATASOURCE_MAP$3 = {
+    collection: MrCollectionDS,
+    metadata: MrMetadataDS,
+    preview: MrItemPreviewDS,
+    title: MrInnerTitleDS,
+};
+let MrResourceModalComponent = class MrResourceModalComponent {
+    constructor(router, modalService) {
+        this.router = router;
+        this.modalService = modalService;
+        this.destroy$ = new Subject();
+        this.status = 'IDLE';
+        this.widgets = {};
+        this.errorTitle = _t('global#layout_error_title');
+        this.errorDescription = _t('global#layout_error_description');
+    }
+    ngOnInit() {
+        this.modalService.state$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(({ status, config, response }) => {
+            this.status = status;
+            this.config = config;
+            if (status === 'SUCCESS') {
+                this.loadWidgets(config, response);
+            }
+        });
+        // on router change close
+        this.router.events.pipe(takeUntil(this.destroy$), filter(() => !isEmpty(this.widgets)), filter((event) => event instanceof NavigationStart)).subscribe(() => {
+            this.onClose();
+        });
+    }
+    ngOnDestroy() {
+        // reset
+        this.onClose();
+        this.destroy$.next();
+    }
+    onClose(target) {
+        if (target && target.className !== 'mr-resource-modal__overlay') {
+            return;
+        }
+        this.widgets = {};
+        this.modalService.close();
+    }
+    loadWidgets(config, response) {
+        const { top, content } = config.sections;
+        const sections = top.concat(content);
+        if (sections) {
+            sections.forEach(({ id, type, options }) => {
+                const data = response.sections[id];
+                this.widgets[id] = {
+                    ds: new DATASOURCE_MAP$3[type]()
+                };
+                // update options
+                if (options) {
+                    this.widgets[id].ds.options = options;
+                }
+                // update data
+                if (data) {
+                    this.widgets[id].ds.update(data);
+                }
+            });
+        }
+    }
+};
+MrResourceModalComponent.ctorParameters = () => [
+    { type: Router },
+    { type: MrResourceModalService }
+];
+MrResourceModalComponent = __decorate([
+    Component({
+        selector: 'mr-resource-modal',
+        template: "<div *ngIf=\"status !== 'IDLE'\" class=\"mr-resource mr-resource-modal mr-layout\" [ngClass]=\"{\n        'is-loading': status === 'LOADING',\n        'is-error': status === 'ERROR'\n      }\">\n    <div class=\"mr-resource-modal__overlay\" (click)=\"onClose($event.target)\">\n        <div class=\"mr-resource-modal__container\">\n            <!-- RESOURCE MODAL CLOSE BTN -->\n            <div class=\"mr-resource__close\">\n                <a (click)=\"onClose()\"><span class=\"n7-icon-close\"></span></a>\n            </div>\n        \n            <!-- RESOURCE MODAL CONTENT -->\n            <ng-container [ngSwitch]=\"status\">\n                <!-- loading -->\n                <ng-container *ngSwitchCase=\"'LOADING'\">\n                    <div class=\"mr-layout__loader\">\n                        <n7-loader></n7-loader>\n                    </div>\n                </ng-container>\n        \n                <!-- error -->\n                <ng-container *ngSwitchCase=\"'ERROR'\">\n                    <div class=\"mr-layout__error\">\n                        <h2>{{ errorTitle }}</h2>\n                        <p>{{ errorDescription }}</p>\n                    </div>\n                </ng-container>\n        \n                <!-- success -->\n                <ng-container *ngSwitchCase=\"'SUCCESS'\">\n                    <ng-container *ngIf=\"config.sections as sections\">\n                        <!-- Pass the list of blocks to render to the block template -->\n                        <div class=\"mr-resource__top\">\n                            <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\n                        </div>\n                        <div class=\"mr-resource__content mr-side-margin\">\n                            <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\n                        </div>\n                    </ng-container>\n                </ng-container>\n        \n            </ng-container>\n        </div>\n    </div>\n</div>\n\n<ng-template #blocks let-list>\n    <ng-container *ngFor=\"let section of list\">\n        <section *ngIf=\"widgets[section.id].ds && (widgets[section.id].ds.out$ | async)\"\n            class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\n            <ng-container [ngSwitch]=\"section.type\">\n\n                <!-- INNER TITLE -->\n                <ng-container *ngSwitchCase=\"'title'\">\n                    <div class=\"mr-resource__title-content mr-side-margin\">\n                        <n7-inner-title [data]=\"widgets[section.id].ds.out$ | async\">\n                        </n7-inner-title>\n                    </div>\n                </ng-container>\n\n                <!-- METADATA VIEWER -->\n                <ng-container *ngSwitchCase=\"'metadata'\">\n                    <div class=\"mr-resource__metadata-content\">\n                        <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__metadata-title\">\n                            {{ section.title }}\n                        </h3>\n                        <mr-read-more [data]=\"section.readmore\">\n                            <n7-metadata-viewer [data]=\"widgets[section.id].ds.out$ | async\">\n                            </n7-metadata-viewer>\n                        </mr-read-more>\n                    </div>\n                </ng-container>\n\n                <!-- COLLECTION -->\n                <ng-container *ngSwitchCase=\"'collection'\">\n                    <ng-container *ngIf=\"widgets[section.id].ds.out$ | async as collection$\">\n                        <div *ngIf=\"collection$.items?.length > 0\" class=\"mr-resource__collection-content\">\n                            <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title\">\n                                {{ section.title }}\n                            </h3>\n                            <div\n                                class=\"mr-resource__collection-grid {{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\n                                <n7-item-preview *ngFor=\"let item of collection$?.items\" [data]=\"item\">\n                                </n7-item-preview>\n                            </div>\n                        </div>\n                    </ng-container>\n                </ng-container>\n\n                <!-- ITEM PREVIEW -->\n                <ng-container *ngSwitchCase=\"'preview'\">\n                    <h3 *ngIf=\"section.title\" class=\"mr-resource__section-title mr-resource__preview-title\">\n                        {{ section.title }}\n                    </h3>\n                    <n7-item-preview [data]=\"widgets[section.id].ds.out$ | async\">\n                    </n7-item-preview>\n                </ng-container>\n\n            </ng-container>\n        </section>\n    </ng-container>\n</ng-template>\n"
+    }),
+    __metadata("design:paramtypes", [Router,
+        MrResourceModalService])
+], MrResourceModalComponent);
+
 const COMPONENTS$3 = [
     // Layout components
     MrGlossaryLayoutComponent,
@@ -11399,7 +11598,8 @@ const COMPONENTS$3 = [
     ReadMoreComponent,
     MrFormComponent,
     MrFormWrapperAccordionComponent,
-    MrSearchPageDescriptionComponent
+    MrSearchPageDescriptionComponent,
+    MrResourceModalComponent
 ];
 let N7BoilerplateMurucaModule = class N7BoilerplateMurucaModule {
 };
@@ -11416,7 +11616,8 @@ N7BoilerplateMurucaModule = __decorate([
         ],
         providers: [
             MrSearchService,
-            MrLayoutStateService
+            MrLayoutStateService,
+            MrResourceModalService
         ],
         entryComponents: COMPONENTS$3,
         exports: COMPONENTS$3,
@@ -11644,13 +11845,14 @@ let MrMenuService = class MrMenuService {
     _handleResponse(response) {
         if (response) {
             const headerConfig = this.configuration.get('header');
-            headerConfig.nav.items = response.map(({ label, slug, isStatic, subpages }) => {
+            headerConfig.nav.items = response.map(({ label, slug, isStatic, subpages, classes }) => {
                 const href = `/${slug}`;
                 // dynamic path control
                 if (!isStatic) {
                     this.dynamicPaths.push(href);
                 }
                 const item = {
+                    classes,
                     text: label,
                     anchor: { href },
                     _meta: {
@@ -11665,6 +11867,7 @@ let MrMenuService = class MrMenuService {
                             this.dynamicPaths.push(subHref);
                         }
                         item.subnav.push({
+                            classes: el.classes || null,
                             text: el.label,
                             anchor: { href: subHref },
                             _meta: {
@@ -11804,5 +12007,5 @@ DynamicPathGuard = __decorate([
  * Generated bundle index. Do not edit.
  */
 
-export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapEH, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineEH, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, LocalConfigService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrAdvancedSearchLayoutComponent, MrAdvancedSearchLayoutConfig, MrAdvancedSearchLayoutDS, MrAdvancedSearchLayoutEH, MrBreadcrumbsDS, MrCollectionDS, MrContentDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrFooterService, MrFormComponent, MrFormWrapperAccordionComponent, MrFormWrapperAccordionDS, MrFormWrapperAccordionEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrResourceTabsDS, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageDescriptionComponent, MrSearchPageDescriptionDS, MrSearchPageDescriptionEH, MrSearchPageTitleDS, MrSearchPageTitleEH, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrStaticMetadataDS, MrTextViewerDS, MrTranslationsLoaderService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, N7BoilerplateSandboxModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, ReadMoreComponent, RestProvider, SbDummyDS, SbDummyEH, SbExampleLayoutComponent, SbExampleLayoutConfig, SbExampleLayoutDS, SbExampleLayoutEH, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrGlossaryLayoutComponent as ɵba, MrHomeLayoutComponent as ɵbb, MrLayoutStateService as ɵbc, MrResourceLayoutComponent as ɵbd, MrSearchFacetsLayoutComponent as ɵbe, MrSearchLayoutComponent as ɵbf, MrSearchService as ɵbg, MrStaticLayoutComponent as ɵbh, MrAdvancedSearchLayoutComponent as ɵbi, ReadMoreComponent as ɵbj, MrFormComponent as ɵbk, MrFormWrapperAccordionComponent as ɵbl, MrSearchPageDescriptionComponent as ɵbm, SbExampleLayoutComponent as ɵbn, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, AwGalleryLayoutComponent as ɵl, AwSearchService as ɵm, AwHomeLayoutComponent as ɵn, AwMapLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwSearchLayoutComponent as ɵq, AwTimelineLayoutComponent as ɵr, BubbleChartWrapperComponent as ɵs, ChartTippyComponent as ɵt, SmartBreadcrumbsComponent as ɵu, AwFacetsWrapperComponent as ɵv, DataWidgetWrapperComponent as ɵw, DatepickerWrapperComponent as ɵx, DvExampleLayoutComponent as ɵy, EscapeHtmlPipe as ɵz };
+export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapEH, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineEH, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, LocalConfigService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrAdvancedSearchLayoutComponent, MrAdvancedSearchLayoutConfig, MrAdvancedSearchLayoutDS, MrAdvancedSearchLayoutEH, MrBreadcrumbsDS, MrCollectionDS, MrContentDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrFooterService, MrFormComponent, MrFormWrapperAccordionComponent, MrFormWrapperAccordionDS, MrFormWrapperAccordionEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrResourceModalComponent, MrResourceTabsDS, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageDescriptionComponent, MrSearchPageDescriptionDS, MrSearchPageDescriptionEH, MrSearchPageTitleDS, MrSearchPageTitleEH, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrStaticMetadataDS, MrTextViewerDS, MrTranslationsLoaderService, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, N7BoilerplateSandboxModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, ReadMoreComponent, RestProvider, SbDummyDS, SbDummyEH, SbExampleLayoutComponent, SbExampleLayoutConfig, SbExampleLayoutDS, SbExampleLayoutEH, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, MrGlossaryLayoutComponent as ɵba, MrHomeLayoutComponent as ɵbb, MrLayoutStateService as ɵbc, MrResourceLayoutComponent as ɵbd, MrResourceModalService as ɵbe, MrSearchFacetsLayoutComponent as ɵbf, MrSearchLayoutComponent as ɵbg, MrSearchService as ɵbh, MrStaticLayoutComponent as ɵbi, MrAdvancedSearchLayoutComponent as ɵbj, ReadMoreComponent as ɵbk, MrFormComponent as ɵbl, MrFormWrapperAccordionComponent as ɵbm, MrSearchPageDescriptionComponent as ɵbn, MrResourceModalComponent as ɵbo, SbExampleLayoutComponent as ɵbp, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, AwGalleryLayoutComponent as ɵl, AwSearchService as ɵm, AwHomeLayoutComponent as ɵn, AwMapLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwSearchLayoutComponent as ɵq, AwTimelineLayoutComponent as ɵr, BubbleChartWrapperComponent as ɵs, ChartTippyComponent as ɵt, SmartBreadcrumbsComponent as ɵu, AwFacetsWrapperComponent as ɵv, DataWidgetWrapperComponent as ɵw, DatepickerWrapperComponent as ɵx, DvExampleLayoutComponent as ɵy, EscapeHtmlPipe as ɵz };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map
