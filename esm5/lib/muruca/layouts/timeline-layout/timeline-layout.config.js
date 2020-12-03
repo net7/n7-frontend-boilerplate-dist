@@ -1,0 +1,19 @@
+import { MrTimelineLayoutDS } from './timeline-layout.ds';
+import { MrTimelineLayoutEH } from './timeline-layout.eh';
+import * as DS from '../../data-sources';
+import * as EH from '../../event-handlers';
+export var MrTimelineLayoutConfig = {
+    layoutId: 'mr-timeline-layout',
+    widgets: [
+        { id: 'mr-timeline' },
+        { id: 'mr-map' }
+    ],
+    layoutDS: MrTimelineLayoutDS,
+    layoutEH: MrTimelineLayoutEH,
+    widgetsDataSources: DS,
+    widgetsEventHandlers: EH,
+    options: {
+    // TODO
+    },
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGltZWxpbmUtbGF5b3V0LmNvbmZpZy5qcyIsInNvdXJjZVJvb3QiOiJuZzovL0BuNy1mcm9udGVuZC9ib2lsZXJwbGF0ZS8iLCJzb3VyY2VzIjpbImxpYi9tdXJ1Y2EvbGF5b3V0cy90aW1lbGluZS1sYXlvdXQvdGltZWxpbmUtbGF5b3V0LmNvbmZpZy50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxPQUFPLEVBQUUsa0JBQWtCLEVBQUUsTUFBTSxzQkFBc0IsQ0FBQztBQUMxRCxPQUFPLEVBQUUsa0JBQWtCLEVBQUUsTUFBTSxzQkFBc0IsQ0FBQztBQUMxRCxPQUFPLEtBQUssRUFBRSxNQUFNLG9CQUFvQixDQUFDO0FBQ3pDLE9BQU8sS0FBSyxFQUFFLE1BQU0sc0JBQXNCLENBQUM7QUFFM0MsTUFBTSxDQUFDLElBQU0sc0JBQXNCLEdBQUc7SUFDcEMsUUFBUSxFQUFFLG9CQUFvQjtJQUM5QixPQUFPLEVBQUU7UUFDUCxFQUFFLEVBQUUsRUFBRSxhQUFhLEVBQUU7UUFDckIsRUFBRSxFQUFFLEVBQUUsUUFBUSxFQUFFO0tBQ2pCO0lBQ0QsUUFBUSxFQUFFLGtCQUFrQjtJQUM1QixRQUFRLEVBQUUsa0JBQWtCO0lBQzVCLGtCQUFrQixFQUFFLEVBQUU7SUFDdEIsb0JBQW9CLEVBQUUsRUFBRTtJQUN4QixPQUFPLEVBQUU7SUFDUCxPQUFPO0tBQ1I7Q0FDRixDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgTXJUaW1lbGluZUxheW91dERTIH0gZnJvbSAnLi90aW1lbGluZS1sYXlvdXQuZHMnO1xyXG5pbXBvcnQgeyBNclRpbWVsaW5lTGF5b3V0RUggfSBmcm9tICcuL3RpbWVsaW5lLWxheW91dC5laCc7XHJcbmltcG9ydCAqIGFzIERTIGZyb20gJy4uLy4uL2RhdGEtc291cmNlcyc7XHJcbmltcG9ydCAqIGFzIEVIIGZyb20gJy4uLy4uL2V2ZW50LWhhbmRsZXJzJztcclxuXHJcbmV4cG9ydCBjb25zdCBNclRpbWVsaW5lTGF5b3V0Q29uZmlnID0ge1xyXG4gIGxheW91dElkOiAnbXItdGltZWxpbmUtbGF5b3V0JyxcclxuICB3aWRnZXRzOiBbXHJcbiAgICB7IGlkOiAnbXItdGltZWxpbmUnIH0sXHJcbiAgICB7IGlkOiAnbXItbWFwJyB9XHJcbiAgXSxcclxuICBsYXlvdXREUzogTXJUaW1lbGluZUxheW91dERTLFxyXG4gIGxheW91dEVIOiBNclRpbWVsaW5lTGF5b3V0RUgsXHJcbiAgd2lkZ2V0c0RhdGFTb3VyY2VzOiBEUyxcclxuICB3aWRnZXRzRXZlbnRIYW5kbGVyczogRUgsXHJcbiAgb3B0aW9uczoge1xyXG4gICAgLy8gVE9ET1xyXG4gIH0sXHJcbn07XHJcbiJdfQ==

@@ -27,11 +27,11 @@ export { MainStateService as ɵe } from './lib/common/services/main-state.servic
 export { DataWidgetWrapperComponent as ɵw } from './lib/data-viz/components/data-widget-wrapper/data-widget-wrapper';
 export { DatepickerWrapperComponent as ɵx } from './lib/data-viz/components/datepicker-wrapper/datepicker-wrapper';
 export { DvExampleLayoutComponent as ɵy } from './lib/data-viz/layout/example-layout/example-layout';
-export { MrFormWrapperAccordionComponent as ɵbm } from './lib/muruca/components/form-wrapper-accordion/form-wrapper-accordion';
-export { MrFormComponent as ɵbl } from './lib/muruca/components/form/form';
-export { ReadMoreComponent as ɵbk } from './lib/muruca/components/read-more/read-more';
-export { MrResourceModalComponent as ɵbo } from './lib/muruca/components/resource-modal/resource-modal';
-export { MrSearchPageDescriptionComponent as ɵbn } from './lib/muruca/components/search-page-description/search-page-description';
+export { MrFormWrapperAccordionComponent as ɵbn } from './lib/muruca/components/form-wrapper-accordion/form-wrapper-accordion';
+export { MrFormComponent as ɵbm } from './lib/muruca/components/form/form';
+export { ReadMoreComponent as ɵbl } from './lib/muruca/components/read-more/read-more';
+export { MrResourceModalComponent as ɵbp } from './lib/muruca/components/resource-modal/resource-modal';
+export { MrSearchPageDescriptionComponent as ɵbo } from './lib/muruca/components/search-page-description/search-page-description';
 export { MrAdvancedSearchLayoutComponent as ɵbj } from './lib/muruca/layouts/advanced-search-layout/advanced-search-layout';
 export { MrGlossaryLayoutComponent as ɵba } from './lib/muruca/layouts/glossary-layout/glossary-layout';
 export { MrHomeLayoutComponent as ɵbb } from './lib/muruca/layouts/home-layout/home-layout';
@@ -39,8 +39,9 @@ export { MrResourceLayoutComponent as ɵbd } from './lib/muruca/layouts/resource
 export { MrSearchFacetsLayoutComponent as ɵbf } from './lib/muruca/layouts/search-facets-layout/search-facets-layout';
 export { MrSearchLayoutComponent as ɵbg } from './lib/muruca/layouts/search-layout/search-layout';
 export { MrStaticLayoutComponent as ɵbi } from './lib/muruca/layouts/static-layout/static-layout';
+export { MrTimelineLayoutComponent as ɵbk } from './lib/muruca/layouts/timeline-layout/timeline-layout';
 export { EscapeHtmlPipe as ɵz } from './lib/muruca/pipes/keep-html.pipe';
 export { MrLayoutStateService as ɵbc } from './lib/muruca/services/layout-state.service';
 export { MrResourceModalService as ɵbe } from './lib/muruca/services/resource-modal.service';
 export { MrSearchService as ɵbh } from './lib/muruca/services/search.service';
-export { SbExampleLayoutComponent as ɵbp } from './lib/sandbox/layout/example-layout/example-layout';
+export { SbExampleLayoutComponent as ɵbq } from './lib/sandbox/layout/example-layout/example-layout';
