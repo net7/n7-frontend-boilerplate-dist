@@ -11,6 +11,10 @@ declare const _default: {
         queryName: string;
         queryBody: string;
     };
+    getEntityRelatedItems: {
+        queryName: string;
+        queryBody: string;
+    };
     getEntityDetails: {
         queryName: string;
         queryBody: string;
