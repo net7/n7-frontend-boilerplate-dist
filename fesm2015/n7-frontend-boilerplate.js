@@ -64,6 +64,7 @@ let MainStateService = class MainStateService {
             subnav: new ReplaySubject(),
             breadcrumbs: new ReplaySubject(),
             filters: new ReplaySubject(),
+            header: new ReplaySubject(),
         };
         this.get$ = (key) => this._get('default', key);
         this.getCustom$ = (key) => this._get('custom', key);
@@ -313,10 +314,21 @@ class MainLayoutDS extends LayoutDataSource {
             this.one('footer').update(this.configuration.get('footer'));
         }
         // main state updates
-        this.mainState.get$('headTitle').subscribe((val) => this.titleService.setTitle(val));
-        this.mainState.get$('pageTitle').subscribe((val) => { this.pageTitle = val; });
-        this.mainState.get$('subnav').subscribe((val) => this.one('subnav').update(val));
-        this.mainState.get$('breadcrumbs').subscribe((val) => this.one('breadcrumbs').update(val));
+        this.mainState.get$('headTitle').subscribe((val) => {
+            this.titleService.setTitle(val);
+        });
+        this.mainState.get$('pageTitle').subscribe((val) => {
+            this.pageTitle = val;
+        });
+        this.mainState.get$('subnav').subscribe((val) => {
+            this.one('subnav').update(val);
+        });
+        this.mainState.get$('breadcrumbs').subscribe((val) => {
+            this.one('breadcrumbs').update(val);
+        });
+        this.mainState.get$('header').subscribe((val) => {
+            this.one('header').update(val);
+        });
         // mainState test
         /* this.mainState.addCustom('customNav', new Subject());
         this.mainState.get$('pageTitle').subscribe(val => console.log('pageTitle', val));

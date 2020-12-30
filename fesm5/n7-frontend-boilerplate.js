@@ -69,6 +69,7 @@ var MainStateService = /** @class */ (function () {
             subnav: new ReplaySubject(),
             breadcrumbs: new ReplaySubject(),
             filters: new ReplaySubject(),
+            header: new ReplaySubject(),
         };
         this.get$ = function (key) { return _this._get('default', key); };
         this.getCustom$ = function (key) { return _this._get('custom', key); };
@@ -334,10 +335,21 @@ var MainLayoutDS = /** @class */ (function (_super) {
             this.one('footer').update(this.configuration.get('footer'));
         }
         // main state updates
-        this.mainState.get$('headTitle').subscribe(function (val) { return _this.titleService.setTitle(val); });
-        this.mainState.get$('pageTitle').subscribe(function (val) { _this.pageTitle = val; });
-        this.mainState.get$('subnav').subscribe(function (val) { return _this.one('subnav').update(val); });
-        this.mainState.get$('breadcrumbs').subscribe(function (val) { return _this.one('breadcrumbs').update(val); });
+        this.mainState.get$('headTitle').subscribe(function (val) {
+            _this.titleService.setTitle(val);
+        });
+        this.mainState.get$('pageTitle').subscribe(function (val) {
+            _this.pageTitle = val;
+        });
+        this.mainState.get$('subnav').subscribe(function (val) {
+            _this.one('subnav').update(val);
+        });
+        this.mainState.get$('breadcrumbs').subscribe(function (val) {
+            _this.one('breadcrumbs').update(val);
+        });
+        this.mainState.get$('header').subscribe(function (val) {
+            _this.one('header').update(val);
+        });
         // mainState test
         /* this.mainState.addCustom('customNav', new Subject());
         this.mainState.get$('pageTitle').subscribe(val => console.log('pageTitle', val));
