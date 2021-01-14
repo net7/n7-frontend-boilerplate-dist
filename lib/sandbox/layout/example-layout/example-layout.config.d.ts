@@ -8,7 +8,10 @@ export declare const SbExampleLayoutConfig: {
      * Array of components you want to use
      * in this leyout
      */
-    widgets: any[];
+    widgets: {
+        id: string;
+        hasStaticData: boolean;
+    }[];
     layoutDS: typeof SbExampleLayoutDS;
     layoutEH: typeof SbExampleLayoutEH;
     widgetsDataSources: typeof DS;

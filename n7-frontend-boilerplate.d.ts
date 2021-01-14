@@ -45,3 +45,4 @@ export { MrLayoutStateService as ɵbc } from './lib/muruca/services/layout-state
 export { MrResourceModalService as ɵbe } from './lib/muruca/services/resource-modal.service';
 export { MrSearchService as ɵbh } from './lib/muruca/services/search.service';
 export { SbExampleLayoutComponent as ɵbq } from './lib/sandbox/layout/example-layout/example-layout';
+export { SbImageViewerLayoutComponent as ɵbr } from './lib/sandbox/layout/image-viewer-layout/image-viewer-layout';
