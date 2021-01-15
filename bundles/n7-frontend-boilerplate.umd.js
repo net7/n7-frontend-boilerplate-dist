@@ -1,12 +1,11 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('@angular/common'), require('@angular/common/http'), require('@n7-frontend/components'), require('rxjs'), require('rxjs/operators'), require('@angular/router'), require('@angular/platform-browser'), require('@n7-frontend/core'), require('tippy.js'), require('lodash'), require('slugify'), require('leaflet'), require('moment'), require('n7-boilerplate-lib/lib/common/helpers'), require('@n7-frontend/core/dist/layout-data-source')) :
-    typeof define === 'function' && define.amd ? define('@n7-frontend/boilerplate', ['exports', '@angular/core', '@angular/common', '@angular/common/http', '@n7-frontend/components', 'rxjs', 'rxjs/operators', '@angular/router', '@angular/platform-browser', '@n7-frontend/core', 'tippy.js', 'lodash', 'slugify', 'leaflet', 'moment', 'n7-boilerplate-lib/lib/common/helpers', '@n7-frontend/core/dist/layout-data-source'], factory) :
-    (global = global || self, factory((global['n7-frontend'] = global['n7-frontend'] || {}, global['n7-frontend'].boilerplate = {}), global.ng.core, global.ng.common, global.ng.common.http, global.components, global.rxjs, global.rxjs.operators, global.ng.router, global.ng.platformBrowser, global.core$1, global.tippy, global.lodash, global.slugify, global.leaflet, global.moment, global.helpers$1, global.layoutDataSource));
-}(this, (function (exports, core, common, http, components, rxjs, operators, router, platformBrowser, core$1, tippy, lodash, slugify, leaflet, moment, helpers$1, layoutDataSource) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('@angular/common'), require('@angular/common/http'), require('@n7-frontend/components'), require('rxjs'), require('rxjs/operators'), require('@angular/router'), require('@angular/platform-browser'), require('@n7-frontend/core'), require('tippy.js'), require('lodash'), require('slugify'), require('leaflet'), require('moment'), require('@n7-frontend/core/dist/layout-data-source')) :
+    typeof define === 'function' && define.amd ? define('@n7-frontend/boilerplate', ['exports', '@angular/core', '@angular/common', '@angular/common/http', '@n7-frontend/components', 'rxjs', 'rxjs/operators', '@angular/router', '@angular/platform-browser', '@n7-frontend/core', 'tippy.js', 'lodash', 'slugify', 'leaflet', 'moment', '@n7-frontend/core/dist/layout-data-source'], factory) :
+    (global = global || self, factory((global['n7-frontend'] = global['n7-frontend'] || {}, global['n7-frontend'].boilerplate = {}), global.ng.core, global.ng.common, global.ng.common.http, global.components, global.rxjs, global.rxjs.operators, global.ng.router, global.ng.platformBrowser, global.core$1, global.tippy, global.lodash, global.slugify, global.leaflet, global.moment, global.layoutDataSource));
+}(this, (function (exports, core, common, http, components, rxjs, operators, router, platformBrowser, core$1, tippy, lodash, slugify, leaflet, moment, layoutDataSource) { 'use strict';
 
     var tippy__default = 'default' in tippy ? tippy['default'] : tippy;
     slugify = slugify && Object.prototype.hasOwnProperty.call(slugify, 'default') ? slugify['default'] : slugify;
-    helpers$1 = helpers$1 && Object.prototype.hasOwnProperty.call(helpers$1, 'default') ? helpers$1['default'] : helpers$1;
 
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation.
@@ -12428,7 +12427,7 @@
                                 // build URL slug
                                 var content = _this.dataSource.timelineData.dataSet
                                     .find(function (d) { return d.id === props.item; }).content;
-                                var slug = helpers$1.slugify(content);
+                                var slug = helpers.slugify(content);
                                 // navigate without reloading the layout
                                 _this.location.go("/timeline/" + props.item + "/" + slug);
                                 _this.dataSource.updatePageDetails(props.item);

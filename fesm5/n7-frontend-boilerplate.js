@@ -13,7 +13,6 @@ import { isEmpty, get, max, min, cloneDeep, isNull, xor, merge as merge$1, clone
 import slugify from 'slugify';
 import { icon, LatLngBounds, markerClusterGroup, marker } from 'leaflet';
 import * as moment from 'moment';
-import helpers$1 from 'n7-boilerplate-lib/lib/common/helpers';
 import { LayoutDataSource as LayoutDataSource$1 } from '@n7-frontend/core/dist/layout-data-source';
 
 var ConfigurationService = /** @class */ (function () {
@@ -12217,7 +12216,7 @@ var MrTimelineLayoutEH = /** @class */ (function (_super) {
                             // build URL slug
                             var content = _this.dataSource.timelineData.dataSet
                                 .find(function (d) { return d.id === props.item; }).content;
-                            var slug = helpers$1.slugify(content);
+                            var slug = helpers.slugify(content);
                             // navigate without reloading the layout
                             _this.location.go("/timeline/" + props.item + "/" + slug);
                             _this.dataSource.updatePageDetails(props.item);
