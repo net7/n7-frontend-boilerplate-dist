@@ -20,7 +20,10 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
     hasMetadata: boolean;
     hasRelatedEntities: boolean;
     hasSimilarItems: boolean;
-    hasImage: boolean;
+    hasDigitalObjects: boolean;
+    digitalObjects: any;
+    currentDigitalObject: any;
+    currentDigitalObjectIndex: number;
     imageViewerIstance: any;
     sidebarIsSticky: boolean;
     treeMaxHeight: string;
@@ -31,6 +34,7 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
     hasContent: boolean;
     /** String to render in the loaded-empty state */
     emptyStateString: string;
+    externalUrlText: string;
     onInit({ configuration, mainState, router, options, titleService, communication, }: {
         configuration: any;
         mainState: any;
@@ -55,4 +59,6 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
         order: any;
         label: string;
     }[];
+    changeDigitalObject(payload: any): void;
+    private normalizeDigitalObjects;
 }
