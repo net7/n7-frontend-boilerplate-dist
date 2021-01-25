@@ -5,5 +5,6 @@ export declare class AwSchedaImageDS extends DataSource {
     protected transform(data: any): ImageViewerData;
     hasInstance(): boolean;
     updateImages(data: any): void;
+    reset(): void;
     private getTileSources;
 }

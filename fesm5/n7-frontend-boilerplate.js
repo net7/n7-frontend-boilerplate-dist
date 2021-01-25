@@ -3,8 +3,8 @@ import { ɵɵdefineInjectable, Injectable, Inject, ɵɵinject, Component, Input,
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK, IMAGE_VIEWER_MOCK, IMAGE_VIEWER_TOOLS_MOCK } from '@n7-frontend/components';
-import { ReplaySubject, empty, Subject, of, merge, fromEvent, BehaviorSubject, forkJoin } from 'rxjs';
-import { map, catchError, takeUntil, filter, tap, mapTo, debounceTime, switchMap, first, withLatestFrom, delay } from 'rxjs/operators';
+import { ReplaySubject, empty, Subject, of, interval, merge, fromEvent, BehaviorSubject, forkJoin } from 'rxjs';
+import { map, catchError, takeUntil, filter, tap, first, mapTo, debounceTime, switchMap, withLatestFrom, delay } from 'rxjs/operators';
 import { NavigationStart, Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Title, DomSanitizer } from '@angular/platform-browser';
 import { LayoutBuilder, LayoutDataSource, EventHandler, DataSource, _t, translate } from '@n7-frontend/core';
@@ -3198,12 +3198,20 @@ var AwSchedaImageDS = /** @class */ (function (_super) {
         var _this = this;
         if (!this.instance)
             return;
-        // reset
-        this.instance.world.removeAll();
-        setTimeout(function () {
-            var images = _this.getTileSources(data.items);
-            _this.instance.open(images);
+        // container exists check
+        interval(10).pipe(filter(function () { return !!document.getElementById(_this.output.viewerId); }), first()).subscribe(function () {
+            // reset
+            _this.instance.world.removeAll();
+            setTimeout(function () {
+                var images = _this.getTileSources(data.items);
+                _this.instance.open(images);
+            });
         });
+    };
+    AwSchedaImageDS.prototype.reset = function () {
+        if (!this.instance)
+            return;
+        this.instance.world.removeAll();
     };
     AwSchedaImageDS.prototype.getTileSources = function (images) {
         return images.map(function (_a) {
@@ -6941,7 +6949,8 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
             // reset
             this.currentDigitalObject = null;
             this.currentDigitalObjectIndex = null;
-            this.hasMetadata = Array.isArray(response.fields) && response.fields.length;
+            var metadataFields = this.getFields(response);
+            this.hasMetadata = !!(Array.isArray(metadataFields) && metadataFields.length);
             this.hasSimilarItems = Array.isArray(response.relatedItems) && response.relatedItems.length;
             this.hasBreadcrumb = Array.isArray(response.breadcrumbs) && response.breadcrumbs.length;
             this.hasDigitalObjects = (Array.isArray(response.digitalObjects)
@@ -6978,7 +6987,7 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
                 actions: {},
             };
             this.one('aw-scheda-inner-title').update(titleObj);
-            this.one('aw-scheda-metadata').update(this.getFields(response));
+            this.one('aw-scheda-metadata').update(metadataFields);
             // Breadcrumb section
             var breadcrumbs_1 = {
                 items: [],
@@ -7077,10 +7086,12 @@ var AwSchedaLayoutDS = /** @class */ (function (_super) {
                 window.open(this.digitalObjects[payload].url, '_blank');
             }
             else {
+                // always reset image viewer
+                var schedaImageDS = this.getWidgetDataSource('aw-scheda-image');
+                schedaImageDS.reset();
                 this.currentDigitalObjectIndex = payload;
                 this.currentDigitalObject = this.digitalObjects[payload];
                 if (this.currentDigitalObject.type.includes('images')) {
-                    var schedaImageDS = this.getWidgetDataSource('aw-scheda-image');
                     if (schedaImageDS.hasInstance()) {
                         schedaImageDS.updateImages(this.currentDigitalObject);
                     }
@@ -9301,9 +9312,12 @@ var MrFormModel = /** @class */ (function () {
 var MrAdvancedSearchLayoutDS = /** @class */ (function (_super) {
     __extends(MrAdvancedSearchLayoutDS, _super);
     function MrAdvancedSearchLayoutDS() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.initialState = {};
+        return _this;
     }
     MrAdvancedSearchLayoutDS.prototype.onInit = function (payload) {
+        this.router = payload.router;
         this.configuration = payload.configuration;
         this.mainState = payload.mainState;
         this.configId = payload.configId;
@@ -9312,6 +9326,8 @@ var MrAdvancedSearchLayoutDS = /** @class */ (function (_super) {
         this.form = new MrFormModel();
         // form init
         this.form.init(this.pageConfig.formConfig);
+        // set initial state
+        this.initialState = cloneDeep(this.form.getState());
         this.one('mr-form-wrapper-accordion').update({
             form: this.form
         });
@@ -9325,11 +9341,30 @@ var MrAdvancedSearchLayoutDS = /** @class */ (function (_super) {
     };
     MrAdvancedSearchLayoutDS.prototype.onSubmit = function (_a) {
         var state = _a.state;
-        // do nothing
-        console.warn('onSubmit: to be implemented on project', state);
+        if (!isEmpty(state)) {
+            var resultsUrl = this.pageConfig.resultsUrl;
+            var params = Object.keys(state)
+                .filter(function (key) { return !(state[key].disabled || isEmpty(state[key].value)); })
+                .map(function (key) { return ({
+                key: key,
+                value: Array.isArray(state[key].value)
+                    ? state[key].value.join(',')
+                    : state[key].value
+            }); })
+                .map(function (_a) {
+                var key = _a.key, value = _a.value;
+                return key + "=" + encodeURIComponent(value);
+            });
+            var url = resultsUrl + "?" + params.join('&');
+            window.open(url, '_blank');
+        }
     };
     MrAdvancedSearchLayoutDS.prototype.onReset = function () {
-        // do nothing
+        var _this = this;
+        Object.keys(this.initialState).forEach(function (key) {
+            var inputState = cloneDeep(_this.initialState[key]);
+            _this.form.getInput(key).setState(inputState);
+        });
     };
     return MrAdvancedSearchLayoutDS;
 }(LayoutDataSource));
@@ -10242,13 +10277,6 @@ var MrFormWrapperAccordionDS = /** @class */ (function (_super) {
         data.form.config.groups = groups.map(function (group) { return (__assign(__assign({}, group), { options: __assign(__assign({}, group.options), { text: group.options.label, payload: group.id, iconRight: group.options.isOpen ? ICON_OPEN : ICON_CLOSE, isOpen: group.options.isOpen }) })); });
         return data;
     };
-    MrFormWrapperAccordionDS.prototype.onReset = function () {
-        var form = this.output.form;
-        var inputs = form.getInputs();
-        Object.keys(inputs).forEach(function (id) {
-            inputs[id].clear();
-        });
-    };
     MrFormWrapperAccordionDS.prototype.toggleGroup = function (groupId) {
         this.output.form.config.groups.forEach(function (group) {
             if (group.id === groupId) {
@@ -10485,7 +10513,6 @@ var MrFormWrapperAccordionEH = /** @class */ (function (_super) {
                     break;
                 }
                 case 'mr-form-wrapper-accordion.reset':
-                    _this.dataSource.onReset();
                     _this.emitOuter('reset');
                     break;
                 case 'mr-form-wrapper-accordion.click':
@@ -10574,6 +10601,242 @@ var MrAdvancedSearchLayoutComponent = /** @class */ (function (_super) {
             LayoutsConfigurationService])
     ], MrAdvancedSearchLayoutComponent);
     return MrAdvancedSearchLayoutComponent;
+}(AbstractLayout));
+
+var MrAdvancedResultsLayoutDS = /** @class */ (function (_super) {
+    __extends(MrAdvancedResultsLayoutDS, _super);
+    function MrAdvancedResultsLayoutDS() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    MrAdvancedResultsLayoutDS.prototype.onInit = function (payload) {
+        this.configuration = payload.configuration;
+        this.mainState = payload.mainState;
+        this.configId = payload.configId;
+        this.communication = payload.communication;
+        this.pageConfig = this.configuration.get(this.configId);
+        // config
+        this.all().updateOptions({ config: this.pageConfig });
+        // manual updates
+        this.one('mr-search-page-title').update({});
+        // update head title
+        this.updateHeadTitle();
+        // update translations
+        this.addTranslations(this.pageConfig);
+    };
+    MrAdvancedResultsLayoutDS.prototype.request$ = function (params, onError) {
+        var searchId = this.pageConfig.searchId;
+        Object.keys(params)
+            .filter(function (key) { return ['page', 'limit', 'sort'].includes(key); })
+            .forEach(function (key) {
+            params.results = params.results || {};
+            params.results[key] = params[key];
+            delete params[key];
+        });
+        return this.communication.request$('advancedSearch', {
+            method: 'POST',
+            params: __assign(__assign({}, params), { searchId: searchId, results: {
+                    sort: 'sort_ASC',
+                    offset: 0,
+                    limit: 12
+                } }),
+            onError: onError
+        });
+    };
+    MrAdvancedResultsLayoutDS.prototype.handleResponse = function (response) {
+        this.some([
+            'mr-search-results-title',
+            'mr-search-results',
+        ]).update(response);
+        // pagination
+        this.one('n7-smart-pagination').updateOptions({ mode: 'payload' });
+        this.one('n7-smart-pagination').update(this.getPaginationParams(response));
+    };
+    MrAdvancedResultsLayoutDS.prototype.updateHeadTitle = function () {
+        var appName = this.configuration.get('name');
+        var pageTitle = this.pageConfig.title;
+        this.mainState.update('headTitle', [appName, _t(pageTitle)].join(' > '));
+    };
+    MrAdvancedResultsLayoutDS.prototype.addTranslations = function (config) {
+        var _a;
+        if ((_a = config === null || config === void 0 ? void 0 : config.sort) === null || _a === void 0 ? void 0 : _a.label) {
+            config.sort.label = _t(config.sort.label);
+            config.sort.options = config.sort.options.map(function (option) { return (__assign(__assign({}, option), { label: _t(option.label) })); });
+        }
+        ['text', 'button'].forEach(function (key) {
+            if (config.fallback) {
+                config.fallback[key] = _t(config.fallback[key]);
+            }
+            if (config.ko) {
+                config.ko[key] = _t(config.ko[key]);
+            }
+        });
+    };
+    MrAdvancedResultsLayoutDS.prototype.getPaginationParams = function (response) {
+        var totalCount = response.total_count, offset = response.offset, limit = response.limit;
+        var paginationConfig = this.pageConfig.pagination;
+        return {
+            totalPages: Math.ceil(totalCount / limit),
+            currentPage: (offset + limit) / limit,
+            pageLimit: paginationConfig.limit,
+            sizes: {
+                label: paginationConfig.selectLabel ? _t(paginationConfig.selectLabel) : null,
+                list: paginationConfig.options,
+                active: limit,
+            },
+        };
+    };
+    return MrAdvancedResultsLayoutDS;
+}(LayoutDataSource));
+
+var MrAdvancedResultsLayoutEH = /** @class */ (function (_super) {
+    __extends(MrAdvancedResultsLayoutEH, _super);
+    function MrAdvancedResultsLayoutEH() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.destroy$ = new Subject();
+        return _this;
+    }
+    MrAdvancedResultsLayoutEH.prototype.listen = function () {
+        var _this = this;
+        this.innerEvents$.subscribe(function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                case 'mr-advanced-results-layout.init':
+                    _this.activatedRoute = payload.activatedRoute;
+                    _this.router = payload.router;
+                    _this.layoutState = payload.layoutState;
+                    _this.dataSource.onInit(payload);
+                    // listen route changes
+                    _this.listenToRouterChanges();
+                    break;
+                case 'mr-advanced-results-layout.destroy':
+                    _this.destroy$.next();
+                    break;
+                default:
+                    console.warn('unhandled inner event of type', type);
+                    break;
+            }
+        });
+        this.outerEvents$.subscribe(function (_a) {
+            var type = _a.type, payload = _a.payload;
+            switch (type) {
+                case 'n7-smart-pagination.click':
+                    _this.updateRouter({ page: payload.page });
+                    break;
+                case 'n7-smart-pagination.change':
+                    _this.updateRouter({ limit: payload.value });
+                    break;
+                case 'mr-search-results-title.change':
+                    _this.updateRouter({ sort: payload.value });
+                    break;
+                default:
+                    console.warn('unhandled inner event of type', type);
+                    break;
+            }
+        });
+    };
+    /** URL changes */
+    MrAdvancedResultsLayoutEH.prototype.listenToRouterChanges = function () {
+        var _this = this;
+        this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$), tap(function () {
+            _this.layoutState.set('results', LayoutState.LOADING);
+        }), switchMap(function (params) { return _this.dataSource.request$(params, function (error) {
+            console.warn('Advanced search error', error);
+            _this.layoutState.set('results', LayoutState.ERROR);
+        }); })).subscribe(function (response) {
+            _this.dataSource.handleResponse(response);
+            _this.layoutState.set('results', isEmpty(response.results) ? LayoutState.EMPTY : LayoutState.SUCCESS);
+        });
+    };
+    MrAdvancedResultsLayoutEH.prototype.updateRouter = function (queryParams) {
+        this.router.navigate([], {
+            queryParams: queryParams,
+            queryParamsHandling: 'merge'
+        });
+    };
+    return MrAdvancedResultsLayoutEH;
+}(EventHandler));
+
+var MrAdvancedResultsLayoutConfig = {
+    layoutId: 'mr-advanced-results-layout',
+    widgets: [
+        {
+            id: 'mr-search-page-title'
+        }, {
+            id: 'mr-search-results-title'
+        }, {
+            id: 'mr-search-results'
+        }, {
+            id: 'n7-smart-pagination',
+            dataSource: SmartPaginationDS,
+            eventHandler: SmartPaginationEH,
+        }
+    ],
+    layoutDS: MrAdvancedResultsLayoutDS,
+    layoutEH: MrAdvancedResultsLayoutEH,
+    widgetsDataSources: DS$3,
+    widgetsEventHandlers: EH$3,
+    layoutOptions: {}
+};
+
+var MrAdvancedResultsLayoutComponent = /** @class */ (function (_super) {
+    __extends(MrAdvancedResultsLayoutComponent, _super);
+    function MrAdvancedResultsLayoutComponent(router, activatedRoute, mainState, configuration, communication, layoutState, layoutsConfiguration) {
+        var _this = _super.call(this, layoutsConfiguration.get('MrAdvancedResultsLayoutConfig') || MrAdvancedResultsLayoutConfig) || this;
+        _this.router = router;
+        _this.activatedRoute = activatedRoute;
+        _this.mainState = mainState;
+        _this.configuration = configuration;
+        _this.communication = communication;
+        _this.layoutState = layoutState;
+        return _this;
+    }
+    MrAdvancedResultsLayoutComponent.prototype.initPayload = function () {
+        return {
+            configId: this.configId,
+            configuration: this.configuration,
+            communication: this.communication,
+            mainState: this.mainState,
+            router: this.router,
+            activatedRoute: this.activatedRoute,
+            layoutState: this.layoutState,
+            options: this.config.options || {},
+        };
+    };
+    MrAdvancedResultsLayoutComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        this.activatedRoute.data.subscribe(function (data) {
+            _this.configId = data.configId;
+            // add layout states
+            _this.layoutState.add(['results']);
+            _this.onInit();
+        });
+    };
+    MrAdvancedResultsLayoutComponent.prototype.ngOnDestroy = function () {
+        this.onDestroy();
+    };
+    MrAdvancedResultsLayoutComponent.ctorParameters = function () { return [
+        { type: Router },
+        { type: ActivatedRoute },
+        { type: MainStateService },
+        { type: ConfigurationService },
+        { type: CommunicationService },
+        { type: MrLayoutStateService },
+        { type: LayoutsConfigurationService }
+    ]; };
+    MrAdvancedResultsLayoutComponent = __decorate([
+        Component({
+            selector: 'mr-advanced-results-layout',
+            template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth mr-side-margin\">\n\n        <div class=\"mr-search__title\">\n            <n7-inner-title\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\"\n            [emit]=\"lb.widgets['mr-search-page-title'].emit\">\n            </n7-inner-title>\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    <n7-inner-title\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\n                    </n7-inner-title>\n                </div>\n                <main class=\"mr-search__results\">\n                    <!-- SEARCH RESULTS -->\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\n                        \n                        <!-- loading -->\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\n                            <div class=\"mr-search__results-loading n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                                    blocks: [\n                                        { classes: 'search-result-placeholder-title' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' }\n                                    ]\n                                }\"></n7-content-placeholder>\n                            </div>\n                        </ng-container>\n                        \n                        <!-- success: items > 0 -->\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n                            <div class=\"n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\n                                <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\n                                [data]=\"item\">\n                                </n7-item-preview>\n                            </div>\n                        </ng-container>\n\n                        <!-- empty: items === 0 -->\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\n                            <div class=\"mr-search__results-fallback\">\n                                <p class=\"mr-search__results-fallback-string\">\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\n                                </p>\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\n                                </button>\n                            </div>\n                        </ng-container>\n\n                        <!-- error: request problem -->\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\n                            <p class=\"mr-search__results-ko-string\">\n                                {{ lb.dataSource.pageConfig.ko.text }}\n                            </p>\n                            <button class=\"n7-btn mr-search__results-ko-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                {{ lb.dataSource.pageConfig.ko.button }}\n                            </button>\n                        </ng-container>\n                        \n                    </ng-container>\n                </main>               \n                <n7-smart-pagination\n                *ngIf=\"(layoutState.get$('results') | async) === 'SUCCESS'\"\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
+        }),
+        __metadata("design:paramtypes", [Router,
+            ActivatedRoute,
+            MainStateService,
+            ConfigurationService,
+            CommunicationService,
+            MrLayoutStateService,
+            LayoutsConfigurationService])
+    ], MrAdvancedResultsLayoutComponent);
+    return MrAdvancedResultsLayoutComponent;
 }(AbstractLayout));
 
 var MrGlossaryLayoutDS = /** @class */ (function (_super) {
@@ -12838,6 +13101,7 @@ var COMPONENTS$3 = [
     MrSearchLayoutComponent,
     MrStaticLayoutComponent,
     MrAdvancedSearchLayoutComponent,
+    MrAdvancedResultsLayoutComponent,
     MrTimelineLayoutComponent,
     // Custom components
     ReadMoreComponent,
@@ -13618,5 +13882,5 @@ var DynamicPathGuard = /** @class */ (function () {
  * Generated bundle index. Do not edit.
  */
 
-export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapEH, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaDropdownDS, AwSchedaDropdownEH, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaPdfDS, AwSchedaPdfEH, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineEH, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, LocalConfigService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrAdvancedSearchLayoutComponent, MrAdvancedSearchLayoutConfig, MrAdvancedSearchLayoutDS, MrAdvancedSearchLayoutEH, MrBreadcrumbsDS, MrCollectionDS, MrContentDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrFooterService, MrFormComponent, MrFormWrapperAccordionComponent, MrFormWrapperAccordionDS, MrFormWrapperAccordionEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrMapDS, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrResourceModalComponent, MrResourceTabsDS, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageDescriptionComponent, MrSearchPageDescriptionDS, MrSearchPageDescriptionEH, MrSearchPageTitleDS, MrSearchPageTitleEH, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrStaticMetadataDS, MrTextViewerDS, MrTimelineDS, MrTimelineEH, MrTimelineLayoutComponent, MrTimelineLayoutConfig, MrTimelineLayoutDS, MrTimelineLayoutEH, MrTranslationsLoaderService, MrYearHeaderDS, MrYearHeaderEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, N7BoilerplateSandboxModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, PdfViewerComponent, ReadMoreComponent, RestProvider, SbExampleLayoutComponent, SbExampleLayoutConfig, SbExampleLayoutDS, SbExampleLayoutEH, SbImageViewerDS, SbImageViewerEH, SbImageViewerLayoutComponent, SbImageViewerLayoutConfig, SbImageViewerLayoutDS, SbImageViewerLayoutEH, SbImageViewerToolsDS, SbImageViewerToolsEH, SchedaDropdownComponent, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, DvExampleLayoutComponent as ɵba, EscapeHtmlPipe as ɵbb, MrGlossaryLayoutComponent as ɵbc, MrHomeLayoutComponent as ɵbd, MrLayoutStateService as ɵbe, MrResourceLayoutComponent as ɵbf, MrResourceModalService as ɵbg, MrSearchFacetsLayoutComponent as ɵbh, MrSearchLayoutComponent as ɵbi, MrSearchService as ɵbj, MrStaticLayoutComponent as ɵbk, MrAdvancedSearchLayoutComponent as ɵbl, MrTimelineLayoutComponent as ɵbm, ReadMoreComponent as ɵbn, MrFormComponent as ɵbo, MrFormWrapperAccordionComponent as ɵbp, MrSearchPageDescriptionComponent as ɵbq, MrResourceModalComponent as ɵbr, SbExampleLayoutComponent as ɵbs, SbImageViewerLayoutComponent as ɵbt, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, AwGalleryLayoutComponent as ɵl, AwSearchService as ɵm, AwHomeLayoutComponent as ɵn, AwMapLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwSearchLayoutComponent as ɵq, AwTimelineLayoutComponent as ɵr, BubbleChartWrapperComponent as ɵs, ChartTippyComponent as ɵt, SmartBreadcrumbsComponent as ɵu, AwFacetsWrapperComponent as ɵv, PdfViewerComponent as ɵw, SchedaDropdownComponent as ɵx, DataWidgetWrapperComponent as ɵy, DatepickerWrapperComponent as ɵz };
+export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwChartTippyDS, AwChartTippyEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapEH, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaDropdownDS, AwSchedaDropdownEH, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaPdfDS, AwSchedaPdfEH, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineEH, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, LocalConfigService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrAdvancedResultsLayoutComponent, MrAdvancedResultsLayoutConfig, MrAdvancedResultsLayoutDS, MrAdvancedResultsLayoutEH, MrAdvancedSearchLayoutComponent, MrAdvancedSearchLayoutConfig, MrAdvancedSearchLayoutDS, MrAdvancedSearchLayoutEH, MrBreadcrumbsDS, MrCollectionDS, MrContentDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrFooterService, MrFormComponent, MrFormWrapperAccordionComponent, MrFormWrapperAccordionDS, MrFormWrapperAccordionEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrMapDS, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrResourceModalComponent, MrResourceTabsDS, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageDescriptionComponent, MrSearchPageDescriptionDS, MrSearchPageDescriptionEH, MrSearchPageTitleDS, MrSearchPageTitleEH, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrStaticMetadataDS, MrTextViewerDS, MrTimelineDS, MrTimelineEH, MrTimelineLayoutComponent, MrTimelineLayoutConfig, MrTimelineLayoutDS, MrTimelineLayoutEH, MrTranslationsLoaderService, MrYearHeaderDS, MrYearHeaderEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, N7BoilerplateSandboxModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, PdfViewerComponent, ReadMoreComponent, RestProvider, SbExampleLayoutComponent, SbExampleLayoutConfig, SbExampleLayoutDS, SbExampleLayoutEH, SbImageViewerDS, SbImageViewerEH, SbImageViewerLayoutComponent, SbImageViewerLayoutConfig, SbImageViewerLayoutDS, SbImageViewerLayoutEH, SbImageViewerToolsDS, SbImageViewerToolsEH, SchedaDropdownComponent, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, DvExampleLayoutComponent as ɵba, EscapeHtmlPipe as ɵbb, MrGlossaryLayoutComponent as ɵbc, MrHomeLayoutComponent as ɵbd, MrLayoutStateService as ɵbe, MrResourceLayoutComponent as ɵbf, MrResourceModalService as ɵbg, MrSearchFacetsLayoutComponent as ɵbh, MrSearchLayoutComponent as ɵbi, MrSearchService as ɵbj, MrStaticLayoutComponent as ɵbk, MrAdvancedSearchLayoutComponent as ɵbl, MrAdvancedResultsLayoutComponent as ɵbm, MrTimelineLayoutComponent as ɵbn, ReadMoreComponent as ɵbo, MrFormComponent as ɵbp, MrFormWrapperAccordionComponent as ɵbq, MrSearchPageDescriptionComponent as ɵbr, MrResourceModalComponent as ɵbs, SbExampleLayoutComponent as ɵbt, SbImageViewerLayoutComponent as ɵbu, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwEntitaLayoutComponent as ɵk, AwGalleryLayoutComponent as ɵl, AwSearchService as ɵm, AwHomeLayoutComponent as ɵn, AwMapLayoutComponent as ɵo, AwSchedaLayoutComponent as ɵp, AwSearchLayoutComponent as ɵq, AwTimelineLayoutComponent as ɵr, BubbleChartWrapperComponent as ɵs, ChartTippyComponent as ɵt, SmartBreadcrumbsComponent as ɵu, AwFacetsWrapperComponent as ɵv, PdfViewerComponent as ɵw, SchedaDropdownComponent as ɵx, DataWidgetWrapperComponent as ɵy, DatepickerWrapperComponent as ɵz };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

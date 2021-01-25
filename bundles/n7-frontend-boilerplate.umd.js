@@ -3408,12 +3408,20 @@
             var _this = this;
             if (!this.instance)
                 return;
-            // reset
-            this.instance.world.removeAll();
-            setTimeout(function () {
-                var images = _this.getTileSources(data.items);
-                _this.instance.open(images);
+            // container exists check
+            rxjs.interval(10).pipe(operators.filter(function () { return !!document.getElementById(_this.output.viewerId); }), operators.first()).subscribe(function () {
+                // reset
+                _this.instance.world.removeAll();
+                setTimeout(function () {
+                    var images = _this.getTileSources(data.items);
+                    _this.instance.open(images);
+                });
             });
+        };
+        AwSchedaImageDS.prototype.reset = function () {
+            if (!this.instance)
+                return;
+            this.instance.world.removeAll();
         };
         AwSchedaImageDS.prototype.getTileSources = function (images) {
             return images.map(function (_a) {
@@ -7151,7 +7159,8 @@
                 // reset
                 this.currentDigitalObject = null;
                 this.currentDigitalObjectIndex = null;
-                this.hasMetadata = Array.isArray(response.fields) && response.fields.length;
+                var metadataFields = this.getFields(response);
+                this.hasMetadata = !!(Array.isArray(metadataFields) && metadataFields.length);
                 this.hasSimilarItems = Array.isArray(response.relatedItems) && response.relatedItems.length;
                 this.hasBreadcrumb = Array.isArray(response.breadcrumbs) && response.breadcrumbs.length;
                 this.hasDigitalObjects = (Array.isArray(response.digitalObjects)
@@ -7188,7 +7197,7 @@
                     actions: {},
                 };
                 this.one('aw-scheda-inner-title').update(titleObj);
-                this.one('aw-scheda-metadata').update(this.getFields(response));
+                this.one('aw-scheda-metadata').update(metadataFields);
                 // Breadcrumb section
                 var breadcrumbs_1 = {
                     items: [],
@@ -7287,10 +7296,12 @@
                     window.open(this.digitalObjects[payload].url, '_blank');
                 }
                 else {
+                    // always reset image viewer
+                    var schedaImageDS = this.getWidgetDataSource('aw-scheda-image');
+                    schedaImageDS.reset();
                     this.currentDigitalObjectIndex = payload;
                     this.currentDigitalObject = this.digitalObjects[payload];
                     if (this.currentDigitalObject.type.includes('images')) {
-                        var schedaImageDS = this.getWidgetDataSource('aw-scheda-image');
                         if (schedaImageDS.hasInstance()) {
                             schedaImageDS.updateImages(this.currentDigitalObject);
                         }
@@ -9511,9 +9522,12 @@
     var MrAdvancedSearchLayoutDS = /** @class */ (function (_super) {
         __extends(MrAdvancedSearchLayoutDS, _super);
         function MrAdvancedSearchLayoutDS() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.initialState = {};
+            return _this;
         }
         MrAdvancedSearchLayoutDS.prototype.onInit = function (payload) {
+            this.router = payload.router;
             this.configuration = payload.configuration;
             this.mainState = payload.mainState;
             this.configId = payload.configId;
@@ -9522,6 +9536,8 @@
             this.form = new MrFormModel();
             // form init
             this.form.init(this.pageConfig.formConfig);
+            // set initial state
+            this.initialState = lodash.cloneDeep(this.form.getState());
             this.one('mr-form-wrapper-accordion').update({
                 form: this.form
             });
@@ -9535,11 +9551,30 @@
         };
         MrAdvancedSearchLayoutDS.prototype.onSubmit = function (_a) {
             var state = _a.state;
-            // do nothing
-            console.warn('onSubmit: to be implemented on project', state);
+            if (!lodash.isEmpty(state)) {
+                var resultsUrl = this.pageConfig.resultsUrl;
+                var params = Object.keys(state)
+                    .filter(function (key) { return !(state[key].disabled || lodash.isEmpty(state[key].value)); })
+                    .map(function (key) { return ({
+                    key: key,
+                    value: Array.isArray(state[key].value)
+                        ? state[key].value.join(',')
+                        : state[key].value
+                }); })
+                    .map(function (_a) {
+                    var key = _a.key, value = _a.value;
+                    return key + "=" + encodeURIComponent(value);
+                });
+                var url = resultsUrl + "?" + params.join('&');
+                window.open(url, '_blank');
+            }
         };
         MrAdvancedSearchLayoutDS.prototype.onReset = function () {
-            // do nothing
+            var _this = this;
+            Object.keys(this.initialState).forEach(function (key) {
+                var inputState = lodash.cloneDeep(_this.initialState[key]);
+                _this.form.getInput(key).setState(inputState);
+            });
         };
         return MrAdvancedSearchLayoutDS;
     }(core$1.LayoutDataSource));
@@ -10452,13 +10487,6 @@
             data.form.config.groups = groups.map(function (group) { return (__assign(__assign({}, group), { options: __assign(__assign({}, group.options), { text: group.options.label, payload: group.id, iconRight: group.options.isOpen ? ICON_OPEN : ICON_CLOSE, isOpen: group.options.isOpen }) })); });
             return data;
         };
-        MrFormWrapperAccordionDS.prototype.onReset = function () {
-            var form = this.output.form;
-            var inputs = form.getInputs();
-            Object.keys(inputs).forEach(function (id) {
-                inputs[id].clear();
-            });
-        };
         MrFormWrapperAccordionDS.prototype.toggleGroup = function (groupId) {
             this.output.form.config.groups.forEach(function (group) {
                 if (group.id === groupId) {
@@ -10695,7 +10723,6 @@
                         break;
                     }
                     case 'mr-form-wrapper-accordion.reset':
-                        _this.dataSource.onReset();
                         _this.emitOuter('reset');
                         break;
                     case 'mr-form-wrapper-accordion.click':
@@ -10784,6 +10811,242 @@
                 LayoutsConfigurationService])
         ], MrAdvancedSearchLayoutComponent);
         return MrAdvancedSearchLayoutComponent;
+    }(AbstractLayout));
+
+    var MrAdvancedResultsLayoutDS = /** @class */ (function (_super) {
+        __extends(MrAdvancedResultsLayoutDS, _super);
+        function MrAdvancedResultsLayoutDS() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        MrAdvancedResultsLayoutDS.prototype.onInit = function (payload) {
+            this.configuration = payload.configuration;
+            this.mainState = payload.mainState;
+            this.configId = payload.configId;
+            this.communication = payload.communication;
+            this.pageConfig = this.configuration.get(this.configId);
+            // config
+            this.all().updateOptions({ config: this.pageConfig });
+            // manual updates
+            this.one('mr-search-page-title').update({});
+            // update head title
+            this.updateHeadTitle();
+            // update translations
+            this.addTranslations(this.pageConfig);
+        };
+        MrAdvancedResultsLayoutDS.prototype.request$ = function (params, onError) {
+            var searchId = this.pageConfig.searchId;
+            Object.keys(params)
+                .filter(function (key) { return ['page', 'limit', 'sort'].includes(key); })
+                .forEach(function (key) {
+                params.results = params.results || {};
+                params.results[key] = params[key];
+                delete params[key];
+            });
+            return this.communication.request$('advancedSearch', {
+                method: 'POST',
+                params: __assign(__assign({}, params), { searchId: searchId, results: {
+                        sort: 'sort_ASC',
+                        offset: 0,
+                        limit: 12
+                    } }),
+                onError: onError
+            });
+        };
+        MrAdvancedResultsLayoutDS.prototype.handleResponse = function (response) {
+            this.some([
+                'mr-search-results-title',
+                'mr-search-results',
+            ]).update(response);
+            // pagination
+            this.one('n7-smart-pagination').updateOptions({ mode: 'payload' });
+            this.one('n7-smart-pagination').update(this.getPaginationParams(response));
+        };
+        MrAdvancedResultsLayoutDS.prototype.updateHeadTitle = function () {
+            var appName = this.configuration.get('name');
+            var pageTitle = this.pageConfig.title;
+            this.mainState.update('headTitle', [appName, core$1._t(pageTitle)].join(' > '));
+        };
+        MrAdvancedResultsLayoutDS.prototype.addTranslations = function (config) {
+            var _a;
+            if ((_a = config === null || config === void 0 ? void 0 : config.sort) === null || _a === void 0 ? void 0 : _a.label) {
+                config.sort.label = core$1._t(config.sort.label);
+                config.sort.options = config.sort.options.map(function (option) { return (__assign(__assign({}, option), { label: core$1._t(option.label) })); });
+            }
+            ['text', 'button'].forEach(function (key) {
+                if (config.fallback) {
+                    config.fallback[key] = core$1._t(config.fallback[key]);
+                }
+                if (config.ko) {
+                    config.ko[key] = core$1._t(config.ko[key]);
+                }
+            });
+        };
+        MrAdvancedResultsLayoutDS.prototype.getPaginationParams = function (response) {
+            var totalCount = response.total_count, offset = response.offset, limit = response.limit;
+            var paginationConfig = this.pageConfig.pagination;
+            return {
+                totalPages: Math.ceil(totalCount / limit),
+                currentPage: (offset + limit) / limit,
+                pageLimit: paginationConfig.limit,
+                sizes: {
+                    label: paginationConfig.selectLabel ? core$1._t(paginationConfig.selectLabel) : null,
+                    list: paginationConfig.options,
+                    active: limit,
+                },
+            };
+        };
+        return MrAdvancedResultsLayoutDS;
+    }(core$1.LayoutDataSource));
+
+    var MrAdvancedResultsLayoutEH = /** @class */ (function (_super) {
+        __extends(MrAdvancedResultsLayoutEH, _super);
+        function MrAdvancedResultsLayoutEH() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.destroy$ = new rxjs.Subject();
+            return _this;
+        }
+        MrAdvancedResultsLayoutEH.prototype.listen = function () {
+            var _this = this;
+            this.innerEvents$.subscribe(function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case 'mr-advanced-results-layout.init':
+                        _this.activatedRoute = payload.activatedRoute;
+                        _this.router = payload.router;
+                        _this.layoutState = payload.layoutState;
+                        _this.dataSource.onInit(payload);
+                        // listen route changes
+                        _this.listenToRouterChanges();
+                        break;
+                    case 'mr-advanced-results-layout.destroy':
+                        _this.destroy$.next();
+                        break;
+                    default:
+                        console.warn('unhandled inner event of type', type);
+                        break;
+                }
+            });
+            this.outerEvents$.subscribe(function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case 'n7-smart-pagination.click':
+                        _this.updateRouter({ page: payload.page });
+                        break;
+                    case 'n7-smart-pagination.change':
+                        _this.updateRouter({ limit: payload.value });
+                        break;
+                    case 'mr-search-results-title.change':
+                        _this.updateRouter({ sort: payload.value });
+                        break;
+                    default:
+                        console.warn('unhandled inner event of type', type);
+                        break;
+                }
+            });
+        };
+        /** URL changes */
+        MrAdvancedResultsLayoutEH.prototype.listenToRouterChanges = function () {
+            var _this = this;
+            this.activatedRoute.queryParams.pipe(operators.takeUntil(this.destroy$), operators.tap(function () {
+                _this.layoutState.set('results', LayoutState.LOADING);
+            }), operators.switchMap(function (params) { return _this.dataSource.request$(params, function (error) {
+                console.warn('Advanced search error', error);
+                _this.layoutState.set('results', LayoutState.ERROR);
+            }); })).subscribe(function (response) {
+                _this.dataSource.handleResponse(response);
+                _this.layoutState.set('results', lodash.isEmpty(response.results) ? LayoutState.EMPTY : LayoutState.SUCCESS);
+            });
+        };
+        MrAdvancedResultsLayoutEH.prototype.updateRouter = function (queryParams) {
+            this.router.navigate([], {
+                queryParams: queryParams,
+                queryParamsHandling: 'merge'
+            });
+        };
+        return MrAdvancedResultsLayoutEH;
+    }(core$1.EventHandler));
+
+    var MrAdvancedResultsLayoutConfig = {
+        layoutId: 'mr-advanced-results-layout',
+        widgets: [
+            {
+                id: 'mr-search-page-title'
+            }, {
+                id: 'mr-search-results-title'
+            }, {
+                id: 'mr-search-results'
+            }, {
+                id: 'n7-smart-pagination',
+                dataSource: SmartPaginationDS,
+                eventHandler: SmartPaginationEH,
+            }
+        ],
+        layoutDS: MrAdvancedResultsLayoutDS,
+        layoutEH: MrAdvancedResultsLayoutEH,
+        widgetsDataSources: DS$3,
+        widgetsEventHandlers: EH$3,
+        layoutOptions: {}
+    };
+
+    var MrAdvancedResultsLayoutComponent = /** @class */ (function (_super) {
+        __extends(MrAdvancedResultsLayoutComponent, _super);
+        function MrAdvancedResultsLayoutComponent(router, activatedRoute, mainState, configuration, communication, layoutState, layoutsConfiguration) {
+            var _this = _super.call(this, layoutsConfiguration.get('MrAdvancedResultsLayoutConfig') || MrAdvancedResultsLayoutConfig) || this;
+            _this.router = router;
+            _this.activatedRoute = activatedRoute;
+            _this.mainState = mainState;
+            _this.configuration = configuration;
+            _this.communication = communication;
+            _this.layoutState = layoutState;
+            return _this;
+        }
+        MrAdvancedResultsLayoutComponent.prototype.initPayload = function () {
+            return {
+                configId: this.configId,
+                configuration: this.configuration,
+                communication: this.communication,
+                mainState: this.mainState,
+                router: this.router,
+                activatedRoute: this.activatedRoute,
+                layoutState: this.layoutState,
+                options: this.config.options || {},
+            };
+        };
+        MrAdvancedResultsLayoutComponent.prototype.ngOnInit = function () {
+            var _this = this;
+            this.activatedRoute.data.subscribe(function (data) {
+                _this.configId = data.configId;
+                // add layout states
+                _this.layoutState.add(['results']);
+                _this.onInit();
+            });
+        };
+        MrAdvancedResultsLayoutComponent.prototype.ngOnDestroy = function () {
+            this.onDestroy();
+        };
+        MrAdvancedResultsLayoutComponent.ctorParameters = function () { return [
+            { type: router.Router },
+            { type: router.ActivatedRoute },
+            { type: MainStateService },
+            { type: ConfigurationService },
+            { type: CommunicationService },
+            { type: MrLayoutStateService },
+            { type: LayoutsConfigurationService }
+        ]; };
+        MrAdvancedResultsLayoutComponent = __decorate([
+            core.Component({
+                selector: 'mr-advanced-results-layout',
+                template: "<div class=\"mr-search mr-layout\"\n     *ngIf=\"lb.dataSource\">\n    <section class=\"mr-layout__maxwidth mr-side-margin\">\n\n        <div class=\"mr-search__title\">\n            <n7-inner-title\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\"\n            [emit]=\"lb.widgets['mr-search-page-title'].emit\">\n            </n7-inner-title>\n        </div>\n        \n        <div class=\"mr-search__results-content\">\n            <div class=\"mr-search__results-wrapper\">\n                <div class=\"mr-search__results-info\">\n                    <n7-inner-title\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\n                    </n7-inner-title>\n                </div>\n                <main class=\"mr-search__results\">\n                    <!-- SEARCH RESULTS -->\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\n                        \n                        <!-- loading -->\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\n                            <div class=\"mr-search__results-loading n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\n                                    blocks: [\n                                        { classes: 'search-result-placeholder-title' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' },\n                                        { classes: 'search-result-placeholder-metadata' }\n                                    ]\n                                }\"></n7-content-placeholder>\n                            </div>\n                        </ng-container>\n                        \n                        <!-- success: items > 0 -->\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\n                            <div class=\"n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\n                                <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\n                                [data]=\"item\">\n                                </n7-item-preview>\n                            </div>\n                        </ng-container>\n\n                        <!-- empty: items === 0 -->\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\n                            <div class=\"mr-search__results-fallback\">\n                                <p class=\"mr-search__results-fallback-string\">\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\n                                </p>\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\n                                </button>\n                            </div>\n                        </ng-container>\n\n                        <!-- error: request problem -->\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\n                            <p class=\"mr-search__results-ko-string\">\n                                {{ lb.dataSource.pageConfig.ko.text }}\n                            </p>\n                            <button class=\"n7-btn mr-search__results-ko-button\"\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\n                                {{ lb.dataSource.pageConfig.ko.button }}\n                            </button>\n                        </ng-container>\n                        \n                    </ng-container>\n                </main>               \n                <n7-smart-pagination\n                *ngIf=\"(layoutState.get$('results') | async) === 'SUCCESS'\"\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\n                </n7-smart-pagination>\n            </div>\n        </div>\n\n    </section>\n</div>\n"
+            }),
+            __metadata("design:paramtypes", [router.Router,
+                router.ActivatedRoute,
+                MainStateService,
+                ConfigurationService,
+                CommunicationService,
+                MrLayoutStateService,
+                LayoutsConfigurationService])
+        ], MrAdvancedResultsLayoutComponent);
+        return MrAdvancedResultsLayoutComponent;
     }(AbstractLayout));
 
     var MrGlossaryLayoutDS = /** @class */ (function (_super) {
@@ -13048,6 +13311,7 @@
         MrSearchLayoutComponent,
         MrStaticLayoutComponent,
         MrAdvancedSearchLayoutComponent,
+        MrAdvancedResultsLayoutComponent,
         MrTimelineLayoutComponent,
         // Custom components
         ReadMoreComponent,
@@ -13928,6 +14192,10 @@
     exports.MainLayoutDS = MainLayoutDS;
     exports.MainLayoutEH = MainLayoutEH;
     exports.MainStateService = MainStateService;
+    exports.MrAdvancedResultsLayoutComponent = MrAdvancedResultsLayoutComponent;
+    exports.MrAdvancedResultsLayoutConfig = MrAdvancedResultsLayoutConfig;
+    exports.MrAdvancedResultsLayoutDS = MrAdvancedResultsLayoutDS;
+    exports.MrAdvancedResultsLayoutEH = MrAdvancedResultsLayoutEH;
     exports.MrAdvancedSearchLayoutComponent = MrAdvancedSearchLayoutComponent;
     exports.MrAdvancedSearchLayoutConfig = MrAdvancedSearchLayoutConfig;
     exports.MrAdvancedSearchLayoutDS = MrAdvancedSearchLayoutDS;
@@ -14047,14 +14315,15 @@
     exports.ɵbj = MrSearchService;
     exports.ɵbk = MrStaticLayoutComponent;
     exports.ɵbl = MrAdvancedSearchLayoutComponent;
-    exports.ɵbm = MrTimelineLayoutComponent;
-    exports.ɵbn = ReadMoreComponent;
-    exports.ɵbo = MrFormComponent;
-    exports.ɵbp = MrFormWrapperAccordionComponent;
-    exports.ɵbq = MrSearchPageDescriptionComponent;
-    exports.ɵbr = MrResourceModalComponent;
-    exports.ɵbs = SbExampleLayoutComponent;
-    exports.ɵbt = SbImageViewerLayoutComponent;
+    exports.ɵbm = MrAdvancedResultsLayoutComponent;
+    exports.ɵbn = MrTimelineLayoutComponent;
+    exports.ɵbo = ReadMoreComponent;
+    exports.ɵbp = MrFormComponent;
+    exports.ɵbq = MrFormWrapperAccordionComponent;
+    exports.ɵbr = MrSearchPageDescriptionComponent;
+    exports.ɵbs = MrResourceModalComponent;
+    exports.ɵbt = SbExampleLayoutComponent;
+    exports.ɵbu = SbImageViewerLayoutComponent;
     exports.ɵc = ConfigurationService;
     exports.ɵd = LayoutsConfigurationService;
     exports.ɵe = MainStateService;
