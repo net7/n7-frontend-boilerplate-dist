@@ -7,6 +7,24 @@ export declare type PdfViewerData = {
     next: number | null;
     prev: number | null;
     currentUrl: string;
+    libOptions: {
+        showToolbar: boolean;
+        showSidebarButton: boolean;
+        showFindButton: boolean;
+        showPagingButtons: boolean;
+        showZoomButtons: boolean;
+        showPresentationModeButton: boolean;
+        showOpenFileButton: boolean;
+        showPrintButton: boolean;
+        showDownloadButton: boolean;
+        showBookmarkButton: boolean;
+        showSecondaryToolbarButton: boolean;
+        showRotateButton: boolean;
+        showHandToolButton: boolean;
+        showScrollingButton: boolean;
+        showSpreadButton: boolean;
+        showPropertiesButton: boolean;
+    };
     classes?: string;
 };
 export declare class PdfViewerComponent {

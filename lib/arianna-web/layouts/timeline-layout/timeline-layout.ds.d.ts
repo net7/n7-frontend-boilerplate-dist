@@ -21,9 +21,10 @@ export declare class AwTimelineLayoutDS extends LayoutDataSource {
         titleService: any;
         communication: any;
     }): void;
-    onTimelineClick({ id, label }: {
+    onTimelineClick({ id, label, dateText }: {
         id: any;
         label: any;
+        dateText: any;
     }): void;
     private clearResults;
     onPaginationChange({ value }: {

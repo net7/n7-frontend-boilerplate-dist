@@ -3465,6 +3465,24 @@
         return AwSchedaMetadataDS;
     }(core$1.DataSource));
 
+    var DEFAULT_OPTIONS = {
+        showToolbar: true,
+        showSidebarButton: true,
+        showFindButton: true,
+        showPagingButtons: true,
+        showZoomButtons: true,
+        showPresentationModeButton: true,
+        showOpenFileButton: false,
+        showPrintButton: false,
+        showDownloadButton: false,
+        showBookmarkButton: false,
+        showSecondaryToolbarButton: true,
+        showRotateButton: false,
+        showHandToolButton: true,
+        showScrollingButton: false,
+        showSpreadButton: false,
+        showPropertiesButton: false
+    };
     var AwSchedaPdfDS = /** @class */ (function (_super) {
         __extends(AwSchedaPdfDS, _super);
         function AwSchedaPdfDS() {
@@ -3472,16 +3490,19 @@
         }
         AwSchedaPdfDS.prototype.transform = function (data) {
             var items = data.items;
+            var libOptions = lodash.merge(DEFAULT_OPTIONS, this.options.libOptions || {});
             if (!(Array.isArray(items) && items.length)) {
                 return null;
             }
             this.items = items.map(function (item, index) { return (__assign(__assign({}, item), { selected: index === 0 })); });
+            console.log('libOptions----------------------------->', libOptions);
             // defaults
             return {
+                libOptions: libOptions,
                 items: this.items,
                 next: 1,
                 prev: null,
-                currentUrl: items[0].url
+                currentUrl: items[0].url,
             };
         };
         AwSchedaPdfDS.prototype.onChange = function (index) {
@@ -4180,7 +4201,10 @@
                         item: item,
                         start: start ? moment(start).format('YYYY-MM-DD') : null,
                         end: end && end !== start ? moment(end).format('YYYY-MM-DD') : null,
-                        content: _this.getItemTemplate(label, item.label)
+                        content: _this.getItemTemplate(label, item.label),
+                        _meta: {
+                            dateText: label
+                        }
                     });
                 });
                 var max = _this.getMax();
@@ -4959,9 +4983,12 @@
                         return item === id;
                     });
                     if (clicked) {
+                        var dateText = clicked._meta.dateText;
+                        var _b = clicked.item, id = _b.id, label = _b.label;
                         _this.emitOuter('click', {
-                            id: clicked.item.id,
-                            label: clicked.item.label
+                            id: id,
+                            label: label,
+                            dateText: dateText,
                         });
                     }
                     else {
@@ -7120,6 +7147,11 @@
             this.mainState.update('headTitle', 'Arianna4View - Patrimonio');
             this.mainState.update('pageTitle', 'Arianna4View - Patrimonio');
             this.mainState.updateCustom('currentNav', 'patrimonio');
+            // image viewer context-menu check
+            var imageViewerConfig = this.configuration.get('scheda-layout')['image-viewer'] || {};
+            this.hasContextMenu = function () { return !!imageViewerConfig['context-menu']; };
+            // pdf viewer options
+            this.one('aw-scheda-pdf').updateOptions(this.configuration.get('scheda-layout')['pdf-viewer'] || {});
             // sidebar sticky control
             this._sidebarStickyControl();
         };
@@ -7498,7 +7530,7 @@
         AwSchedaLayoutComponent = __decorate([
             core.Component({
                 selector: 'aw-scheda-layout',
-                template: "<div class=\"aw-scheda\"\n     id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n\n        <ng-container *ngTemplateOutlet=\"tree\"></ng-container>\n\n        <div class=\"aw-scheda__scheda-wrapper\"\n             [hidden]=\"lb.dataSource.contentIsLoading\">\n\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                                  [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                                  [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\"\n                 class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n\n            <div *ngIf=\"!lb.dataSource.currentId\"\n                 class=\"aw-scheda__intro-text\"\n                 [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <!-- Empty state -->\n            <ng-container *ngIf=\"!lb.dataSource.hasContent\">\n                <ng-container *ngTemplateOutlet=\"empty\"></ng-container>\n            </ng-container>\n\n            <!-- Content sections -->\n            <ng-container *ngIf=\"lb.dataSource.hasContent\">\n                <ng-container *ngTemplateOutlet=\"content\"></ng-container>\n            </ng-container>\n\n        </div>\n\n    </div>\n</div>\n\n<ng-template #tree>\n    <div class=\"aw-scheda__tree sticky-target\"\n         [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n        <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                           [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n        <div class=\"aw-scheda__tree-content-loading\"\n             *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                    [data]=\"{\n                            blocks: [{\n                                classes: 'tree-placeholder-item'\n                            }]\n                        }\"></n7-content-placeholder>\n        </div>\n        <div class=\"aw-scheda__tree-content\"\n             (click)=\"lb.eventHandler.emitOuter('treeposition', $event)\"\n             [ngStyle]=\"{\n                            'max-height': lb.dataSource.treeMaxHeight,\n                            'overflow': 'auto'\n                        }\">\n            <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                     [emit]=\"lb.widgets['aw-tree'].emit\"\n                     *ngIf=\"!lb.dataSource.sidebarCollapsed\">\n            </n7-tree>\n        </div>\n    </div>\n</ng-template>\n\n<ng-template #empty>\n    <section class=\"aw-scheda__section aw-scheda__empty\"\n             [innerHTML]=\"lb.dataSource.emptyStateString\">\n    </section>\n</ng-template>\n\n<ng-template #content>\n    <!-- Digital Object selection dropdown -->\n    <section class=\"aw-scheda__digital-object-dropdown\"\n            *ngIf=\"(\n                lb.dataSource.hasDigitalObjects \n                && lb.dataSource.digitalObjects.length > 1\n            )\">\n        <p class=\"aw-scheda__digital-object-dropdown-label\">\n            Seleziona l'oggetto digitale da visualizzare:\n        </p>\n        <aw-scheda-dropdown \n        [data]=\"lb.widgets['aw-scheda-dropdown'].ds.out$ | async\"\n        [emit]=\"lb.widgets['aw-scheda-dropdown'].emit\">\n        </aw-scheda-dropdown>\n    </section>\n    <!-- END // Digital Object selection dropdown -->\n\n    <!-- Digital Objects: images, IIP, PDFs, external links -->\n    <section *ngIf=\"lb.dataSource.currentDigitalObject as $do\" \n        class=\"aw-scheda__media aw-scheda__{{ $do.type }}\"\n        [ngClass]=\"{ \n            'navigation-hidden': !$do.hasNavigation\n        }\">\n        <ng-container [ngSwitch]=\"$do.type\">\n            <!-- IMAGE VIEWER (IIIF) -->\n            <ng-container *ngSwitchCase=\"'images-iiif'\">\n                <n7-image-viewer [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n                </n7-image-viewer>\n            </ng-container>\n\n            <!-- IMAGE VIEWER (Simple: jpg, png) -->\n            <ng-container *ngSwitchCase=\"'images-simple'\">\n                <n7-image-viewer [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n                </n7-image-viewer>\n            </ng-container>\n    \n            <!-- PDF -->\n            <ng-container *ngSwitchCase=\"'pdf'\">\n                <aw-pdf-viewer \n                [data]=\"lb.widgets['aw-scheda-pdf'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-pdf'].emit\">\n                </aw-pdf-viewer>\n            </ng-container>\n    \n            <!-- EXTERNAL URL -->\n            <ng-container *ngSwitchCase=\"'external'\">\n                <div class=\"aw-scheda__external-url\">\n                    <a class=\"aw-scheda__external-url-link\" href=\"{{ $do.url }}\" target=\"_blank\">\n                        {{ $do.label || lb.dataSource.externalUrlText }}\n                        <span class=\"n7-icon-external-link\"></span>\n                    </a>\n                </div>\n            </ng-container>\n        </ng-container>\n    </section>\n    <!-- END // Digital Objects -->\n\n    <section class=\"aw-scheda__section aw-scheda__description\"\n             *ngIf=\"lb.dataSource.contentParts.content\">\n        <div *ngFor=\"let part of lb.dataSource.contentParts\">\n            <div [innerHTML]=\"part.content\"></div>\n        </div>\n    </section>\n\n    <!-- Metadata -->\n    <section class=\"aw-scheda__section aw-scheda__metadata\"\n             *ngIf=\"lb.dataSource.hasMetadata\">\n        <div class=\"aw-scheda__inner-title\"\n             *ngIf=\"lb.dataSource.metadataSectionTitle\">\n            {{lb.dataSource.metadataSectionTitle}}\n        </div>\n        <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n        </n7-metadata-viewer>\n    </section>\n    <!-- END // Metadata -->\n\n    <!-- Related entities -->\n    <section *ngIf=\"lb.dataSource.hasRelatedEntities\"\n             id=\"related-item-container\"\n             class=\"aw-scheda__section aw-scheda__related\">\n        <div class=\"aw-scheda__inner-title\">\n            {{lb.dataSource.relatedEntitiesHeader}}\n        </div>\n        <div class=\"aw-scheda__related-items aw-item-preview-list n7-grid-2\">\n            <ng-container *ngFor=\"let preview of (lb.widgets['aw-related-entities'].ds.out$ | async)?.previews\">\n                <div class=\"aw-item-preview-wrapper\">\n                    <n7-item-preview [data]=\"preview\"\n                                     [emit]=\"lb.widgets['aw-related-entities'].emit\">\n                    </n7-item-preview>\n                    <!-- Relation -->\n                    <div class=\"aw-item-preview-relation\"\n                         *ngIf=\"preview.relation?.value\">\n                        <p class=\"aw-item-preview-relation__description\">Tipo di relazione\n                            <!-- <span class=\"aw-item-preview-relation__key\">{{preview.relation.key}}</span>: -->\n                            <span class=\"aw-item-preview-relation__value\">{{preview.relation.value}}</span>\n                        </p>\n                    </div>\n                </div>\n            </ng-container>\n        </div>\n    </section>\n    <!-- END // Related entities -->\n\n    <!-- Similar Objects -->\n    <section *ngIf=\"lb.dataSource.hasSimilarItems\"\n             id=\"related-item-container\"\n             class=\"aw-scheda__section aw-scheda__related\">\n        <div class=\"aw-scheda__inner-title\">\n            {{lb.dataSource.similarItemsSectionTitle}}\n        </div>\n        <div class=\"aw-scheda__related-items aw-item-preview-list n7-grid-2\">\n            <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                <div class=\"aw-item-preview-wrapper\">\n                    <n7-item-preview [data]=\"preview\"\n                                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </div> \n            </ng-container>\n        </div>\n    </section>\n    <!-- END // Similar Objects -->\n</ng-template>\n"
+                template: "<div class=\"aw-scheda\"\n     id=\"scheda-layout\">\n    <div class=\"aw-scheda__content n7-side-auto-padding sticky-parent\"\n         [ngClass]=\"{ 'is-collapsed' : lb.dataSource.sidebarCollapsed }\">\n\n        <ng-container *ngTemplateOutlet=\"tree\"></ng-container>\n\n        <div class=\"aw-scheda__scheda-wrapper\"\n             [hidden]=\"lb.dataSource.contentIsLoading\">\n\n            <n7-smart-breadcrumbs *ngIf=\"lb.dataSource.hasBreadcrumb\"\n                                  [data]=\"lb.widgets['aw-scheda-breadcrumbs'].ds.out$ | async\"\n                                  [emit]=\"lb.widgets['aw-scheda-breadcrumbs'].emit\">\n            </n7-smart-breadcrumbs>\n\n            <div *ngIf=\"!lb.dataSource.hasBreadcrumb\"\n                 class=\"aw-scheda__fake-breadcrumbs\">\n            </div>\n\n            <div *ngIf=\"!lb.dataSource.currentId\"\n                 class=\"aw-scheda__intro-text\"\n                 [innerHTML]=\"lb.dataSource.emptyLabel\">\n            </div>\n\n            <n7-inner-title [data]=\"lb.widgets['aw-scheda-inner-title'].ds.out$ | async\">\n            </n7-inner-title>\n\n            <!-- Empty state -->\n            <ng-container *ngIf=\"!lb.dataSource.hasContent\">\n                <ng-container *ngTemplateOutlet=\"empty\"></ng-container>\n            </ng-container>\n\n            <!-- Content sections -->\n            <ng-container *ngIf=\"lb.dataSource.hasContent\">\n                <ng-container *ngTemplateOutlet=\"content\"></ng-container>\n            </ng-container>\n\n        </div>\n\n    </div>\n</div>\n\n<ng-template #tree>\n    <div class=\"aw-scheda__tree sticky-target\"\n         [ngClass]=\"{ 'is-sticky': lb.dataSource.sidebarIsSticky }\">\n        <n7-sidebar-header [data]=\"lb.widgets['aw-sidebar-header'].ds.out$ | async\"\n                           [emit]=\"lb.widgets['aw-sidebar-header'].emit\"></n7-sidebar-header>\n        <div class=\"aw-scheda__tree-content-loading\"\n             *ngIf=\"!(lb.widgets['aw-tree'].ds.out$ | async)\">\n            <n7-content-placeholder *ngFor=\"let n of [0,1,2,3]\"\n                                    [data]=\"{\n                            blocks: [{\n                                classes: 'tree-placeholder-item'\n                            }]\n                        }\"></n7-content-placeholder>\n        </div>\n        <div class=\"aw-scheda__tree-content\"\n             (click)=\"lb.eventHandler.emitOuter('treeposition', $event)\"\n             [ngStyle]=\"{\n                            'max-height': lb.dataSource.treeMaxHeight,\n                            'overflow': 'auto'\n                        }\">\n            <n7-tree [data]=\"lb.widgets['aw-tree'].ds.out$ | async\"\n                     [emit]=\"lb.widgets['aw-tree'].emit\"\n                     *ngIf=\"!lb.dataSource.sidebarCollapsed\">\n            </n7-tree>\n        </div>\n    </div>\n</ng-template>\n\n<ng-template #empty>\n    <section class=\"aw-scheda__section aw-scheda__empty\"\n             [innerHTML]=\"lb.dataSource.emptyStateString\">\n    </section>\n</ng-template>\n\n<ng-template #content>\n    <!-- Digital Object selection dropdown -->\n    <section class=\"aw-scheda__digital-object-dropdown\"\n            *ngIf=\"(\n                lb.dataSource.hasDigitalObjects \n                && lb.dataSource.digitalObjects.length > 1\n            )\">\n        <p class=\"aw-scheda__digital-object-dropdown-label\">\n            Seleziona l'oggetto digitale da visualizzare:\n        </p>\n        <aw-scheda-dropdown \n        [data]=\"lb.widgets['aw-scheda-dropdown'].ds.out$ | async\"\n        [emit]=\"lb.widgets['aw-scheda-dropdown'].emit\">\n        </aw-scheda-dropdown>\n    </section>\n    <!-- END // Digital Object selection dropdown -->\n\n    <!-- Digital Objects: images, IIP, PDFs, external links -->\n    <section *ngIf=\"lb.dataSource.currentDigitalObject as $do\" \n        class=\"aw-scheda__media aw-scheda__{{ $do.type }}\"\n        [ngClass]=\"{ \n            'navigation-hidden': !$do.hasNavigation\n        }\">\n        <ng-container [ngSwitch]=\"$do.type\">\n            <!-- IMAGE VIEWER (IIIF) -->\n            <ng-container *ngSwitchCase=\"'images-iiif'\">\n                <n7-image-viewer \n                (contextmenu)=\"lb.dataSource.hasContextMenu()\" \n                [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n                </n7-image-viewer>\n            </ng-container>\n\n            <!-- IMAGE VIEWER (Simple: jpg, png) -->\n            <ng-container *ngSwitchCase=\"'images-simple'\">\n                <n7-image-viewer \n                (contextmenu)=\"lb.dataSource.hasContextMenu()\"\n                [data]=\"lb.widgets['aw-scheda-image'].ds.out$ | async\">\n                </n7-image-viewer>\n            </ng-container>\n    \n            <!-- PDF -->\n            <ng-container *ngSwitchCase=\"'pdf'\">\n                <aw-pdf-viewer \n                [data]=\"lb.widgets['aw-scheda-pdf'].ds.out$ | async\"\n                [emit]=\"lb.widgets['aw-scheda-pdf'].emit\">\n                </aw-pdf-viewer>\n            </ng-container>\n    \n            <!-- EXTERNAL URL -->\n            <ng-container *ngSwitchCase=\"'external'\">\n                <div class=\"aw-scheda__external-url\">\n                    <a class=\"aw-scheda__external-url-link\" href=\"{{ $do.url }}\" target=\"_blank\">\n                        {{ $do.label || lb.dataSource.externalUrlText }}\n                        <span class=\"n7-icon-external-link\"></span>\n                    </a>\n                </div>\n            </ng-container>\n        </ng-container>\n    </section>\n    <!-- END // Digital Objects -->\n\n    <section class=\"aw-scheda__section aw-scheda__description\"\n             *ngIf=\"lb.dataSource.contentParts.content\">\n        <div *ngFor=\"let part of lb.dataSource.contentParts\">\n            <div [innerHTML]=\"part.content\"></div>\n        </div>\n    </section>\n\n    <!-- Metadata -->\n    <section class=\"aw-scheda__section aw-scheda__metadata\"\n             *ngIf=\"lb.dataSource.hasMetadata\">\n        <div class=\"aw-scheda__inner-title\"\n             *ngIf=\"lb.dataSource.metadataSectionTitle\">\n            {{lb.dataSource.metadataSectionTitle}}\n        </div>\n        <n7-metadata-viewer [data]=\"lb.widgets['aw-scheda-metadata'].ds.out$ | async\">\n        </n7-metadata-viewer>\n    </section>\n    <!-- END // Metadata -->\n\n    <!-- Related entities -->\n    <section *ngIf=\"lb.dataSource.hasRelatedEntities\"\n             id=\"related-item-container\"\n             class=\"aw-scheda__section aw-scheda__related\">\n        <div class=\"aw-scheda__inner-title\">\n            {{lb.dataSource.relatedEntitiesHeader}}\n        </div>\n        <div class=\"aw-scheda__related-items aw-item-preview-list n7-grid-2\">\n            <ng-container *ngFor=\"let preview of (lb.widgets['aw-related-entities'].ds.out$ | async)?.previews\">\n                <div class=\"aw-item-preview-wrapper\">\n                    <n7-item-preview [data]=\"preview\"\n                                     [emit]=\"lb.widgets['aw-related-entities'].emit\">\n                    </n7-item-preview>\n                    <!-- Relation -->\n                    <div class=\"aw-item-preview-relation\"\n                         *ngIf=\"preview.relation?.value\">\n                        <p class=\"aw-item-preview-relation__description\">Tipo di relazione\n                            <!-- <span class=\"aw-item-preview-relation__key\">{{preview.relation.key}}</span>: -->\n                            <span class=\"aw-item-preview-relation__value\">{{preview.relation.value}}</span>\n                        </p>\n                    </div>\n                </div>\n            </ng-container>\n        </div>\n    </section>\n    <!-- END // Related entities -->\n\n    <!-- Similar Objects -->\n    <section *ngIf=\"lb.dataSource.hasSimilarItems\"\n             id=\"related-item-container\"\n             class=\"aw-scheda__section aw-scheda__related\">\n        <div class=\"aw-scheda__inner-title\">\n            {{lb.dataSource.similarItemsSectionTitle}}\n        </div>\n        <div class=\"aw-scheda__related-items aw-item-preview-list n7-grid-2\">\n            <ng-container *ngFor=\"let preview of (lb.widgets['aw-linked-objects'].ds.out$ | async)?.previews\">\n                <div class=\"aw-item-preview-wrapper\">\n                    <n7-item-preview [data]=\"preview\"\n                                    [emit]=\"lb.widgets['aw-linked-objects'].emit\">\n                    </n7-item-preview>\n                </div> \n            </ng-container>\n        </div>\n    </section>\n    <!-- END // Similar Objects -->\n</ng-template>\n"
             }),
             __metadata("design:paramtypes", [router.Router,
                 router.ActivatedRoute,
@@ -7592,23 +7624,6 @@
         return AwSearchLayoutComponent;
     }(AbstractLayout));
 
-    var timelineMock = [
-        {
-            id: 'c67b3a8b-5ec9-4c82-b77c-6142e49cfad4',
-            content: 'Mostra internazionale di edilizia ospedaliera, Roma (1935)',
-            start: '1935'
-        },
-        {
-            id: 'b788bca1-ce11-4618-b283-a654d16b4a10',
-            content: 'Mostra di edilizia ospedaliera, Fiuggi',
-            start: '1942'
-        },
-        {
-            id: '5dae76e3-7bde-46e5-8371-a689e38378a4',
-            content: 'I Congresso mondiale di sociologia',
-            start: '1951'
-        }
-    ];
     var AwTimelineLayoutDS = /** @class */ (function (_super) {
         __extends(AwTimelineLayoutDS, _super);
         function AwTimelineLayoutDS() {
@@ -7633,8 +7648,6 @@
                 params: {},
                 onError: function (err) {
                     console.warn(err);
-                    // FIXME: togliere
-                    _this.one('aw-timeline').update(timelineMock);
                 }
             }).subscribe(function (response) {
                 _this.one('aw-timeline').update(response);
@@ -7642,7 +7655,7 @@
         };
         AwTimelineLayoutDS.prototype.onTimelineClick = function (_a) {
             var _this = this;
-            var id = _a.id, label = _a.label;
+            var id = _a.id, label = _a.label, dateText = _a.dateText;
             if (lodash.isNull(id)) {
                 this.currentId = null;
                 this.clearResults();
@@ -7666,7 +7679,10 @@
                     }
                     _this.one('aw-scheda-inner-title').update({
                         title: {
-                            main: { text: text }
+                            main: { text: text },
+                            secondary: dateText ? {
+                                text: dateText
+                            } : null
                         }
                     });
                     // update items
@@ -7962,7 +7978,7 @@
         PdfViewerComponent = __decorate([
             core.Component({
                 selector: 'aw-pdf-viewer',
-                template: "<div *ngIf=\"data\" class=\"aw-pdf-viewer {{ data.classes || '' }}\">\n    <div class=\"aw-pdf-viewer__loader\">\n        <n7-loader></n7-loader>\n    </div>\n    \n    <ngx-extended-pdf-viewer\n        [src]=\"data.currentUrl\"\n        [height]=\"'90vh'\"\n        [useBrowserLocale]=\"true\"\n        [textLayer]=\"true\"\n        [showToolbar]=\"true\"\n        [showSidebarButton]=\"true\"\n        [showFindButton]=\"true\"\n        [showPagingButtons]=\"true\"\n        [showZoomButtons]=\"true\"\n        [showPresentationModeButton]=\"true\"\n        [showHandToolButton]=\"true\"\n        [showOpenFileButton]=\"false\"\n        [showPrintButton]=\"false\"\n        [showDownloadButton]=\"false\"\n        [showBookmarkButton]=\"false\"\n        [showSecondaryToolbarButton]=\"true\"\n        [showRotateButton]=\"false\"\n        [showScrollingButton]=\"false\"\n        [showSpreadButton]=\"false\"\n        [showPropertiesButton]=\"false\"\n        (pdfLoaded)=\"onLoaded()\"\n        (pdfLoadingFailed)=\"onLoaded()\">\n    </ngx-extended-pdf-viewer>\n    \n    <div *ngIf=\"data.items.length > 1\" class=\"aw-pdf-viewer__navigation\">\n        <div class=\"aw-pdf-viewer__navigation-tools\">\n            <a class=\"aw-pdf-viewer__navigation-prev {{ (!data.prev && data.prev !== 0) ? 'is-disabled' : '' }}\" \n            (click)=\"onClick(data.prev)\">\n                <span class=\"n7-icon-angle-left\"></span>\n            </a>\n            <div class=\"aw-pdf-viewer__navigation-select\">\n                <p class=\"aw-pdf-viewer__navigation-select-text\">Scorri i documenti PDF</p>\n                <select (change)=\"onClick(+$event.target.value)\">\n                    <option *ngFor=\"let item of data.items; let $i = index\" [value]=\"$i\"\n                    [selected]=\"item.selected\">{{ item.label }}</option>\n                </select>\n            </div>\n            <a class=\"aw-pdf-viewer__navigation-next {{ !data.next ? 'is-disabled' : '' }}\" \n            (click)=\"onClick(data.next)\">\n                <span class=\"n7-icon-angle-right\"></span>\n            </a>\n        </div>\n    </div>\n</div>"
+                template: "<div *ngIf=\"data\" class=\"aw-pdf-viewer {{ data.classes || '' }}\">\n    <div class=\"aw-pdf-viewer__loader\">\n        <n7-loader></n7-loader>\n    </div>\n    \n    <ngx-extended-pdf-viewer\n        [src]=\"data.currentUrl\"\n        [height]=\"'90vh'\"\n        [useBrowserLocale]=\"true\"\n        [textLayer]=\"true\"\n        [showToolbar]=\"data.libOptions.showToolbar\"\n        [showSidebarButton]=\"data.libOptions.showSidebarButton\"\n        [showFindButton]=\"data.libOptions.showFindButton\"\n        [showPagingButtons]=\"data.libOptions.showPagingButtons\"\n        [showZoomButtons]=\"data.libOptions.showZoomButtons\"\n        [showPresentationModeButton]=\"data.libOptions.showPresentationModeButton\"\n        [showOpenFileButton]=\"data.libOptions.showOpenFileButton\"\n        [showPrintButton]=\"data.libOptions.showPrintButton\"\n        [showDownloadButton]=\"data.libOptions.showDownloadButton\"\n        [showBookmarkButton]=\"data.libOptions.showBookmarkButton\"\n        [showSecondaryToolbarButton]=\"data.libOptions.showSecondaryToolbarButton\"\n        [showRotateButton]=\"data.libOptions.showRotateButton\"\n        [showHandToolButton]=\"data.libOptions.showHandToolButton\"\n        [showScrollingButton]=\"data.libOptions.showScrollingButton\"\n        [showSpreadButton]=\"data.libOptions.showSpreadButton\"\n        [showPropertiesButton]=\"data.libOptions.showPropertiesButton\"\n        (pdfLoaded)=\"onLoaded()\"\n        (pdfLoadingFailed)=\"onLoaded()\">\n    </ngx-extended-pdf-viewer>\n    \n    <div *ngIf=\"data.items.length > 1\" class=\"aw-pdf-viewer__navigation\">\n        <div class=\"aw-pdf-viewer__navigation-tools\">\n            <a class=\"aw-pdf-viewer__navigation-prev {{ (!data.prev && data.prev !== 0) ? 'is-disabled' : '' }}\" \n            (click)=\"onClick(data.prev)\">\n                <span class=\"n7-icon-angle-left\"></span>\n            </a>\n            <div class=\"aw-pdf-viewer__navigation-select\">\n                <p class=\"aw-pdf-viewer__navigation-select-text\">Scorri i documenti PDF</p>\n                <select (change)=\"onClick(+$event.target.value)\">\n                    <option *ngFor=\"let item of data.items; let $i = index\" [value]=\"$i\"\n                    [selected]=\"item.selected\">{{ item.label }}</option>\n                </select>\n            </div>\n            <a class=\"aw-pdf-viewer__navigation-next {{ !data.next ? 'is-disabled' : '' }}\" \n            (click)=\"onClick(data.next)\">\n                <span class=\"n7-icon-angle-right\"></span>\n            </a>\n        </div>\n    </div>\n</div>"
             })
         ], PdfViewerComponent);
         return PdfViewerComponent;

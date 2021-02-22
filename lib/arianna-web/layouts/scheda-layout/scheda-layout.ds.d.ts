@@ -35,6 +35,7 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
     /** String to render in the loaded-empty state */
     emptyStateString: string;
     externalUrlText: string;
+    hasContextMenu: () => boolean;
     onInit({ configuration, mainState, router, options, titleService, communication, }: {
         configuration: any;
         mainState: any;
