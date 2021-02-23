@@ -7,11 +7,11 @@ export declare class MrAdvancedSearchLayoutEH extends EventHandler {
     listen(): void;
     /**
      * @example
-     * protected listenFormChanges() {
+     * protected onInit() {
      *   this.dataSource.form.changed$.subscribe(({ id, state }) => {
      *     console.log('changed$', { id, state });
      *   });
      * }
      */
-    protected listenFormChanges(): void;
+    protected onInit(): void;
 }
