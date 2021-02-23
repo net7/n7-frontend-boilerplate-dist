@@ -23,6 +23,12 @@ export interface MrChangedParams {
 export interface MrFormConfig {
     sections: MrFormConfigSection[];
     groups?: MrFormConfigGroup[];
+    submitButton: {
+        label: string;
+    };
+    resetButton?: {
+        label: string;
+    };
 }
 export interface MrFormConfigSection {
     id: string;

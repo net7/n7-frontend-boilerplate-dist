@@ -10,6 +10,7 @@ export declare class MrAdvancedResultsLayoutDS extends LayoutDataSource {
     protected configId: string;
     pageConfig: any;
     onInit(payload: any): void;
+    updateSearchTags(params: any): void;
     request$(params: any, onError: any): Observable<any>;
     handleResponse(response: any): void;
     protected updateHeadTitle(): void;

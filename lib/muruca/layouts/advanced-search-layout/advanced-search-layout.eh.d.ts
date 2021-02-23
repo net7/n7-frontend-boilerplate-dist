@@ -5,5 +5,13 @@ export declare class MrAdvancedSearchLayoutEH extends EventHandler {
     dataSource: MrAdvancedSearchLayoutDS;
     protected destroy$: Subject<void>;
     listen(): void;
+    /**
+     * @example
+     * protected listenFormChanges() {
+     *   this.dataSource.form.changed$.subscribe(({ id, state }) => {
+     *     console.log('changed$', { id, state });
+     *   });
+     * }
+     */
     protected listenFormChanges(): void;
 }
