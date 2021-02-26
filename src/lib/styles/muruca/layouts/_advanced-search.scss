@@ -7,7 +7,9 @@
 /* ------------------------------------ *\
     ADVANCED-SEARCH-LAYOUT
 \* ------------------------------------ */
-.mr-advanced-search-layout {
+.mr-advanced-search {
+    padding-bottom: $space*4;
+
     .mr-layout__maxwidth {
         max-width: $page-readable-width;
     }

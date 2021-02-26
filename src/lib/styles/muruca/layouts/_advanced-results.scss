@@ -1,0 +1,44 @@
+/**
+ * ADVANCED RESULTS LAYOUT
+ *
+ * Style for the advanced search results page.
+ */
+
+/* ------------------------------------ *\
+    ADVANCED-RESULTS-LAYOUT
+\* ------------------------------------ */
+.mr-advanced-results {
+    padding-bottom: $space*4;
+
+    .mr-layout__maxwidth {
+        max-width: $page-readable-width;
+    }
+
+    &__feedback-text {
+        margin-bottom: $space*2;
+    }
+
+    &__buttons {
+        text-align: center;
+    }
+}
+
+
+/* ------------------------------------ *\
+   #MEDIA-QUERIES
+\* ------------------------------------ */
+@media all and (max-width: 1120px) {
+}
+
+@media all and (max-width: $breakpoint-laptop) {
+}
+
+@media all and (max-width: $breakpoint-ipad-portrait) {
+}
+
+@media all and (max-width: $breakpoint-smartphone-landscape) {
+}
+
+/* Retina */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+}
