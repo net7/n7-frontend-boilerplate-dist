@@ -10407,8 +10407,8 @@ var MrSearchResultsDS = /** @class */ (function (_super) {
                     value.forEach(function (_, i) {
                         highlightGroup_1.items.push({
                             // add a label only to the first entry
-                            label: i === 0 ? label : undefined,
-                            value: value[i],
+                            label: i === 0 ? _t(label) : undefined,
+                            value: _t(value[i]),
                         });
                     });
                 });
