@@ -12,6 +12,7 @@ export declare class AwSearchLayoutEH extends EventHandler {
     private previousText;
     /** Is true when the search is triggered with a new text-string */
     private textHasChanged;
+    private scrollRefElement;
     listen(): void;
     /**
      * Handles changes to any of the search-facets

@@ -7,6 +7,7 @@ export declare class MrAdvancedResultsLayoutEH extends EventHandler {
     protected router: Router;
     private layoutState;
     protected destroy$: Subject<void>;
+    protected scrollRefElement: HTMLElement;
     dataSource: MrAdvancedResultsLayoutDS;
     listen(): void;
     /** URL changes */

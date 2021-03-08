@@ -10,6 +10,7 @@ export declare class MrSearchService {
     private router;
     private activatedRoute;
     private communication;
+    private destroyed$;
     private searchId;
     private config;
     private queryParamKeys;
@@ -28,6 +29,7 @@ export declare class MrSearchService {
     setState(context: string, id: string, newValue: any): void;
     setBeforeHook(context: string, id: string, hook: any): void;
     reset(): void;
+    destroy(): void;
     private clear;
     private setContextState;
     private initInputState;

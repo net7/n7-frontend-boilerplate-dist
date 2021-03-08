@@ -8,5 +8,6 @@ declare const _default: {
     escapeDoubleQuotes(str: any): any;
     unescapeDoubleQuotes(str: any): any;
     striptags(str: any): string;
+    isElementInViewport(el: HTMLElement): boolean;
 };
 export default _default;

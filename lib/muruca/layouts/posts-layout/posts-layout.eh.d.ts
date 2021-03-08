@@ -7,6 +7,7 @@ export declare class MrPostsLayoutEH extends EventHandler {
     protected router: Router;
     private layoutState;
     protected destroy$: Subject<void>;
+    protected scrollRefElement: HTMLElement;
     dataSource: MrPostsLayoutDS;
     listen(): void;
     /** URL changes */

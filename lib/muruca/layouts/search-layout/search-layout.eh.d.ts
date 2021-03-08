@@ -7,6 +7,7 @@ export declare class MrSearchLayoutEH extends EventHandler {
     private layoutState;
     private searchState;
     private linksResponse;
+    private scrollRefElement;
     listen(): void;
     initStateListener(): void;
 }
