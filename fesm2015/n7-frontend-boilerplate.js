@@ -10238,7 +10238,7 @@ class MrAdvancedSearchTagsDS extends DataSource {
     transform(data) {
         const { labels } = this.options;
         return Object.keys(data).map((key) => ({
-            text: `${labels[key] || key}: ${data[key]}`
+            text: `${labels[key] || key}: ${_t(data[key])}`
         }));
     }
 }

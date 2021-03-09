@@ -10560,7 +10560,7 @@ var MrAdvancedSearchTagsDS = /** @class */ (function (_super) {
     MrAdvancedSearchTagsDS.prototype.transform = function (data) {
         var labels = this.options.labels;
         return Object.keys(data).map(function (key) { return ({
-            text: (labels[key] || key) + ": " + data[key]
+            text: (labels[key] || key) + ": " + _t(data[key])
         }); });
     };
     return MrAdvancedSearchTagsDS;

@@ -10771,7 +10771,7 @@
         MrAdvancedSearchTagsDS.prototype.transform = function (data) {
             var labels = this.options.labels;
             return Object.keys(data).map(function (key) { return ({
-                text: (labels[key] || key) + ": " + data[key]
+                text: (labels[key] || key) + ": " + core$1._t(data[key])
             }); });
         };
         return MrAdvancedSearchTagsDS;
