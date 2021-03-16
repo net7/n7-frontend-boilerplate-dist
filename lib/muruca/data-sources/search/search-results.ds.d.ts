@@ -35,6 +35,7 @@ export declare class MrSearchResultsDS extends DataSource {
         /** unique id for the search result entry */
         id: number;
         image?: string;
+        color?: string;
         title: string;
         text?: string;
     }[];

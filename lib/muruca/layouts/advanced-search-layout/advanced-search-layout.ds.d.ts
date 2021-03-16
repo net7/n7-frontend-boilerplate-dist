@@ -17,5 +17,5 @@ export declare class MrAdvancedSearchLayoutDS extends LayoutDataSource {
         state: any;
     }): void;
     onReset(): void;
-    protected addTranslations(formConfig: any): void;
+    protected addTranslations(pageConfig: any): void;
 }
