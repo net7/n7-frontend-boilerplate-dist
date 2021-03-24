@@ -3,7 +3,7 @@ import { ɵɵdefineInjectable, Injectable, Inject, ɵɵinject, Component, Input,
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK, IMAGE_VIEWER_MOCK, IMAGE_VIEWER_TOOLS_MOCK } from '@n7-frontend/components';
-import { ReplaySubject, empty, Subject, interval, merge as merge$1, fromEvent, of, BehaviorSubject, forkJoin } from 'rxjs';
+import { ReplaySubject, empty, Subject, interval, merge as merge$1, fromEvent, BehaviorSubject, of, forkJoin } from 'rxjs';
 import { map, catchError, takeUntil, filter, first, mapTo, debounceTime, switchMap, withLatestFrom, tap, delay } from 'rxjs/operators';
 import { NavigationStart, Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Title, DomSanitizer } from '@angular/platform-browser';
@@ -1626,14 +1626,14 @@ class AwLinkedObjectsDS extends DataSource {
             this.checkForMore();
             this.loadedData.isLoading = false;
         };
+        /**
+         * Dynamically returns the data object for each HTML component
+         *  data: {
+         *     previews: [ breadcrumbs: { items[] }, classes, image, metadata, payload, title ],
+         *     pagination: { first, last, links, next, prev, select }
+         *   }
+         */
         this.unpackData = (data) => {
-            /*
-              Dynamically returns the data object for each HTML component
-              data: {
-                previews: [ breadcrumbs: { items[] }, classes, image, metadata, payload, title ],
-                pagination: { first, last, links, next, prev, select }
-              }
-            */
             const { config } = this.options; // app-config.json
             const paths = config.get('item-preview'); // item preview dynamic paths
             const { totalCount } = data; // total amount of items available on backend
@@ -4160,60 +4160,118 @@ var EH$1 = /*#__PURE__*/Object.freeze({
     AwChartTippyEH: AwChartTippyEH
 });
 
-const mock = [{
-        title: '1 - Casa a S. Piero a Ponti - 1964 - Tipo A - Veduta',
-        classes: 'is-overlay has-image',
-        image: 'https://placeimg.com/640/480/any',
-    }, {
-        title: '1953 - Settembre - Bari - Padiglione dell\'I.N.A alla Fiera del Levante (1953)',
-        classes: 'is-overlay has-image',
-        image: 'https://placeimg.com/640/480/any',
-    }, {
-        title: '1956 - Cagliari - cattedrale (1956)',
-        classes: 'is-overlay has-image',
-        image: 'https://placeimg.com/640/480/any',
-    }, {
-        title: '4 aprile 1948 - Lucca - San Martino - Tomba di Ilaria del Carretto - (J. della Quercia) (4 aprile 1948)',
-        classes: 'is-overlay has-image',
-        image: 'https://placeimg.com/640/480/any',
-    }, {
-        title: '5 - Casa a S. Piero a Ponti - Tipo A - Retro 1:50 ([1964])',
-        classes: 'is-overlay has-image',
-        image: 'https://placeimg.com/640/480/any',
-    }, {
-        title: '1 - Casa a S. Piero a Ponti - 1964 - Tipo A  Veduta (1964)',
-        classes: 'is-overlay has-image',
-        image: 'https://placeimg.com/640/480/any',
-    }];
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getCollection = ({ offset, limit }) => of({
-    results: mock.slice(0, limit),
-    totalCount: 120
-});
-const ɵ0 = getCollection;
-
 class AwCollectionLayoutDS extends LayoutDataSource {
     constructor() {
         super(...arguments);
-        this.innerTitleData = {
-            title: { main: { text: 'Articoli recenti' } },
-        };
+        this.innerTitleData = new BehaviorSubject({
+            title: { main: { text: '' } },
+        });
+        this.collectionDescription = new BehaviorSubject('');
         this.pageSize = 6;
         this.currentOffset = 0;
+        this.loadMoreButton = new BehaviorSubject(true);
     }
     onInit(payload) {
         this.communication = payload.communication;
-        getCollection({ limit: this.pageSize, offset: this.currentOffset })
-            .subscribe((d) => {
-            this.currentOffset += this.pageSize;
-            this.loadedCollections = new BehaviorSubject(d.results);
-        });
+        this.route = payload.route;
+        this.configuration = payload.configuration;
+        this.loadedCollections = new BehaviorSubject([]);
+        this.layoutOptions = this.configuration.get('collection-layout');
+    }
+    /**
+     * After the collection ID has been loaded
+     */
+    onCollectionID() {
+        this.loadMore();
     }
     loadMore() {
         const collection = this.loadedCollections.getValue();
-        getCollection({ limit: this.pageSize, offset: this.currentOffset }).subscribe((d) => {
-            this.currentOffset += this.pageSize;
-            this.loadedCollections.next([...collection, ...d.results]);
+        const params = {
+            id: this.collectionID,
+            itemPagination: {
+                limit: this.pageSize,
+                offset: this.currentOffset,
+            }
+        };
+        this.communication.request$('getCollection', {
+            onError: (error) => console.error(error),
+            params
+        }).pipe(first((d) => !!d), map((d) => ({
+            // map the backend response to the format used by ItemPreviewComponent
+            response: d.items.map((item) => ({
+                title: this.stringLimiter(item.title, {
+                    maxLength: this.layoutOptions.item.title.maxLength,
+                    char: this.layoutOptions.item.title.char,
+                }),
+                text: this.stringLimiter(item.content, {
+                    maxLength: this.layoutOptions.item.description.maxLength,
+                    char: this.layoutOptions.item.description.char
+                }),
+                classes: `${item.image ? 'is-overlay has-image' : 'is-overlay has-image has-watermark'} ${item.classification ? `is-${item.classification}` : ''}`,
+                image: item.image || this.layoutOptions.watermark,
+                color: item.background,
+                anchor: {
+                    href: item.url || this.urlBuilder(item.a4vId, item.title)
+                },
+                classification: item.classification
+            })),
+            text: d.text,
+            title: d.title,
+            total: d.total,
+        }))).subscribe({
+            next: (data) => {
+                if (data.title) {
+                    this.setTitle(this.stringLimiter(data.title, {
+                        maxLength: this.layoutOptions.header.maxLength,
+                        char: this.layoutOptions.header.char
+                    }));
+                }
+                if (data.text) {
+                    this.collectionDescription.next(this.stringLimiter(data.text, {
+                        maxLength: this.layoutOptions.description.maxLength,
+                        char: this.layoutOptions.description.char
+                    }));
+                }
+                this.currentOffset += this.pageSize;
+                this.loadedCollections.next([...collection, ...data.response]);
+                this.loadMoreButton.next(data.total > this.loadedCollections.getValue().length);
+            },
+            error: (e) => {
+                console.error(e);
+                this.loadMoreButton.next(false);
+            },
+        });
+    }
+    /**
+     * Builds a URL from entity type,
+     * entity id, and a slug string.
+     *
+     * @param type entity type
+     * @param id entity ID
+     * @param title human-readable title
+     * @returns URL string including a slug
+     */
+    urlBuilder(id, title) {
+        if (id && title) {
+            const titleSlug = slugify(title);
+            const basePath = this.configuration.get('paths').schedaBasePath;
+            return `/${basePath}/${id}/${titleSlug}`;
+        }
+        return undefined;
+    }
+    stringLimiter(content, options) {
+        let res = content;
+        if (content && options.maxLength) {
+            res = content.slice(0, options.maxLength);
+            if (options.char && res !== content) {
+                res += options.char;
+            }
+        }
+        return res;
+    }
+    setTitle(title) {
+        this.innerTitleData.next({
+            title: { main: { text: title } }
         });
     }
 }
@@ -4224,16 +4282,23 @@ class AwCollectionLayoutEH extends EventHandler {
             switch (type) {
                 case 'aw-collection-layout.init':
                     this.dataSource.onInit(payload);
+                    this.route = payload.route;
+                    this.listenRoute();
                     break;
                 default:
                     console.warn('unhandled inner event of type', type);
                     break;
             }
         });
-        /*
-          this.outerEvents$.subscribe(({ type, payload }) => {
-          });
-        */
+    }
+    listenRoute() {
+        // get collection ID from the url
+        this.route.paramMap.subscribe((params) => {
+            if (params.get('id')) {
+                this.dataSource.collectionID = params.get('id');
+                this.dataSource.onCollectionID();
+            }
+        });
     }
 }
 
@@ -4251,13 +4316,19 @@ const AwCollectionLayoutConfig = {
 };
 
 let AwCollectionLayoutComponent = class AwCollectionLayoutComponent extends AbstractLayout {
-    constructor(communication) {
+    constructor(communication, layoutsConfiguration, configuration, route) {
         super(AwCollectionLayoutConfig);
         this.communication = communication;
+        this.layoutsConfiguration = layoutsConfiguration;
+        this.configuration = configuration;
+        this.route = route;
     }
     initPayload() {
         return {
-            communication: this.communication
+            communication: this.communication,
+            layoutsConfiguration: this.layoutsConfiguration,
+            configuration: this.configuration,
+            route: this.route
         };
     }
     ngOnInit() {
@@ -4268,18 +4339,24 @@ let AwCollectionLayoutComponent = class AwCollectionLayoutComponent extends Abst
     }
 };
 AwCollectionLayoutComponent.ctorParameters = () => [
-    { type: CommunicationService }
+    { type: CommunicationService },
+    { type: LayoutsConfigurationService },
+    { type: ConfigurationService },
+    { type: ActivatedRoute }
 ];
 AwCollectionLayoutComponent = __decorate([
     Component({
         selector: 'n7-collection-layout',
-        template: "<div class=\"collection-layout\"\n     *ngIf=\"lb.dataSource as dataSource\">\n    <n7-inner-title [data]=\"dataSource.innerTitleData\">\n    </n7-inner-title>\n\n    <section class=\"n7-grid-3\" *ngIf=\"dataSource.loadedCollections\">\n        <ng-container *ngFor=\"let item of dataSource.loadedCollections.value\">\n            <n7-item-preview [data]=\"item\">\n            </n7-item-preview>\n        </ng-container>\n    </section>\n    \n    <section>\n        <button class=\"n7-btn\" (click)=\"dataSource.loadMore()\">Vedi altri</button>\n    </section>\n</div>\n"
+        template: "<div class=\"aw-collection-layout\" *ngIf=\"lb.dataSource as dataSource\">\n\n    <div class=\"aw-collection-layout__header\">\n        <n7-inner-title [data]=\"dataSource.innerTitleData.getValue()\">\n        </n7-inner-title>\n    </div>\n\n    <div class=\"aw-collection-layout__description\" *ngIf=\"dataSource.collectionDescription.getValue()\">\n        <div class=\"aw-collection-layout__description-text\">\n            {{ dataSource.collectionDescription.getValue() }}\n        </div>\n    </div>\n\n    <section class=\"n7-grid-3 aw-collection-layout__grid\" *ngIf=\"dataSource.loadedCollections\">\n        <ng-container *ngFor=\"let item of dataSource.loadedCollections.value\">\n            <n7-item-preview [data]=\"item\">\n            </n7-item-preview>\n        </ng-container>\n    </section>\n\n    <section *ngIf=\"dataSource.loadMoreButton.getValue()\">\n        <button class=\"n7-btn n7-btn-cta n7-btn-xl aw-collection-layout__btn-more\" (click)=\"dataSource.loadMore()\">\n            MOSTRA ALTRI\n        </button>\n    </section>\n</div>\n"
     }),
-    __metadata("design:paramtypes", [CommunicationService])
+    __metadata("design:paramtypes", [CommunicationService,
+        LayoutsConfigurationService,
+        ConfigurationService,
+        ActivatedRoute])
 ], AwCollectionLayoutComponent);
 
 const metadataIsEmpty = (value) => (!value || value === 'null');
-const ɵ0$1 = metadataIsEmpty;
+const ɵ0 = metadataIsEmpty;
 const isLink = (fields) => !!fields.filter(({ key }) => key === 'isLink').length;
 const ɵ1 = isLink;
 const isRepeater = (fields) => Array.isArray(fields);
@@ -4376,6 +4453,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         super(...arguments);
         this.hasMetadataFields = false;
         this.navHeader = {}; // nav-header (custom) data
+        this.currentPage = 1; // pagination value (url param)
         this.pageSize = 10; // linked objects page size
         // ===== BUBBLE CHART =====
         this.bubblesSize = 10; // related entities (bubbles) page size
@@ -4387,43 +4465,62 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             }
             this.one(id).update(data);
         };
-        this.drawPagination = () => {
+        /**
+         * Updates the pagination component
+         */
+        this.drawPagination = (totalItems, pageSize) => {
             if (!this.getLinkedObjectItems())
                 return;
-            const { href, queryParams } = this._getPaginationParams();
+            const { href, queryParams } = this._getPaginationURL();
             this.one('n7-smart-pagination').updateOptions({
                 mode: 'href',
                 href,
                 queryParams,
             });
             this.one('n7-smart-pagination').update({
-                totalPages: Math.ceil(this.getLinkedObjectItems().length / this.pageSize),
-                currentPage: this.currentPage,
+                totalPages: this.getPageCount(totalItems, pageSize),
+                currentPage: +this.currentPage || 1,
                 pageLimit: 5,
                 sizes: {
                     list: [10, 25, 50],
-                    active: this.pageSize,
+                    active: +this.pageSize,
                 },
             });
         };
+        /**
+         * Updates the selected tab on tab change
+         */
         this.handlePageNavigation = () => {
-            /*
-              Updates selected tab on tab change
-            */
             if (!this.myResponse) {
                 return;
             }
-            const { href, queryParams } = this._getPaginationParams();
-            this.drawPagination();
-            this.one('aw-linked-objects').updateOptions({
-                paginationParams: { href, queryParams },
-                context: this.selectedTab,
-                config: this.configuration,
-                page: this.currentPage,
-                pagination: true,
-                size: this.pageSize,
+            this.getEntityDetailsPage(this.myResponse.id, +this.currentPage, +this.pageSize)
+                .pipe(first())
+                .subscribe({
+                // Await for network response
+                next: (data) => {
+                    this.myResponse = data;
+                    const { href, queryParams } = this._getPaginationURL();
+                    // update layout state
+                    this.pageSize = queryParams.size;
+                    this.currentPage = queryParams.page;
+                    // update components
+                    this.drawPagination(this.myResponse.totalCount, this.pageSize);
+                    this.one('aw-linked-objects').updateOptions({
+                        paginationParams: { href, queryParams },
+                        context: this.selectedTab,
+                        config: this.configuration,
+                        dynamicPagination: {
+                            total: this.myResponse.totalCount,
+                        },
+                        page: queryParams.page,
+                        size: queryParams.size,
+                        pagination: true,
+                    });
+                    this.one('aw-linked-objects').update({ items: this.getLinkedObjectItems() });
+                },
+                error: (e) => catchError(e),
             });
-            this.one('aw-linked-objects').update({ items: this.getLinkedObjectItems() });
         };
         this.handleNavUpdate = (tab) => {
             this.selectedTab = tab;
@@ -4431,12 +4528,24 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             this.one('aw-linked-objects').updateOptions({
                 context: this.selectedTab,
                 config: this.configuration,
+                dynamicPagination: {
+                    total: this.myResponse.totalCount,
+                },
                 page: this.currentPage,
-                pagination: true,
-                paginationParams: this._getPaginationParams(),
                 size: this.pageSize,
+                pagination: true,
+                paginationParams: this._getPaginationURL(),
             });
             this.one('aw-linked-objects').update({ items: this.getLinkedObjectItems() });
+            // update the url with the correct page and size
+            const queryParams = {
+                page: this.currentPage, size: this.pageSize,
+            };
+            this.router.navigate([], {
+                relativeTo: this.route,
+                queryParams,
+                queryParamsHandling: 'merge'
+            });
         };
     }
     onInit({ configuration, mainState, router, route, options, titleService, communication, }) {
@@ -4448,7 +4557,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         this.router = router;
         this.titleService = titleService;
         this.currentId = '';
-        this.currentPage = +this.route.snapshot.queryParams.page;
+        this.currentPage = +this.route.snapshot.queryParams.page || 1;
         this.one('aw-related-entities').updateOptions({
             config: this.configuration,
         });
@@ -4456,15 +4565,18 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         this.mainState.updateCustom('currentNav', 'entita');
         // update head title
         this.mainState.update('headTitle', 'Arianna4View - Entità');
-        // one tab control
-        this.oneTabControl();
+        // check if there is only one tab
+        this.singleTabCheck();
     }
-    oneTabControl() {
+    singleTabCheck() {
         const navDS = this.getWidgetDataSource('aw-entita-nav');
         navDS.out$
             .pipe(filter((output) => !!output))
             .subscribe(({ items }) => {
-            if (items.length === 1) {
+            // if there is only one tab
+            // and there are no query params
+            // navigate to the tab.
+            if (items.length === 1 && !this.currentPage) {
                 this.router.navigate([items[0].anchor.href], { replaceUrl: true });
             }
         });
@@ -4486,31 +4598,45 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         });
         this.updateComponent('aw-entita-metadata-viewer', this.getFields(this.myResponse));
         this.one('aw-related-entities').update(this.myResponse.relatedEntities);
-        this.drawPagination();
+        this.drawPagination(this.myResponse.totalCount, this.pageSize);
     }
+    /**
+     * Given a page number and a list size, returns the data
+     * for a single page of content.
+     *
+     * @param pageNumber Page number to load
+     * @param pageSize How many items need to be loaded
+     */
+    getEntityDetailsPage(id, pageNumber, pageSize) {
+        return this.communication.request$('getEntityDetails', {
+            onError: (error) => console.error(error),
+            params: {
+                entityId: id,
+                itemsPagination: { offset: (pageNumber || 1) * pageSize, limit: +pageSize },
+                entitiesListSize: this.bubblesSize
+            },
+        }).pipe(
+        // global metadata tab control
+        tap(({ fields, typeOfEntity }) => {
+            this.hasMetadataFields = !!metadataHelper.normalize({
+                fields,
+                paths: this.configuration.get('paths'),
+                labels: this.configuration.get('labels'),
+                metadataToShow: get(this.configuration.get('entita-layout'), 'metadata-to-show', []),
+                type: typeOfEntity
+            }).length;
+        }));
+    }
+    /*
+     * Loads the data for the selected nav item, into the adjacent text block.
+     */
     loadItem(id, slug, tab) {
-        /*
-          Loads the data for the selected nav item, into the adjacent text block.
-        */
         this.loading = true;
         if (id && tab) {
             this.currentId = id; // store selected item from url
             this.currentSlug = slug; // store selected item from url
             this.selectedTab = tab; // store selected tab from url
-            return this.communication.request$('getEntityDetails', {
-                onError: (error) => console.error(error),
-                params: { entityId: id, entitiesListSize: this.bubblesSize },
-            }).pipe(
-            // global metadata tab control
-            tap(({ fields, typeOfEntity }) => {
-                this.hasMetadataFields = !!metadataHelper.normalize({
-                    fields,
-                    paths: this.configuration.get('paths'),
-                    labels: this.configuration.get('labels'),
-                    metadataToShow: get(this.configuration.get('entita-layout'), 'metadata-to-show', []),
-                    type: typeOfEntity
-                }).length;
-            }));
+            return this.getEntityDetailsPage(id, 1, this.pageSize);
         }
         this.pageTitle = 'Entità Test';
         return of(null);
@@ -4518,7 +4644,6 @@ class AwEntitaLayoutDS extends LayoutDataSource {
     loadContent(res) {
         this.loading = false;
         const config = this.configuration.get('config-keys')[res.typeOfEntity];
-        // console.log('(entita) Apollo responded with: ', { res })
         this.myResponse = res;
         this.navHeader = {
             icon: config ? config.icon : '',
@@ -4537,7 +4662,10 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             config: this.configuration,
             page: this.currentPage,
             pagination: true,
-            paginationParams: this._getPaginationParams(),
+            dynamicPagination: {
+                total: this.myResponse.totalCount,
+            },
+            paginationParams: this._getPaginationURL(),
             size: this.pageSize,
         });
         this.getLinkedObjectItems().forEach((el) => {
@@ -4552,7 +4680,6 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         });
         this.one('aw-linked-objects').update({ items: this.getLinkedObjectItems() });
         this.one('aw-related-entities').update(res.relatedEntities);
-        this.drawPagination();
         // fallback text
         if (!this.hasMetadataFields) {
             this.fallbackText = this.configuration.get('entita-layout').fallback;
@@ -4560,7 +4687,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         // update head title
         this.mainState.update('headTitle', `Arianna4View - Entità - ${this.myResponse.label}`);
     }
-    _getPaginationParams() {
+    _getPaginationURL() {
         return {
             href: [
                 this.configuration.get('paths').entitaBasePath,
@@ -4569,7 +4696,8 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                 `/${this.selectedTab}/`,
             ].join(''),
             queryParams: {
-                page: this.currentPage,
+                page: this.currentPage || 1,
+                size: this.pageSize,
             },
         };
     }
@@ -4601,15 +4729,27 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             ? this.myResponse.relatedLa
             : this.myResponse.relatedItems;
     }
+    /**
+     * Calculates the total amount of pages
+     *
+     * @param items the number of records in the database
+     * @param size the number of items shown on a page
+     * @returns the total number of pages
+     */
+    getPageCount(items, size) {
+        return Math.floor(items / size);
+    }
 }
 
 class AwEntitaLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.destroyed$ = new Subject();
-        this.handlePageSizeChange = (v) => {
-            this.dataSource.pageSize = v;
+        this.handlePageSizeChange = (size) => {
+            this.dataSource.pageSize = size;
+            this.dataSource.currentPage = 1;
             this.dataSource.handleNavUpdate('oggetti-collegati');
+            // this.dataSource.handlePageNavigation();
         };
     }
     listen() {
@@ -4646,20 +4786,21 @@ class AwEntitaLayoutEH extends EventHandler {
                     }
                     break;
                 case 'aw-linked-objects.change':
-                    { // changed page size value (pagination)
-                        this.dataSource.pageSize = payload;
-                        this.dataSource.currentPage = 1; // reset page
+                    {
                         const options = {
                             context: this.dataSource.selectedTab,
                             config: this.dataSource.configuration,
+                            dynamicPagination: {
+                                total: this.dataSource.myResponse.totalCount,
+                            },
                             page: this.dataSource.currentPage,
-                            pagination: true,
                             size: this.dataSource.pageSize,
+                            pagination: true,
                         };
                         this.dataSource.updateComponent('aw-linked-objects', { items: this.dataSource.myResponse.relatedItems }, options);
                     }
                     break;
-                case 'n7-smart-pagination.change':
+                case 'n7-smart-pagination.change': // changed page size value (pagination)
                     this.handlePageSizeChange(payload.value);
                     break;
                 default:
@@ -4671,8 +4812,14 @@ class AwEntitaLayoutEH extends EventHandler {
      * Listens to routing events of this layout.
      */
     listenRoute(selectedItem = '', forceReload = false) {
-        // listen for "page" query param changes
-        this.route.queryParams.pipe(map((params) => params.page)).subscribe((page) => {
+        // listen for "page" query param changes-
+        this.route.queryParams.pipe(map((params) => ({
+            page: params.page,
+            size: params.size
+        }))).subscribe(({ page, size }) => {
+            if (size) {
+                this.dataSource.pageSize = size;
+            }
             if (this.dataSource.currentPage !== page) {
                 this.dataSource.currentPage = page;
                 this.dataSource.handlePageNavigation();
@@ -7537,6 +7684,7 @@ var apolloConfig = {
         queryName: 'getEntity',
         queryBody: `{
         getEntity(__PARAMS__){
+          totalCount: relatedItemsTotalCount
           overviewTab
           label
           id
@@ -8055,6 +8203,26 @@ var apolloConfig = {
       }
     }`,
     },
+    getCollection: {
+        queryName: 'getCollection',
+        queryBody: `{
+      getCollection(__PARAMS__) {
+        title
+        text
+        total
+        items {
+          title
+          content
+          background
+          image
+          url
+          a4vId
+          type
+          classification
+        }
+      }
+    }`
+    }
 };
 
 const COMPONENTS$1 = [
@@ -8481,7 +8649,7 @@ const hasValue = (value) => {
     }
     return !!value;
 };
-const ɵ0$2 = hasValue;
+const ɵ0$1 = hasValue;
 var searchHelper = {
     stateToQueryParams(state, schemas) {
         const queryParams = {};
@@ -9514,7 +9682,7 @@ const extractQueryParams = (queryParams) => {
     });
     return params;
 };
-const ɵ0$3 = extractQueryParams;
+const ɵ0$2 = extractQueryParams;
 var linksHelper = {
     getQueryParams(href) {
         const queryParams = href.split('?')[1] ? extractQueryParams(href.split('?')[1]) : null;

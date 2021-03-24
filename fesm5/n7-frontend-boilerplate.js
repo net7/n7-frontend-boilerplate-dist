@@ -3,7 +3,7 @@ import { ɵɵdefineInjectable, Injectable, Inject, ɵɵinject, Component, Input,
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK, IMAGE_VIEWER_MOCK, IMAGE_VIEWER_TOOLS_MOCK } from '@n7-frontend/components';
-import { ReplaySubject, empty, Subject, interval, merge as merge$1, fromEvent, of, BehaviorSubject, forkJoin } from 'rxjs';
+import { ReplaySubject, empty, Subject, interval, merge as merge$1, fromEvent, BehaviorSubject, of, forkJoin } from 'rxjs';
 import { map, catchError, takeUntil, filter, first, mapTo, debounceTime, switchMap, withLatestFrom, tap, delay } from 'rxjs/operators';
 import { NavigationStart, Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Title, DomSanitizer } from '@angular/platform-browser';
@@ -1799,14 +1799,14 @@ var AwLinkedObjectsDS = /** @class */ (function (_super) {
             _this.checkForMore();
             _this.loadedData.isLoading = false;
         };
+        /**
+         * Dynamically returns the data object for each HTML component
+         *  data: {
+         *     previews: [ breadcrumbs: { items[] }, classes, image, metadata, payload, title ],
+         *     pagination: { first, last, links, next, prev, select }
+         *   }
+         */
         _this.unpackData = function (data) {
-            /*
-              Dynamically returns the data object for each HTML component
-              data: {
-                previews: [ breadcrumbs: { items[] }, classes, image, metadata, payload, title ],
-                pagination: { first, last, links, next, prev, select }
-              }
-            */
             var config = _this.options.config; // app-config.json
             var paths = config.get('item-preview'); // item preview dynamic paths
             var totalCount = data.totalCount; // total amount of items available on backend
@@ -4629,67 +4629,121 @@ var EH$1 = /*#__PURE__*/Object.freeze({
     AwChartTippyEH: AwChartTippyEH
 });
 
-var mock = [{
-        title: '1 - Casa a S. Piero a Ponti - 1964 - Tipo A - Veduta',
-        classes: 'is-overlay has-image',
-        image: 'https://placeimg.com/640/480/any',
-    }, {
-        title: '1953 - Settembre - Bari - Padiglione dell\'I.N.A alla Fiera del Levante (1953)',
-        classes: 'is-overlay has-image',
-        image: 'https://placeimg.com/640/480/any',
-    }, {
-        title: '1956 - Cagliari - cattedrale (1956)',
-        classes: 'is-overlay has-image',
-        image: 'https://placeimg.com/640/480/any',
-    }, {
-        title: '4 aprile 1948 - Lucca - San Martino - Tomba di Ilaria del Carretto - (J. della Quercia) (4 aprile 1948)',
-        classes: 'is-overlay has-image',
-        image: 'https://placeimg.com/640/480/any',
-    }, {
-        title: '5 - Casa a S. Piero a Ponti - Tipo A - Retro 1:50 ([1964])',
-        classes: 'is-overlay has-image',
-        image: 'https://placeimg.com/640/480/any',
-    }, {
-        title: '1 - Casa a S. Piero a Ponti - 1964 - Tipo A  Veduta (1964)',
-        classes: 'is-overlay has-image',
-        image: 'https://placeimg.com/640/480/any',
-    }];
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-var getCollection = function (_a) {
-    var offset = _a.offset, limit = _a.limit;
-    return of({
-        results: mock.slice(0, limit),
-        totalCount: 120
-    });
-};
-var ɵ0 = getCollection;
-
 var AwCollectionLayoutDS = /** @class */ (function (_super) {
     __extends(AwCollectionLayoutDS, _super);
     function AwCollectionLayoutDS() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.innerTitleData = {
-            title: { main: { text: 'Articoli recenti' } },
-        };
+        _this.innerTitleData = new BehaviorSubject({
+            title: { main: { text: '' } },
+        });
+        _this.collectionDescription = new BehaviorSubject('');
         _this.pageSize = 6;
         _this.currentOffset = 0;
+        _this.loadMoreButton = new BehaviorSubject(true);
         return _this;
     }
     AwCollectionLayoutDS.prototype.onInit = function (payload) {
-        var _this = this;
         this.communication = payload.communication;
-        getCollection({ limit: this.pageSize, offset: this.currentOffset })
-            .subscribe(function (d) {
-            _this.currentOffset += _this.pageSize;
-            _this.loadedCollections = new BehaviorSubject(d.results);
-        });
+        this.route = payload.route;
+        this.configuration = payload.configuration;
+        this.loadedCollections = new BehaviorSubject([]);
+        this.layoutOptions = this.configuration.get('collection-layout');
+    };
+    /**
+     * After the collection ID has been loaded
+     */
+    AwCollectionLayoutDS.prototype.onCollectionID = function () {
+        this.loadMore();
     };
     AwCollectionLayoutDS.prototype.loadMore = function () {
         var _this = this;
         var collection = this.loadedCollections.getValue();
-        getCollection({ limit: this.pageSize, offset: this.currentOffset }).subscribe(function (d) {
-            _this.currentOffset += _this.pageSize;
-            _this.loadedCollections.next(__spread(collection, d.results));
+        var params = {
+            id: this.collectionID,
+            itemPagination: {
+                limit: this.pageSize,
+                offset: this.currentOffset,
+            }
+        };
+        this.communication.request$('getCollection', {
+            onError: function (error) { return console.error(error); },
+            params: params
+        }).pipe(first(function (d) { return !!d; }), map(function (d) { return ({
+            // map the backend response to the format used by ItemPreviewComponent
+            response: d.items.map(function (item) { return ({
+                title: _this.stringLimiter(item.title, {
+                    maxLength: _this.layoutOptions.item.title.maxLength,
+                    char: _this.layoutOptions.item.title.char,
+                }),
+                text: _this.stringLimiter(item.content, {
+                    maxLength: _this.layoutOptions.item.description.maxLength,
+                    char: _this.layoutOptions.item.description.char
+                }),
+                classes: (item.image ? 'is-overlay has-image' : 'is-overlay has-image has-watermark') + " " + (item.classification ? "is-" + item.classification : ''),
+                image: item.image || _this.layoutOptions.watermark,
+                color: item.background,
+                anchor: {
+                    href: item.url || _this.urlBuilder(item.a4vId, item.title)
+                },
+                classification: item.classification
+            }); }),
+            text: d.text,
+            title: d.title,
+            total: d.total,
+        }); })).subscribe({
+            next: function (data) {
+                if (data.title) {
+                    _this.setTitle(_this.stringLimiter(data.title, {
+                        maxLength: _this.layoutOptions.header.maxLength,
+                        char: _this.layoutOptions.header.char
+                    }));
+                }
+                if (data.text) {
+                    _this.collectionDescription.next(_this.stringLimiter(data.text, {
+                        maxLength: _this.layoutOptions.description.maxLength,
+                        char: _this.layoutOptions.description.char
+                    }));
+                }
+                _this.currentOffset += _this.pageSize;
+                _this.loadedCollections.next(__spread(collection, data.response));
+                _this.loadMoreButton.next(data.total > _this.loadedCollections.getValue().length);
+            },
+            error: function (e) {
+                console.error(e);
+                _this.loadMoreButton.next(false);
+            },
+        });
+    };
+    /**
+     * Builds a URL from entity type,
+     * entity id, and a slug string.
+     *
+     * @param type entity type
+     * @param id entity ID
+     * @param title human-readable title
+     * @returns URL string including a slug
+     */
+    AwCollectionLayoutDS.prototype.urlBuilder = function (id, title) {
+        if (id && title) {
+            var titleSlug = slugify(title);
+            var basePath = this.configuration.get('paths').schedaBasePath;
+            return "/" + basePath + "/" + id + "/" + titleSlug;
+        }
+        return undefined;
+    };
+    AwCollectionLayoutDS.prototype.stringLimiter = function (content, options) {
+        var res = content;
+        if (content && options.maxLength) {
+            res = content.slice(0, options.maxLength);
+            if (options.char && res !== content) {
+                res += options.char;
+            }
+        }
+        return res;
+    };
+    AwCollectionLayoutDS.prototype.setTitle = function (title) {
+        this.innerTitleData.next({
+            title: { main: { text: title } }
         });
     };
     return AwCollectionLayoutDS;
@@ -4707,16 +4761,24 @@ var AwCollectionLayoutEH = /** @class */ (function (_super) {
             switch (type) {
                 case 'aw-collection-layout.init':
                     _this.dataSource.onInit(payload);
+                    _this.route = payload.route;
+                    _this.listenRoute();
                     break;
                 default:
                     console.warn('unhandled inner event of type', type);
                     break;
             }
         });
-        /*
-          this.outerEvents$.subscribe(({ type, payload }) => {
-          });
-        */
+    };
+    AwCollectionLayoutEH.prototype.listenRoute = function () {
+        var _this = this;
+        // get collection ID from the url
+        this.route.paramMap.subscribe(function (params) {
+            if (params.get('id')) {
+                _this.dataSource.collectionID = params.get('id');
+                _this.dataSource.onCollectionID();
+            }
+        });
     };
     return AwCollectionLayoutEH;
 }(EventHandler));
@@ -4736,14 +4798,20 @@ var AwCollectionLayoutConfig = {
 
 var AwCollectionLayoutComponent = /** @class */ (function (_super) {
     __extends(AwCollectionLayoutComponent, _super);
-    function AwCollectionLayoutComponent(communication) {
+    function AwCollectionLayoutComponent(communication, layoutsConfiguration, configuration, route) {
         var _this = _super.call(this, AwCollectionLayoutConfig) || this;
         _this.communication = communication;
+        _this.layoutsConfiguration = layoutsConfiguration;
+        _this.configuration = configuration;
+        _this.route = route;
         return _this;
     }
     AwCollectionLayoutComponent.prototype.initPayload = function () {
         return {
-            communication: this.communication
+            communication: this.communication,
+            layoutsConfiguration: this.layoutsConfiguration,
+            configuration: this.configuration,
+            route: this.route
         };
     };
     AwCollectionLayoutComponent.prototype.ngOnInit = function () {
@@ -4753,20 +4821,26 @@ var AwCollectionLayoutComponent = /** @class */ (function (_super) {
         this.onDestroy();
     };
     AwCollectionLayoutComponent.ctorParameters = function () { return [
-        { type: CommunicationService }
+        { type: CommunicationService },
+        { type: LayoutsConfigurationService },
+        { type: ConfigurationService },
+        { type: ActivatedRoute }
     ]; };
     AwCollectionLayoutComponent = __decorate([
         Component({
             selector: 'n7-collection-layout',
-            template: "<div class=\"collection-layout\"\n     *ngIf=\"lb.dataSource as dataSource\">\n    <n7-inner-title [data]=\"dataSource.innerTitleData\">\n    </n7-inner-title>\n\n    <section class=\"n7-grid-3\" *ngIf=\"dataSource.loadedCollections\">\n        <ng-container *ngFor=\"let item of dataSource.loadedCollections.value\">\n            <n7-item-preview [data]=\"item\">\n            </n7-item-preview>\n        </ng-container>\n    </section>\n    \n    <section>\n        <button class=\"n7-btn\" (click)=\"dataSource.loadMore()\">Vedi altri</button>\n    </section>\n</div>\n"
+            template: "<div class=\"aw-collection-layout\" *ngIf=\"lb.dataSource as dataSource\">\n\n    <div class=\"aw-collection-layout__header\">\n        <n7-inner-title [data]=\"dataSource.innerTitleData.getValue()\">\n        </n7-inner-title>\n    </div>\n\n    <div class=\"aw-collection-layout__description\" *ngIf=\"dataSource.collectionDescription.getValue()\">\n        <div class=\"aw-collection-layout__description-text\">\n            {{ dataSource.collectionDescription.getValue() }}\n        </div>\n    </div>\n\n    <section class=\"n7-grid-3 aw-collection-layout__grid\" *ngIf=\"dataSource.loadedCollections\">\n        <ng-container *ngFor=\"let item of dataSource.loadedCollections.value\">\n            <n7-item-preview [data]=\"item\">\n            </n7-item-preview>\n        </ng-container>\n    </section>\n\n    <section *ngIf=\"dataSource.loadMoreButton.getValue()\">\n        <button class=\"n7-btn n7-btn-cta n7-btn-xl aw-collection-layout__btn-more\" (click)=\"dataSource.loadMore()\">\n            MOSTRA ALTRI\n        </button>\n    </section>\n</div>\n"
         }),
-        __metadata("design:paramtypes", [CommunicationService])
+        __metadata("design:paramtypes", [CommunicationService,
+            LayoutsConfigurationService,
+            ConfigurationService,
+            ActivatedRoute])
     ], AwCollectionLayoutComponent);
     return AwCollectionLayoutComponent;
 }(AbstractLayout));
 
 var metadataIsEmpty = function (value) { return (!value || value === 'null'); };
-var ɵ0$1 = metadataIsEmpty;
+var ɵ0 = metadataIsEmpty;
 var isLink = function (fields) { return !!fields.filter(function (_a) {
     var key = _a.key;
     return key === 'isLink';
@@ -4896,6 +4970,7 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.hasMetadataFields = false;
         _this.navHeader = {}; // nav-header (custom) data
+        _this.currentPage = 1; // pagination value (url param)
         _this.pageSize = 10; // linked objects page size
         // ===== BUBBLE CHART =====
         _this.bubblesSize = 10; // related entities (bubbles) page size
@@ -4907,43 +4982,62 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
             }
             _this.one(id).update(data);
         };
-        _this.drawPagination = function () {
+        /**
+         * Updates the pagination component
+         */
+        _this.drawPagination = function (totalItems, pageSize) {
             if (!_this.getLinkedObjectItems())
                 return;
-            var _a = _this._getPaginationParams(), href = _a.href, queryParams = _a.queryParams;
+            var _a = _this._getPaginationURL(), href = _a.href, queryParams = _a.queryParams;
             _this.one('n7-smart-pagination').updateOptions({
                 mode: 'href',
                 href: href,
                 queryParams: queryParams,
             });
             _this.one('n7-smart-pagination').update({
-                totalPages: Math.ceil(_this.getLinkedObjectItems().length / _this.pageSize),
-                currentPage: _this.currentPage,
+                totalPages: _this.getPageCount(totalItems, pageSize),
+                currentPage: +_this.currentPage || 1,
                 pageLimit: 5,
                 sizes: {
                     list: [10, 25, 50],
-                    active: _this.pageSize,
+                    active: +_this.pageSize,
                 },
             });
         };
+        /**
+         * Updates the selected tab on tab change
+         */
         _this.handlePageNavigation = function () {
-            /*
-              Updates selected tab on tab change
-            */
             if (!_this.myResponse) {
                 return;
             }
-            var _a = _this._getPaginationParams(), href = _a.href, queryParams = _a.queryParams;
-            _this.drawPagination();
-            _this.one('aw-linked-objects').updateOptions({
-                paginationParams: { href: href, queryParams: queryParams },
-                context: _this.selectedTab,
-                config: _this.configuration,
-                page: _this.currentPage,
-                pagination: true,
-                size: _this.pageSize,
+            _this.getEntityDetailsPage(_this.myResponse.id, +_this.currentPage, +_this.pageSize)
+                .pipe(first())
+                .subscribe({
+                // Await for network response
+                next: function (data) {
+                    _this.myResponse = data;
+                    var _a = _this._getPaginationURL(), href = _a.href, queryParams = _a.queryParams;
+                    // update layout state
+                    _this.pageSize = queryParams.size;
+                    _this.currentPage = queryParams.page;
+                    // update components
+                    _this.drawPagination(_this.myResponse.totalCount, _this.pageSize);
+                    _this.one('aw-linked-objects').updateOptions({
+                        paginationParams: { href: href, queryParams: queryParams },
+                        context: _this.selectedTab,
+                        config: _this.configuration,
+                        dynamicPagination: {
+                            total: _this.myResponse.totalCount,
+                        },
+                        page: queryParams.page,
+                        size: queryParams.size,
+                        pagination: true,
+                    });
+                    _this.one('aw-linked-objects').update({ items: _this.getLinkedObjectItems() });
+                },
+                error: function (e) { return catchError(e); },
             });
-            _this.one('aw-linked-objects').update({ items: _this.getLinkedObjectItems() });
         };
         _this.handleNavUpdate = function (tab) {
             _this.selectedTab = tab;
@@ -4951,12 +5045,24 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
             _this.one('aw-linked-objects').updateOptions({
                 context: _this.selectedTab,
                 config: _this.configuration,
+                dynamicPagination: {
+                    total: _this.myResponse.totalCount,
+                },
                 page: _this.currentPage,
-                pagination: true,
-                paginationParams: _this._getPaginationParams(),
                 size: _this.pageSize,
+                pagination: true,
+                paginationParams: _this._getPaginationURL(),
             });
             _this.one('aw-linked-objects').update({ items: _this.getLinkedObjectItems() });
+            // update the url with the correct page and size
+            var queryParams = {
+                page: _this.currentPage, size: _this.pageSize,
+            };
+            _this.router.navigate([], {
+                relativeTo: _this.route,
+                queryParams: queryParams,
+                queryParamsHandling: 'merge'
+            });
         };
         return _this;
     }
@@ -4970,7 +5076,7 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
         this.router = router;
         this.titleService = titleService;
         this.currentId = '';
-        this.currentPage = +this.route.snapshot.queryParams.page;
+        this.currentPage = +this.route.snapshot.queryParams.page || 1;
         this.one('aw-related-entities').updateOptions({
             config: this.configuration,
         });
@@ -4978,17 +5084,20 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
         this.mainState.updateCustom('currentNav', 'entita');
         // update head title
         this.mainState.update('headTitle', 'Arianna4View - Entità');
-        // one tab control
-        this.oneTabControl();
+        // check if there is only one tab
+        this.singleTabCheck();
     };
-    AwEntitaLayoutDS.prototype.oneTabControl = function () {
+    AwEntitaLayoutDS.prototype.singleTabCheck = function () {
         var _this = this;
         var navDS = this.getWidgetDataSource('aw-entita-nav');
         navDS.out$
             .pipe(filter(function (output) { return !!output; }))
             .subscribe(function (_a) {
             var items = _a.items;
-            if (items.length === 1) {
+            // if there is only one tab
+            // and there are no query params
+            // navigate to the tab.
+            if (items.length === 1 && !_this.currentPage) {
                 _this.router.navigate([items[0].anchor.href], { replaceUrl: true });
             }
         });
@@ -5010,33 +5119,47 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
         });
         this.updateComponent('aw-entita-metadata-viewer', this.getFields(this.myResponse));
         this.one('aw-related-entities').update(this.myResponse.relatedEntities);
-        this.drawPagination();
+        this.drawPagination(this.myResponse.totalCount, this.pageSize);
     };
-    AwEntitaLayoutDS.prototype.loadItem = function (id, slug, tab) {
+    /**
+     * Given a page number and a list size, returns the data
+     * for a single page of content.
+     *
+     * @param pageNumber Page number to load
+     * @param pageSize How many items need to be loaded
+     */
+    AwEntitaLayoutDS.prototype.getEntityDetailsPage = function (id, pageNumber, pageSize) {
         var _this = this;
-        /*
-          Loads the data for the selected nav item, into the adjacent text block.
-        */
+        return this.communication.request$('getEntityDetails', {
+            onError: function (error) { return console.error(error); },
+            params: {
+                entityId: id,
+                itemsPagination: { offset: (pageNumber || 1) * pageSize, limit: +pageSize },
+                entitiesListSize: this.bubblesSize
+            },
+        }).pipe(
+        // global metadata tab control
+        tap(function (_a) {
+            var fields = _a.fields, typeOfEntity = _a.typeOfEntity;
+            _this.hasMetadataFields = !!metadataHelper.normalize({
+                fields: fields,
+                paths: _this.configuration.get('paths'),
+                labels: _this.configuration.get('labels'),
+                metadataToShow: get(_this.configuration.get('entita-layout'), 'metadata-to-show', []),
+                type: typeOfEntity
+            }).length;
+        }));
+    };
+    /*
+     * Loads the data for the selected nav item, into the adjacent text block.
+     */
+    AwEntitaLayoutDS.prototype.loadItem = function (id, slug, tab) {
         this.loading = true;
         if (id && tab) {
             this.currentId = id; // store selected item from url
             this.currentSlug = slug; // store selected item from url
             this.selectedTab = tab; // store selected tab from url
-            return this.communication.request$('getEntityDetails', {
-                onError: function (error) { return console.error(error); },
-                params: { entityId: id, entitiesListSize: this.bubblesSize },
-            }).pipe(
-            // global metadata tab control
-            tap(function (_a) {
-                var fields = _a.fields, typeOfEntity = _a.typeOfEntity;
-                _this.hasMetadataFields = !!metadataHelper.normalize({
-                    fields: fields,
-                    paths: _this.configuration.get('paths'),
-                    labels: _this.configuration.get('labels'),
-                    metadataToShow: get(_this.configuration.get('entita-layout'), 'metadata-to-show', []),
-                    type: typeOfEntity
-                }).length;
-            }));
+            return this.getEntityDetailsPage(id, 1, this.pageSize);
         }
         this.pageTitle = 'Entità Test';
         return of(null);
@@ -5044,7 +5167,6 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
     AwEntitaLayoutDS.prototype.loadContent = function (res) {
         this.loading = false;
         var config = this.configuration.get('config-keys')[res.typeOfEntity];
-        // console.log('(entita) Apollo responded with: ', { res })
         this.myResponse = res;
         this.navHeader = {
             icon: config ? config.icon : '',
@@ -5063,7 +5185,10 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
             config: this.configuration,
             page: this.currentPage,
             pagination: true,
-            paginationParams: this._getPaginationParams(),
+            dynamicPagination: {
+                total: this.myResponse.totalCount,
+            },
+            paginationParams: this._getPaginationURL(),
             size: this.pageSize,
         });
         this.getLinkedObjectItems().forEach(function (el) {
@@ -5078,7 +5203,6 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
         });
         this.one('aw-linked-objects').update({ items: this.getLinkedObjectItems() });
         this.one('aw-related-entities').update(res.relatedEntities);
-        this.drawPagination();
         // fallback text
         if (!this.hasMetadataFields) {
             this.fallbackText = this.configuration.get('entita-layout').fallback;
@@ -5086,7 +5210,7 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
         // update head title
         this.mainState.update('headTitle', "Arianna4View - Entit\u00E0 - " + this.myResponse.label);
     };
-    AwEntitaLayoutDS.prototype._getPaginationParams = function () {
+    AwEntitaLayoutDS.prototype._getPaginationURL = function () {
         return {
             href: [
                 this.configuration.get('paths').entitaBasePath,
@@ -5095,7 +5219,8 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
                 "/" + this.selectedTab + "/",
             ].join(''),
             queryParams: {
-                page: this.currentPage,
+                page: this.currentPage || 1,
+                size: this.pageSize,
             },
         };
     };
@@ -5127,6 +5252,16 @@ var AwEntitaLayoutDS = /** @class */ (function (_super) {
             ? this.myResponse.relatedLa
             : this.myResponse.relatedItems;
     };
+    /**
+     * Calculates the total amount of pages
+     *
+     * @param items the number of records in the database
+     * @param size the number of items shown on a page
+     * @returns the total number of pages
+     */
+    AwEntitaLayoutDS.prototype.getPageCount = function (items, size) {
+        return Math.floor(items / size);
+    };
     return AwEntitaLayoutDS;
 }(LayoutDataSource));
 
@@ -5135,9 +5270,11 @@ var AwEntitaLayoutEH = /** @class */ (function (_super) {
     function AwEntitaLayoutEH() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.destroyed$ = new Subject();
-        _this.handlePageSizeChange = function (v) {
-            _this.dataSource.pageSize = v;
+        _this.handlePageSizeChange = function (size) {
+            _this.dataSource.pageSize = size;
+            _this.dataSource.currentPage = 1;
             _this.dataSource.handleNavUpdate('oggetti-collegati');
+            // this.dataSource.handlePageNavigation();
         };
         return _this;
     }
@@ -5178,20 +5315,21 @@ var AwEntitaLayoutEH = /** @class */ (function (_super) {
                     }
                     break;
                 case 'aw-linked-objects.change':
-                    { // changed page size value (pagination)
-                        _this.dataSource.pageSize = payload;
-                        _this.dataSource.currentPage = 1; // reset page
+                    {
                         var options = {
                             context: _this.dataSource.selectedTab,
                             config: _this.dataSource.configuration,
+                            dynamicPagination: {
+                                total: _this.dataSource.myResponse.totalCount,
+                            },
                             page: _this.dataSource.currentPage,
-                            pagination: true,
                             size: _this.dataSource.pageSize,
+                            pagination: true,
                         };
                         _this.dataSource.updateComponent('aw-linked-objects', { items: _this.dataSource.myResponse.relatedItems }, options);
                     }
                     break;
-                case 'n7-smart-pagination.change':
+                case 'n7-smart-pagination.change': // changed page size value (pagination)
                     _this.handlePageSizeChange(payload.value);
                     break;
                 default:
@@ -5206,8 +5344,15 @@ var AwEntitaLayoutEH = /** @class */ (function (_super) {
         var _this = this;
         if (selectedItem === void 0) { selectedItem = ''; }
         if (forceReload === void 0) { forceReload = false; }
-        // listen for "page" query param changes
-        this.route.queryParams.pipe(map(function (params) { return params.page; })).subscribe(function (page) {
+        // listen for "page" query param changes-
+        this.route.queryParams.pipe(map(function (params) { return ({
+            page: params.page,
+            size: params.size
+        }); })).subscribe(function (_a) {
+            var page = _a.page, size = _a.size;
+            if (size) {
+                _this.dataSource.pageSize = size;
+            }
             if (_this.dataSource.currentPage !== page) {
                 _this.dataSource.currentPage = page;
                 _this.dataSource.handlePageNavigation();
@@ -8063,7 +8208,7 @@ var apolloConfig = {
     },
     getEntityDetails: {
         queryName: 'getEntity',
-        queryBody: "{\n        getEntity(__PARAMS__){\n          overviewTab\n          label\n          id\n          typeOfEntity\n          relatedLa: relatedAl {\n            thumbnail\n            relation          \n            item {\n              label\n              id\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n          fields {\n            ... on KeyValueField {\n              key\n              value\n            }\n            ... on KeyValueFieldGroup {\n              label\n              fields {\n                ... on KeyValueField {\n                  key\n                  value\n                }\n                ... on KeyValueFieldGroup {\n                  label\n                  fields {\n                    ... on KeyValueField {\n                      key\n                      value\n                    }\n                  }\n                }\n              }\n            }\n          }\n          extraTab\n          wikiTab {\n            text\n            url\n          }\n          relatedItems {\n            thumbnail\n            relation\n            item {\n              label\n              id\n              fields\n              {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n              breadcrumbs {\n                label\n                link\n              }\n            }\n            relatedTypesOfEntity {\n              type\n              count\n            }\n          }\n          relatedEntities {\n            entity {\n                id\n                label\n                typeOfEntity\n                relation\n            }\n            count\n          }\n        }\n      }\n      ",
+        queryBody: "{\n        getEntity(__PARAMS__){\n          totalCount: relatedItemsTotalCount\n          overviewTab\n          label\n          id\n          typeOfEntity\n          relatedLa: relatedAl {\n            thumbnail\n            relation          \n            item {\n              label\n              id\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n          fields {\n            ... on KeyValueField {\n              key\n              value\n            }\n            ... on KeyValueFieldGroup {\n              label\n              fields {\n                ... on KeyValueField {\n                  key\n                  value\n                }\n                ... on KeyValueFieldGroup {\n                  label\n                  fields {\n                    ... on KeyValueField {\n                      key\n                      value\n                    }\n                  }\n                }\n              }\n            }\n          }\n          extraTab\n          wikiTab {\n            text\n            url\n          }\n          relatedItems {\n            thumbnail\n            relation\n            item {\n              label\n              id\n              fields\n              {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n              breadcrumbs {\n                label\n                link\n              }\n            }\n            relatedTypesOfEntity {\n              type\n              count\n            }\n          }\n          relatedEntities {\n            entity {\n                id\n                label\n                typeOfEntity\n                relation\n            }\n            count\n          }\n        }\n      }\n      ",
     },
     getItem: {
         queryName: 'getItem',
@@ -8097,6 +8242,10 @@ var apolloConfig = {
         queryName: 'getEventObjects',
         queryBody: "{\n      getEventObjects{\n        id\n        start\n        end\n        label\n        item {\n          ... on Entity {\n            id\n            label\n          }\n        }\n      }\n    }",
     },
+    getCollection: {
+        queryName: 'getCollection',
+        queryBody: "{\n      getCollection(__PARAMS__) {\n        title\n        text\n        total\n        items {\n          title\n          content\n          background\n          image\n          url\n          a4vId\n          type\n          classification\n        }\n      }\n    }"
+    }
 };
 
 var COMPONENTS$1 = [
@@ -8577,7 +8726,7 @@ var hasValue = function (value) {
     }
     return !!value;
 };
-var ɵ0$2 = hasValue;
+var ɵ0$1 = hasValue;
 var searchHelper = {
     stateToQueryParams: function (state, schemas) {
         var queryParams = {};
@@ -9700,7 +9849,7 @@ var extractQueryParams = function (queryParams) {
     });
     return params;
 };
-var ɵ0$3 = extractQueryParams;
+var ɵ0$2 = extractQueryParams;
 var linksHelper = {
     getQueryParams: function (href) {
         var queryParams = href.split('?')[1] ? extractQueryParams(href.split('?')[1]) : null;

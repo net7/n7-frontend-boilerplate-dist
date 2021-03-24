@@ -1,20 +1,22 @@
 import { LayoutDataSource } from '@n7-frontend/core';
 import { Observable } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { EntitaLayoutResponse } from './entita-layout.types';
 export declare class AwEntitaLayoutDS extends LayoutDataSource {
     protected configuration: any;
     protected mainState: any;
-    protected router: any;
+    protected router: Router;
     protected titleService: any;
-    protected route: any;
+    protected route: ActivatedRoute;
     options: any;
     pageTitle: string;
     hasMetadataFields: boolean;
-    myResponse: any;
+    myResponse: EntitaLayoutResponse;
     selectedTab: string;
     navHeader: any;
     currentId: string;
     currentSlug: string;
-    currentPage: any;
+    currentPage: number;
     pageSize: number;
     bubblesSize: number;
     bubblesEnabled: boolean;
@@ -30,15 +32,29 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
         titleService: any;
         communication: any;
     }): void;
-    oneTabControl(): void;
+    singleTabCheck(): void;
     updateComponent: (id: any, data: any, options?: any) => void;
-    drawPagination: () => void;
+    /**
+     * Updates the pagination component
+     */
+    drawPagination: (totalItems: any, pageSize: any) => void;
+    /**
+     * Updates the selected tab on tab change
+     */
     handlePageNavigation: () => void;
     handleNavUpdate: (tab: any) => void;
     updateWidgets(data: any): void;
+    /**
+     * Given a page number and a list size, returns the data
+     * for a single page of content.
+     *
+     * @param pageNumber Page number to load
+     * @param pageSize How many items need to be loaded
+     */
+    getEntityDetailsPage(id: any, pageNumber: number, pageSize: number): Observable<any>;
     loadItem(id: any, slug: any, tab: any): Observable<any>;
     loadContent(res: any): void;
-    private _getPaginationParams;
+    private _getPaginationURL;
     getNavBasePath(): string;
     getFields(response: any): {
         key: any;
@@ -47,4 +63,12 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
         label: string;
     }[];
     private getLinkedObjectItems;
+    /**
+     * Calculates the total amount of pages
+     *
+     * @param items the number of records in the database
+     * @param size the number of items shown on a page
+     * @returns the total number of pages
+     */
+    private getPageCount;
 }

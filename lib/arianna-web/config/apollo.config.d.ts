@@ -51,5 +51,9 @@ declare const _default: {
         queryName: string;
         queryBody: string;
     };
+    getCollection: {
+        queryName: string;
+        queryBody: string;
+    };
 };
 export default _default;

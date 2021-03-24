@@ -11,5 +11,12 @@ export declare class AwLinkedObjectsDS extends DataSource {
     protected transform(data: any): any;
     checkForMore: (force?: boolean) => void;
     handleIncomingData: (incomingData: any) => void;
+    /**
+     * Dynamically returns the data object for each HTML component
+     *  data: {
+     *     previews: [ breadcrumbs: { items[] }, classes, image, metadata, payload, title ],
+     *     pagination: { first, last, links, next, prev, select }
+     *   }
+     */
     private unpackData;
 }
