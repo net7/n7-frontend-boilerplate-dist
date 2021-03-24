@@ -2037,8 +2037,8 @@
                         resultsLimit = config.get(context + "-layout")['results-limit'];
                     }
                 }
-                // resize data
-                if (!dynamicPagination && size && page) {
+                // resize data if necessary
+                if (!dynamicPagination && size && page && d.length > size) {
                     d = d.slice(page * size - size, page * size);
                 }
                 else if (size) {
@@ -5233,13 +5233,13 @@
                         _this.pageSize = queryParams.size;
                         _this.currentPage = queryParams.page;
                         // update components
-                        _this.drawPagination(_this.myResponse.totalCount, _this.pageSize);
+                        _this.drawPagination(_this.getItemCount(), _this.pageSize);
                         _this.one('aw-linked-objects').updateOptions({
                             paginationParams: { href: href, queryParams: queryParams },
                             context: _this.selectedTab,
                             config: _this.configuration,
                             dynamicPagination: {
-                                total: _this.myResponse.totalCount,
+                                total: _this.getItemCount(),
                             },
                             page: queryParams.page,
                             size: queryParams.size,
@@ -5257,7 +5257,7 @@
                     context: _this.selectedTab,
                     config: _this.configuration,
                     dynamicPagination: {
-                        total: _this.myResponse.totalCount,
+                        total: _this.getItemCount(),
                     },
                     page: _this.currentPage,
                     size: _this.pageSize,
@@ -5330,7 +5330,7 @@
             });
             this.updateComponent('aw-entita-metadata-viewer', this.getFields(this.myResponse));
             this.one('aw-related-entities').update(this.myResponse.relatedEntities);
-            this.drawPagination(this.myResponse.totalCount, this.pageSize);
+            this.drawPagination(this.getItemCount(), this.pageSize);
         };
         /**
          * Given a page number and a list size, returns the data
@@ -5397,7 +5397,7 @@
                 page: this.currentPage,
                 pagination: true,
                 dynamicPagination: {
-                    total: this.myResponse.totalCount,
+                    total: this.getItemCount(),
                 },
                 paginationParams: this._getPaginationURL(),
                 size: this.pageSize,
@@ -5441,6 +5441,16 @@
                 this.currentId + "/",
                 this.currentSlug,
             ].join('');
+        };
+        AwEntitaLayoutDS.prototype.getItemCount = function () {
+            switch (this.selectedTab) {
+                case 'fondi-collegati':
+                    return this.myResponse.relatedLaTotalCount;
+                case 'oggetti-collegati':
+                    return this.myResponse.relatedItemsTotalCount;
+                default:
+                    return 0;
+            }
         };
         AwEntitaLayoutDS.prototype.getFields = function (response) {
             var fields = response.fields, typeOfEntity = response.typeOfEntity;
@@ -8419,7 +8429,7 @@
         },
         getEntityDetails: {
             queryName: 'getEntity',
-            queryBody: "{\n        getEntity(__PARAMS__){\n          totalCount: relatedItemsTotalCount\n          overviewTab\n          label\n          id\n          typeOfEntity\n          relatedLa: relatedAl {\n            thumbnail\n            relation          \n            item {\n              label\n              id\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n          fields {\n            ... on KeyValueField {\n              key\n              value\n            }\n            ... on KeyValueFieldGroup {\n              label\n              fields {\n                ... on KeyValueField {\n                  key\n                  value\n                }\n                ... on KeyValueFieldGroup {\n                  label\n                  fields {\n                    ... on KeyValueField {\n                      key\n                      value\n                    }\n                  }\n                }\n              }\n            }\n          }\n          extraTab\n          wikiTab {\n            text\n            url\n          }\n          relatedItems {\n            thumbnail\n            relation\n            item {\n              label\n              id\n              fields\n              {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n              breadcrumbs {\n                label\n                link\n              }\n            }\n            relatedTypesOfEntity {\n              type\n              count\n            }\n          }\n          relatedEntities {\n            entity {\n                id\n                label\n                typeOfEntity\n                relation\n            }\n            count\n          }\n        }\n      }\n      ",
+            queryBody: "{\n        getEntity(__PARAMS__){\n          relatedItemsTotalCount,\n          relatedLaTotalCount: relatedAlTotalCount,\n          overviewTab\n          label\n          id\n          typeOfEntity\n          relatedLa: relatedAl {\n            thumbnail\n            relation          \n            item {\n              label\n              id\n              fields {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n            }\n          }\n          fields {\n            ... on KeyValueField {\n              key\n              value\n            }\n            ... on KeyValueFieldGroup {\n              label\n              fields {\n                ... on KeyValueField {\n                  key\n                  value\n                }\n                ... on KeyValueFieldGroup {\n                  label\n                  fields {\n                    ... on KeyValueField {\n                      key\n                      value\n                    }\n                  }\n                }\n              }\n            }\n          }\n          extraTab\n          wikiTab {\n            text\n            url\n          }\n          relatedItems {\n            thumbnail\n            relation\n            item {\n              label\n              id\n              fields\n              {\n                ...\n                on KeyValueField {\n                  key\n                  value\n                }\n              }\n              breadcrumbs {\n                label\n                link\n              }\n            }\n            relatedTypesOfEntity {\n              type\n              count\n            }\n          }\n          relatedEntities {\n            entity {\n                id\n                label\n                typeOfEntity\n                relation\n            }\n            count\n          }\n        }\n      }\n      ",
         },
         getItem: {
             queryName: 'getItem',

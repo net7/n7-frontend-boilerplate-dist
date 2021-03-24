@@ -56,6 +56,7 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
     loadContent(res: any): void;
     private _getPaginationURL;
     getNavBasePath(): string;
+    getItemCount(): number;
     getFields(response: any): {
         key: any;
         value: any;

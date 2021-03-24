@@ -1653,8 +1653,8 @@ class AwLinkedObjectsDS extends DataSource {
                     resultsLimit = config.get(`${context}-layout`)['results-limit'];
                 }
             }
-            // resize data
-            if (!dynamicPagination && size && page) {
+            // resize data if necessary
+            if (!dynamicPagination && size && page && d.length > size) {
                 d = d.slice(page * size - size, page * size);
             }
             else if (size) {
@@ -4505,13 +4505,13 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                     this.pageSize = queryParams.size;
                     this.currentPage = queryParams.page;
                     // update components
-                    this.drawPagination(this.myResponse.totalCount, this.pageSize);
+                    this.drawPagination(this.getItemCount(), this.pageSize);
                     this.one('aw-linked-objects').updateOptions({
                         paginationParams: { href, queryParams },
                         context: this.selectedTab,
                         config: this.configuration,
                         dynamicPagination: {
-                            total: this.myResponse.totalCount,
+                            total: this.getItemCount(),
                         },
                         page: queryParams.page,
                         size: queryParams.size,
@@ -4529,7 +4529,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                 context: this.selectedTab,
                 config: this.configuration,
                 dynamicPagination: {
-                    total: this.myResponse.totalCount,
+                    total: this.getItemCount(),
                 },
                 page: this.currentPage,
                 size: this.pageSize,
@@ -4598,7 +4598,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         });
         this.updateComponent('aw-entita-metadata-viewer', this.getFields(this.myResponse));
         this.one('aw-related-entities').update(this.myResponse.relatedEntities);
-        this.drawPagination(this.myResponse.totalCount, this.pageSize);
+        this.drawPagination(this.getItemCount(), this.pageSize);
     }
     /**
      * Given a page number and a list size, returns the data
@@ -4663,7 +4663,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             page: this.currentPage,
             pagination: true,
             dynamicPagination: {
-                total: this.myResponse.totalCount,
+                total: this.getItemCount(),
             },
             paginationParams: this._getPaginationURL(),
             size: this.pageSize,
@@ -4707,6 +4707,16 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             `${this.currentId}/`,
             this.currentSlug,
         ].join('');
+    }
+    getItemCount() {
+        switch (this.selectedTab) {
+            case 'fondi-collegati':
+                return this.myResponse.relatedLaTotalCount;
+            case 'oggetti-collegati':
+                return this.myResponse.relatedItemsTotalCount;
+            default:
+                return 0;
+        }
     }
     getFields(response) {
         const { fields, typeOfEntity } = response;
@@ -7684,7 +7694,8 @@ var apolloConfig = {
         queryName: 'getEntity',
         queryBody: `{
         getEntity(__PARAMS__){
-          totalCount: relatedItemsTotalCount
+          relatedItemsTotalCount,
+          relatedLaTotalCount: relatedAlTotalCount,
           overviewTab
           label
           id
