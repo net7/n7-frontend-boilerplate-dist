@@ -4182,9 +4182,13 @@ class AwCollectionLayoutDS extends LayoutDataSource {
      * After the collection ID has been loaded
      */
     onCollectionID() {
-        this.loadMore();
+        // reset pagination params
+        this.pageSize = 6;
+        this.currentOffset = 0;
+        // load
+        this.loadMore(true);
     }
-    loadMore() {
+    loadMore(reload = false) {
         const collection = this.loadedCollections.getValue();
         const params = {
             id: this.collectionID,
@@ -4211,7 +4215,7 @@ class AwCollectionLayoutDS extends LayoutDataSource {
                 image: item.image || this.layoutOptions.watermark,
                 color: item.background,
                 anchor: {
-                    href: item.url || this.urlBuilder(item.a4vId, item.title)
+                    href: item.url || this.urlBuilder(item.a4vId, item.title, item.type)
                 },
                 classification: item.classification
             })),
@@ -4226,14 +4230,15 @@ class AwCollectionLayoutDS extends LayoutDataSource {
                         char: this.layoutOptions.header.char
                     }));
                 }
-                if (data.text) {
-                    this.collectionDescription.next(this.stringLimiter(data.text, {
-                        maxLength: this.layoutOptions.description.maxLength,
-                        char: this.layoutOptions.description.char
-                    }));
-                }
+                this.collectionDescription.next(data.text ? this.stringLimiter(data.text, {
+                    maxLength: this.layoutOptions.description.maxLength,
+                    char: this.layoutOptions.description.char
+                }) : '');
                 this.currentOffset += this.pageSize;
-                this.loadedCollections.next([...collection, ...data.response]);
+                const collectionData = !reload
+                    ? [...collection, ...data.response]
+                    : [...data.response];
+                this.loadedCollections.next(collectionData);
                 this.loadMoreButton.next(data.total > this.loadedCollections.getValue().length);
             },
             error: (e) => {
@@ -4251,10 +4256,11 @@ class AwCollectionLayoutDS extends LayoutDataSource {
      * @param title human-readable title
      * @returns URL string including a slug
      */
-    urlBuilder(id, title) {
+    urlBuilder(id, title, type) {
         if (id && title) {
             const titleSlug = slugify(title);
-            const basePath = this.configuration.get('paths').schedaBasePath;
+            const { schedaBasePath, entitaBasePath } = this.configuration.get('paths');
+            const basePath = type === 'entity' ? entitaBasePath : schedaBasePath;
             return `/${basePath}/${id}/${titleSlug}`;
         }
         return undefined;
@@ -4347,7 +4353,7 @@ AwCollectionLayoutComponent.ctorParameters = () => [
 AwCollectionLayoutComponent = __decorate([
     Component({
         selector: 'n7-collection-layout',
-        template: "<div class=\"aw-collection-layout\" *ngIf=\"lb.dataSource as dataSource\">\n\n    <div class=\"aw-collection-layout__header\">\n        <n7-inner-title [data]=\"dataSource.innerTitleData.getValue()\">\n        </n7-inner-title>\n    </div>\n\n    <div class=\"aw-collection-layout__description\" *ngIf=\"dataSource.collectionDescription.getValue()\">\n        <div class=\"aw-collection-layout__description-text\">\n            {{ dataSource.collectionDescription.getValue() }}\n        </div>\n    </div>\n\n    <section class=\"n7-grid-3 aw-collection-layout__grid\" *ngIf=\"dataSource.loadedCollections\">\n        <ng-container *ngFor=\"let item of dataSource.loadedCollections.value\">\n            <n7-item-preview [data]=\"item\">\n            </n7-item-preview>\n        </ng-container>\n    </section>\n\n    <section *ngIf=\"dataSource.loadMoreButton.getValue()\">\n        <button class=\"n7-btn n7-btn-cta n7-btn-xl aw-collection-layout__btn-more\" (click)=\"dataSource.loadMore()\">\n            MOSTRA ALTRI\n        </button>\n    </section>\n</div>\n"
+        template: "<div class=\"aw-collection-layout\" *ngIf=\"lb.dataSource as dataSource\">\n\n    <div class=\"aw-collection-layout__header\">\n        <n7-inner-title [data]=\"dataSource.innerTitleData.getValue()\">\n        </n7-inner-title>\n    </div>\n\n    <div class=\"aw-collection-layout__description\" *ngIf=\"dataSource.collectionDescription.getValue()\">\n        <div class=\"aw-collection-layout__description-text\">\n            {{ dataSource.collectionDescription.getValue() }}\n        </div>\n    </div>\n\n    <section class=\"n7-grid-3 aw-collection-layout__grid\" *ngIf=\"dataSource.loadedCollections | async\">\n        <ng-container *ngFor=\"let item of (dataSource.loadedCollections | async)\">\n            <n7-item-preview [data]=\"item\">\n            </n7-item-preview>\n        </ng-container>\n    </section>\n\n    <section *ngIf=\"dataSource.loadMoreButton.getValue()\">\n        <button class=\"n7-btn n7-btn-cta n7-btn-xl aw-collection-layout__btn-more\" (click)=\"dataSource.loadMore()\">\n            MOSTRA ALTRI\n        </button>\n    </section>\n</div>\n"
     }),
     __metadata("design:paramtypes", [CommunicationService,
         LayoutsConfigurationService,

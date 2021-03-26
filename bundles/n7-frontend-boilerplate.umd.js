@@ -4864,10 +4864,15 @@
          * After the collection ID has been loaded
          */
         AwCollectionLayoutDS.prototype.onCollectionID = function () {
-            this.loadMore();
+            // reset pagination params
+            this.pageSize = 6;
+            this.currentOffset = 0;
+            // load
+            this.loadMore(true);
         };
-        AwCollectionLayoutDS.prototype.loadMore = function () {
+        AwCollectionLayoutDS.prototype.loadMore = function (reload) {
             var _this = this;
+            if (reload === void 0) { reload = false; }
             var collection = this.loadedCollections.getValue();
             var params = {
                 id: this.collectionID,
@@ -4894,7 +4899,7 @@
                     image: item.image || _this.layoutOptions.watermark,
                     color: item.background,
                     anchor: {
-                        href: item.url || _this.urlBuilder(item.a4vId, item.title)
+                        href: item.url || _this.urlBuilder(item.a4vId, item.title, item.type)
                     },
                     classification: item.classification
                 }); }),
@@ -4909,14 +4914,14 @@
                             char: _this.layoutOptions.header.char
                         }));
                     }
-                    if (data.text) {
-                        _this.collectionDescription.next(_this.stringLimiter(data.text, {
-                            maxLength: _this.layoutOptions.description.maxLength,
-                            char: _this.layoutOptions.description.char
-                        }));
-                    }
+                    _this.collectionDescription.next(data.text ? _this.stringLimiter(data.text, {
+                        maxLength: _this.layoutOptions.description.maxLength,
+                        char: _this.layoutOptions.description.char
+                    }) : '');
                     _this.currentOffset += _this.pageSize;
-                    _this.loadedCollections.next(__spread(collection, data.response));
+                    var collectionData = !reload
+                        ? __spread(collection, data.response) : __spread(data.response);
+                    _this.loadedCollections.next(collectionData);
                     _this.loadMoreButton.next(data.total > _this.loadedCollections.getValue().length);
                 },
                 error: function (e) {
@@ -4934,10 +4939,11 @@
          * @param title human-readable title
          * @returns URL string including a slug
          */
-        AwCollectionLayoutDS.prototype.urlBuilder = function (id, title) {
+        AwCollectionLayoutDS.prototype.urlBuilder = function (id, title, type) {
             if (id && title) {
                 var titleSlug = slugify(title);
-                var basePath = this.configuration.get('paths').schedaBasePath;
+                var _a = this.configuration.get('paths'), schedaBasePath = _a.schedaBasePath, entitaBasePath = _a.entitaBasePath;
+                var basePath = type === 'entity' ? entitaBasePath : schedaBasePath;
                 return "/" + basePath + "/" + id + "/" + titleSlug;
             }
             return undefined;
@@ -5040,7 +5046,7 @@
         AwCollectionLayoutComponent = __decorate([
             core.Component({
                 selector: 'n7-collection-layout',
-                template: "<div class=\"aw-collection-layout\" *ngIf=\"lb.dataSource as dataSource\">\n\n    <div class=\"aw-collection-layout__header\">\n        <n7-inner-title [data]=\"dataSource.innerTitleData.getValue()\">\n        </n7-inner-title>\n    </div>\n\n    <div class=\"aw-collection-layout__description\" *ngIf=\"dataSource.collectionDescription.getValue()\">\n        <div class=\"aw-collection-layout__description-text\">\n            {{ dataSource.collectionDescription.getValue() }}\n        </div>\n    </div>\n\n    <section class=\"n7-grid-3 aw-collection-layout__grid\" *ngIf=\"dataSource.loadedCollections\">\n        <ng-container *ngFor=\"let item of dataSource.loadedCollections.value\">\n            <n7-item-preview [data]=\"item\">\n            </n7-item-preview>\n        </ng-container>\n    </section>\n\n    <section *ngIf=\"dataSource.loadMoreButton.getValue()\">\n        <button class=\"n7-btn n7-btn-cta n7-btn-xl aw-collection-layout__btn-more\" (click)=\"dataSource.loadMore()\">\n            MOSTRA ALTRI\n        </button>\n    </section>\n</div>\n"
+                template: "<div class=\"aw-collection-layout\" *ngIf=\"lb.dataSource as dataSource\">\n\n    <div class=\"aw-collection-layout__header\">\n        <n7-inner-title [data]=\"dataSource.innerTitleData.getValue()\">\n        </n7-inner-title>\n    </div>\n\n    <div class=\"aw-collection-layout__description\" *ngIf=\"dataSource.collectionDescription.getValue()\">\n        <div class=\"aw-collection-layout__description-text\">\n            {{ dataSource.collectionDescription.getValue() }}\n        </div>\n    </div>\n\n    <section class=\"n7-grid-3 aw-collection-layout__grid\" *ngIf=\"dataSource.loadedCollections | async\">\n        <ng-container *ngFor=\"let item of (dataSource.loadedCollections | async)\">\n            <n7-item-preview [data]=\"item\">\n            </n7-item-preview>\n        </ng-container>\n    </section>\n\n    <section *ngIf=\"dataSource.loadMoreButton.getValue()\">\n        <button class=\"n7-btn n7-btn-cta n7-btn-xl aw-collection-layout__btn-more\" (click)=\"dataSource.loadMore()\">\n            MOSTRA ALTRI\n        </button>\n    </section>\n</div>\n"
             }),
             __metadata("design:paramtypes", [CommunicationService,
                 LayoutsConfigurationService,

@@ -18,7 +18,7 @@ export declare class AwCollectionLayoutDS extends LayoutDataSource {
      * After the collection ID has been loaded
      */
     onCollectionID(): void;
-    loadMore(): void;
+    loadMore(reload?: boolean): void;
     /**
      * Builds a URL from entity type,
      * entity id, and a slug string.
@@ -28,7 +28,7 @@ export declare class AwCollectionLayoutDS extends LayoutDataSource {
      * @param title human-readable title
      * @returns URL string including a slug
      */
-    urlBuilder(id: any, title: any): string | undefined;
+    urlBuilder(id: any, title: any, type: string): string | undefined;
     stringLimiter(content: string, options: {
         maxLength: number;
         char: string;
