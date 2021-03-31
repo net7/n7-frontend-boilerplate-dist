@@ -886,7 +886,7 @@
                 && rect.right > 0
                 && rect.left < (window.innerWidth || document.documentElement.clientWidth)
                 && rect.top < (window.innerHeight || document.documentElement.clientHeight);
-        }
+        },
     };
 
     var AwFacetInputText = /** @class */ (function (_super) {
@@ -4844,13 +4844,31 @@
         __extends(AwCollectionLayoutDS, _super);
         function AwCollectionLayoutDS() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.classificationsMap = {
+                ff400: 'fondo-fotografico',
+                al: 'aggregazione-logica',
+                la: 'libro-antico',
+                veac301: 'vestimento',
+                f400: 'fotografia',
+                uasc: 'cartografica',
+                dc: 'scheda-dublin-core',
+                oa300: 'scheda-oa',
+                rmmus: 'materiale-musicale',
+                ua: 'unita-archivistica',
+                oac300: 'opera-arte-contemporanea',
+            };
             _this.innerTitleData = new rxjs.BehaviorSubject({
                 title: { main: { text: '' } },
             });
             _this.collectionDescription = new rxjs.BehaviorSubject('');
             _this.pageSize = 6;
+            /** Necessary to iterate with the loading item placeholder HTML */
+            _this.pageSizeList = [];
             _this.currentOffset = 0;
+            /** Button that loads more content into the layout */
             _this.loadMoreButton = new rxjs.BehaviorSubject(true);
+            /** Controls the loading state of the layout */
+            _this.loading = true;
             return _this;
         }
         AwCollectionLayoutDS.prototype.onInit = function (payload) {
@@ -4859,6 +4877,7 @@
             this.configuration = payload.configuration;
             this.loadedCollections = new rxjs.BehaviorSubject([]);
             this.layoutOptions = this.configuration.get('collection-layout');
+            this.pageSizeList = new Array(this.pageSize);
         };
         /**
          * After the collection ID has been loaded
@@ -4873,6 +4892,7 @@
         AwCollectionLayoutDS.prototype.loadMore = function (reload) {
             var _this = this;
             if (reload === void 0) { reload = false; }
+            this.loading = true;
             var collection = this.loadedCollections.getValue();
             var params = {
                 id: this.collectionID,
@@ -4895,7 +4915,7 @@
                         maxLength: _this.layoutOptions.item.description.maxLength,
                         char: _this.layoutOptions.item.description.char
                     }),
-                    classes: (item.image ? 'is-overlay has-image' : 'is-overlay has-image has-watermark') + " " + (item.classification ? "is-" + item.classification : ''),
+                    classes: (item.image ? 'is-overlay has-image' : 'is-overlay has-image has-watermark') + " " + _this.classMap(item.classification),
                     image: item.image || _this.layoutOptions.watermark,
                     color: item.background,
                     anchor: {
@@ -4908,6 +4928,7 @@
                 total: d.total,
             }); })).subscribe({
                 next: function (data) {
+                    _this.loading = false;
                     if (data.title) {
                         _this.setTitle(_this.stringLimiter(data.title, {
                             maxLength: _this.layoutOptions.header.maxLength,
@@ -4962,6 +4983,27 @@
             this.innerTitleData.next({
                 title: { main: { text: title } }
             });
+        };
+        /**
+         * Convert classification strings to css classes.
+         *
+         * @param classification a classification string like "a4.oc.ua"
+         * @returns a CSS class
+         */
+        AwCollectionLayoutDS.prototype.classMap = function (classification) {
+            var _a;
+            if (!classification || classification.length < 1) {
+                return '';
+            }
+            var codeMatch = /\.(\w+)$/gi.exec(classification);
+            if (codeMatch) {
+                var parsedCode = (_a = codeMatch[1]) === null || _a === void 0 ? void 0 : _a.toLocaleLowerCase();
+                var className = this.classificationsMap[parsedCode];
+                if (className) {
+                    return "is-" + className;
+                }
+            }
+            return "is-" + classification.replace('.', '-');
         };
         return AwCollectionLayoutDS;
     }(core$1.LayoutDataSource));
@@ -5046,7 +5088,7 @@
         AwCollectionLayoutComponent = __decorate([
             core.Component({
                 selector: 'n7-collection-layout',
-                template: "<div class=\"aw-collection-layout\" *ngIf=\"lb.dataSource as dataSource\">\n\n    <div class=\"aw-collection-layout__header\">\n        <n7-inner-title [data]=\"dataSource.innerTitleData.getValue()\">\n        </n7-inner-title>\n    </div>\n\n    <div class=\"aw-collection-layout__description\" *ngIf=\"dataSource.collectionDescription.getValue()\">\n        <div class=\"aw-collection-layout__description-text\">\n            {{ dataSource.collectionDescription.getValue() }}\n        </div>\n    </div>\n\n    <section class=\"n7-grid-3 aw-collection-layout__grid\" *ngIf=\"dataSource.loadedCollections | async\">\n        <ng-container *ngFor=\"let item of (dataSource.loadedCollections | async)\">\n            <n7-item-preview [data]=\"item\">\n            </n7-item-preview>\n        </ng-container>\n    </section>\n\n    <section *ngIf=\"dataSource.loadMoreButton.getValue()\">\n        <button class=\"n7-btn n7-btn-cta n7-btn-xl aw-collection-layout__btn-more\" (click)=\"dataSource.loadMore()\">\n            MOSTRA ALTRI\n        </button>\n    </section>\n</div>\n"
+                template: "<div class=\"aw-collection-layout\"\n     *ngIf=\"lb.dataSource as dataSource\">\n\n    <div class=\"aw-collection-layout__header\">\n        <n7-inner-title [data]=\"dataSource.innerTitleData.getValue()\">\n        </n7-inner-title>\n    </div>\n\n    <div class=\"aw-collection-layout__description\"\n         *ngIf=\"dataSource.collectionDescription.getValue()\">\n        <div class=\"aw-collection-layout__description-text\">\n            {{ dataSource.collectionDescription.getValue() }}\n        </div>\n    </div>\n\n    <section class=\"n7-grid-3 aw-collection-layout__grid\"\n            [ngClass]=\"{ 'is-loading': dataSource.loading }\"\n             *ngIf=\"dataSource.loadedCollections | async\">\n        \n        <ng-container *ngFor=\"let item of (dataSource.loadedCollections | async)\">\n            <n7-item-preview [data]=\"item\">\n            </n7-item-preview>\n        </ng-container>\n        \n        <ng-container *ngIf=\"dataSource.loading\">\n            <n7-content-placeholder *ngFor=\"let n of dataSource.pageSizeList\"\n                                    [data]=\"{\n                blocks: [{ classes: 'collection-placeholder-item-preview' }]\n            }\"></n7-content-placeholder>\n        </ng-container>\n        \n    </section>\n\n    <section *ngIf=\"dataSource.loadMoreButton.getValue()\">\n        <button class=\"n7-btn n7-btn-cta n7-btn-xl aw-collection-layout__btn-more\"\n                (click)=\"dataSource.loadMore()\"\n                [disabled]=\"dataSource.loading\">\n            MOSTRA ALTRI\n        </button>\n    </section>\n</div>\n"
             }),
             __metadata("design:paramtypes", [CommunicationService,
                 LayoutsConfigurationService,
@@ -5285,6 +5327,7 @@
         }
         AwEntitaLayoutDS.prototype.onInit = function (_a) {
             var configuration = _a.configuration, mainState = _a.mainState, router = _a.router, route = _a.route, options = _a.options, titleService = _a.titleService, communication = _a.communication;
+            var _b;
             this.route = route;
             this.communication = communication;
             this.configuration = configuration;
@@ -5293,7 +5336,7 @@
             this.router = router;
             this.titleService = titleService;
             this.currentId = '';
-            this.currentPage = +this.route.snapshot.queryParams.page || 1;
+            this.currentPage = (_b = +this.route.snapshot.queryParams.page) !== null && _b !== void 0 ? _b : 1;
             this.one('aw-related-entities').updateOptions({
                 config: this.configuration,
             });
@@ -5342,6 +5385,7 @@
          * Given a page number and a list size, returns the data
          * for a single page of content.
          *
+         * @param id Entity ID
          * @param pageNumber Page number to load
          * @param pageSize How many items need to be loaded
          */
@@ -5351,7 +5395,7 @@
                 onError: function (error) { return console.error(error); },
                 params: {
                     entityId: id,
-                    itemsPagination: { offset: (pageNumber || 1) * pageSize, limit: +pageSize },
+                    itemsPagination: { offset: ((pageNumber || 1) - 1) * pageSize, limit: +pageSize },
                     entitiesListSize: this.bubblesSize
                 },
             }).pipe(
@@ -5376,7 +5420,7 @@
                 this.currentId = id; // store selected item from url
                 this.currentSlug = slug; // store selected item from url
                 this.selectedTab = tab; // store selected tab from url
-                return this.getEntityDetailsPage(id, 1, this.pageSize);
+                return this.getEntityDetailsPage(id, this.currentPage, this.pageSize);
             }
             this.pageTitle = 'Entità Test';
             return rxjs.of(null);

@@ -625,7 +625,7 @@ var helpers = {
             && rect.right > 0
             && rect.left < (window.innerWidth || document.documentElement.clientWidth)
             && rect.top < (window.innerHeight || document.documentElement.clientHeight);
-    }
+    },
 };
 
 class AwFacetInputText extends AwFacetInput {
@@ -4163,13 +4163,31 @@ var EH$1 = /*#__PURE__*/Object.freeze({
 class AwCollectionLayoutDS extends LayoutDataSource {
     constructor() {
         super(...arguments);
+        this.classificationsMap = {
+            ff400: 'fondo-fotografico',
+            al: 'aggregazione-logica',
+            la: 'libro-antico',
+            veac301: 'vestimento',
+            f400: 'fotografia',
+            uasc: 'cartografica',
+            dc: 'scheda-dublin-core',
+            oa300: 'scheda-oa',
+            rmmus: 'materiale-musicale',
+            ua: 'unita-archivistica',
+            oac300: 'opera-arte-contemporanea',
+        };
         this.innerTitleData = new BehaviorSubject({
             title: { main: { text: '' } },
         });
         this.collectionDescription = new BehaviorSubject('');
         this.pageSize = 6;
+        /** Necessary to iterate with the loading item placeholder HTML */
+        this.pageSizeList = [];
         this.currentOffset = 0;
+        /** Button that loads more content into the layout */
         this.loadMoreButton = new BehaviorSubject(true);
+        /** Controls the loading state of the layout */
+        this.loading = true;
     }
     onInit(payload) {
         this.communication = payload.communication;
@@ -4177,6 +4195,7 @@ class AwCollectionLayoutDS extends LayoutDataSource {
         this.configuration = payload.configuration;
         this.loadedCollections = new BehaviorSubject([]);
         this.layoutOptions = this.configuration.get('collection-layout');
+        this.pageSizeList = new Array(this.pageSize);
     }
     /**
      * After the collection ID has been loaded
@@ -4189,6 +4208,7 @@ class AwCollectionLayoutDS extends LayoutDataSource {
         this.loadMore(true);
     }
     loadMore(reload = false) {
+        this.loading = true;
         const collection = this.loadedCollections.getValue();
         const params = {
             id: this.collectionID,
@@ -4211,7 +4231,7 @@ class AwCollectionLayoutDS extends LayoutDataSource {
                     maxLength: this.layoutOptions.item.description.maxLength,
                     char: this.layoutOptions.item.description.char
                 }),
-                classes: `${item.image ? 'is-overlay has-image' : 'is-overlay has-image has-watermark'} ${item.classification ? `is-${item.classification}` : ''}`,
+                classes: `${item.image ? 'is-overlay has-image' : 'is-overlay has-image has-watermark'} ${this.classMap(item.classification)}`,
                 image: item.image || this.layoutOptions.watermark,
                 color: item.background,
                 anchor: {
@@ -4224,6 +4244,7 @@ class AwCollectionLayoutDS extends LayoutDataSource {
             total: d.total,
         }))).subscribe({
             next: (data) => {
+                this.loading = false;
                 if (data.title) {
                     this.setTitle(this.stringLimiter(data.title, {
                         maxLength: this.layoutOptions.header.maxLength,
@@ -4279,6 +4300,27 @@ class AwCollectionLayoutDS extends LayoutDataSource {
         this.innerTitleData.next({
             title: { main: { text: title } }
         });
+    }
+    /**
+     * Convert classification strings to css classes.
+     *
+     * @param classification a classification string like "a4.oc.ua"
+     * @returns a CSS class
+     */
+    classMap(classification) {
+        var _a;
+        if (!classification || classification.length < 1) {
+            return '';
+        }
+        const codeMatch = /\.(\w+)$/gi.exec(classification);
+        if (codeMatch) {
+            const parsedCode = (_a = codeMatch[1]) === null || _a === void 0 ? void 0 : _a.toLocaleLowerCase();
+            const className = this.classificationsMap[parsedCode];
+            if (className) {
+                return `is-${className}`;
+            }
+        }
+        return `is-${classification.replace('.', '-')}`;
     }
 }
 
@@ -4353,7 +4395,7 @@ AwCollectionLayoutComponent.ctorParameters = () => [
 AwCollectionLayoutComponent = __decorate([
     Component({
         selector: 'n7-collection-layout',
-        template: "<div class=\"aw-collection-layout\" *ngIf=\"lb.dataSource as dataSource\">\n\n    <div class=\"aw-collection-layout__header\">\n        <n7-inner-title [data]=\"dataSource.innerTitleData.getValue()\">\n        </n7-inner-title>\n    </div>\n\n    <div class=\"aw-collection-layout__description\" *ngIf=\"dataSource.collectionDescription.getValue()\">\n        <div class=\"aw-collection-layout__description-text\">\n            {{ dataSource.collectionDescription.getValue() }}\n        </div>\n    </div>\n\n    <section class=\"n7-grid-3 aw-collection-layout__grid\" *ngIf=\"dataSource.loadedCollections | async\">\n        <ng-container *ngFor=\"let item of (dataSource.loadedCollections | async)\">\n            <n7-item-preview [data]=\"item\">\n            </n7-item-preview>\n        </ng-container>\n    </section>\n\n    <section *ngIf=\"dataSource.loadMoreButton.getValue()\">\n        <button class=\"n7-btn n7-btn-cta n7-btn-xl aw-collection-layout__btn-more\" (click)=\"dataSource.loadMore()\">\n            MOSTRA ALTRI\n        </button>\n    </section>\n</div>\n"
+        template: "<div class=\"aw-collection-layout\"\n     *ngIf=\"lb.dataSource as dataSource\">\n\n    <div class=\"aw-collection-layout__header\">\n        <n7-inner-title [data]=\"dataSource.innerTitleData.getValue()\">\n        </n7-inner-title>\n    </div>\n\n    <div class=\"aw-collection-layout__description\"\n         *ngIf=\"dataSource.collectionDescription.getValue()\">\n        <div class=\"aw-collection-layout__description-text\">\n            {{ dataSource.collectionDescription.getValue() }}\n        </div>\n    </div>\n\n    <section class=\"n7-grid-3 aw-collection-layout__grid\"\n            [ngClass]=\"{ 'is-loading': dataSource.loading }\"\n             *ngIf=\"dataSource.loadedCollections | async\">\n        \n        <ng-container *ngFor=\"let item of (dataSource.loadedCollections | async)\">\n            <n7-item-preview [data]=\"item\">\n            </n7-item-preview>\n        </ng-container>\n        \n        <ng-container *ngIf=\"dataSource.loading\">\n            <n7-content-placeholder *ngFor=\"let n of dataSource.pageSizeList\"\n                                    [data]=\"{\n                blocks: [{ classes: 'collection-placeholder-item-preview' }]\n            }\"></n7-content-placeholder>\n        </ng-container>\n        \n    </section>\n\n    <section *ngIf=\"dataSource.loadMoreButton.getValue()\">\n        <button class=\"n7-btn n7-btn-cta n7-btn-xl aw-collection-layout__btn-more\"\n                (click)=\"dataSource.loadMore()\"\n                [disabled]=\"dataSource.loading\">\n            MOSTRA ALTRI\n        </button>\n    </section>\n</div>\n"
     }),
     __metadata("design:paramtypes", [CommunicationService,
         LayoutsConfigurationService,
@@ -4555,6 +4597,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         };
     }
     onInit({ configuration, mainState, router, route, options, titleService, communication, }) {
+        var _a;
         this.route = route;
         this.communication = communication;
         this.configuration = configuration;
@@ -4563,7 +4606,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
         this.router = router;
         this.titleService = titleService;
         this.currentId = '';
-        this.currentPage = +this.route.snapshot.queryParams.page || 1;
+        this.currentPage = (_a = +this.route.snapshot.queryParams.page) !== null && _a !== void 0 ? _a : 1;
         this.one('aw-related-entities').updateOptions({
             config: this.configuration,
         });
@@ -4610,6 +4653,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
      * Given a page number and a list size, returns the data
      * for a single page of content.
      *
+     * @param id Entity ID
      * @param pageNumber Page number to load
      * @param pageSize How many items need to be loaded
      */
@@ -4618,7 +4662,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             onError: (error) => console.error(error),
             params: {
                 entityId: id,
-                itemsPagination: { offset: (pageNumber || 1) * pageSize, limit: +pageSize },
+                itemsPagination: { offset: ((pageNumber || 1) - 1) * pageSize, limit: +pageSize },
                 entitiesListSize: this.bubblesSize
             },
         }).pipe(
@@ -4642,7 +4686,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
             this.currentId = id; // store selected item from url
             this.currentSlug = slug; // store selected item from url
             this.selectedTab = tab; // store selected tab from url
-            return this.getEntityDetailsPage(id, 1, this.pageSize);
+            return this.getEntityDetailsPage(id, this.currentPage, this.pageSize);
         }
         this.pageTitle = 'Entità Test';
         return of(null);

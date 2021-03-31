@@ -48,6 +48,7 @@ export declare class AwEntitaLayoutDS extends LayoutDataSource {
      * Given a page number and a list size, returns the data
      * for a single page of content.
      *
+     * @param id Entity ID
      * @param pageNumber Page number to load
      * @param pageSize How many items need to be loaded
      */
