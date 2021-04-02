@@ -19,6 +19,8 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     private destroyed$;
     homeAutocompleteIsLoading: boolean;
     resultsListIsLoading: boolean;
+    /** Enabled from: arianna-config/features-enabled/carousel */
+    carouselEnabled: boolean;
     bubblesEnabled: boolean;
     selectedBubbles: any[];
     lastBubbleResponse: any;
@@ -38,6 +40,10 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     updateTags(onlyBubbles?: boolean): void;
     handleFacetSearchChange(change: any): void;
     renderItemTags(): void;
+    /**
+     * Loads data for the carousel component
+     */
+    loadCarousel(): void;
     onHeroChange(value: any): void;
     private _scrollBackgroundControl;
     private _setHasScrollBackground;

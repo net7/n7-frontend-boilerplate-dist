@@ -3,6 +3,10 @@ declare const _default: {
         queryName: string;
         queryBody: string;
     };
+    getSlider: {
+        queryName: string;
+        queryBody: string;
+    };
     getTree: {
         queryName: string;
         queryBody: string;

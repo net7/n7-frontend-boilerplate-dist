@@ -7,5 +7,12 @@ export declare class AwAutocompleteWrapperDS extends DataSource {
         suggestion: any[];
         loading?: undefined;
     };
+    /**
+     * Given a string, it trims it to the specified length.
+     *
+     * @param string an input string
+     * @param limit character limit
+     * @returns the resulting trimmed string
+     */
     private stringTrim;
 }

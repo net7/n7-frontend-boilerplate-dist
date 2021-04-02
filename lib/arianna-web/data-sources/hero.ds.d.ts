@@ -15,5 +15,6 @@ export declare class AwHeroDS extends DataSource {
             placeholder: any;
             payload: string;
         };
+        classes: any;
     };
 }
