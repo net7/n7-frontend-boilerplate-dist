@@ -2,6 +2,7 @@ import { LayoutDataSource } from '@n7-frontend/core';
 import { ItemPreviewData, TimelineData } from '@n7-frontend/components';
 import * as vis from 'vis-timeline';
 import { Subject } from 'rxjs';
+import 'leaflet.markercluster';
 export declare class MrTimelineLayoutDS extends LayoutDataSource {
     private configuration;
     private communication;
@@ -14,6 +15,7 @@ export declare class MrTimelineLayoutDS extends LayoutDataSource {
     eventHeader: string;
     eventDescription: string;
     timelineData: TimelineData;
+    hasMap: boolean;
     timelineListener$: Subject<vis.Timeline>;
     bibliographyMock: ItemPreviewData[];
     connectedMapsMock: ItemPreviewData[];
