@@ -6765,9 +6765,12 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         this.currentId = null;
         /** Switch loaded-content and loaded-empty states */
         this.hasContent = true;
+        /** Name of query that should be used (chosen in config) */
+        this.getTreeQuery = 'getTree';
         this.getTree = () => AwSchedaLayoutDS.tree;
     }
     onInit({ configuration, mainState, router, options, titleService, communication, }) {
+        var _a, _b;
         this.configuration = configuration;
         this.mainState = mainState;
         this.router = router;
@@ -6786,6 +6789,10 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         this.emptyLabel = this.configuration.get('scheda-layout')['empty-label'];
         this.emptyStateString = this.configuration.get('scheda-layout')['empty-html'];
         this.one('aw-tree').updateOptions({ config: this.configuration.get('config-keys') });
+        // switch the tree query to the slim version
+        if ((_b = (_a = this.configuration.get('scheda-layout')) === null || _a === void 0 ? void 0 : _a.tree) === null || _b === void 0 ? void 0 : _b.lite) {
+            this.getTreeQuery = 'getTreeLite';
+        }
         this.mainState.update('headTitle', 'Arianna4View - Patrimonio');
         this.mainState.update('pageTitle', 'Arianna4View - Patrimonio');
         this.mainState.updateCustom('currentNav', 'patrimonio');
@@ -6809,7 +6816,7 @@ class AwSchedaLayoutDS extends LayoutDataSource {
         if (AwSchedaLayoutDS.tree) {
             return of(AwSchedaLayoutDS.tree);
         }
-        return this.communication.request$('getTree', {
+        return this.communication.request$(this.getTreeQuery, {
             onError: (error) => console.error(error),
             params: { treeId: id },
         });
@@ -7710,6 +7717,67 @@ var apolloConfig = {
         }
       }
     }`
+    },
+    getTreeLite: {
+        queryName: 'getTreeOfItems',
+        queryBody: `
+      {
+        getTreeOfItems{
+          label
+          id
+          document_type
+          document_classification
+          branches {
+            label
+            id
+            document_type
+            document_classification
+            branches {
+              label
+              id
+              document_type
+              document_classification
+              branches {
+                label
+                id
+                document_type
+                document_classification
+                branches {
+                  label
+                  id
+                  document_type
+                  document_classification
+                  branches {
+                    label
+                    id
+                    document_type
+                    document_classification
+                    branches {
+                      label
+                      id
+                      document_type
+                      document_classification
+                      branches {
+                        label
+                        id
+                        document_type
+                        document_classification
+                        branches {
+                          label
+                          id
+                          document_type
+                          document_classification
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      `,
     },
     getTree: {
         queryName: 'getTreeOfItems',
@@ -9744,6 +9812,14 @@ class MrAdvancedSearchLayoutDS extends LayoutDataSource {
         if (formConfig.resetButton) {
             formConfig.resetButton.label = _t(formConfig.resetButton.label);
         }
+        // groups
+        formConfig.groups.forEach((group) => {
+            var _a;
+            if ((_a = group.options) === null || _a === void 0 ? void 0 : _a.label) {
+                group.options.label = _t(group.options.label);
+            }
+        });
+        // sections
         formConfig.sections.forEach((section) => {
             if (section.title) {
                 section.title = _t(section.title);

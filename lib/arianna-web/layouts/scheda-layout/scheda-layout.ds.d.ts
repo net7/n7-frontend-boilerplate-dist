@@ -36,6 +36,8 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
     emptyStateString: string;
     externalUrlText: string;
     hasContextMenu: () => boolean;
+    /** Name of query that should be used (chosen in config) */
+    private getTreeQuery;
     onInit({ configuration, mainState, router, options, titleService, communication, }: {
         configuration: any;
         mainState: any;

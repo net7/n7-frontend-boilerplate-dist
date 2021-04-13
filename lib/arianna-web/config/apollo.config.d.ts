@@ -7,6 +7,10 @@ declare const _default: {
         queryName: string;
         queryBody: string;
     };
+    getTreeLite: {
+        queryName: string;
+        queryBody: string;
+    };
     getTree: {
         queryName: string;
         queryBody: string;

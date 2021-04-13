@@ -1,6 +1,6 @@
 import { LayoutDataSource } from '@n7-frontend/core';
 import { ItemPreviewData, TimelineData } from '@n7-frontend/components';
-import * as vis from 'vis-timeline';
+import * as vis from 'vis-timeline/declarations';
 import { Subject } from 'rxjs';
 import 'leaflet.markercluster';
 export declare class MrTimelineLayoutDS extends LayoutDataSource {

@@ -7590,11 +7590,14 @@
             _this.currentId = null;
             /** Switch loaded-content and loaded-empty states */
             _this.hasContent = true;
+            /** Name of query that should be used (chosen in config) */
+            _this.getTreeQuery = 'getTree';
             _this.getTree = function () { return AwSchedaLayoutDS.tree; };
             return _this;
         }
         AwSchedaLayoutDS.prototype.onInit = function (_a) {
             var configuration = _a.configuration, mainState = _a.mainState, router = _a.router, options = _a.options, titleService = _a.titleService, communication = _a.communication;
+            var _b, _c;
             this.configuration = configuration;
             this.mainState = mainState;
             this.router = router;
@@ -7613,6 +7616,10 @@
             this.emptyLabel = this.configuration.get('scheda-layout')['empty-label'];
             this.emptyStateString = this.configuration.get('scheda-layout')['empty-html'];
             this.one('aw-tree').updateOptions({ config: this.configuration.get('config-keys') });
+            // switch the tree query to the slim version
+            if ((_c = (_b = this.configuration.get('scheda-layout')) === null || _b === void 0 ? void 0 : _b.tree) === null || _c === void 0 ? void 0 : _c.lite) {
+                this.getTreeQuery = 'getTreeLite';
+            }
             this.mainState.update('headTitle', 'Arianna4View - Patrimonio');
             this.mainState.update('pageTitle', 'Arianna4View - Patrimonio');
             this.mainState.updateCustom('currentNav', 'patrimonio');
@@ -7636,7 +7643,7 @@
             if (AwSchedaLayoutDS.tree) {
                 return rxjs.of(AwSchedaLayoutDS.tree);
             }
-            return this.communication.request$('getTree', {
+            return this.communication.request$(this.getTreeQuery, {
                 onError: function (error) { return console.error(error); },
                 params: { treeId: id },
             });
@@ -8571,6 +8578,10 @@
         getSlider: {
             queryName: 'getSlider',
             queryBody: " {\n      getSlider {\n        pretext\n        title\n        text\n        background {\n            type\n            value\n        }\n        ctaLabel\n        ctaPayload\n        metadata {\n            key\n            value\n        }\n      }\n    }"
+        },
+        getTreeLite: {
+            queryName: 'getTreeOfItems',
+            queryBody: "\n      {\n        getTreeOfItems{\n          label\n          id\n          document_type\n          document_classification\n          branches {\n            label\n            id\n            document_type\n            document_classification\n            branches {\n              label\n              id\n              document_type\n              document_classification\n              branches {\n                label\n                id\n                document_type\n                document_classification\n                branches {\n                  label\n                  id\n                  document_type\n                  document_classification\n                  branches {\n                    label\n                    id\n                    document_type\n                    document_classification\n                    branches {\n                      label\n                      id\n                      document_type\n                      document_classification\n                      branches {\n                        label\n                        id\n                        document_type\n                        document_classification\n                        branches {\n                          label\n                          id\n                          document_type\n                          document_classification\n                        }\n                      }\n                    }\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n      ",
         },
         getTree: {
             queryName: 'getTreeOfItems',
@@ -10095,6 +10106,14 @@
             if (formConfig.resetButton) {
                 formConfig.resetButton.label = core$1._t(formConfig.resetButton.label);
             }
+            // groups
+            formConfig.groups.forEach(function (group) {
+                var _a;
+                if ((_a = group.options) === null || _a === void 0 ? void 0 : _a.label) {
+                    group.options.label = core$1._t(group.options.label);
+                }
+            });
+            // sections
             formConfig.sections.forEach(function (section) {
                 if (section.title) {
                     section.title = core$1._t(section.title);
