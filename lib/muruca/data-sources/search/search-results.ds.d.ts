@@ -7,13 +7,16 @@ declare type MrSearchResponse = {
     sort: string;
     total_count: number;
 };
+declare type HighlightItem = [string, [string]] | {
+    link?: string;
+    text?: string;
+    label?: string;
+};
 interface MrSearchResult extends ItemPreviewData {
     /** relative path */
     link: string;
     /** items that matched the search input */
-    highlights?: {
-        [x: string]: [string];
-    };
+    highlights?: HighlightItem[];
     /** unique id for the search result entry */
     id: number;
 }
@@ -29,9 +32,7 @@ export declare class MrSearchResultsDS extends DataSource {
         /** relative path */
         link: string;
         /** items that matched the search input */
-        highlights?: {
-            [x: string]: [string];
-        };
+        highlights?: HighlightItem[];
         /** unique id for the search result entry */
         id: number;
         image?: string;

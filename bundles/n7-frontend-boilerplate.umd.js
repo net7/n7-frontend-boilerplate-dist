@@ -3761,7 +3761,11 @@
                     var markers = leaflet.markerClusterGroup({
                         showCoverageOnHover: false,
                     });
-                    data.forEach(function (_a) {
+                    data
+                        // skip broken markers
+                        .filter(function (d) { return (d.lat && d.lon); })
+                        // draw markers on the map
+                        .forEach(function (_a) {
                         var lat = _a.lat, lon = _a.lon, item = _a.item;
                         var label = item.label;
                         var marker$1 = leaflet.marker([lat, lon], { icon: MARKER_ICON })
@@ -10291,7 +10295,7 @@
                     }];
             }
             return {
-                header: {
+                header: header ? {
                     title: {
                         main: {
                             text: header.title,
@@ -10304,7 +10308,7 @@
                     actions: {
                         buttons: header.button
                     }
-                },
+                } : null,
                 items: items.map(function (item) {
                     var anchor = null;
                     if (item.text) {
@@ -10862,6 +10866,41 @@
         return MrYearHeaderDS;
     }(core$1.DataSource));
 
+    var MrGalleryDS = /** @class */ (function (_super) {
+        __extends(MrGalleryDS, _super);
+        function MrGalleryDS() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        MrGalleryDS.prototype.transform = function (data) {
+            if (!data) {
+                return null;
+            }
+            return {
+                selected: null,
+                items: data.map(function (_a) {
+                    var id = _a.id, title = _a.title, thumbnail = _a.thumbnail, image = _a.image;
+                    return ({
+                        id: id,
+                        title: title,
+                        thumbSrc: thumbnail,
+                        fullSrc: image,
+                        payload: id
+                    });
+                })
+            };
+        };
+        MrGalleryDS.prototype.setSelected = function (itemId) {
+            this.output.selected = this.output.items.find(function (_a) {
+                var id = _a.id;
+                return id === itemId;
+            });
+        };
+        MrGalleryDS.prototype.removeSelected = function () {
+            this.output.selected = null;
+        };
+        return MrGalleryDS;
+    }(core$1.DataSource));
+
     var MrSearchPageTitleDS = /** @class */ (function (_super) {
         __extends(MrSearchPageTitleDS, _super);
         function MrSearchPageTitleDS() {
@@ -10979,21 +11018,32 @@
                         metadata.push({ items: items });
                     });
                 }
-                // add the highlights to the item's metadata
+                /*
+                  Add the highlights to the item's metadata with a custom group
+                */
                 if (item.highlights) {
                     var highlightGroup_1 = {
+                        title: core$1._t('advancedsearch#highlights_title'),
                         items: [],
                         classes: 'n7-item-preview__highlights'
                     };
-                    Object.entries(item.highlights).forEach(function (_a) {
-                        var _b = __read(_a, 2), label = _b[0], value = _b[1];
-                        value.forEach(function (_, i) {
+                    item.highlights.forEach(function (highlight) {
+                        var _a, _b;
+                        // if the item is an array interpret it as [label, [value]]
+                        if (Array.isArray(highlight)) {
                             highlightGroup_1.items.push({
-                                // add a label only to the first entry
-                                label: i === 0 ? core$1._t(label) : undefined,
-                                value: core$1._t(value[i]),
+                                label: core$1._t(highlight[0]),
+                                value: core$1._t(highlight[1][0])
                             });
-                        });
+                            // if it's an object then it should have a custom hyperlink
+                        }
+                        else {
+                            highlightGroup_1.items.push({
+                                label: highlight.label ? core$1._t(highlight.label) : undefined,
+                                value: (_a = highlight.text) !== null && _a !== void 0 ? _a : '',
+                                href: (_b = "" + item.link + highlight.link) !== null && _b !== void 0 ? _b : undefined,
+                            });
+                        }
                     });
                     metadata.push(highlightGroup_1);
                 }
@@ -11168,6 +11218,7 @@
         MrTextViewerDS: MrTextViewerDS,
         MrTimelineDS: MrTimelineDS,
         MrYearHeaderDS: MrYearHeaderDS,
+        MrGalleryDS: MrGalleryDS,
         MrSearchPageTitleDS: MrSearchPageTitleDS,
         MrSearchResultsTitleDS: MrSearchResultsTitleDS,
         MrSearchResultsDS: MrSearchResultsDS,
@@ -11260,6 +11311,55 @@
             });
         };
         return MrYearHeaderEH;
+    }(core$1.EventHandler));
+
+    var MrGalleryEH = /** @class */ (function (_super) {
+        __extends(MrGalleryEH, _super);
+        function MrGalleryEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        MrGalleryEH.prototype.listen = function () {
+            var _this = this;
+            this.innerEvents$.subscribe(function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case _this.dataSource.id + ".click":
+                        _this.dataSource.setSelected(payload);
+                        break;
+                    case _this.dataSource.id + ".close":
+                        _this.dataSource.removeSelected();
+                        break;
+                    default:
+                        break;
+                }
+            });
+        };
+        return MrGalleryEH;
+    }(core$1.EventHandler));
+
+    var MrCollectionEH = /** @class */ (function (_super) {
+        __extends(MrCollectionEH, _super);
+        function MrCollectionEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        MrCollectionEH.prototype.listen = function () {
+            var _this = this;
+            this.innerEvents$.subscribe(function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case _this.dataSource.id + ".click": {
+                        var action = payload.action;
+                        if (action === 'resource-modal') {
+                            _this.emitOuter('openresourcemodal', payload);
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            });
+        };
+        return MrCollectionEH;
     }(core$1.EventHandler));
 
     var MrSearchTagsEH = /** @class */ (function (_super) {
@@ -11409,6 +11509,8 @@
         MrNavEH: MrNavEH,
         MrTimelineEH: MrTimelineEH,
         MrYearHeaderEH: MrYearHeaderEH,
+        MrGalleryEH: MrGalleryEH,
+        MrCollectionEH: MrCollectionEH,
         MrSearchTagsEH: MrSearchTagsEH,
         MrSearchResultsTitleEH: MrSearchResultsTitleEH,
         MrSearchPageTitleEH: MrSearchPageTitleEH,
@@ -11742,7 +11844,7 @@
         MrAdvancedResultsLayoutComponent = __decorate([
             core.Component({
                 selector: 'mr-advanced-results-layout',
-                template: "<div class=\"mr-advanced-results mr-layout\"\r\n     *ngIf=\"lb.dataSource\">\r\n    <section class=\"mr-layout__maxwidth mr-side-margin\">\r\n\r\n        <div class=\"mr-advanced-results__title\">\r\n            <n7-inner-title\r\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['mr-search-page-title'].emit\">\r\n            </n7-inner-title>\r\n        </div>\r\n        \r\n        <div class=\"mr-advanced-results__results-content\">\r\n            <div class=\"scroll-ref\">&nbsp;</div>\r\n            <div class=\"mr-advanced-results__results-wrapper\">\r\n                \r\n                <div class=\"mr-advanced-results__results-info\">\r\n                    <n7-inner-title\r\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\r\n                    </n7-inner-title>\r\n                </div>\r\n                \r\n                <div *ngIf=\"lb.dataSource.pageConfig['filters']\" class=\"mr-active-filters\">\r\n                    <span *ngIf=\"lb.dataSource.pageConfig['filters'].title\" \r\n                    class=\"mr-active-filters__label\">{{ lb.dataSource.pageConfig['filters'].title }}</span>\r\n                    <div class=\"mr-active-filters__tags-wrapper\">\r\n                        <n7-tag *ngFor=\"let tag of (lb.widgets['mr-advanced-search-tags'].ds.out$ | async)\"\r\n                            [data]=\"tag\">\r\n                        </n7-tag>\r\n                    </div>\r\n                </div>\r\n\r\n                <main class=\"mr-advanced-results__results\">\r\n                    \r\n                    <!-- SEARCH RESULTS -->\r\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\r\n                        \r\n                        <!-- loading -->\r\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n                            <div class=\"mr-advanced-results__results-loading n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\r\n                                    blocks: [\r\n                                        { classes: 'search-result-placeholder-title' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' }\r\n                                    ]\r\n                                }\"></n7-content-placeholder>\r\n                            </div>\r\n                        </ng-container>\r\n                        \r\n                        <!-- success: items > 0 -->\r\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n                            <div class=\"n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\r\n                                [data]=\"item\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- empty: items === 0 -->\r\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\r\n                            <div *ngIf=\"lb.dataSource.pageConfig?.fallback?.text\" class=\"mr-advanced-results__results-fallback\">\r\n                                <p class=\"mr-advanced-results__feedback-text\">\r\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\r\n                                </p>\r\n                                <!-- <div class=\"mr-advanced-results__buttons\">\r\n                                    <button class=\"n7-btn n7-btn-xl mr-advanced-results__results-fallback-button\"\r\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                        {{ lb.dataSource.pageConfig.fallback.button }}\r\n                                    </button>\r\n                                </div> -->\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- error: request problem -->\r\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n                            <p *ngIf=\"lb.dataSource.pageConfig?.ko?.text\" class=\"mr-advanced-results__feedback-text\">\r\n                                {{ lb.dataSource.pageConfig.ko.text }}\r\n                            </p>\r\n                            <!-- <div class=\"mr-advanced-results__buttons\">\r\n                                <button class=\"n7-btn n7-btn-xl mr-advanced-results__results-ko-button\"\r\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                    {{ lb.dataSource.pageConfig.ko.button }}\r\n                                </button>\r\n                            </div> -->\r\n                        </ng-container>\r\n                        \r\n                    </ng-container>\r\n                </main>               \r\n                \r\n                <n7-smart-pagination\r\n                    *ngIf=\"(layoutState.get$('results') | async) === 'SUCCESS'\"\r\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\r\n                </n7-smart-pagination>\r\n\r\n            </div>\r\n        </div>\r\n    </section>\r\n</div>"
+                template: "<div class=\"mr-advanced-results mr-layout\"\r\n     *ngIf=\"lb.dataSource\">\r\n    <section class=\"mr-layout__maxwidth mr-side-margin\">\r\n\r\n        <div class=\"mr-advanced-results__title\">\r\n            <n7-inner-title\r\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['mr-search-page-title'].emit\">\r\n            </n7-inner-title>\r\n        </div>\r\n        \r\n        <div class=\"mr-advanced-results__results-content\">\r\n            <div class=\"scroll-ref\">&nbsp;</div>\r\n            <div class=\"mr-advanced-results__results-wrapper\">\r\n                \r\n                <div class=\"mr-advanced-results__results-info\">\r\n                    <n7-inner-title\r\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\r\n                    </n7-inner-title>\r\n                </div>\r\n                \r\n                <div *ngIf=\"lb.dataSource.pageConfig['filters']\" class=\"mr-active-filters\">\r\n                    <span *ngIf=\"lb.dataSource.pageConfig['filters'].title\" \r\n                    class=\"mr-active-filters__label\">{{ lb.dataSource.pageConfig['filters'].title }}</span>\r\n                    <div class=\"mr-active-filters__tags-wrapper\">\r\n                        <n7-tag *ngFor=\"let tag of (lb.widgets['mr-advanced-search-tags'].ds.out$ | async)\"\r\n                            [data]=\"tag\">\r\n                        </n7-tag>\r\n                    </div>\r\n                </div>\r\n\r\n                <main class=\"mr-advanced-results__results\">\r\n                    \r\n                    <!-- SEARCH RESULTS -->\r\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\r\n                        \r\n                        <!-- loading -->\r\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n                            <div class=\"mr-advanced-results__results-loading n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\r\n                                    blocks: [\r\n                                        { classes: 'search-result-placeholder-title' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' }\r\n                                    ]\r\n                                }\"></n7-content-placeholder>\r\n                            </div>\r\n                        </ng-container>\r\n                        \r\n                        <!-- success: items > 0 -->\r\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n                            <div class=\"n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <!-- Use a custom item preview with clickable metadata items -->\r\n                                <mr-advanced-result\r\n                                    *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\r\n                                    [data]=\"item\">\r\n                                </mr-advanced-result>\r\n                                <!-- ../../components/advanced-result/advanced-result.html -->\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- empty: items === 0 -->\r\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\r\n                            <div *ngIf=\"lb.dataSource.pageConfig?.fallback?.text\" class=\"mr-advanced-results__results-fallback\">\r\n                                <p class=\"mr-advanced-results__feedback-text\">\r\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\r\n                                </p>\r\n                                <!-- <div class=\"mr-advanced-results__buttons\">\r\n                                    <button class=\"n7-btn n7-btn-xl mr-advanced-results__results-fallback-button\"\r\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                        {{ lb.dataSource.pageConfig.fallback.button }}\r\n                                    </button>\r\n                                </div> -->\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- error: request problem -->\r\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n                            <p *ngIf=\"lb.dataSource.pageConfig?.ko?.text\" class=\"mr-advanced-results__feedback-text\">\r\n                                {{ lb.dataSource.pageConfig.ko.text }}\r\n                            </p>\r\n                            <!-- <div class=\"mr-advanced-results__buttons\">\r\n                                <button class=\"n7-btn n7-btn-xl mr-advanced-results__results-ko-button\"\r\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                    {{ lb.dataSource.pageConfig.ko.button }}\r\n                                </button>\r\n                            </div> -->\r\n                        </ng-container>\r\n                        \r\n                    </ng-container>\r\n                </main>               \r\n                \r\n                <n7-smart-pagination\r\n                    *ngIf=\"(layoutState.get$('results') | async) === 'SUCCESS'\"\r\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\r\n                </n7-smart-pagination>\r\n\r\n            </div>\r\n        </div>\r\n    </section>\r\n</div>\r\n"
             }),
             __metadata("design:paramtypes", [router.Router,
                 router.ActivatedRoute,
@@ -11989,31 +12091,6 @@
             // });
         };
         return MrSliderEH;
-    }(core$1.EventHandler));
-
-    var MrCollectionEH = /** @class */ (function (_super) {
-        __extends(MrCollectionEH, _super);
-        function MrCollectionEH() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        MrCollectionEH.prototype.listen = function () {
-            var _this = this;
-            this.innerEvents$.subscribe(function (_a) {
-                var type = _a.type, payload = _a.payload;
-                switch (type) {
-                    case _this.dataSource.id + ".click": {
-                        var action = payload.action;
-                        if (action === 'resource-modal') {
-                            _this.emitOuter('openresourcemodal', payload);
-                        }
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            });
-        };
-        return MrCollectionEH;
     }(core$1.EventHandler));
 
     var MrHeroEH = /** @class */ (function (_super) {
@@ -14105,6 +14182,245 @@
         return MrPostsLayoutComponent;
     }(AbstractLayout));
 
+    var MrItineraryLayoutDS = /** @class */ (function (_super) {
+        __extends(MrItineraryLayoutDS, _super);
+        function MrItineraryLayoutDS() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.errorTitle = core$1._t('global#layout_error_title');
+            _this.errorDescription = core$1._t('global#layout_error_description');
+            return _this;
+        }
+        MrItineraryLayoutDS.prototype.onInit = function (payload) {
+            this.configuration = payload.configuration;
+            this.communication = payload.communication;
+            this.mainState = payload.mainState;
+            this.configId = payload.configId;
+            this.pageConfig = this.configuration.get(this.configId);
+            // add translations
+            this.pageConfig.sections = this.pageConfig.sections.map(function (section) { return (__assign(__assign({}, section), { title: core$1._t(section.title) })); });
+        };
+        MrItineraryLayoutDS.prototype.pageRequest$ = function (id, onError) {
+            return this.communication.request$('itinerary', {
+                onError: onError,
+                method: 'GET',
+                urlParams: id
+            });
+        };
+        MrItineraryLayoutDS.prototype.handleResponse = function (response) {
+            this.updateTitle(response);
+            this.updateContent(response);
+            this.updateMetadata(response);
+            this.initSections(response);
+            this.updateHeadTitle(response);
+        };
+        MrItineraryLayoutDS.prototype.updateTitle = function (_a) {
+            var title = _a.title;
+            this.title = title;
+        };
+        MrItineraryLayoutDS.prototype.updateContent = function (_a) {
+            var content = _a.content;
+            this.content = content;
+        };
+        MrItineraryLayoutDS.prototype.updateMetadata = function (response) {
+            this.one('mr-static-metadata').update(response);
+        };
+        MrItineraryLayoutDS.prototype.initSections = function (response) {
+            var _this = this;
+            var sections = this.pageConfig.sections;
+            sections.forEach(function (_a) {
+                var id = _a.id;
+                var widgetDataSource = _this.getWidgetDataSource(id);
+                if (!widgetDataSource)
+                    return;
+                var responseSection = response.sections[id];
+                // set id
+                widgetDataSource.id = id;
+                // update data
+                if (responseSection) {
+                    _this.one(id).update(responseSection);
+                }
+            });
+        };
+        MrItineraryLayoutDS.prototype.updateHeadTitle = function (_a) {
+            var itineraryTitle = _a.title;
+            var appName = this.configuration.get('name');
+            var pageTitle = this.pageConfig.title;
+            this.mainState.update('headTitle', [appName, core$1._t(pageTitle), itineraryTitle].join(' > '));
+        };
+        return MrItineraryLayoutDS;
+    }(core$1.LayoutDataSource));
+
+    var MrItineraryLayoutEH = /** @class */ (function (_super) {
+        __extends(MrItineraryLayoutEH, _super);
+        function MrItineraryLayoutEH() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.destroy$ = new rxjs.Subject();
+            return _this;
+        }
+        MrItineraryLayoutEH.prototype.listen = function () {
+            var _this = this;
+            this.innerEvents$.subscribe(function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case 'mr-itinerary-layout.init':
+                        _this.route = payload.route;
+                        _this.router = payload.router;
+                        _this.layoutState = payload.layoutState;
+                        _this.modalService = payload.modalService;
+                        _this.dataSource.onInit(payload);
+                        _this.listenRoute();
+                        // scroll top
+                        window.scrollTo(0, 0);
+                        break;
+                    case 'mr-resource-layout.destroy':
+                        _this.destroy$.next();
+                        break;
+                    default:
+                        console.warn('unhandled inner event of type', type);
+                        break;
+                }
+            });
+            this.outerEvents$.subscribe(function (_a) {
+                var type = _a.type, payload = _a.payload;
+                if (type.indexOf('openresourcemodal') !== -1) {
+                    var id = payload.id, resourceType = payload.type;
+                    _this.modalService.open(id, resourceType);
+                }
+            });
+        };
+        MrItineraryLayoutEH.prototype.listenRoute = function () {
+            var _this = this;
+            this.route.paramMap.pipe(operators.takeUntil(this.destroy$), operators.tap(function () {
+                _this.layoutState.set('content', LayoutState.LOADING);
+            }), operators.map(function (params) { return params.get('id'); }), operators.switchMap(function (id) { return _this.dataSource.pageRequest$(id, function (err) {
+                if (err.status === 404) {
+                    // getting not found path
+                    var config = _this.router.config;
+                    var route404 = config.find(function (_a) {
+                        var data = _a.data;
+                        return (data === null || data === void 0 ? void 0 : data.id) === 'page-404';
+                    });
+                    var path404 = (route404 === null || route404 === void 0 ? void 0 : route404.path) || 'page-404';
+                    _this.router.navigate([path404]);
+                }
+                console.warn("Error loading resource layout for " + id, err.message);
+                _this.layoutState.set('content', LayoutState.ERROR);
+            }); })).subscribe(function (response) {
+                _this.layoutState.set('content', LayoutState.SUCCESS);
+                _this.dataSource.handleResponse(response);
+                // scroll top
+                window.scrollTo(0, 0);
+            });
+        };
+        return MrItineraryLayoutEH;
+    }(core$1.EventHandler));
+
+    var MrItineraryLayoutConfig = {
+        layoutId: 'mr-itinerary-layout',
+        widgets: [
+            { id: 'mr-static-metadata' }
+        ],
+        layoutDS: MrItineraryLayoutDS,
+        layoutEH: MrItineraryLayoutEH,
+        widgetsDataSources: DS$3,
+        widgetsEventHandlers: EH$3,
+        options: {
+        // TODO
+        },
+    };
+
+    var DATASOURCE_MAP$3 = {
+        collection: MrCollectionDS,
+        metadata: MrMetadataDS,
+        gallery: MrGalleryDS,
+    };
+    var EVENTHANDLER_MAP$3 = {
+        collection: MrCollectionEH,
+        gallery: MrGalleryEH,
+    };
+    var MrItineraryLayoutComponent = /** @class */ (function (_super) {
+        __extends(MrItineraryLayoutComponent, _super);
+        function MrItineraryLayoutComponent(layoutsConfiguration, activatedRoute, configuration, communication, mainState, route, router, layoutState, modalService) {
+            var _this = _super.call(this, layoutsConfiguration.get('MrItineraryLayoutConfig') || MrItineraryLayoutConfig) || this;
+            _this.activatedRoute = activatedRoute;
+            _this.configuration = configuration;
+            _this.communication = communication;
+            _this.mainState = mainState;
+            _this.route = route;
+            _this.router = router;
+            _this.layoutState = layoutState;
+            _this.modalService = modalService;
+            return _this;
+        }
+        MrItineraryLayoutComponent.prototype.initPayload = function () {
+            return {
+                configId: this.configId,
+                configuration: this.configuration,
+                communication: this.communication,
+                mainState: this.mainState,
+                layoutState: this.layoutState,
+                modalService: this.modalService,
+                options: this.config.options || {},
+                route: this.route,
+                router: this.router
+            };
+        };
+        MrItineraryLayoutComponent.prototype.ngOnInit = function () {
+            var _this = this;
+            this.activatedRoute.data.subscribe(function (data) {
+                _this.layoutState.add('content');
+                _this.configId = data.configId;
+                _this.loadWidgets();
+                _this.onInit();
+            });
+        };
+        MrItineraryLayoutComponent.prototype.ngOnDestroy = function () {
+            this.onDestroy();
+        };
+        MrItineraryLayoutComponent.prototype.loadWidgets = function () {
+            var _this = this;
+            var sections = this.configuration.get(this.configId).sections;
+            if (sections) {
+                sections.forEach(function (_a) {
+                    var id = _a.id, type = _a.type, options = _a.options;
+                    _this.widgets.push({
+                        id: id,
+                        options: options,
+                        dataSource: DATASOURCE_MAP$3[type],
+                        eventHandler: EVENTHANDLER_MAP$3[type]
+                    });
+                });
+            }
+        };
+        MrItineraryLayoutComponent.ctorParameters = function () { return [
+            { type: LayoutsConfigurationService },
+            { type: router.ActivatedRoute },
+            { type: ConfigurationService },
+            { type: CommunicationService },
+            { type: MainStateService },
+            { type: router.ActivatedRoute },
+            { type: router.Router },
+            { type: MrLayoutStateService },
+            { type: MrResourceModalService }
+        ]; };
+        MrItineraryLayoutComponent = __decorate([
+            core.Component({
+                selector: 'mr-itinerary-layout',
+                template: "<div class=\"mr-itinerary mr-layout\" \r\n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\"\r\n     [ngClass]=\"{\r\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\r\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\r\n      }\">\r\n    <!-- ITINERARY LAYOUT CONTENT -->\r\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\r\n        <!-- loading -->\r\n        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n            <div class=\"mr-layout__loader\">\r\n                <n7-loader></n7-loader>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- error -->\r\n        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n            <div class=\"mr-layout__error\">\r\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\r\n                <p>{{ lb.dataSource.errorDescription }}</p>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- success -->\r\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n            <div class=\"mr-static__top\">\r\n                <h1 class=\"mr-static__title mr-generated-title-WP\">{{lb.dataSource.title}}</h1>\r\n                <div class=\"mr-static__metadata\">\r\n                    <n7-metadata-viewer \r\n                    [data]=\"lb.widgets['mr-static-metadata'].ds.out$ | async\">\r\n                    </n7-metadata-viewer>\r\n                </div>\r\n            </div>\r\n\r\n            <div class=\"mr-resource__content mr-side-margin\">\r\n                <!-- Page content html -->\r\n                <div class=\"mr-wp-content\" [innerHTML]=\"lb.dataSource.content | keepHtml\"></div>\r\n    \r\n                <!-- Pass the list of blocks to render to the block template -->\r\n                <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: lb.dataSource.pageConfig.sections }\"></ng-container>\r\n            </div>\r\n        </ng-container>\r\n\r\n    </ng-container>\r\n</div>\r\n\r\n<ng-template #blocks let-list>\r\n    <ng-container *ngFor=\"let section of list\">\r\n        <section *ngIf=\"lb.widgets[section.id].ds.out$ | async\"\r\n        class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\r\n            <ng-container [ngSwitch]=\"section.type\">\r\n    \r\n                <!-- METADATA VIEWER -->\r\n                <ng-container *ngSwitchCase=\"'metadata'\">\r\n                    \r\n                    <div class=\"mr-content-block mr-content-block-metadata\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <mr-read-more [data]=\"section.readmore\">\r\n                                <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\r\n                                    [emit]=\"lb.widgets[section.id].emit\">\r\n                                </n7-metadata-viewer>\r\n                            </mr-read-more>\r\n                        </div>\r\n                    </div>\r\n\r\n                </ng-container>\r\n    \r\n                <!-- COLLECTION -->\r\n                <ng-container *ngSwitchCase=\"'collection'\">\r\n                    <ng-container *ngIf=\"lb.widgets[section.id].ds.out$ | async as collection$\">\r\n                        \r\n                        <div *ngIf=\"collection$.items?.length > 0\" class=\"mr-content-block mr-content-block-collection\">\r\n                            <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                                {{ section.title }}\r\n                            </h3>\r\n                            <div class=\"mr-content-block__content {{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\r\n                                <n7-item-preview *ngFor=\"let item of collection$?.items\"\r\n                                    [data]=\"item\" [emit]=\"lb.widgets[section.id].emit\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n\r\n                    </ng-container>\r\n                </ng-container>\r\n    \r\n                <!-- GALLERY -->\r\n                <ng-container *ngSwitchCase=\"'gallery'\">\r\n                    <div class=\"mr-content-block mr-content-block-gallery\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <mr-gallery [grid]=\"section.grid\" [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">        \r\n                            </mr-gallery>\r\n                        </div>\r\n                    </div>\r\n                </ng-container>\r\n\r\n            </ng-container>\r\n        </section>\r\n    </ng-container>\r\n</ng-template>\r\n"
+            }),
+            __metadata("design:paramtypes", [LayoutsConfigurationService,
+                router.ActivatedRoute,
+                ConfigurationService,
+                CommunicationService,
+                MainStateService,
+                router.ActivatedRoute,
+                router.Router,
+                MrLayoutStateService,
+                MrResourceModalService])
+        ], MrItineraryLayoutComponent);
+        return MrItineraryLayoutComponent;
+    }(AbstractLayout));
+
     //---------------------------
     var HEIGHT_MARGIN = 50;
     var ReadMoreComponent = /** @class */ (function () {
@@ -14165,6 +14481,31 @@
             })
         ], ReadMoreComponent);
         return ReadMoreComponent;
+    }());
+
+    var MrAdvancedResultComponent = /** @class */ (function () {
+        function MrAdvancedResultComponent() {
+        }
+        MrAdvancedResultComponent.prototype.onClick = function (payload) {
+            if (!this.emit)
+                return;
+            this.emit('click', payload);
+        };
+        __decorate([
+            core.Input(),
+            __metadata("design:type", Object)
+        ], MrAdvancedResultComponent.prototype, "data", void 0);
+        __decorate([
+            core.Input(),
+            __metadata("design:type", Object)
+        ], MrAdvancedResultComponent.prototype, "emit", void 0);
+        MrAdvancedResultComponent = __decorate([
+            core.Component({
+                selector: 'mr-advanced-result',
+                template: "<div *ngIf=\"data\"\r\n     class=\"n7-item-preview {{data.classes || ''}}\"\r\n     [ngClass]=\"{ 'has-image' : !!data.image, 'has-color' : !!data.color }\">\r\n    <n7-anchor-wrapper [data]=\"data.anchor\"\r\n                       (clicked)=\"onClick($event)\"\r\n                       [classes]=\"'n7-item-preview__inner'\">\r\n        <!-- Image, color -->\r\n        <div class=\"n7-item-preview__image n7-item-preview__color\"\r\n             *ngIf=\"data.image || data.color\"\r\n             [style.background-image]=\"data.image ? 'url(' + data.image + ')' : undefined\"\r\n             [style.background-color]=\"data.color\">\r\n        </div>\r\n        <div class=\"n7-item-preview__content\">\r\n            <!-- Title and text -->\r\n            <div class=\"n7-item-preview__title-text\">\r\n                <h1 class=\"n7-item-preview__title\"\r\n                    [innerHTML]=\"data.title\"></h1>\r\n                <p class=\"n7-item-preview__text\"\r\n                   *ngIf=\"data.text\"\r\n                   [innerHTML]=\"data.text\"></p>\r\n            </div>\r\n            <!-- Metadata -->\r\n            <div class=\"n7-item-preview__metadata\"\r\n                 *ngIf=\"data.metadata\">\r\n                <div class=\"n7-item-preview__metadata-group {{ meta.classes || '' }}\"\r\n                     *ngFor=\"let meta of data.metadata\">\r\n                    <h3 class=\"n7-item-preview__metadata-group-title\"\r\n                        *ngIf=\"meta.title\"\r\n                        [innerHTML]=\"meta.title\"></h3>\r\n                    <div class=\"n7-item-preview__metadata-item {{ item.classes || '' }}\"\r\n                         *ngFor=\"let item of meta.items\">\r\n                        <span class=\"n7-item-preview__metadata-item-icon {{item.icon}}\"\r\n                              *ngIf=\"item.icon\">\r\n                        </span>\r\n                        <span class=\"n7-item-preview__metadata-item-label\"\r\n                              *ngIf=\"item.label\"\r\n                              [innerHTML]=\"item.label\">\r\n                        </span>\r\n                        <a *ngIf=\"item.href\"\r\n                           [href]=\"item.href\">\r\n                            <span class=\"n7-item-preview__metadata-item-value\"\r\n                                  *ngIf=\"item.value\"\r\n                                  [innerHTML]=\"item.value\">\r\n                            </span>\r\n                        </a>\r\n                        <span class=\"n7-item-preview__metadata-item-value\"\r\n                              *ngIf=\"item.value && !item.href\"\r\n                              [innerHTML]=\"item.value\">\r\n                        </span>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </n7-anchor-wrapper>\r\n</div>\r\n"
+            })
+        ], MrAdvancedResultComponent);
+        return MrAdvancedResultComponent;
     }());
 
     var MrFormComponent = /** @class */ (function () {
@@ -14270,7 +14611,7 @@
         return MrSearchPageDescriptionComponent;
     }());
 
-    var DATASOURCE_MAP$3 = {
+    var DATASOURCE_MAP$4 = {
         collection: MrCollectionDS,
         metadata: MrMetadataDS,
         preview: MrItemPreviewDS,
@@ -14324,7 +14665,7 @@
                     var id = _a.id, type = _a.type, options = _a.options;
                     var data = response.sections[id];
                     _this.widgets[id] = {
-                        ds: new DATASOURCE_MAP$3[type]()
+                        ds: new DATASOURCE_MAP$4[type]()
                     };
                     // update options
                     if (options) {
@@ -14352,6 +14693,40 @@
         return MrResourceModalComponent;
     }());
 
+    var MrGalleryComponent = /** @class */ (function () {
+        function MrGalleryComponent() {
+        }
+        MrGalleryComponent.prototype.onClick = function (payload) {
+            if (this.emit) {
+                this.emit('click', payload);
+            }
+        };
+        MrGalleryComponent.prototype.onClose = function () {
+            if (this.emit) {
+                this.emit('close');
+            }
+        };
+        __decorate([
+            core.Input(),
+            __metadata("design:type", Object)
+        ], MrGalleryComponent.prototype, "data", void 0);
+        __decorate([
+            core.Input(),
+            __metadata("design:type", Function)
+        ], MrGalleryComponent.prototype, "emit", void 0);
+        __decorate([
+            core.Input(),
+            __metadata("design:type", Number)
+        ], MrGalleryComponent.prototype, "grid", void 0);
+        MrGalleryComponent = __decorate([
+            core.Component({
+                selector: 'mr-gallery',
+                template: "<div *ngIf=\"data\" class=\"mr-gallery mr-wp-content\">\r\n    <div class=\"mr-gallery__wrapper wp-block-gallery has-zoom {{ grid ? 'columns-' + grid : '' }}\">\r\n        <ul class=\"mr-gallery__items blocks-gallery-grid\">\r\n            <li *ngFor=\"let item of data.items\" class=\"mr-gallery__item blocks-gallery-item\">\r\n                <figure>\r\n                    <a (click)=\"onClick(item.payload)\" class=\"mr-gallery__link\">\r\n                        <img [src]=\"item.thumbSrc\" [alt]=\"item.title\" class=\"mr-gallery__image\">\r\n                    </a>\r\n                </figure>\r\n            </li>\r\n        </ul>\r\n    </div>\r\n    <div *ngIf=\"data.selected\" class=\"mr-modal mr-gallery-modal\" (click)=\"onClose()\">\r\n        <div class=\"mr-modal__overlay\">\r\n            <div class=\"mr-modal__window mr-gallery-modal__window\">\r\n                <div class=\"mr-modal__header mr-gallery-modal__header\">\r\n                    <div class=\"mr-modal__close\">\r\n                        <a class=\"mr-modal__close-link\" (click)=\"onClose()\"><span class=\"n7-icon-close\"></span></a>\r\n                    </div>\r\n                </div>\r\n                <div class=\"mr-modal__content mr-gallery-modal__content\">\r\n                    <div class=\"mr-gallery__zoom-image-wrapper\">\r\n                        <img [src]=\"data.selected.fullSrc\" [alt]=\"data.selected.title\" class=\"mr-gallery__zoom-image\">\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>"
+            })
+        ], MrGalleryComponent);
+        return MrGalleryComponent;
+    }());
+
     var COMPONENTS$3 = [
         // Layout components
         MrGlossaryLayoutComponent,
@@ -14364,12 +14739,15 @@
         MrAdvancedResultsLayoutComponent,
         MrTimelineLayoutComponent,
         MrPostsLayoutComponent,
+        MrItineraryLayoutComponent,
         // Custom components
         ReadMoreComponent,
         MrFormComponent,
         MrFormWrapperAccordionComponent,
         MrSearchPageDescriptionComponent,
-        MrResourceModalComponent
+        MrResourceModalComponent,
+        MrGalleryComponent,
+        MrAdvancedResultComponent,
     ];
     var N7BoilerplateMurucaModule = /** @class */ (function () {
         function N7BoilerplateMurucaModule() {
@@ -15248,6 +15626,7 @@
     exports.MainLayoutDS = MainLayoutDS;
     exports.MainLayoutEH = MainLayoutEH;
     exports.MainStateService = MainStateService;
+    exports.MrAdvancedResultComponent = MrAdvancedResultComponent;
     exports.MrAdvancedResultsLayoutComponent = MrAdvancedResultsLayoutComponent;
     exports.MrAdvancedResultsLayoutConfig = MrAdvancedResultsLayoutConfig;
     exports.MrAdvancedResultsLayoutDS = MrAdvancedResultsLayoutDS;
@@ -15259,6 +15638,7 @@
     exports.MrAdvancedSearchTagsDS = MrAdvancedSearchTagsDS;
     exports.MrBreadcrumbsDS = MrBreadcrumbsDS;
     exports.MrCollectionDS = MrCollectionDS;
+    exports.MrCollectionEH = MrCollectionEH;
     exports.MrContentDS = MrContentDS;
     exports.MrDummyEH = MrDummyEH;
     exports.MrFiltersDS = MrFiltersDS;
@@ -15268,6 +15648,9 @@
     exports.MrFormWrapperAccordionComponent = MrFormWrapperAccordionComponent;
     exports.MrFormWrapperAccordionDS = MrFormWrapperAccordionDS;
     exports.MrFormWrapperAccordionEH = MrFormWrapperAccordionEH;
+    exports.MrGalleryComponent = MrGalleryComponent;
+    exports.MrGalleryDS = MrGalleryDS;
+    exports.MrGalleryEH = MrGalleryEH;
     exports.MrGlossaryLayoutComponent = MrGlossaryLayoutComponent;
     exports.MrGlossaryLayoutConfig = MrGlossaryLayoutConfig;
     exports.MrGlossaryLayoutDS = MrGlossaryLayoutDS;
@@ -15282,6 +15665,10 @@
     exports.MrInnerTitleDS = MrInnerTitleDS;
     exports.MrItemPreviewDS = MrItemPreviewDS;
     exports.MrItemPreviewsDS = MrItemPreviewsDS;
+    exports.MrItineraryLayoutComponent = MrItineraryLayoutComponent;
+    exports.MrItineraryLayoutConfig = MrItineraryLayoutConfig;
+    exports.MrItineraryLayoutDS = MrItineraryLayoutDS;
+    exports.MrItineraryLayoutEH = MrItineraryLayoutEH;
     exports.MrMapDS = MrMapDS;
     exports.MrMenuService = MrMenuService;
     exports.MrMetadataDS = MrMetadataDS;
@@ -15380,13 +15767,16 @@
     exports.ɵbn = MrAdvancedResultsLayoutComponent;
     exports.ɵbo = MrTimelineLayoutComponent;
     exports.ɵbp = MrPostsLayoutComponent;
-    exports.ɵbq = ReadMoreComponent;
-    exports.ɵbr = MrFormComponent;
-    exports.ɵbs = MrFormWrapperAccordionComponent;
-    exports.ɵbt = MrSearchPageDescriptionComponent;
-    exports.ɵbu = MrResourceModalComponent;
-    exports.ɵbv = SbExampleLayoutComponent;
-    exports.ɵbw = SbImageViewerLayoutComponent;
+    exports.ɵbq = MrItineraryLayoutComponent;
+    exports.ɵbr = ReadMoreComponent;
+    exports.ɵbs = MrFormComponent;
+    exports.ɵbt = MrFormWrapperAccordionComponent;
+    exports.ɵbu = MrSearchPageDescriptionComponent;
+    exports.ɵbv = MrResourceModalComponent;
+    exports.ɵbw = MrGalleryComponent;
+    exports.ɵbx = MrAdvancedResultComponent;
+    exports.ɵby = SbExampleLayoutComponent;
+    exports.ɵbz = SbImageViewerLayoutComponent;
     exports.ɵc = ConfigurationService;
     exports.ɵd = LayoutsConfigurationService;
     exports.ɵe = MainStateService;
