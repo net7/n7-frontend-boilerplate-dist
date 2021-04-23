@@ -8,18 +8,47 @@ export declare class MrTimelineLayoutDS extends LayoutDataSource {
     private communication;
     private mainState;
     private layoutState;
-    private route;
+    private configId;
+    private pageConfig;
     private location;
-    private loadedResourceDetails;
+    loading: {
+        resourceDetails: boolean;
+        timeline: boolean;
+    };
     defaultDescription: string;
     eventHeader: string;
     eventDescription: string;
     timelineData: TimelineData;
     hasMap: boolean;
+    route: any;
+    mapHeader: string;
     timelineListener$: Subject<Timeline>;
-    bibliographyMock: ItemPreviewData[];
-    connectedMapsMock: ItemPreviewData[];
-    images: string[];
+    bibliographyData: {
+        header: {
+            title: string;
+        };
+        items: {
+            payload?: {
+                action: string;
+                id: number;
+                type: string;
+            };
+            text?: string;
+        }[];
+    };
+    collectionWorksData: {
+        header: {
+            title: string;
+        };
+        items: ItemPreviewData[];
+    };
+    collectionWitnessData: {
+        header: {
+            title: string;
+        };
+        items: ItemPreviewData[];
+    };
+    collectionGalleryData: any;
     eventTitle: string;
     onInit(payload: any): void;
     loadDefaults(navigate: boolean): void;

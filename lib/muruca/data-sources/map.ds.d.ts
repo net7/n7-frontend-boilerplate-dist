@@ -18,9 +18,16 @@ declare type TimelineResponse = {
 }[];
 export declare class MrMapDS extends DataSource {
     id: string;
+    /** Instance of the leaflet map */
     mapInstance: any;
+    /** Instance of the marker layerGroup */
     markerLayer: any;
     protected transform(data: TimelineResponse): MapData;
     private fitMapToBounds;
+    /**
+     * Builds markers with a custom icon and adds them to the map.
+     * @param markers an array of markers
+     */
+    private buildMarkers;
 }
 export {};

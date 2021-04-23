@@ -10258,6 +10258,18 @@ class MrItemPreviewsDS extends DataSource {
     }
 }
 
+const MARKER_ICON$1 = L.icon({
+    iconUrl: '/assets/pin.png',
+    iconSize: [30, 45.5],
+    popupAnchor: [0, -25],
+    className: 'marker-icon'
+});
+const MARKER_ICON_SELECTED$1 = L.icon({
+    iconUrl: '/assets/pin-selected.png',
+    iconSize: [30, 45.5],
+    popupAnchor: [0, -25],
+    className: 'marker-icon-selected'
+});
 class MrMapDS extends DataSource {
     // eslint-disable-next-line consistent-return
     transform(data) {
@@ -10278,30 +10290,24 @@ class MrMapDS extends DataSource {
                 .reduce((acc, val) => acc.concat(val), []);
         }
         const initialView = {
+            // center of europe (only for initial load)
             center: [54.5260, 15.2551],
             zoom: 5,
         };
+        // if the map and the markers already exist
+        // update the already existing layers.
         if (this.mapInstance && this.markerLayer) {
-            this.markerLayer.clearLayers();
-            this.mapInstance.removeLayer(this.markerLayer);
-            this.markerLayer = L.markerClusterGroup();
-            if (markers) {
-                markers.forEach((mrk) => {
-                    L.marker(mrk.coords)
-                        .addTo(this.markerLayer)
-                        .bindPopup(`${mrk.template}`);
-                });
-                this.mapInstance.addLayer(this.markerLayer);
-                this.fitMapToBounds(markers.map((m) => m.coords));
-            }
+            this.buildMarkers(markers);
+            this.fitMapToBounds(markers.map((m) => m.coords));
         }
         return {
+            // only called once, on component init!
             _setInstance: (instance) => {
                 this.mapInstance = instance;
+                // center the map on the markers
                 this.fitMapToBounds(markers.map((m) => m.coords));
-            },
-            _setMarkerLayer: (m) => {
-                this.markerLayer = m;
+                // load custom markers
+                this.buildMarkers(markers);
             },
             containerId: 'map-canvas',
             libOptions: {
@@ -10312,7 +10318,6 @@ class MrMapDS extends DataSource {
                     options: {}
                 }],
             initialView,
-            markers: this.markerLayer ? undefined : markers
         };
     }
     fitMapToBounds(bounds) {
@@ -10325,6 +10330,38 @@ class MrMapDS extends DataSource {
         else {
             console.warn('map instance is missing');
         }
+    }
+    /**
+     * Builds markers with a custom icon and adds them to the map.
+     * @param markers an array of markers
+     */
+    buildMarkers(markers) {
+        if (!markers)
+            return;
+        // remove all existing markers
+        if (this.markerLayer) {
+            this.markerLayer.clearLayers();
+            this.mapInstance.removeLayer(this.markerLayer);
+        }
+        const markerGroup = L.markerClusterGroup();
+        markers.forEach(({ coords, template }) => {
+            // create custom icon marker
+            const newMarker = L.marker(coords, { icon: MARKER_ICON$1 })
+                // add the marker to the group
+                .addTo(markerGroup)
+                // add the on-click tooltip
+                .bindPopup(template);
+            newMarker.getPopup().on('remove', ({ target }) => {
+                target._source.setIcon(MARKER_ICON$1);
+            });
+            newMarker.getPopup().on('add', ({ target }) => {
+                target._source.setIcon(MARKER_ICON_SELECTED$1);
+            });
+        });
+        // add the markers to the map instance
+        this.mapInstance.addLayer(markerGroup);
+        // update the marker layer instance
+        this.markerLayer = markerGroup;
     }
 }
 
@@ -12880,44 +12917,30 @@ MrStaticLayoutComponent = __decorate([
 class MrTimelineLayoutDS extends LayoutDataSource {
     constructor() {
         super(...arguments);
-        this.loadedResourceDetails = false;
+        this.loading = {
+            resourceDetails: true,
+            timeline: true,
+        };
         this.defaultDescription = '';
         this.eventDescription = '';
         this.hasMap = false;
+        this.mapHeader = _t('timeline#mapheader');
         this.timelineListener$ = new Subject();
-        this.bibliographyMock = [
-            { title: 'M.J.L. Hocker, Bibliotheca Heilsbronnensis sive Catalogus librorum omnium..., Nkirnberg 1731, 56 n. 68 ' },
-            { title: 'J.C. Irmischer, Handschriften-Katalog der Kgl. Universitàtsbibliothek Erlangen, Frankfurt a. M.-Erlangen 1852, 191-192 n. 686 ' },
-            { title: 'H. Flischer, Die lateinischen Papierhandschriften der Universitàtsbibliothek Erlangen, Erlangen 1936, 371 ' },
-            { title: 'A. Sottili, I codici del Petrarca nella Germania Occidentale, in «IMU», X (1967), pp. 486-487 ' },
-            { title: 'F. Petrarca, Senile V 2, a cura di M. Berté, Firenze 1998, pp. 38-39 ' },
-            { title: 'H. Fischer, Die lateinischen Papierhandschriften der Universitàtsbibliothek Erlangen, Erlangen 1936, 371 ' },
-        ];
-        this.connectedMapsMock = [
-            { title: 'Kunyu Wanguo Quantu', text: 'Complete Map of all mountains and seas', image: '/assets/mocks/paper.png' }
-        ];
-        this.images = [
-            'https://i.imgur.com/WM3EG9d.png',
-            'https://i.imgur.com/ZDQmlnX.png',
-            'https://i.imgur.com/HhKxoZb.png',
-            'https://i.imgur.com/c3tonAj.png',
-            'https://i.imgur.com/Ef7izGP.png',
-            'https://i.imgur.com/8Xpzoig.png',
-            'https://i.imgur.com/yhF0LCt.png',
-            'https://i.imgur.com/bMfHfEh.png',
-        ];
     }
     onInit(payload) {
         this.configuration = payload.configuration;
         this.communication = payload.communication;
         this.route = payload.route;
         this.location = payload.location;
+        this.configId = payload.configId;
+        this.pageConfig = this.configuration.get(this.configId) || {};
         // update the timeline
         this.communication.request$('timeline', {
             method: 'GET',
             onError: (e) => console.error(e)
         }).subscribe((d) => {
             this.timelineData = d;
+            this.loading.timeline = false;
             this.one('mr-timeline').update(d);
         });
         this.getWidgetDataSource('mr-timeline').timelineLoaded$
@@ -12937,10 +12960,15 @@ class MrTimelineLayoutDS extends LayoutDataSource {
     loadDefaults(navigate) {
         this.eventDescription = this.defaultDescription;
         this.eventHeader = '';
+        this.hasMap = false;
+        this.bibliographyData = undefined;
+        this.collectionWitnessData = undefined;
+        this.collectionWorksData = undefined;
+        this.collectionGalleryData = undefined;
         if (navigate)
             this.location.go('/timeline/');
         this.one('mr-year-header').update({
-            title: { main: { text: 'La vita di Petrarca' } },
+            title: { main: { text: _t(this.pageConfig.title) } },
         });
     }
     updatePageDetails(id) {
@@ -12955,9 +12983,7 @@ class MrTimelineLayoutDS extends LayoutDataSource {
                 return;
             const { 
             /* eslint-disable */
-            'collection-bibliography': bibliographyData, 'collection-places': placesData, 'collection-witnesses': witnessData, 'collection-works': worksData, 
-            /* eslint-enable */
-            header, title, } = res.sections;
+            'collection-bibliography': bibData, 'collection-places': placesData, 'collection-witnesses': witnessData, 'collection-works': worksData, gallery, header, } = res.sections;
             if (placesData) {
                 this.hasMap = true;
                 this.one('mr-map').update(placesData);
@@ -12965,21 +12991,53 @@ class MrTimelineLayoutDS extends LayoutDataSource {
             else {
                 this.hasMap = false;
             }
-            this.eventHeader = header.title;
-            this.eventDescription = header.content;
-            this.one('mr-year-header').update({
-                title: { main: { text: title } },
-                actions: {
-                    buttons: [{
-                            text: '',
-                            icon: 'n7-icon-close',
-                            anchor: {
-                                payload: 'closebutton'
-                            }
-                        }]
-                }
-            });
-            this.loadedResourceDetails = true;
+            if (bibData) {
+                this.bibliographyData = bibData;
+            }
+            if (witnessData) {
+                this.collectionWitnessData = {
+                    items: witnessData.items.map((witness) => ({
+                        title: witness.title,
+                        anchor: {
+                            href: witness.link,
+                        }
+                    })),
+                    header: witnessData.header
+                };
+            }
+            if (worksData === null || worksData === void 0 ? void 0 : worksData.items) {
+                this.collectionWorksData = {
+                    header: worksData.header,
+                    items: worksData.items.map((item) => ({
+                        image: item.image,
+                        title: item.title,
+                        anchor: item.link ? {
+                            href: item.link,
+                        } : undefined,
+                        text: item.text,
+                    }))
+                };
+            }
+            if (gallery) {
+                this.collectionGalleryData = gallery;
+            }
+            if (header) {
+                this.eventDescription = header.content;
+                this.eventHeader = res.title;
+                this.one('mr-year-header').update({
+                    title: { main: { text: header.title } },
+                    actions: {
+                        buttons: [{
+                                text: '',
+                                icon: 'n7-icon-close',
+                                anchor: {
+                                    payload: 'closebutton'
+                                }
+                            }]
+                    }
+                });
+            }
+            this.loading.resourceDetails = false;
         });
     }
 }
@@ -13083,7 +13141,8 @@ let MrTimelineLayoutComponent = class MrTimelineLayoutComponent extends Abstract
         };
     }
     ngOnInit() {
-        this.route.data.subscribe(() => {
+        this.route.data.subscribe((data) => {
+            this.configId = data.configId;
             this.layoutState.add('content');
             this.onInit();
         });
@@ -13105,7 +13164,7 @@ MrTimelineLayoutComponent.ctorParameters = () => [
 MrTimelineLayoutComponent = __decorate([
     Component({
         selector: 'mr-timeline-layout',
-        template: "<div class=\"mr-timeline mr-layout\"\r\n     *ngIf=\"lb.dataSource\">\r\n    <div class=\"mr-timeline__timeline\">\r\n        <n7-timeline [data]=\"lb.widgets['mr-timeline'].ds.out$ | async\"></n7-timeline>\r\n    </div>\r\n\r\n    <div class=\"mr-timeline__page mr-side-margin\">\r\n        <div class=\"mr-timeline__date\">\r\n            <n7-inner-title [data]=\"lb.widgets['mr-year-header'].ds.out$ | async\" \r\n                            [emit]=\"lb.widgets['mr-year-header'].emit\">\r\n            </n7-inner-title>\r\n        </div>\r\n        <h1 class=\"mr-timeline__title\"\r\n            *ngIf=\"lb.dataSource.loadedResourceDetails\">\r\n            {{lb.dataSource.eventHeader}}\r\n        </h1>\r\n        <div class=\"mr-timeline__content\">\r\n            <p [innerHTML]=\"lb.dataSource.eventDescription\">\r\n            <p>\r\n                <ng-container *ngIf=\"lb.dataSource.loadedResourceDetails\">\r\n                    <div *ngIf=\"false\">Fonti:\r\n                        <ul>\r\n                            <li><a href=\"#\">Canzoniere</a></li>\r\n                            <li><a href=\"#\">I Trionfi</a></li>\r\n                            <li><a href=\"#\">Epistole</a></li>\r\n                        </ul>\r\n                    </div>\r\n\r\n                    <div class=\"mr-gallery\" *ngIf=\"false\">\r\n                        <div class=\"mr-gallery__item\"\r\n                             *ngFor=\"let image of lb.dataSource.images\">\r\n                            <img class=\"mr-gallery__image\"\r\n                                 [src]=\"image\">\r\n                        </div>\r\n                    </div>\r\n\r\n                    <div class=\"mr-map\" *ngIf=\"lb.dataSource.hasMap\">\r\n                        <n7-map [data]=\"lb.widgets['mr-map'].ds.out$ | async\"></n7-map>\r\n                    </div>\r\n\r\n                    <ng-container *ngIf=\"lb.dataSource.bibliographyMock && false\">\r\n                        <div class=\"mr-content-block mr-content-block-collection\">\r\n                            <h3 class=\"mr-content-block__title\">Bibliografia</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-1\">\r\n                                <ng-container *ngFor=\"let item of lb.dataSource.bibliographyMock\">\r\n                                    <ng-container *ngTemplateOutlet=\"biblio; context: { $implicit: item }\">\r\n                                    </ng-container>\r\n                                </ng-container>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n\r\n                    <div class=\"mr-content-block mr-content-block-collection\" *ngIf=\"false\">\r\n                        <h3 class=\"mr-content-block__title\">Mappe collegate</h3>\r\n                        <div class=\"mr-content-block__content n7-grid-3\">\r\n                            <ng-container *ngFor=\"let item of lb.dataSource.connectedMapsMock\">\r\n                                <ng-container *ngTemplateOutlet=\"maps; context: { $implicit: item }\">\r\n                                </ng-container>\r\n                            </ng-container>\r\n                        </div>\r\n                    </div>\r\n                </ng-container>\r\n        </div>\r\n    </div>\r\n</div>\r\n\r\n\r\n<ng-template #biblio\r\n             let-item>\r\n    <div class=\"mr-timeline__collection-content\">\r\n        <n7-item-preview [data]=\"item\"></n7-item-preview>\r\n    </div>\r\n</ng-template>\r\n\r\n<ng-template #maps\r\n             let-item>\r\n    <div class=\"mr-timeline__collection-content\">\r\n        <n7-item-preview [data]=\"item\"></n7-item-preview>\r\n    </div>\r\n</ng-template>\r\n"
+        template: "<div class=\"mr-timeline mr-layout\"\r\n     *ngIf=\"lb.dataSource\">\r\n    <div class=\"mr-timeline__timeline\">\r\n        <div class=\"mr-timeline__timeline-loading\"\r\n             *ngIf=\"lb.dataSource.loading.timeline\">\r\n        </div>\r\n        <n7-timeline [data]=\"lb.widgets['mr-timeline'].ds.out$ | async\"\r\n                     *ngIf=\"!lb.dataSource.loading.timeline\">\r\n        </n7-timeline>\r\n    </div>\r\n\r\n    <div class=\"mr-timeline__page mr-side-margin\">\r\n        <div class=\"mr-timeline__date\">\r\n            <n7-inner-title [data]=\"lb.widgets['mr-year-header'].ds.out$ | async\"\r\n                            [emit]=\"lb.widgets['mr-year-header'].emit\">\r\n            </n7-inner-title>\r\n        </div>\r\n        <h1 class=\"mr-timeline__title\"\r\n            *ngIf=\"!lb.dataSource.loading.resourceDetails\">\r\n            {{lb.dataSource.eventHeader}}\r\n        </h1>\r\n        <div class=\"mr-timeline__content\">\r\n            <!-- DESCRIZIONE -->\r\n            <div class=\"mr-content-block mr-content-block-description\">\r\n                <p [innerHTML]=\"lb.dataSource.eventDescription\">\r\n                <p>\r\n            </div>\r\n            <ng-container *ngIf=\"!lb.dataSource.loading.resourceDetails\">\r\n\r\n                <!-- GALLERIA -->\r\n                <div class=\"mr-content-block n7-grid-6\">\r\n                    <ng-container *ngFor=\"let image of lb.dataSource.collectionGalleryData\">\r\n                        <a [href]=\"image.image\" class=\"mr-gallery__image\">\r\n                            <img [src]=\"image.thumbnail\" alt=\"image.title\">\r\n                        </a>\r\n                    </ng-container>\r\n                </div>\r\n                \r\n\r\n                <!-- MAPPA -->\r\n                <div class=\"mr-map\"\r\n                     *ngIf=\"lb.dataSource.hasMap\">\r\n                    <h3 class=\"mr-content-block__title\"\r\n                        *ngIf=\"lb.dataSource.mapHeader\">{{ lb.dataSource.mapHeader }}</h3>\r\n                    <n7-map [data]=\"lb.widgets['mr-map'].ds.out$ | async\"></n7-map>\r\n                </div>\r\n\r\n                <!-- BIBLIOGRAFIA -->\r\n                <ng-container *ngIf=\"lb.dataSource.bibliographyData as biblio\">\r\n                    <ng-container *ngIf=\"biblio.items && biblio.items.length > 0\">\r\n                        <div class=\"mr-content-block mr-content-block-collection\">\r\n                            <h3 class=\"mr-content-block__title\">{{ biblio.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-1\">\r\n                                <ng-container *ngFor=\"let item of biblio.items\">\r\n                                    <div class=\"mr-timeline__collection-content\">\r\n                                        <n7-item-preview [data]=\"item\"></n7-item-preview>\r\n                                    </div>\r\n                                </ng-container>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n                <!-- TESTIMONI -->\r\n                <ng-container *ngIf=\"lb.dataSource.collectionWitnessData as wit\">\r\n                    <ng-container *ngIf=\"wit.items && wit.items.length > 0\">\r\n                        <div class=\"mr-content-block-collection mr-content-block\">\r\n                            <h3 class=\"mr-content-block__title\">{{ wit.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-3\">\r\n                                <n7-item-preview *ngFor=\"let item of wit.items\"\r\n                                                 [data]=\"item\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n                <!-- OPERE -->\r\n                <ng-container *ngIf=\"lb.dataSource.collectionWorksData as works\">\r\n                    <ng-container *ngIf=\"works.items && works.items.length > 0\">\r\n                        <div class=\"mr-content-block-collection mr-content-block\">\r\n                            <h3 class=\"mr-content-block__title\">{{ works.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-3\">\r\n                                <n7-item-preview *ngFor=\"let item of works.items\"\r\n                                                 [data]=\"item\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n            </ng-container>\r\n        </div>\r\n    </div>\r\n</div>\r\n"
     }),
     __metadata("design:paramtypes", [LayoutsConfigurationService,
         ActivatedRoute,
