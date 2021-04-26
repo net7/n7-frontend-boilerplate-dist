@@ -13525,6 +13525,7 @@ var MrTimelineLayoutDS = /** @class */ (function (_super) {
         });
     };
     MrTimelineLayoutDS.prototype.loadDefaults = function (navigate) {
+        this.getWidgetDataSource('mr-timeline').timeline.setSelection([]);
         this.eventDescription = this.defaultDescription;
         this.eventHeader = '';
         this.hasMap = false;
@@ -13562,6 +13563,9 @@ var MrTimelineLayoutDS = /** @class */ (function (_super) {
             if (bibData) {
                 _this.bibliographyData = bibData;
             }
+            else {
+                _this.bibliographyData = undefined;
+            }
             if (witnessData) {
                 _this.collectionWitnessData = {
                     items: witnessData.items.map(function (witness) { return ({
@@ -13572,6 +13576,9 @@ var MrTimelineLayoutDS = /** @class */ (function (_super) {
                     }); }),
                     header: witnessData.header
                 };
+            }
+            else {
+                _this.collectionWitnessData = undefined;
             }
             if (worksData === null || worksData === void 0 ? void 0 : worksData.items) {
                 _this.collectionWorksData = {
@@ -13586,8 +13593,14 @@ var MrTimelineLayoutDS = /** @class */ (function (_super) {
                     }); })
                 };
             }
+            else {
+                _this.collectionWorksData = undefined;
+            }
             if (gallery) {
                 _this.collectionGalleryData = gallery;
+            }
+            else {
+                _this.collectionGalleryData = undefined;
             }
             if (header) {
                 _this.eventDescription = header.content;

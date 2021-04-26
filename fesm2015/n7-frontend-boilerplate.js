@@ -12958,6 +12958,7 @@ class MrTimelineLayoutDS extends LayoutDataSource {
         });
     }
     loadDefaults(navigate) {
+        this.getWidgetDataSource('mr-timeline').timeline.setSelection([]);
         this.eventDescription = this.defaultDescription;
         this.eventHeader = '';
         this.hasMap = false;
@@ -12994,6 +12995,9 @@ class MrTimelineLayoutDS extends LayoutDataSource {
             if (bibData) {
                 this.bibliographyData = bibData;
             }
+            else {
+                this.bibliographyData = undefined;
+            }
             if (witnessData) {
                 this.collectionWitnessData = {
                     items: witnessData.items.map((witness) => ({
@@ -13004,6 +13008,9 @@ class MrTimelineLayoutDS extends LayoutDataSource {
                     })),
                     header: witnessData.header
                 };
+            }
+            else {
+                this.collectionWitnessData = undefined;
             }
             if (worksData === null || worksData === void 0 ? void 0 : worksData.items) {
                 this.collectionWorksData = {
@@ -13018,8 +13025,14 @@ class MrTimelineLayoutDS extends LayoutDataSource {
                     }))
                 };
             }
+            else {
+                this.collectionWorksData = undefined;
+            }
             if (gallery) {
                 this.collectionGalleryData = gallery;
+            }
+            else {
+                this.collectionGalleryData = undefined;
             }
             if (header) {
                 this.eventDescription = header.content;
