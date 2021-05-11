@@ -9486,379 +9486,113 @@ EscapeHtmlPipe = __decorate([
     __metadata("design:paramtypes", [DomSanitizer])
 ], EscapeHtmlPipe);
 
-class MrInputTextDS extends DataSource {
-    constructor() {
-        super(...arguments);
-        this.state = {
-            value: null,
-            disabled: false,
-            hidden: false,
-        };
-        this.getState = () => this.state;
-    }
-    transform(data) {
-        return Object.assign(Object.assign({}, data), { placeholder: _t(data.placeholder) });
-    }
-    setState(newState) {
-        this.state = Object.assign(Object.assign({}, this.state), newState);
-        this.refresh();
-    }
-    clear() {
-        this.setState({ value: null });
-    }
-    refresh() {
-        const { value, hidden, disabled } = this.state;
-        // render value
-        this.output.value = value;
-        // fix element update
-        const el = document.getElementById(this.id);
-        if (el) {
-            el.value = value;
-        }
-        // render disabled
-        this.output.disabled = disabled;
-        // render hidden
-        this.output.classes = hidden ? 'is-hidden' : '';
-    }
-}
-
-class MrInputTextEH extends EventHandler {
-    listen() {
-        this.innerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case `${this.dataSource.id}.change`: {
-                    const { value } = payload;
-                    // set new value
-                    this.dataSource.setState({ value });
-                    // emit changed signal
-                    this.changed$.next({
-                        id: this.dataSource.id,
-                        state: this.dataSource.getState()
-                    });
-                    break;
-                }
-                default:
-                    break;
-            }
-        });
-    }
-}
-
-class MrInputSelectDS extends DataSource {
-    constructor() {
-        super(...arguments);
-        this.state = {
-            value: null,
-            disabled: false,
-            hidden: false,
-        };
-        this.getState = () => this.state;
-    }
-    transform(data) {
-        return Object.assign(Object.assign({}, data), { options: this.getOptions(data.options) });
-    }
-    setState(newState) {
-        this.state = Object.assign(Object.assign({}, this.state), newState);
-        this.refresh();
-    }
-    clear() {
-        this.setState({ value: null });
-    }
-    refresh() {
-        const { hidden, disabled } = this.state;
-        // render value
-        this.output.options = this.getOptions(this.output.options);
-        // render disabled
-        this.output.disabled = disabled;
-        // render hidden
-        this.output.classes = hidden ? 'is-hidden' : '';
-    }
-    getOptions(options) {
-        const { value } = this.state;
-        return options.map((option) => (Object.assign(Object.assign({}, option), { label: _t(option.label), selected: value === option.value })));
-    }
-}
-
-class MrInputSelectEH extends EventHandler {
-    listen() {
-        this.innerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case `${this.dataSource.id}.change`: {
-                    const { value } = payload;
-                    // set new value
-                    this.dataSource.setState({ value });
-                    // emit changed signal
-                    this.changed$.next({
-                        id: this.dataSource.id,
-                        state: this.dataSource.getState()
-                    });
-                    break;
-                }
-                default:
-                    break;
-            }
-        });
-    }
-}
-
-// eslint-disable-next-line max-len
-class MrInputCheckboxDS extends DataSource {
-    constructor() {
-        super(...arguments);
-        this.state = {
-            value: [],
-            disabled: false,
-            hidden: false,
-        };
-        this.getState = () => this.state;
-    }
-    transform(data) {
-        return Object.assign(Object.assign({}, data), { checkboxes: this.getCheckboxes(data.checkboxes) });
-    }
-    setState(newState) {
-        this.state = Object.assign(Object.assign({}, this.state), newState);
-        this.refresh();
-    }
-    clear() {
-        this.setState({ value: [] });
-    }
-    refresh() {
-        const { hidden } = this.state;
-        // render value
-        this.output.checkboxes = this.getCheckboxes(this.output.checkboxes);
-        // render hidden
-        this.output.classes = hidden ? 'is-hidden' : '';
-    }
-    toggleValue({ inputPayload, value: isChecked }) {
-        const { value } = this.state;
-        const exists = !!(value.includes(inputPayload));
-        if (isChecked && !exists) {
-            value.push(inputPayload);
-        }
-        else if (!isChecked && exists) {
-            value.splice(value.indexOf(inputPayload), 1);
-        }
-        this.setState({ value });
-    }
-    getCheckboxes(checkboxes) {
-        const { value, disabled } = this.state;
-        return checkboxes.map((checkbox, index) => (Object.assign(Object.assign({}, checkbox), { id: `${this.id}-${index}`, disabled, label: _t(checkbox.label), checked: !!(value.includes(checkbox.payload)) })));
-    }
-}
-
-class MrInputCheckboxEH extends EventHandler {
-    listen() {
-        this.innerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case `${this.dataSource.id}.change`: {
-                    // update value
-                    this.dataSource.toggleValue(payload);
-                    // emit changed signal
-                    this.changed$.next({
-                        id: this.dataSource.id,
-                        state: this.dataSource.getState()
-                    });
-                    break;
-                }
-                default:
-                    break;
-            }
-        });
-    }
-}
-
-class MrFormModel {
-    constructor() {
-        this.loaded$ = new ReplaySubject();
-        this.inputs = {};
-        this.inputTypes = {
-            text: {
-                ds: MrInputTextDS,
-                eh: MrInputTextEH
-            },
-            select: {
-                ds: MrInputSelectDS,
-                eh: MrInputSelectEH
-            },
-            checkbox: {
-                ds: MrInputCheckboxDS,
-                eh: MrInputCheckboxEH
-            }
-        };
-        this.changed$ = new Subject();
-        this.getInput = (id) => this.inputs[id].ds;
-        this.getInputs = () => {
-            const inputs = {};
-            Object.keys(this.inputs).forEach((id) => {
-                inputs[id] = this.getInput(id);
-            });
-            return inputs;
-        };
-    }
-    init(config) {
-        this.config = config;
-        // init inputs
-        this.initInputs();
-        // emit signal
-        this.loaded$.next(true);
-    }
-    getState() {
-        const state = {};
-        Object.keys(this.inputs).forEach((key) => {
-            state[key] = this.inputs[key].ds.getState();
-        });
-        return state;
-    }
-    addInputType(type, ds, eh) {
-        if (this.inputTypes[type]) {
-            throw Error(`input type ${type} already exists!`);
-        }
-        this.inputTypes[type] = { ds, eh };
-    }
-    initInputs() {
-        const { sections } = this.config;
-        sections.forEach((section) => {
-            section.inputs.forEach(({ id, type, options, state, data }) => {
-                const DSClass = this.inputTypes[type].ds;
-                const EHClass = this.inputTypes[type].eh;
-                const DSInstance = new DSClass(options || {});
-                const EHInstance = new EHClass();
-                // set datasource id
-                DSInstance.id = id;
-                // set initial data
-                if (data) {
-                    DSInstance.update(data);
-                }
-                // set state
-                if (state) {
-                    DSInstance.setState(state);
-                }
-                // set eventhandler hostid
-                EHInstance.hostId = id;
-                // attach datasource to eventhandler
-                EHInstance.dataSource = DSInstance;
-                // attach changed$ to eventhandler
-                EHInstance.changed$ = this.changed$;
-                // listen to input events
-                EHInstance.listen();
-                // save it to input
-                this.inputs[id] = {
-                    ds: DSInstance,
-                    eh: EHInstance,
-                    emit: (t, p) => EHInstance.emitInner(t, p)
-                };
-            });
-        });
-    }
-}
-
-class MrAdvancedSearchLayoutDS extends LayoutDataSource {
-    constructor() {
-        super(...arguments);
-        this.initialState = {};
-    }
+class MrAdvancedResultsLayoutDS extends LayoutDataSource {
     onInit(payload) {
-        this.router = payload.router;
         this.configuration = payload.configuration;
         this.mainState = payload.mainState;
         this.configId = payload.configId;
+        this.communication = payload.communication;
         this.pageConfig = this.configuration.get(this.configId);
-        // add translations
-        this.addTranslations(this.pageConfig);
-        // init form
-        this.form = new MrFormModel();
-        // form init
-        this.form.init(this.pageConfig.formConfig);
-        // set initial state
-        this.initialState = cloneDeep(this.form.getState());
-        this.one('mr-form-wrapper-accordion').update({
-            form: this.form
-        });
+        // config
+        this.all().updateOptions({ config: this.pageConfig });
+        // manual updates
+        this.one('mr-search-page-title').update({});
         // update head title
         this.updateHeadTitle();
+        // update translations
+        this.addTranslations(this.pageConfig);
+    }
+    updateSearchTags(params) {
+        if (!this.pageConfig.filters) {
+            return;
+        }
+        const { labels } = this.pageConfig.filters;
+        const tags = [];
+        Object.keys(labels)
+            .filter((key) => !!params[key])
+            .forEach((key) => {
+            tags[key] = params[key];
+        });
+        this.one('mr-advanced-search-tags').updateOptions({ labels });
+        this.one('mr-advanced-search-tags').update(tags);
+    }
+    request$(params, onError) {
+        const { searchId } = this.pageConfig;
+        const searchParams = Object.assign({}, params);
+        Object.keys(searchParams)
+            .filter((key) => ['page', 'limit', 'sort'].includes(key))
+            .forEach((key) => {
+            searchParams.results = searchParams.results || {};
+            searchParams.results[key] = searchParams[key];
+            delete searchParams[key];
+        });
+        // normalize results filters
+        const resultsParams = {};
+        const results = searchParams.results || {};
+        const page = results.page ? +results.page : 1;
+        resultsParams.limit = results.limit ? +results.limit : 12;
+        resultsParams.offset = page === 1 ? 0 : resultsParams.limit * (page - 1);
+        resultsParams.sort = results.sort || 'sort_ASC';
+        return this.communication.request$('advancedSearch', {
+            method: 'POST',
+            params: Object.assign(Object.assign({}, searchParams), { searchId, results: Object.assign({}, resultsParams) }),
+            onError
+        });
+    }
+    handleResponse(response) {
+        this.some([
+            'mr-search-results-title',
+            'mr-search-results',
+        ]).update(response);
+        // pagination
+        this.one('n7-smart-pagination').updateOptions({ mode: 'payload' });
+        this.one('n7-smart-pagination').update(this.getPaginationParams(response));
     }
     updateHeadTitle() {
         const appName = this.configuration.get('name');
         const pageTitle = this.pageConfig.title;
         this.mainState.update('headTitle', [appName, _t(pageTitle)].join(' > '));
     }
-    onSubmit({ state }) {
-        if (!isEmpty(state)) {
-            const { resultsUrl } = this.pageConfig;
-            const params = Object.keys(state)
-                .filter((key) => !(state[key].disabled || isEmpty(state[key].value)))
-                .map((key) => ({
-                key,
-                value: Array.isArray(state[key].value)
-                    ? state[key].value.join(',')
-                    : state[key].value
-            }))
-                .map(({ key, value }) => `${key}=${encodeURIComponent(value)}`);
-            const url = `${resultsUrl}?${params.join('&')}`;
-            window.open(url, '_blank');
+    addTranslations(config) {
+        var _a;
+        if ((_a = config === null || config === void 0 ? void 0 : config.sort) === null || _a === void 0 ? void 0 : _a.label) {
+            config.sort.label = _t(config.sort.label);
+            config.sort.options = config.sort.options.map((option) => (Object.assign(Object.assign({}, option), { label: _t(option.label) })));
         }
-    }
-    onReset() {
-        Object.keys(this.initialState).forEach((key) => {
-            const inputState = cloneDeep(this.initialState[key]);
-            this.form.getInput(key).setState(inputState);
-        });
-    }
-    addTranslations(pageConfig) {
-        const { formConfig } = pageConfig;
-        // page title
-        pageConfig.title = _t(pageConfig.title);
-        // submit
-        if (formConfig.submitButton) {
-            formConfig.submitButton.label = _t(formConfig.submitButton.label);
-        }
-        // reset
-        if (formConfig.resetButton) {
-            formConfig.resetButton.label = _t(formConfig.resetButton.label);
-        }
-        // groups
-        formConfig.groups.forEach((group) => {
-            var _a;
-            if ((_a = group.options) === null || _a === void 0 ? void 0 : _a.label) {
-                group.options.label = _t(group.options.label);
+        ['text', 'button'].forEach((key) => {
+            if (config.fallback) {
+                config.fallback[key] = _t(config.fallback[key]);
+            }
+            if (config.ko) {
+                config.ko[key] = _t(config.ko[key]);
             }
         });
-        // sections
-        formConfig.sections.forEach((section) => {
-            if (section.title) {
-                section.title = _t(section.title);
-            }
-            if (section.description) {
-                section.description = _t(section.description);
-            }
-            section.inputs.forEach((input) => {
-                if (input.data.label) {
-                    input.data.label = _t(input.data.label);
-                }
-                // input text
-                if (input.type === 'text') {
-                    if (input.data.placeholder) {
-                        input.data.placeholder = _t(input.data.placeholder);
-                    }
-                }
-                // input checkbox
-                if (input.type === 'checkbox') {
-                    input.data.checkboxes.forEach((checkbox) => {
-                        checkbox.label = _t(checkbox.label);
-                    });
-                }
-                // input select
-                if (input.type === 'select') {
-                    input.data.options.forEach((option) => {
-                        option.label = _t(option.label);
-                    });
-                }
+        // filters
+        const { filters } = this.pageConfig;
+        if (filters) {
+            filters.title = _t(filters.title);
+            Object.keys(filters.labels).forEach((key) => {
+                filters.labels[key] = _t(filters.labels[key]);
             });
-        });
+        }
+    }
+    getPaginationParams(response) {
+        const { total_count: totalCount, offset, limit } = response;
+        const { pagination: paginationConfig } = this.pageConfig;
+        return {
+            totalPages: Math.ceil(totalCount / limit),
+            currentPage: (offset + limit) / limit,
+            pageLimit: paginationConfig.limit,
+            sizes: {
+                label: paginationConfig.selectLabel ? _t(paginationConfig.selectLabel) : null,
+                list: paginationConfig.options,
+                active: limit,
+            },
+        };
     }
 }
 
-class MrAdvancedSearchLayoutEH extends EventHandler {
+class MrAdvancedResultsLayoutEH extends EventHandler {
     constructor() {
         super(...arguments);
         this.destroy$ = new Subject();
@@ -9866,14 +9600,17 @@ class MrAdvancedSearchLayoutEH extends EventHandler {
     listen() {
         this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
-                case 'mr-advanced-search-layout.init':
+                case 'mr-advanced-results-layout.init':
+                    this.activatedRoute = payload.activatedRoute;
+                    this.router = payload.router;
+                    this.layoutState = payload.layoutState;
                     this.dataSource.onInit(payload);
-                    // init hook
-                    this.onInit();
+                    // listen route changes
+                    this.listenToRouterChanges();
                     // scroll top
                     window.scrollTo(0, 0);
                     break;
-                case 'mr-advanced-search-layout.destroy':
+                case 'mr-advanced-results-layout.destroy':
                     this.destroy$.next();
                     break;
                 default:
@@ -9883,11 +9620,14 @@ class MrAdvancedSearchLayoutEH extends EventHandler {
         });
         this.outerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
-                case 'mr-form-wrapper-accordion.submit':
-                    this.dataSource.onSubmit(payload);
+                case 'n7-smart-pagination.click':
+                    this.updateRouter({ page: payload.page });
                     break;
-                case 'mr-form-wrapper-accordion.reset':
-                    this.dataSource.onReset();
+                case 'n7-smart-pagination.change':
+                    this.updateRouter({ limit: payload.value, page: 1 });
+                    break;
+                case 'mr-search-results-title.change':
+                    this.updateRouter({ sort: payload.value, page: 1 });
                     break;
                 default:
                     console.warn('unhandled inner event of type', type);
@@ -9895,16 +9635,33 @@ class MrAdvancedSearchLayoutEH extends EventHandler {
             }
         });
     }
-    /**
-     * @example
-     * protected onInit() {
-     *   this.dataSource.form.changed$.subscribe(({ id, state }) => {
-     *     console.log('changed$', { id, state });
-     *   });
-     * }
-     */
-    onInit() {
-        // to be extended on project
+    /** URL changes */
+    listenToRouterChanges() {
+        this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$), tap(() => {
+            this.layoutState.set('results', LayoutState.LOADING);
+        }), switchMap((params) => {
+            this.dataSource.updateSearchTags(params);
+            return this.dataSource.request$(params, (error) => {
+                console.warn('Advanced search error', error);
+                this.layoutState.set('results', LayoutState.ERROR);
+            });
+        })).subscribe((response) => {
+            this.dataSource.handleResponse(response);
+            this.layoutState.set('results', isEmpty(response.results) ? LayoutState.EMPTY : LayoutState.SUCCESS);
+            // scroll to ref element
+            if (!this.scrollRefElement) {
+                this.scrollRefElement = document.querySelector('.scroll-ref');
+            }
+            else if (!helpers.isElementInViewport(this.scrollRefElement)) {
+                this.scrollRefElement.scrollIntoView();
+            }
+        });
+    }
+    updateRouter(queryParams) {
+        this.router.navigate([], {
+            queryParams,
+            queryParamsHandling: 'merge'
+        });
     }
 }
 
@@ -10271,6 +10028,10 @@ const MARKER_ICON_SELECTED$1 = L.icon({
     className: 'marker-icon-selected'
 });
 class MrMapDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.mapLoaded$ = new Subject();
+    }
     // eslint-disable-next-line consistent-return
     transform(data) {
         let markers;
@@ -10284,6 +10045,8 @@ class MrMapDS extends DataSource {
                     coords: [+m.lat, +m.lng],
                     template: (_a = m.default_label) !== null && _a !== void 0 ? _a : m.label,
                     title: (_b = m.label) !== null && _b !== void 0 ? _b : m.default_label,
+                    id: area.id,
+                    slug: area.slug,
                 });
             })))
                 // flatten the list of markers
@@ -10308,6 +10071,7 @@ class MrMapDS extends DataSource {
                 this.fitMapToBounds(markers.map((m) => m.coords));
                 // load custom markers
                 this.buildMarkers(markers);
+                this.mapLoaded$.next({ map: instance, markers: this.markerLayer });
             },
             containerId: 'map-canvas',
             libOptions: {
@@ -10344,9 +10108,14 @@ class MrMapDS extends DataSource {
             this.mapInstance.removeLayer(this.markerLayer);
         }
         const markerGroup = L.markerClusterGroup();
-        markers.forEach(({ coords, template }) => {
+        markers.forEach(({ coords, template, id, slug }) => {
             // create custom icon marker
-            const newMarker = L.marker(coords, { icon: MARKER_ICON$1 })
+            const newMarker = L.marker(coords, { icon: MARKER_ICON$1 });
+            if (id && slug) {
+                newMarker.id = id;
+                newMarker.slug = slug;
+            }
+            newMarker
                 // add the marker to the group
                 .addTo(markerGroup)
                 // add the on-click tooltip
@@ -11021,244 +10790,6 @@ var EH$3 = /*#__PURE__*/Object.freeze({
     MrFormWrapperAccordionEH: MrFormWrapperAccordionEH
 });
 
-const MrAdvancedSearchLayoutConfig = {
-    layoutId: 'mr-advanced-search-layout',
-    widgets: [{
-            id: 'mr-form-wrapper-accordion'
-        }],
-    layoutDS: MrAdvancedSearchLayoutDS,
-    layoutEH: MrAdvancedSearchLayoutEH,
-    widgetsDataSources: DS$3,
-    widgetsEventHandlers: EH$3,
-    layoutOptions: {}
-};
-
-let MrAdvancedSearchLayoutComponent = class MrAdvancedSearchLayoutComponent extends AbstractLayout {
-    constructor(router, activatedRoute, mainState, configuration, layoutsConfiguration) {
-        super(layoutsConfiguration.get('MrAdvancedSearchLayoutConfig') || MrAdvancedSearchLayoutConfig);
-        this.router = router;
-        this.activatedRoute = activatedRoute;
-        this.mainState = mainState;
-        this.configuration = configuration;
-    }
-    initPayload() {
-        return {
-            configId: this.configId,
-            configuration: this.configuration,
-            mainState: this.mainState,
-            router: this.router,
-            activatedRoute: this.activatedRoute,
-            options: this.config.options || {},
-        };
-    }
-    ngOnInit() {
-        this.activatedRoute.data.subscribe((data) => {
-            this.configId = data.configId;
-            this.onInit();
-        });
-    }
-    ngOnDestroy() {
-        this.onDestroy();
-    }
-};
-MrAdvancedSearchLayoutComponent.ctorParameters = () => [
-    { type: Router },
-    { type: ActivatedRoute },
-    { type: MainStateService },
-    { type: ConfigurationService },
-    { type: LayoutsConfigurationService }
-];
-MrAdvancedSearchLayoutComponent = __decorate([
-    Component({
-        selector: 'mr-advanced-search-layout',
-        template: "<div *ngIf=\"lb.dataSource\" class=\"mr-advanced-search mr-layout\">\r\n    <div class=\"mr-layout__maxwidth mr-side-margin\">\r\n\r\n        <n7-inner-title [data]=\"{\r\n            title: {\r\n                main: {\r\n                    text: lb.dataSource.pageConfig.title\r\n                }\r\n            }\r\n        }\"></n7-inner-title>\r\n\r\n        <mr-form-wrapper-accordion \r\n            [data]=\"lb.widgets['mr-form-wrapper-accordion'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['mr-form-wrapper-accordion'].emit\">\r\n        </mr-form-wrapper-accordion>\r\n    </div>\r\n</div>"
-    }),
-    __metadata("design:paramtypes", [Router,
-        ActivatedRoute,
-        MainStateService,
-        ConfigurationService,
-        LayoutsConfigurationService])
-], MrAdvancedSearchLayoutComponent);
-
-class MrAdvancedResultsLayoutDS extends LayoutDataSource {
-    onInit(payload) {
-        this.configuration = payload.configuration;
-        this.mainState = payload.mainState;
-        this.configId = payload.configId;
-        this.communication = payload.communication;
-        this.pageConfig = this.configuration.get(this.configId);
-        // config
-        this.all().updateOptions({ config: this.pageConfig });
-        // manual updates
-        this.one('mr-search-page-title').update({});
-        // update head title
-        this.updateHeadTitle();
-        // update translations
-        this.addTranslations(this.pageConfig);
-    }
-    updateSearchTags(params) {
-        if (!this.pageConfig.filters) {
-            return;
-        }
-        const { labels } = this.pageConfig.filters;
-        const tags = [];
-        Object.keys(labels)
-            .filter((key) => !!params[key])
-            .forEach((key) => {
-            tags[key] = params[key];
-        });
-        this.one('mr-advanced-search-tags').updateOptions({ labels });
-        this.one('mr-advanced-search-tags').update(tags);
-    }
-    request$(params, onError) {
-        const { searchId } = this.pageConfig;
-        const searchParams = Object.assign({}, params);
-        Object.keys(searchParams)
-            .filter((key) => ['page', 'limit', 'sort'].includes(key))
-            .forEach((key) => {
-            searchParams.results = searchParams.results || {};
-            searchParams.results[key] = searchParams[key];
-            delete searchParams[key];
-        });
-        // normalize results filters
-        const resultsParams = {};
-        const results = searchParams.results || {};
-        const page = results.page ? +results.page : 1;
-        resultsParams.limit = results.limit ? +results.limit : 12;
-        resultsParams.offset = page === 1 ? 0 : resultsParams.limit * (page - 1);
-        resultsParams.sort = results.sort || 'sort_ASC';
-        return this.communication.request$('advancedSearch', {
-            method: 'POST',
-            params: Object.assign(Object.assign({}, searchParams), { searchId, results: Object.assign({}, resultsParams) }),
-            onError
-        });
-    }
-    handleResponse(response) {
-        this.some([
-            'mr-search-results-title',
-            'mr-search-results',
-        ]).update(response);
-        // pagination
-        this.one('n7-smart-pagination').updateOptions({ mode: 'payload' });
-        this.one('n7-smart-pagination').update(this.getPaginationParams(response));
-    }
-    updateHeadTitle() {
-        const appName = this.configuration.get('name');
-        const pageTitle = this.pageConfig.title;
-        this.mainState.update('headTitle', [appName, _t(pageTitle)].join(' > '));
-    }
-    addTranslations(config) {
-        var _a;
-        if ((_a = config === null || config === void 0 ? void 0 : config.sort) === null || _a === void 0 ? void 0 : _a.label) {
-            config.sort.label = _t(config.sort.label);
-            config.sort.options = config.sort.options.map((option) => (Object.assign(Object.assign({}, option), { label: _t(option.label) })));
-        }
-        ['text', 'button'].forEach((key) => {
-            if (config.fallback) {
-                config.fallback[key] = _t(config.fallback[key]);
-            }
-            if (config.ko) {
-                config.ko[key] = _t(config.ko[key]);
-            }
-        });
-        // filters
-        const { filters } = this.pageConfig;
-        if (filters) {
-            filters.title = _t(filters.title);
-            Object.keys(filters.labels).forEach((key) => {
-                filters.labels[key] = _t(filters.labels[key]);
-            });
-        }
-    }
-    getPaginationParams(response) {
-        const { total_count: totalCount, offset, limit } = response;
-        const { pagination: paginationConfig } = this.pageConfig;
-        return {
-            totalPages: Math.ceil(totalCount / limit),
-            currentPage: (offset + limit) / limit,
-            pageLimit: paginationConfig.limit,
-            sizes: {
-                label: paginationConfig.selectLabel ? _t(paginationConfig.selectLabel) : null,
-                list: paginationConfig.options,
-                active: limit,
-            },
-        };
-    }
-}
-
-class MrAdvancedResultsLayoutEH extends EventHandler {
-    constructor() {
-        super(...arguments);
-        this.destroy$ = new Subject();
-    }
-    listen() {
-        this.innerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case 'mr-advanced-results-layout.init':
-                    this.activatedRoute = payload.activatedRoute;
-                    this.router = payload.router;
-                    this.layoutState = payload.layoutState;
-                    this.dataSource.onInit(payload);
-                    // listen route changes
-                    this.listenToRouterChanges();
-                    // scroll top
-                    window.scrollTo(0, 0);
-                    break;
-                case 'mr-advanced-results-layout.destroy':
-                    this.destroy$.next();
-                    break;
-                default:
-                    console.warn('unhandled inner event of type', type);
-                    break;
-            }
-        });
-        this.outerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case 'n7-smart-pagination.click':
-                    this.updateRouter({ page: payload.page });
-                    break;
-                case 'n7-smart-pagination.change':
-                    this.updateRouter({ limit: payload.value, page: 1 });
-                    break;
-                case 'mr-search-results-title.change':
-                    this.updateRouter({ sort: payload.value, page: 1 });
-                    break;
-                default:
-                    console.warn('unhandled inner event of type', type);
-                    break;
-            }
-        });
-    }
-    /** URL changes */
-    listenToRouterChanges() {
-        this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$), tap(() => {
-            this.layoutState.set('results', LayoutState.LOADING);
-        }), switchMap((params) => {
-            this.dataSource.updateSearchTags(params);
-            return this.dataSource.request$(params, (error) => {
-                console.warn('Advanced search error', error);
-                this.layoutState.set('results', LayoutState.ERROR);
-            });
-        })).subscribe((response) => {
-            this.dataSource.handleResponse(response);
-            this.layoutState.set('results', isEmpty(response.results) ? LayoutState.EMPTY : LayoutState.SUCCESS);
-            // scroll to ref element
-            if (!this.scrollRefElement) {
-                this.scrollRefElement = document.querySelector('.scroll-ref');
-            }
-            else if (!helpers.isElementInViewport(this.scrollRefElement)) {
-                this.scrollRefElement.scrollIntoView();
-            }
-        });
-    }
-    updateRouter(queryParams) {
-        this.router.navigate([], {
-            queryParams,
-            queryParamsHandling: 'merge'
-        });
-    }
-}
-
 const MrAdvancedResultsLayoutConfig = {
     layoutId: 'mr-advanced-results-layout',
     widgets: [
@@ -11339,6 +10870,487 @@ MrAdvancedResultsLayoutComponent = __decorate([
         MrLayoutStateService,
         LayoutsConfigurationService])
 ], MrAdvancedResultsLayoutComponent);
+
+class MrInputTextDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.state = {
+            value: null,
+            disabled: false,
+            hidden: false,
+        };
+        this.getState = () => this.state;
+    }
+    transform(data) {
+        return Object.assign(Object.assign({}, data), { placeholder: _t(data.placeholder) });
+    }
+    setState(newState) {
+        this.state = Object.assign(Object.assign({}, this.state), newState);
+        this.refresh();
+    }
+    clear() {
+        this.setState({ value: null });
+    }
+    refresh() {
+        const { value, hidden, disabled } = this.state;
+        // render value
+        this.output.value = value;
+        // fix element update
+        const el = document.getElementById(this.id);
+        if (el) {
+            el.value = value;
+        }
+        // render disabled
+        this.output.disabled = disabled;
+        // render hidden
+        this.output.classes = hidden ? 'is-hidden' : '';
+    }
+}
+
+class MrInputTextEH extends EventHandler {
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case `${this.dataSource.id}.change`: {
+                    const { value } = payload;
+                    // set new value
+                    this.dataSource.setState({ value });
+                    // emit changed signal
+                    this.changed$.next({
+                        id: this.dataSource.id,
+                        state: this.dataSource.getState()
+                    });
+                    break;
+                }
+                default:
+                    break;
+            }
+        });
+    }
+}
+
+class MrInputSelectDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.state = {
+            value: null,
+            disabled: false,
+            hidden: false,
+        };
+        this.getState = () => this.state;
+    }
+    transform(data) {
+        return Object.assign(Object.assign({}, data), { options: this.getOptions(data.options) });
+    }
+    setState(newState) {
+        this.state = Object.assign(Object.assign({}, this.state), newState);
+        this.refresh();
+    }
+    clear() {
+        this.setState({ value: null });
+    }
+    refresh() {
+        const { hidden, disabled } = this.state;
+        // render value
+        this.output.options = this.getOptions(this.output.options);
+        // render disabled
+        this.output.disabled = disabled;
+        // render hidden
+        this.output.classes = hidden ? 'is-hidden' : '';
+    }
+    getOptions(options) {
+        const { value } = this.state;
+        return options.map((option) => (Object.assign(Object.assign({}, option), { label: _t(option.label), selected: value === option.value })));
+    }
+}
+
+class MrInputSelectEH extends EventHandler {
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case `${this.dataSource.id}.change`: {
+                    const { value } = payload;
+                    // set new value
+                    this.dataSource.setState({ value });
+                    // emit changed signal
+                    this.changed$.next({
+                        id: this.dataSource.id,
+                        state: this.dataSource.getState()
+                    });
+                    break;
+                }
+                default:
+                    break;
+            }
+        });
+    }
+}
+
+// eslint-disable-next-line max-len
+class MrInputCheckboxDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.state = {
+            value: [],
+            disabled: false,
+            hidden: false,
+        };
+        this.getState = () => this.state;
+    }
+    transform(data) {
+        return Object.assign(Object.assign({}, data), { checkboxes: this.getCheckboxes(data.checkboxes) });
+    }
+    setState(newState) {
+        this.state = Object.assign(Object.assign({}, this.state), newState);
+        this.refresh();
+    }
+    clear() {
+        this.setState({ value: [] });
+    }
+    refresh() {
+        const { hidden } = this.state;
+        // render value
+        this.output.checkboxes = this.getCheckboxes(this.output.checkboxes);
+        // render hidden
+        this.output.classes = hidden ? 'is-hidden' : '';
+    }
+    toggleValue({ inputPayload, value: isChecked }) {
+        const { value } = this.state;
+        const exists = !!(value.includes(inputPayload));
+        if (isChecked && !exists) {
+            value.push(inputPayload);
+        }
+        else if (!isChecked && exists) {
+            value.splice(value.indexOf(inputPayload), 1);
+        }
+        this.setState({ value });
+    }
+    getCheckboxes(checkboxes) {
+        const { value, disabled } = this.state;
+        return checkboxes.map((checkbox, index) => (Object.assign(Object.assign({}, checkbox), { id: `${this.id}-${index}`, disabled, label: _t(checkbox.label), checked: !!(value.includes(checkbox.payload)) })));
+    }
+}
+
+class MrInputCheckboxEH extends EventHandler {
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case `${this.dataSource.id}.change`: {
+                    // update value
+                    this.dataSource.toggleValue(payload);
+                    // emit changed signal
+                    this.changed$.next({
+                        id: this.dataSource.id,
+                        state: this.dataSource.getState()
+                    });
+                    break;
+                }
+                default:
+                    break;
+            }
+        });
+    }
+}
+
+class MrFormModel {
+    constructor() {
+        this.loaded$ = new ReplaySubject();
+        this.inputs = {};
+        this.inputTypes = {
+            text: {
+                ds: MrInputTextDS,
+                eh: MrInputTextEH
+            },
+            select: {
+                ds: MrInputSelectDS,
+                eh: MrInputSelectEH
+            },
+            checkbox: {
+                ds: MrInputCheckboxDS,
+                eh: MrInputCheckboxEH
+            }
+        };
+        this.changed$ = new Subject();
+        this.getInput = (id) => this.inputs[id].ds;
+        this.getInputs = () => {
+            const inputs = {};
+            Object.keys(this.inputs).forEach((id) => {
+                inputs[id] = this.getInput(id);
+            });
+            return inputs;
+        };
+    }
+    init(config) {
+        this.config = config;
+        // init inputs
+        this.initInputs();
+        // emit signal
+        this.loaded$.next(true);
+    }
+    getState() {
+        const state = {};
+        Object.keys(this.inputs).forEach((key) => {
+            state[key] = this.inputs[key].ds.getState();
+        });
+        return state;
+    }
+    addInputType(type, ds, eh) {
+        if (this.inputTypes[type]) {
+            throw Error(`input type ${type} already exists!`);
+        }
+        this.inputTypes[type] = { ds, eh };
+    }
+    initInputs() {
+        const { sections } = this.config;
+        sections.forEach((section) => {
+            section.inputs.forEach(({ id, type, options, state, data }) => {
+                const DSClass = this.inputTypes[type].ds;
+                const EHClass = this.inputTypes[type].eh;
+                const DSInstance = new DSClass(options || {});
+                const EHInstance = new EHClass();
+                // set datasource id
+                DSInstance.id = id;
+                // set initial data
+                if (data) {
+                    DSInstance.update(data);
+                }
+                // set state
+                if (state) {
+                    DSInstance.setState(state);
+                }
+                // set eventhandler hostid
+                EHInstance.hostId = id;
+                // attach datasource to eventhandler
+                EHInstance.dataSource = DSInstance;
+                // attach changed$ to eventhandler
+                EHInstance.changed$ = this.changed$;
+                // listen to input events
+                EHInstance.listen();
+                // save it to input
+                this.inputs[id] = {
+                    ds: DSInstance,
+                    eh: EHInstance,
+                    emit: (t, p) => EHInstance.emitInner(t, p)
+                };
+            });
+        });
+    }
+}
+
+class MrAdvancedSearchLayoutDS extends LayoutDataSource {
+    constructor() {
+        super(...arguments);
+        this.initialState = {};
+    }
+    onInit(payload) {
+        this.router = payload.router;
+        this.configuration = payload.configuration;
+        this.mainState = payload.mainState;
+        this.configId = payload.configId;
+        this.pageConfig = this.configuration.get(this.configId);
+        // add translations
+        this.addTranslations(this.pageConfig);
+        // init form
+        this.form = new MrFormModel();
+        // form init
+        this.form.init(this.pageConfig.formConfig);
+        // set initial state
+        this.initialState = cloneDeep(this.form.getState());
+        this.one('mr-form-wrapper-accordion').update({
+            form: this.form
+        });
+        // update head title
+        this.updateHeadTitle();
+    }
+    updateHeadTitle() {
+        const appName = this.configuration.get('name');
+        const pageTitle = this.pageConfig.title;
+        this.mainState.update('headTitle', [appName, _t(pageTitle)].join(' > '));
+    }
+    onSubmit({ state }) {
+        if (!isEmpty(state)) {
+            const { resultsUrl } = this.pageConfig;
+            const params = Object.keys(state)
+                .filter((key) => !(state[key].disabled || isEmpty(state[key].value)))
+                .map((key) => ({
+                key,
+                value: Array.isArray(state[key].value)
+                    ? state[key].value.join(',')
+                    : state[key].value
+            }))
+                .map(({ key, value }) => `${key}=${encodeURIComponent(value)}`);
+            const url = `${resultsUrl}?${params.join('&')}`;
+            window.open(url, '_blank');
+        }
+    }
+    onReset() {
+        Object.keys(this.initialState).forEach((key) => {
+            const inputState = cloneDeep(this.initialState[key]);
+            this.form.getInput(key).setState(inputState);
+        });
+    }
+    addTranslations(pageConfig) {
+        const { formConfig } = pageConfig;
+        // page title
+        pageConfig.title = _t(pageConfig.title);
+        // submit
+        if (formConfig.submitButton) {
+            formConfig.submitButton.label = _t(formConfig.submitButton.label);
+        }
+        // reset
+        if (formConfig.resetButton) {
+            formConfig.resetButton.label = _t(formConfig.resetButton.label);
+        }
+        // groups
+        formConfig.groups.forEach((group) => {
+            var _a;
+            if ((_a = group.options) === null || _a === void 0 ? void 0 : _a.label) {
+                group.options.label = _t(group.options.label);
+            }
+        });
+        // sections
+        formConfig.sections.forEach((section) => {
+            if (section.title) {
+                section.title = _t(section.title);
+            }
+            if (section.description) {
+                section.description = _t(section.description);
+            }
+            section.inputs.forEach((input) => {
+                if (input.data.label) {
+                    input.data.label = _t(input.data.label);
+                }
+                // input text
+                if (input.type === 'text') {
+                    if (input.data.placeholder) {
+                        input.data.placeholder = _t(input.data.placeholder);
+                    }
+                }
+                // input checkbox
+                if (input.type === 'checkbox') {
+                    input.data.checkboxes.forEach((checkbox) => {
+                        checkbox.label = _t(checkbox.label);
+                    });
+                }
+                // input select
+                if (input.type === 'select') {
+                    input.data.options.forEach((option) => {
+                        option.label = _t(option.label);
+                    });
+                }
+            });
+        });
+    }
+}
+
+class MrAdvancedSearchLayoutEH extends EventHandler {
+    constructor() {
+        super(...arguments);
+        this.destroy$ = new Subject();
+    }
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'mr-advanced-search-layout.init':
+                    this.dataSource.onInit(payload);
+                    // init hook
+                    this.onInit();
+                    // scroll top
+                    window.scrollTo(0, 0);
+                    break;
+                case 'mr-advanced-search-layout.destroy':
+                    this.destroy$.next();
+                    break;
+                default:
+                    console.warn('unhandled inner event of type', type);
+                    break;
+            }
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'mr-form-wrapper-accordion.submit':
+                    this.dataSource.onSubmit(payload);
+                    break;
+                case 'mr-form-wrapper-accordion.reset':
+                    this.dataSource.onReset();
+                    break;
+                default:
+                    console.warn('unhandled inner event of type', type);
+                    break;
+            }
+        });
+    }
+    /**
+     * @example
+     * protected onInit() {
+     *   this.dataSource.form.changed$.subscribe(({ id, state }) => {
+     *     console.log('changed$', { id, state });
+     *   });
+     * }
+     */
+    onInit() {
+        // to be extended on project
+    }
+}
+
+const MrAdvancedSearchLayoutConfig = {
+    layoutId: 'mr-advanced-search-layout',
+    widgets: [{
+            id: 'mr-form-wrapper-accordion'
+        }],
+    layoutDS: MrAdvancedSearchLayoutDS,
+    layoutEH: MrAdvancedSearchLayoutEH,
+    widgetsDataSources: DS$3,
+    widgetsEventHandlers: EH$3,
+    layoutOptions: {}
+};
+
+let MrAdvancedSearchLayoutComponent = class MrAdvancedSearchLayoutComponent extends AbstractLayout {
+    constructor(router, activatedRoute, mainState, configuration, layoutsConfiguration) {
+        super(layoutsConfiguration.get('MrAdvancedSearchLayoutConfig') || MrAdvancedSearchLayoutConfig);
+        this.router = router;
+        this.activatedRoute = activatedRoute;
+        this.mainState = mainState;
+        this.configuration = configuration;
+    }
+    initPayload() {
+        return {
+            configId: this.configId,
+            configuration: this.configuration,
+            mainState: this.mainState,
+            router: this.router,
+            activatedRoute: this.activatedRoute,
+            options: this.config.options || {},
+        };
+    }
+    ngOnInit() {
+        this.activatedRoute.data.subscribe((data) => {
+            this.configId = data.configId;
+            this.onInit();
+        });
+    }
+    ngOnDestroy() {
+        this.onDestroy();
+    }
+};
+MrAdvancedSearchLayoutComponent.ctorParameters = () => [
+    { type: Router },
+    { type: ActivatedRoute },
+    { type: MainStateService },
+    { type: ConfigurationService },
+    { type: LayoutsConfigurationService }
+];
+MrAdvancedSearchLayoutComponent = __decorate([
+    Component({
+        selector: 'mr-advanced-search-layout',
+        template: "<div *ngIf=\"lb.dataSource\" class=\"mr-advanced-search mr-layout\">\r\n    <div class=\"mr-layout__maxwidth mr-side-margin\">\r\n\r\n        <n7-inner-title [data]=\"{\r\n            title: {\r\n                main: {\r\n                    text: lb.dataSource.pageConfig.title\r\n                }\r\n            }\r\n        }\"></n7-inner-title>\r\n\r\n        <mr-form-wrapper-accordion \r\n            [data]=\"lb.widgets['mr-form-wrapper-accordion'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['mr-form-wrapper-accordion'].emit\">\r\n        </mr-form-wrapper-accordion>\r\n    </div>\r\n</div>"
+    }),
+    __metadata("design:paramtypes", [Router,
+        ActivatedRoute,
+        MainStateService,
+        ConfigurationService,
+        LayoutsConfigurationService])
+], MrAdvancedSearchLayoutComponent);
 
 class MrGlossaryLayoutDS extends LayoutDataSource {
     // private communication;
@@ -11627,6 +11639,746 @@ MrHomeLayoutComponent = __decorate([
         MrLayoutStateService])
 ], MrHomeLayoutComponent);
 
+class MrItineraryLayoutDS extends LayoutDataSource {
+    constructor() {
+        super(...arguments);
+        this.errorTitle = _t('global#layout_error_title');
+        this.errorDescription = _t('global#layout_error_description');
+    }
+    onInit(payload) {
+        this.configuration = payload.configuration;
+        this.communication = payload.communication;
+        this.mainState = payload.mainState;
+        this.configId = payload.configId;
+        this.pageConfig = this.configuration.get(this.configId);
+        // add translations
+        this.pageConfig.sections = this.pageConfig.sections.map((section) => (Object.assign(Object.assign({}, section), { title: _t(section.title) })));
+    }
+    pageRequest$(id, onError) {
+        return this.communication.request$('itinerary', {
+            onError,
+            method: 'GET',
+            urlParams: id
+        });
+    }
+    handleResponse(response) {
+        this.updateTitle(response);
+        this.updateContent(response);
+        this.updateMetadata(response);
+        this.initSections(response);
+        this.updateHeadTitle(response);
+    }
+    updateTitle({ title }) {
+        this.title = title;
+    }
+    updateContent({ content }) {
+        this.content = content;
+    }
+    updateMetadata(response) {
+        this.one('mr-static-metadata').update(response);
+    }
+    initSections(response) {
+        const { sections } = this.pageConfig;
+        sections.forEach(({ id }) => {
+            const widgetDataSource = this.getWidgetDataSource(id);
+            if (!widgetDataSource)
+                return;
+            const responseSection = response.sections[id];
+            // set id
+            widgetDataSource.id = id;
+            // update data
+            if (responseSection) {
+                this.one(id).update(responseSection);
+            }
+        });
+    }
+    updateHeadTitle({ title: itineraryTitle }) {
+        const appName = this.configuration.get('name');
+        const pageTitle = this.pageConfig.title;
+        this.mainState.update('headTitle', [appName, _t(pageTitle), itineraryTitle].join(' > '));
+    }
+}
+
+class MrItineraryLayoutEH extends EventHandler {
+    constructor() {
+        super(...arguments);
+        this.destroy$ = new Subject();
+    }
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'mr-itinerary-layout.init':
+                    this.route = payload.route;
+                    this.router = payload.router;
+                    this.layoutState = payload.layoutState;
+                    this.modalService = payload.modalService;
+                    this.dataSource.onInit(payload);
+                    this.listenRoute();
+                    // scroll top
+                    window.scrollTo(0, 0);
+                    break;
+                case 'mr-resource-layout.destroy':
+                    this.destroy$.next();
+                    break;
+                default:
+                    console.warn('unhandled inner event of type', type);
+                    break;
+            }
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
+            if (type.indexOf('openresourcemodal') !== -1) {
+                const { id, type: resourceType } = payload;
+                this.modalService.open(id, resourceType);
+            }
+        });
+    }
+    listenRoute() {
+        this.route.paramMap.pipe(takeUntil(this.destroy$), tap(() => {
+            this.layoutState.set('content', LayoutState.LOADING);
+        }), map((params) => params.get('id')), switchMap((id) => this.dataSource.pageRequest$(id, (err) => {
+            if (err.status === 404) {
+                // getting not found path
+                const { config } = this.router;
+                const route404 = config.find(({ data }) => (data === null || data === void 0 ? void 0 : data.id) === 'page-404');
+                const path404 = (route404 === null || route404 === void 0 ? void 0 : route404.path) || 'page-404';
+                this.router.navigate([path404]);
+            }
+            console.warn(`Error loading resource layout for ${id}`, err.message);
+            this.layoutState.set('content', LayoutState.ERROR);
+        }))).subscribe((response) => {
+            this.layoutState.set('content', LayoutState.SUCCESS);
+            this.dataSource.handleResponse(response);
+            // scroll top
+            window.scrollTo(0, 0);
+        });
+    }
+}
+
+const MrItineraryLayoutConfig = {
+    layoutId: 'mr-itinerary-layout',
+    widgets: [
+        { id: 'mr-static-metadata' }
+    ],
+    layoutDS: MrItineraryLayoutDS,
+    layoutEH: MrItineraryLayoutEH,
+    widgetsDataSources: DS$3,
+    widgetsEventHandlers: EH$3,
+    options: {
+    // TODO
+    },
+};
+
+const DATASOURCE_MAP$1 = {
+    collection: MrCollectionDS,
+    metadata: MrMetadataDS,
+    gallery: MrGalleryDS,
+};
+const EVENTHANDLER_MAP$1 = {
+    collection: MrCollectionEH,
+    gallery: MrGalleryEH,
+};
+let MrItineraryLayoutComponent = class MrItineraryLayoutComponent extends AbstractLayout {
+    constructor(layoutsConfiguration, activatedRoute, configuration, communication, mainState, route, router, layoutState, modalService) {
+        super(layoutsConfiguration.get('MrItineraryLayoutConfig') || MrItineraryLayoutConfig);
+        this.activatedRoute = activatedRoute;
+        this.configuration = configuration;
+        this.communication = communication;
+        this.mainState = mainState;
+        this.route = route;
+        this.router = router;
+        this.layoutState = layoutState;
+        this.modalService = modalService;
+    }
+    initPayload() {
+        return {
+            configId: this.configId,
+            configuration: this.configuration,
+            communication: this.communication,
+            mainState: this.mainState,
+            layoutState: this.layoutState,
+            modalService: this.modalService,
+            options: this.config.options || {},
+            route: this.route,
+            router: this.router
+        };
+    }
+    ngOnInit() {
+        this.activatedRoute.data.subscribe((data) => {
+            this.layoutState.add('content');
+            this.configId = data.configId;
+            this.loadWidgets();
+            this.onInit();
+        });
+    }
+    ngOnDestroy() {
+        this.onDestroy();
+    }
+    loadWidgets() {
+        const { sections } = this.configuration.get(this.configId);
+        if (sections) {
+            sections.forEach(({ id, type, options }) => {
+                this.widgets.push({
+                    id,
+                    options,
+                    dataSource: DATASOURCE_MAP$1[type],
+                    eventHandler: EVENTHANDLER_MAP$1[type]
+                });
+            });
+        }
+    }
+};
+MrItineraryLayoutComponent.ctorParameters = () => [
+    { type: LayoutsConfigurationService },
+    { type: ActivatedRoute },
+    { type: ConfigurationService },
+    { type: CommunicationService },
+    { type: MainStateService },
+    { type: ActivatedRoute },
+    { type: Router },
+    { type: MrLayoutStateService },
+    { type: MrResourceModalService }
+];
+MrItineraryLayoutComponent = __decorate([
+    Component({
+        selector: 'mr-itinerary-layout',
+        template: "<div class=\"mr-static mr-layout\" \r\n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\"\r\n     [ngClass]=\"{\r\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\r\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\r\n      }\">\r\n    <!-- ITINERARY LAYOUT CONTENT -->\r\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\r\n        <!-- loading -->\r\n        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n            <div class=\"mr-layout__loader\">\r\n                <n7-loader></n7-loader>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- error -->\r\n        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n            <div class=\"mr-layout__error\">\r\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\r\n                <p>{{ lb.dataSource.errorDescription }}</p>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- success -->\r\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n            <div class=\"mr-static__top\">\r\n                <h1 class=\"mr-static__title mr-generated-title-WP\">{{lb.dataSource.title}}</h1>\r\n                <div class=\"mr-static__metadata\">\r\n                    <n7-metadata-viewer \r\n                    [data]=\"lb.widgets['mr-static-metadata'].ds.out$ | async\">\r\n                    </n7-metadata-viewer>\r\n                </div>\r\n            </div>\r\n\r\n            <div class=\"mr-static__content mr-side-margin\">\r\n                <!-- Page content html -->\r\n                <div class=\"mr-wp-content\" [innerHTML]=\"lb.dataSource.content | keepHtml\"></div>\r\n    \r\n                <!-- Pass the list of blocks to render to the block template -->\r\n                <div class=\"mr-static__related-resources\">\r\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: lb.dataSource.pageConfig.sections }\"></ng-container>\r\n                </div>\r\n            </div>\r\n        </ng-container>\r\n\r\n    </ng-container>\r\n</div>\r\n\r\n<ng-template #blocks let-list>\r\n    <ng-container *ngFor=\"let section of list\">\r\n        <section *ngIf=\"lb.widgets[section.id].ds.out$ | async\"\r\n        class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\r\n            <ng-container [ngSwitch]=\"section.type\">\r\n    \r\n                <!-- METADATA VIEWER -->\r\n                <ng-container *ngSwitchCase=\"'metadata'\">\r\n                    \r\n                    <div class=\"mr-content-block mr-content-block-metadata\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <mr-read-more [data]=\"section.readmore\">\r\n                                <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\r\n                                    [emit]=\"lb.widgets[section.id].emit\">\r\n                                </n7-metadata-viewer>\r\n                            </mr-read-more>\r\n                        </div>\r\n                    </div>\r\n\r\n                </ng-container>\r\n    \r\n                <!-- COLLECTION -->\r\n                <ng-container *ngSwitchCase=\"'collection'\">\r\n                    <ng-container *ngIf=\"lb.widgets[section.id].ds.out$ | async as collection$\">\r\n                        \r\n                        <div *ngIf=\"collection$.items?.length > 0\" class=\"mr-content-block mr-content-block-collection\">\r\n                            <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                                {{ section.title }}\r\n                            </h3>\r\n                            <div class=\"mr-content-block__content {{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\r\n                                <n7-item-preview *ngFor=\"let item of collection$?.items\"\r\n                                    [data]=\"item\" [emit]=\"lb.widgets[section.id].emit\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n\r\n                    </ng-container>\r\n                </ng-container>\r\n    \r\n                <!-- GALLERY -->\r\n                <ng-container *ngSwitchCase=\"'gallery'\">\r\n                    <div class=\"mr-content-block mr-content-block-gallery\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <mr-gallery [grid]=\"section.grid\" [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">        \r\n                            </mr-gallery>\r\n                        </div>\r\n                    </div>\r\n                </ng-container>\r\n\r\n            </ng-container>\r\n        </section>\r\n    </ng-container>\r\n</ng-template>\r\n"
+    }),
+    __metadata("design:paramtypes", [LayoutsConfigurationService,
+        ActivatedRoute,
+        ConfigurationService,
+        CommunicationService,
+        MainStateService,
+        ActivatedRoute,
+        Router,
+        MrLayoutStateService,
+        MrResourceModalService])
+], MrItineraryLayoutComponent);
+
+class MrMapLayoutDS extends LayoutDataSource {
+    constructor() {
+        super(...arguments);
+        this.loading = {
+            resourceDetails: true,
+            timeline: true,
+        };
+        this.defaultDescription = '';
+        this.eventDescription = '';
+        this.mapListener$ = new Subject();
+    }
+    onInit(payload) {
+        this.configuration = payload.configuration;
+        this.communication = payload.communication;
+        this.route = payload.route;
+        this.location = payload.location;
+        this.configId = payload.configId;
+        this.pageConfig = this.configuration.get(this.configId) || {};
+        // update the map
+        this.communication.request$('map', {
+            method: 'GET',
+            onError: (e) => console.error(e)
+        }).subscribe(({ dataSet }) => {
+            if (dataSet) {
+                this.one('mr-map').update(dataSet);
+            }
+        });
+        this.getWidgetDataSource('mr-map').mapLoaded$
+            .pipe(first())
+            .subscribe(({ map, markers }) => {
+            this.mapListener$.next({ map, markers });
+        });
+    }
+    loadDefaults(navigate) {
+        this.eventDescription = this.defaultDescription;
+        this.eventHeader = '';
+        this.bibliographyData = undefined;
+        this.collectionWitnessData = undefined;
+        this.collectionWorksData = undefined;
+        this.collectionGalleryData = undefined;
+        if (navigate)
+            this.location.go('/map/');
+        this.one('mr-year-header').update({
+            title: { main: { text: _t(this.pageConfig.title) } },
+        });
+    }
+    updatePageDetails(id) {
+        this.communication.request$('resource', {
+            onError: (e) => console.error(e),
+            method: 'POST',
+            params: {
+                id, type: 'views/places'
+            }
+        }).subscribe((res) => {
+            if (!res || res == null)
+                return;
+            const { 
+            /* eslint-disable */
+            'collection-bibliography': bibData, 'collection-places': placesData, 'collection-witnesses': witnessData, 'collection-works': worksData, gallery, header, } = res.sections;
+            if (placesData) {
+                // this.hasMap = true;
+                this.one('mr-map').update(placesData);
+            }
+            else {
+                // this.hasMap = false;
+            }
+            if (bibData) {
+                this.bibliographyData = bibData;
+            }
+            else {
+                this.bibliographyData = undefined;
+            }
+            if (witnessData) {
+                this.collectionWitnessData = {
+                    items: witnessData.items.map((witness) => ({
+                        title: witness.title,
+                        anchor: {
+                            href: witness.link,
+                        }
+                    })),
+                    header: witnessData.header
+                };
+            }
+            else {
+                this.collectionWitnessData = undefined;
+            }
+            if (worksData === null || worksData === void 0 ? void 0 : worksData.items) {
+                this.collectionWorksData = {
+                    header: worksData.header,
+                    items: worksData.items.map((item) => ({
+                        image: item.image,
+                        title: item.title,
+                        anchor: item.link ? {
+                            href: item.link,
+                        } : undefined,
+                        text: item.text,
+                    }))
+                };
+            }
+            else {
+                this.collectionWorksData = undefined;
+            }
+            if (gallery) {
+                this.collectionGalleryData = gallery;
+            }
+            else {
+                this.collectionGalleryData = undefined;
+            }
+            if (header) {
+                this.eventDescription = header.content;
+                this.eventHeader = res.title;
+                this.one('mr-year-header').update({
+                    title: { main: { text: header.title } },
+                    actions: {
+                        buttons: [{
+                                text: '',
+                                icon: 'n7-icon-close',
+                                anchor: {
+                                    payload: 'closebutton'
+                                }
+                            }]
+                    }
+                });
+            }
+            this.loading.resourceDetails = false;
+        });
+    }
+}
+
+class MrMapLayoutEH extends EventHandler {
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'mr-map-layout.init':
+                    this.dataSource.onInit(payload);
+                    this.route = payload.route;
+                    this.router = payload.router;
+                    this.location = payload.location;
+                    this.listenRoute();
+                    // scroll top
+                    window.scrollTo(0, 0);
+                    // listen for clicks on the map markers
+                    this.dataSource.mapListener$
+                        .subscribe(({ markers }) => {
+                        markers.on('click', ({ layer: marker }) => {
+                            if (!marker.id)
+                                return;
+                            const isSelected = marker.getIcon().options.className.includes('selected');
+                            if (isSelected) {
+                                // navigate to the clicked resource / marker
+                                this.location.go(`/map/${marker.id}/${marker.slug}`);
+                                this.dataSource.updatePageDetails(marker.id);
+                            }
+                            else {
+                                this.location.go('/map/');
+                                this.dataSource.loadDefaults();
+                            }
+                        });
+                    });
+                    break;
+                case 'mr-timeline-layout.destroy':
+                    break;
+                default:
+                    console.warn('unhandled inner event of type', type);
+                    break;
+            }
+        });
+        this.outerEvents$.subscribe(({ type }) => {
+            switch (type) {
+                case 'mr-year-header.closeevent':
+                    this.dataSource.loadDefaults(true);
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+    listenRoute() {
+        this.route.paramMap.subscribe((params) => {
+            const paramId = params.get('id');
+            if (paramId) {
+                this.dataSource.currentId = paramId;
+                this.emitOuter('routechanged', paramId);
+                this.dataSource.updatePageDetails(paramId);
+            }
+            else {
+                this.dataSource.loadDefaults(true);
+            }
+        });
+    }
+}
+
+const MrMapLayoutConfig = {
+    layoutId: 'mr-map-layout',
+    widgets: [
+        { id: 'mr-map' },
+        { id: 'mr-year-header' }
+    ],
+    layoutDS: MrMapLayoutDS,
+    layoutEH: MrMapLayoutEH,
+    widgetsDataSources: DS$3,
+    widgetsEventHandlers: EH$3,
+    options: {},
+};
+
+let MrMapLayoutComponent = class MrMapLayoutComponent extends AbstractLayout {
+    constructor(layoutsConfiguration, route, router, location, configuration, communication, mainState, layoutState) {
+        super(layoutsConfiguration.get('MrMapLayoutConfig') || MrMapLayoutConfig);
+        this.route = route;
+        this.router = router;
+        this.location = location;
+        this.configuration = configuration;
+        this.communication = communication;
+        this.mainState = mainState;
+        this.layoutState = layoutState;
+    }
+    initPayload() {
+        return {
+            configId: this.configId,
+            mainState: this.mainState,
+            configuration: this.configuration,
+            communication: this.communication,
+            layoutState: this.layoutState,
+            route: this.route,
+            router: this.router,
+            location: this.location,
+            options: this.config.options || {}
+        };
+    }
+    ngOnInit() {
+        this.route.data.subscribe((data) => {
+            this.configId = data.configId;
+            this.layoutState.add('content');
+            this.onInit();
+        });
+    }
+    ngOnDestroy() {
+        this.onDestroy();
+    }
+};
+MrMapLayoutComponent.ctorParameters = () => [
+    { type: LayoutsConfigurationService },
+    { type: ActivatedRoute },
+    { type: Router },
+    { type: Location },
+    { type: ConfigurationService },
+    { type: CommunicationService },
+    { type: MainStateService },
+    { type: MrLayoutStateService }
+];
+MrMapLayoutComponent = __decorate([
+    Component({
+        selector: 'mr-map-layout',
+        template: "<div class=\"mr-timeline mr-layout\"\r\n     *ngIf=\"lb.dataSource\">\r\n    <div class=\"mr-map__timeline\">\r\n        <div class=\"mr-map__timeline-loading\"\r\n             *ngIf=\"lb.dataSource.loading.timeline\">\r\n        </div>\r\n        <n7-map [data]=\"lb.widgets['mr-map'].ds.out$ | async\"></n7-map>\r\n        <!-- <n7-timeline [data]=\"lb.widgets['mr-timeline'].ds.out$ | async\"\r\n                     *ngIf=\"!lb.dataSource.loading.timeline\">\r\n        </n7-timeline> -->\r\n    </div>\r\n\r\n    <div class=\"mr-map__page mr-side-margin\">\r\n        <div class=\"mr-map__date\">\r\n            <n7-inner-title [data]=\"lb.widgets['mr-year-header'].ds.out$ | async\"\r\n                            [emit]=\"lb.widgets['mr-year-header'].emit\">\r\n            </n7-inner-title>\r\n        </div>\r\n        <h1 class=\"mr-map__title\"\r\n            *ngIf=\"!lb.dataSource.loading.resourceDetails\">\r\n            {{lb.dataSource.eventHeader}}\r\n        </h1>\r\n        <div class=\"mr-map__content\">\r\n            <!-- DESCRIZIONE -->\r\n            <div class=\"mr-content-block mr-content-block-description\">\r\n                <p [innerHTML]=\"lb.dataSource.eventDescription\">\r\n                <p>\r\n            </div>\r\n            <ng-container *ngIf=\"!lb.dataSource.loading.resourceDetails\">\r\n\r\n                <!-- GALLERIA -->\r\n                <div class=\"mr-content-block n7-grid-6\">\r\n                    <ng-container *ngFor=\"let image of lb.dataSource.collectionGalleryData\">\r\n                        <a [href]=\"image.image\" class=\"mr-gallery__image\">\r\n                            <img [src]=\"image.thumbnail\" alt=\"image.title\">\r\n                        </a>\r\n                    </ng-container>\r\n                </div>\r\n\r\n                <!-- BIBLIOGRAFIA -->\r\n                <ng-container *ngIf=\"lb.dataSource.bibliographyData as biblio\">\r\n                    <ng-container *ngIf=\"biblio.items && biblio.items.length > 0\">\r\n                        <div class=\"mr-content-block mr-content-block-collection\">\r\n                            <h3 class=\"mr-content-block__title\">{{ biblio.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-1\">\r\n                                <ng-container *ngFor=\"let item of biblio.items\">\r\n                                    <div class=\"mr-map__collection-content\">\r\n                                        <n7-item-preview [data]=\"item\"></n7-item-preview>\r\n                                    </div>\r\n                                </ng-container>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n                <!-- TESTIMONI -->\r\n                <ng-container *ngIf=\"lb.dataSource.collectionWitnessData as wit\">\r\n                    <ng-container *ngIf=\"wit.items && wit.items.length > 0\">\r\n                        <div class=\"mr-content-block-collection mr-content-block\">\r\n                            <h3 class=\"mr-content-block__title\">{{ wit.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-3\">\r\n                                <n7-item-preview *ngFor=\"let item of wit.items\"\r\n                                                 [data]=\"item\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n                <!-- OPERE -->\r\n                <ng-container *ngIf=\"lb.dataSource.collectionWorksData as works\">\r\n                    <ng-container *ngIf=\"works.items && works.items.length > 0\">\r\n                        <div class=\"mr-content-block-collection mr-content-block\">\r\n                            <h3 class=\"mr-content-block__title\">{{ works.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-3\">\r\n                                <n7-item-preview *ngFor=\"let item of works.items\"\r\n                                                 [data]=\"item\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n            </ng-container>\r\n        </div>\r\n    </div>\r\n</div>\r\n"
+    }),
+    __metadata("design:paramtypes", [LayoutsConfigurationService,
+        ActivatedRoute,
+        Router,
+        Location,
+        ConfigurationService,
+        CommunicationService,
+        MainStateService,
+        MrLayoutStateService])
+], MrMapLayoutComponent);
+
+class MrPostsLayoutDS extends LayoutDataSource {
+    onInit(payload) {
+        this.configuration = payload.configuration;
+        this.mainState = payload.mainState;
+        this.configId = payload.configId;
+        this.communication = payload.communication;
+        this.pageConfig = this.configuration.get(this.configId);
+        // config
+        this.all().updateOptions({ config: this.pageConfig });
+        // manual updates
+        this.one('mr-search-page-title').update({});
+        // update head title
+        this.updateHeadTitle();
+        // update translations
+        this.addTranslations(this.pageConfig);
+    }
+    updateSearchTags(params) {
+        if (!this.pageConfig.filters) {
+            return;
+        }
+        const { labels } = this.pageConfig.filters;
+        const tags = [];
+        Object.keys(labels)
+            .filter((key) => !!params[key])
+            .forEach((key) => {
+            tags[key] = params[key];
+        });
+        this.one('mr-advanced-search-tags').updateOptions({ labels });
+        this.one('mr-advanced-search-tags').update(tags);
+    }
+    request$(params, onError) {
+        const { searchId } = this.pageConfig;
+        const searchParams = Object.assign({}, params);
+        Object.keys(searchParams)
+            .filter((key) => ['page', 'limit', 'sort'].includes(key))
+            .forEach((key) => {
+            searchParams.results = searchParams.results || {};
+            searchParams.results[key] = searchParams[key];
+            delete searchParams[key];
+        });
+        // normalize results filters
+        const resultsParams = {};
+        const results = searchParams.results || {};
+        const page = results.page ? +results.page : 1;
+        resultsParams.limit = results.limit ? +results.limit : 12;
+        resultsParams.offset = page === 1 ? 0 : resultsParams.limit * (page - 1);
+        resultsParams.sort = results.sort || 'sort_ASC';
+        return this.communication.request$('posts', {
+            method: 'POST',
+            params: Object.assign(Object.assign({}, searchParams), { searchId, results: Object.assign({}, resultsParams) }),
+            onError
+        });
+    }
+    handleResponse(response) {
+        this.some([
+            'mr-search-results-title',
+            'mr-search-results',
+        ]).update(response);
+        // pagination
+        this.one('n7-smart-pagination').updateOptions({ mode: 'payload' });
+        this.one('n7-smart-pagination').update(this.getPaginationParams(response));
+    }
+    updateHeadTitle() {
+        const appName = this.configuration.get('name');
+        const pageTitle = this.pageConfig.title;
+        this.mainState.update('headTitle', [appName, _t(pageTitle)].join(' > '));
+    }
+    addTranslations(config) {
+        var _a;
+        if ((_a = config === null || config === void 0 ? void 0 : config.sort) === null || _a === void 0 ? void 0 : _a.label) {
+            config.sort.label = _t(config.sort.label);
+            config.sort.options = config.sort.options.map((option) => (Object.assign(Object.assign({}, option), { label: _t(option.label) })));
+        }
+        ['text', 'button'].forEach((key) => {
+            if (config.fallback) {
+                config.fallback[key] = _t(config.fallback[key]);
+            }
+            if (config.ko) {
+                config.ko[key] = _t(config.ko[key]);
+            }
+        });
+        // filters
+        const { filters } = this.pageConfig;
+        if (filters) {
+            filters.title = _t(filters.title);
+            Object.keys(filters.labels).forEach((key) => {
+                filters.labels[key] = _t(filters.labels[key]);
+            });
+        }
+    }
+    getPaginationParams(response) {
+        const { total_count: totalCount, offset, limit } = response;
+        const { pagination: paginationConfig } = this.pageConfig;
+        return {
+            totalPages: Math.ceil(totalCount / limit),
+            currentPage: (offset + limit) / limit,
+            pageLimit: paginationConfig.limit,
+            sizes: {
+                label: paginationConfig.selectLabel ? _t(paginationConfig.selectLabel) : null,
+                list: paginationConfig.options,
+                active: limit,
+            },
+        };
+    }
+}
+
+class MrPostsLayoutEH extends EventHandler {
+    constructor() {
+        super(...arguments);
+        this.destroy$ = new Subject();
+    }
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'mr-posts-layout.init':
+                    this.activatedRoute = payload.activatedRoute;
+                    this.router = payload.router;
+                    this.layoutState = payload.layoutState;
+                    this.dataSource.onInit(payload);
+                    // listen route changes
+                    this.listenToRouterChanges();
+                    // scroll top
+                    window.scrollTo(0, 0);
+                    break;
+                case 'mr-posts-layout.destroy':
+                    this.destroy$.next();
+                    break;
+                default:
+                    console.warn('unhandled inner event of type', type);
+                    break;
+            }
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'n7-smart-pagination.click':
+                    this.updateRouter({ page: payload.page });
+                    break;
+                case 'n7-smart-pagination.change':
+                    this.updateRouter({ limit: payload.value, page: 1 });
+                    break;
+                case 'mr-search-results-title.change':
+                    this.updateRouter({ sort: payload.value, page: 1 });
+                    break;
+                default:
+                    console.warn('unhandled inner event of type', type);
+                    break;
+            }
+        });
+    }
+    /** URL changes */
+    listenToRouterChanges() {
+        this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$), tap(() => {
+            this.layoutState.set('results', LayoutState.LOADING);
+        }), switchMap((params) => {
+            this.dataSource.updateSearchTags(params);
+            return this.dataSource.request$(params, (error) => {
+                console.warn('Posts search error', error);
+                this.layoutState.set('results', LayoutState.ERROR);
+            });
+        })).subscribe((response) => {
+            this.dataSource.handleResponse(response);
+            this.layoutState.set('results', isEmpty(response.results) ? LayoutState.EMPTY : LayoutState.SUCCESS);
+            // scroll to ref element
+            if (!this.scrollRefElement) {
+                this.scrollRefElement = document.querySelector('.scroll-ref');
+            }
+            else if (!helpers.isElementInViewport(this.scrollRefElement)) {
+                this.scrollRefElement.scrollIntoView();
+            }
+        });
+    }
+    updateRouter(queryParams) {
+        this.router.navigate([], {
+            queryParams,
+            queryParamsHandling: 'merge'
+        });
+    }
+}
+
+const MrPostsLayoutConfig = {
+    layoutId: 'mr-posts-layout',
+    widgets: [
+        {
+            id: 'mr-search-page-title'
+        }, {
+            id: 'mr-search-results-title'
+        }, {
+            id: 'mr-search-results'
+        }, {
+            id: 'n7-smart-pagination',
+            dataSource: SmartPaginationDS,
+            eventHandler: SmartPaginationEH,
+        }, {
+            id: 'mr-advanced-search-tags'
+        }
+    ],
+    layoutDS: MrPostsLayoutDS,
+    layoutEH: MrPostsLayoutEH,
+    widgetsDataSources: DS$3,
+    widgetsEventHandlers: EH$3,
+    layoutOptions: {}
+};
+
+let MrPostsLayoutComponent = class MrPostsLayoutComponent extends AbstractLayout {
+    constructor(router, activatedRoute, mainState, configuration, communication, layoutState, layoutsConfiguration) {
+        super(layoutsConfiguration.get('MrPostsLayoutConfig') || MrPostsLayoutConfig);
+        this.router = router;
+        this.activatedRoute = activatedRoute;
+        this.mainState = mainState;
+        this.configuration = configuration;
+        this.communication = communication;
+        this.layoutState = layoutState;
+    }
+    initPayload() {
+        return {
+            configId: this.configId,
+            configuration: this.configuration,
+            communication: this.communication,
+            mainState: this.mainState,
+            router: this.router,
+            activatedRoute: this.activatedRoute,
+            layoutState: this.layoutState,
+            options: this.config.options || {},
+        };
+    }
+    ngOnInit() {
+        this.activatedRoute.data.subscribe((data) => {
+            this.configId = data.configId;
+            // add layout states
+            this.layoutState.add(['results']);
+            this.onInit();
+        });
+    }
+    ngOnDestroy() {
+        this.onDestroy();
+    }
+};
+MrPostsLayoutComponent.ctorParameters = () => [
+    { type: Router },
+    { type: ActivatedRoute },
+    { type: MainStateService },
+    { type: ConfigurationService },
+    { type: CommunicationService },
+    { type: MrLayoutStateService },
+    { type: LayoutsConfigurationService }
+];
+MrPostsLayoutComponent = __decorate([
+    Component({
+        selector: 'mr-posts-layout',
+        template: "<div class=\"mr-search mr-layout\"\r\n     *ngIf=\"lb.dataSource\">\r\n    <section class=\"mr-layout__maxwidth mr-side-margin\">\r\n\r\n        <div class=\"mr-search__title\">\r\n            <div class=\"scroll-ref\">&nbsp;</div>\r\n            <n7-inner-title\r\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['mr-search-page-title'].emit\">\r\n            </n7-inner-title>\r\n        </div>\r\n        \r\n        <div class=\"mr-search__results-content\">\r\n            <div class=\"mr-search__results-wrapper\">\r\n                <div class=\"mr-search__results-info\">\r\n                    <n7-inner-title\r\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\r\n                    </n7-inner-title>\r\n                </div>\r\n                <div *ngIf=\"lb.dataSource.pageConfig['filters']\" class=\"mr-search__results-filters\">\r\n                    <span *ngIf=\"lb.dataSource.pageConfig['filters'].title\" \r\n                    class=\"mr-search__results-filters-title\">{{ lb.dataSource.pageConfig['filters'].title }}</span>\r\n                    <div class=\"mr-search__results-filters-wrapper\">\r\n                        <n7-tag *ngFor=\"let tag of (lb.widgets['mr-advanced-search-tags'].ds.out$ | async)\"\r\n                            [data]=\"tag\">\r\n                        </n7-tag>\r\n                    </div>\r\n                </div>\r\n                <main class=\"mr-search__results\">\r\n                    <!-- SEARCH RESULTS -->\r\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\r\n                        \r\n                        <!-- loading -->\r\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n                            <div class=\"mr-search__results-loading n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\r\n                                    blocks: [\r\n                                        { classes: 'search-result-placeholder-title' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' }\r\n                                    ]\r\n                                }\"></n7-content-placeholder>\r\n                            </div>\r\n                        </ng-container>\r\n                        \r\n                        <!-- success: items > 0 -->\r\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n                            <div class=\"n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\r\n                                [data]=\"item\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- empty: items === 0 -->\r\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\r\n                            <div class=\"mr-search__results-fallback\">\r\n                                <p class=\"mr-search__results-fallback-string\">\r\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\r\n                                </p>\r\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\r\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\r\n                                </button>\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- error: request problem -->\r\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n                            <p class=\"mr-search__results-ko-string\">\r\n                                {{ lb.dataSource.pageConfig.ko.text }}\r\n                            </p>\r\n                            <button class=\"n7-btn mr-search__results-ko-button\"\r\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                {{ lb.dataSource.pageConfig.ko.button }}\r\n                            </button>\r\n                        </ng-container>\r\n                        \r\n                    </ng-container>\r\n                </main>               \r\n                <n7-smart-pagination\r\n                *ngIf=\"(layoutState.get$('results') | async) === 'SUCCESS'\"\r\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\r\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\r\n                </n7-smart-pagination>\r\n            </div>\r\n        </div>\r\n\r\n    </section>\r\n</div>\r\n"
+    }),
+    __metadata("design:paramtypes", [Router,
+        ActivatedRoute,
+        MainStateService,
+        ConfigurationService,
+        CommunicationService,
+        MrLayoutStateService,
+        LayoutsConfigurationService])
+], MrPostsLayoutComponent);
+
 class MrResourceLayoutDS extends LayoutDataSource {
     constructor() {
         super(...arguments);
@@ -11794,7 +12546,7 @@ class MrImageViewerEH extends EventHandler {
     }
 }
 
-const DATASOURCE_MAP$1 = {
+const DATASOURCE_MAP$2 = {
     breadcrumbs: MrBreadcrumbsDS,
     collection: MrCollectionDS,
     info: MrInfoBoxDS,
@@ -11806,7 +12558,7 @@ const DATASOURCE_MAP$1 = {
     tabs: MrResourceTabsDS,
     'text-viewer': MrTextViewerDS
 };
-const EVENTHANDLER_MAP$1 = {
+const EVENTHANDLER_MAP$2 = {
     viewer: MrImageViewerEH,
     collection: MrCollectionEH,
 };
@@ -11855,8 +12607,8 @@ let MrResourceLayoutComponent = class MrResourceLayoutComponent extends Abstract
                 this.widgets.push({
                     id,
                     options,
-                    dataSource: DATASOURCE_MAP$1[type],
-                    eventHandler: EVENTHANDLER_MAP$1[type]
+                    dataSource: DATASOURCE_MAP$2[type],
+                    eventHandler: EVENTHANDLER_MAP$2[type]
                 });
             });
         }
@@ -12328,7 +13080,7 @@ class FacetLinkMultipleEH extends EventHandler {
     }
 }
 
-const DATASOURCE_MAP$2 = {
+const DATASOURCE_MAP$3 = {
     header: FacetHeaderDS,
     text: FacetTextDS,
     checkbox: FacetCheckboxDS,
@@ -12336,7 +13088,7 @@ const DATASOURCE_MAP$2 = {
     link: FacetLinkDS,
     'link-multiple': FacetLinkMultipleDS,
 };
-const EVENTHANDLER_MAP$2 = {
+const EVENTHANDLER_MAP$3 = {
     header: FacetHeaderEH,
     text: FacetTextEH,
     checkbox: FacetCheckboxEH,
@@ -12367,8 +13119,8 @@ let MrSearchFacetsLayoutComponent = class MrSearchFacetsLayoutComponent extends 
             if (header) {
                 this.widgets.push({
                     id: header.id,
-                    dataSource: DATASOURCE_MAP$2.header,
-                    eventHandler: EVENTHANDLER_MAP$2.header
+                    dataSource: DATASOURCE_MAP$3.header,
+                    eventHandler: EVENTHANDLER_MAP$3.header
                 });
             }
             inputs.forEach((input) => {
@@ -12380,8 +13132,8 @@ let MrSearchFacetsLayoutComponent = class MrSearchFacetsLayoutComponent extends 
                 }
                 this.widgets.push({
                     id: input.id,
-                    dataSource: DATASOURCE_MAP$2[inputType],
-                    eventHandler: EVENTHANDLER_MAP$2[inputType]
+                    dataSource: DATASOURCE_MAP$3[inputType],
+                    eventHandler: EVENTHANDLER_MAP$3[inputType]
                 });
             });
         });
@@ -12902,7 +13654,7 @@ MrStaticLayoutComponent.ctorParameters = () => [
 MrStaticLayoutComponent = __decorate([
     Component({
         selector: 'mr-static-layout',
-        template: "<div class=\"mr-static mr-layout\"\r\n     *ngIf=\"lb.dataSource\"\r\n     [ngClass]=\"{\r\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\r\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\r\n      }\">\r\n    <!-- STATIC LAYOUT CONTENT -->\r\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\r\n        <!-- loading -->\r\n        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n            <div class=\"mr-layout__loader\">\r\n                <n7-loader></n7-loader>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- error -->\r\n        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n            <div class=\"mr-layout__error\">\r\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\r\n                <p>{{ lb.dataSource.errorDescription }}</p>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- success -->\r\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n            <div class=\"mr-static__top\">\r\n                <h1 class=\"mr-static__title mr-generated-title-WP\">{{lb.dataSource.title}}</h1>\r\n                <div class=\"mr-static__metadata\">\r\n                    <n7-metadata-viewer \r\n                    [data]=\"lb.widgets['mr-static-metadata'].ds.out$ | async\">\r\n                    </n7-metadata-viewer>\r\n                </div>\r\n            </div>\r\n            <div class=\"mr-static__content mr-wp-content\" [innerHTML]=\"lb.dataSource.content | keepHtml\"></div>\r\n        </ng-container>\r\n    \r\n    </ng-container>\r\n</div>\r\n"
+        template: "<div class=\"mr-static mr-layout\"\r\n     *ngIf=\"lb.dataSource\"\r\n     [ngClass]=\"{\r\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\r\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\r\n      }\">\r\n    <!-- STATIC LAYOUT CONTENT -->\r\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\r\n        <!-- loading -->\r\n        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n            <div class=\"mr-layout__loader\">\r\n                <n7-loader></n7-loader>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- error -->\r\n        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n            <div class=\"mr-layout__error\">\r\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\r\n                <p>{{ lb.dataSource.errorDescription }}</p>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- success -->\r\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n            <div class=\"mr-static__top\">\r\n                <h1 class=\"mr-static__title mr-generated-title-WP\">{{lb.dataSource.title}}</h1>\r\n                <div class=\"mr-static__metadata\">\r\n                    <n7-metadata-viewer \r\n                    [data]=\"lb.widgets['mr-static-metadata'].ds.out$ | async\">\r\n                    </n7-metadata-viewer>\r\n                </div>\r\n            </div>\r\n            \r\n            <div class=\"mr-static__content mr-wp-content\" [innerHTML]=\"lb.dataSource.content | keepHtml\"></div>\r\n        </ng-container>\r\n    \r\n    </ng-container>\r\n</div>\r\n"
     }),
     __metadata("design:paramtypes", [CommunicationService,
         ConfigurationService,
@@ -12958,7 +13710,10 @@ class MrTimelineLayoutDS extends LayoutDataSource {
         });
     }
     loadDefaults(navigate) {
-        this.getWidgetDataSource('mr-timeline').timeline.setSelection([]);
+        const timelineInstance = this.getWidgetDataSource('mr-timeline').timeline;
+        if (timelineInstance) {
+            timelineInstance.setSelection([]);
+        }
         this.eventDescription = this.defaultDescription;
         this.eventHeader = '';
         this.hasMap = false;
@@ -13177,7 +13932,7 @@ MrTimelineLayoutComponent.ctorParameters = () => [
 MrTimelineLayoutComponent = __decorate([
     Component({
         selector: 'mr-timeline-layout',
-        template: "<div class=\"mr-timeline mr-layout\"\r\n     *ngIf=\"lb.dataSource\">\r\n    <div class=\"mr-timeline__timeline\">\r\n        <div class=\"mr-timeline__timeline-loading\"\r\n             *ngIf=\"lb.dataSource.loading.timeline\">\r\n        </div>\r\n        <n7-timeline [data]=\"lb.widgets['mr-timeline'].ds.out$ | async\"\r\n                     *ngIf=\"!lb.dataSource.loading.timeline\">\r\n        </n7-timeline>\r\n    </div>\r\n\r\n    <div class=\"mr-timeline__page mr-side-margin\">\r\n        <div class=\"mr-timeline__date\">\r\n            <n7-inner-title [data]=\"lb.widgets['mr-year-header'].ds.out$ | async\"\r\n                            [emit]=\"lb.widgets['mr-year-header'].emit\">\r\n            </n7-inner-title>\r\n        </div>\r\n        <h1 class=\"mr-timeline__title\"\r\n            *ngIf=\"!lb.dataSource.loading.resourceDetails\">\r\n            {{lb.dataSource.eventHeader}}\r\n        </h1>\r\n        <div class=\"mr-timeline__content\">\r\n            <!-- DESCRIZIONE -->\r\n            <div class=\"mr-content-block mr-content-block-description\">\r\n                <p [innerHTML]=\"lb.dataSource.eventDescription\">\r\n                <p>\r\n            </div>\r\n            <ng-container *ngIf=\"!lb.dataSource.loading.resourceDetails\">\r\n\r\n                <!-- GALLERIA -->\r\n                <div class=\"mr-content-block n7-grid-6\">\r\n                    <ng-container *ngFor=\"let image of lb.dataSource.collectionGalleryData\">\r\n                        <a [href]=\"image.image\" class=\"mr-gallery__image\">\r\n                            <img [src]=\"image.thumbnail\" alt=\"image.title\">\r\n                        </a>\r\n                    </ng-container>\r\n                </div>\r\n                \r\n\r\n                <!-- MAPPA -->\r\n                <div class=\"mr-map\"\r\n                     *ngIf=\"lb.dataSource.hasMap\">\r\n                    <h3 class=\"mr-content-block__title\"\r\n                        *ngIf=\"lb.dataSource.mapHeader\">{{ lb.dataSource.mapHeader }}</h3>\r\n                    <n7-map [data]=\"lb.widgets['mr-map'].ds.out$ | async\"></n7-map>\r\n                </div>\r\n\r\n                <!-- BIBLIOGRAFIA -->\r\n                <ng-container *ngIf=\"lb.dataSource.bibliographyData as biblio\">\r\n                    <ng-container *ngIf=\"biblio.items && biblio.items.length > 0\">\r\n                        <div class=\"mr-content-block mr-content-block-collection\">\r\n                            <h3 class=\"mr-content-block__title\">{{ biblio.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-1\">\r\n                                <ng-container *ngFor=\"let item of biblio.items\">\r\n                                    <div class=\"mr-timeline__collection-content\">\r\n                                        <n7-item-preview [data]=\"item\"></n7-item-preview>\r\n                                    </div>\r\n                                </ng-container>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n                <!-- TESTIMONI -->\r\n                <ng-container *ngIf=\"lb.dataSource.collectionWitnessData as wit\">\r\n                    <ng-container *ngIf=\"wit.items && wit.items.length > 0\">\r\n                        <div class=\"mr-content-block-collection mr-content-block\">\r\n                            <h3 class=\"mr-content-block__title\">{{ wit.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-3\">\r\n                                <n7-item-preview *ngFor=\"let item of wit.items\"\r\n                                                 [data]=\"item\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n                <!-- OPERE -->\r\n                <ng-container *ngIf=\"lb.dataSource.collectionWorksData as works\">\r\n                    <ng-container *ngIf=\"works.items && works.items.length > 0\">\r\n                        <div class=\"mr-content-block-collection mr-content-block\">\r\n                            <h3 class=\"mr-content-block__title\">{{ works.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-3\">\r\n                                <n7-item-preview *ngFor=\"let item of works.items\"\r\n                                                 [data]=\"item\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n            </ng-container>\r\n        </div>\r\n    </div>\r\n</div>\r\n"
+        template: "<div class=\"mr-timeline mr-layout\"\r\n     *ngIf=\"lb.dataSource\">\r\n    <div class=\"mr-timeline__timeline\">\r\n        <div class=\"mr-timeline__timeline-loading\"\r\n             *ngIf=\"lb.dataSource.loading.timeline\">\r\n        </div>\r\n        <n7-timeline [data]=\"lb.widgets['mr-timeline'].ds.out$ | async\"\r\n                     *ngIf=\"!lb.dataSource.loading.timeline\">\r\n        </n7-timeline>\r\n    </div>\r\n\r\n    <div class=\"mr-timeline__page mr-side-margin\">\r\n        <div class=\"mr-timeline__date\">\r\n            <n7-inner-title [data]=\"lb.widgets['mr-year-header'].ds.out$ | async\"\r\n                            [emit]=\"lb.widgets['mr-year-header'].emit\">\r\n            </n7-inner-title>\r\n        </div>\r\n        <h1 class=\"mr-timeline__title\"\r\n            *ngIf=\"!lb.dataSource.loading.resourceDetails\">\r\n            {{lb.dataSource.eventHeader}}\r\n        </h1>\r\n        <div class=\"mr-timeline__content\">\r\n            <!-- DESCRIZIONE -->\r\n            <div class=\"mr-content-block mr-content-block-description\">\r\n                <p [innerHTML]=\"lb.dataSource.eventDescription\">\r\n                <p>\r\n            </div>\r\n            <ng-container *ngIf=\"!lb.dataSource.loading.resourceDetails\">\r\n\r\n                <!-- GALLERIA -->\r\n                <div class=\"mr-content-block n7-grid-6\">\r\n                    <ng-container *ngFor=\"let image of lb.dataSource.collectionGalleryData\">\r\n                        <a [href]=\"image.image\" class=\"mr-gallery__image\">\r\n                            <img [src]=\"image.thumbnail\" alt=\"image.title\">\r\n                        </a>\r\n                    </ng-container>\r\n                </div>\r\n                \r\n\r\n                <!-- MAPPA -->\r\n                <div class=\"mr-content-block mr-content-block-map\" *ngIf=\"lb.dataSource.hasMap\">\r\n                    <h3 class=\"mr-content-block__title\" *ngIf=\"lb.dataSource.mapHeader\">{{ lb.dataSource.mapHeader }}</h3>\r\n                    <div class=\"mr-content-block__content\">\r\n                        <n7-map [data]=\"lb.widgets['mr-map'].ds.out$ | async\"></n7-map>\r\n                    </div>\r\n                </div>\r\n\r\n                <!-- BIBLIOGRAFIA -->\r\n                <ng-container *ngIf=\"lb.dataSource.bibliographyData as biblio\">\r\n                    <ng-container *ngIf=\"biblio.items && biblio.items.length > 0\">\r\n                        <div class=\"mr-content-block mr-content-block-collection\">\r\n                            <h3 class=\"mr-content-block__title\">{{ biblio.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-1\">\r\n                                <ng-container *ngFor=\"let item of biblio.items\">\r\n                                    <div class=\"mr-timeline__collection-content\">\r\n                                        <n7-item-preview [data]=\"item\"></n7-item-preview>\r\n                                    </div>\r\n                                </ng-container>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n                <!-- TESTIMONI -->\r\n                <ng-container *ngIf=\"lb.dataSource.collectionWitnessData as wit\">\r\n                    <ng-container *ngIf=\"wit.items && wit.items.length > 0\">\r\n                        <div class=\"mr-content-block-collection mr-content-block\">\r\n                            <h3 class=\"mr-content-block__title\">{{ wit.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-3\">\r\n                                <n7-item-preview *ngFor=\"let item of wit.items\"\r\n                                                 [data]=\"item\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n                <!-- OPERE -->\r\n                <ng-container *ngIf=\"lb.dataSource.collectionWorksData as works\">\r\n                    <ng-container *ngIf=\"works.items && works.items.length > 0\">\r\n                        <div class=\"mr-content-block-collection mr-content-block\">\r\n                            <h3 class=\"mr-content-block__title\">{{ works.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-3\">\r\n                                <n7-item-preview *ngFor=\"let item of works.items\"\r\n                                                 [data]=\"item\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n            </ng-container>\r\n        </div>\r\n    </div>\r\n</div>\r\n"
     }),
     __metadata("design:paramtypes", [LayoutsConfigurationService,
         ActivatedRoute,
@@ -13188,481 +13943,6 @@ MrTimelineLayoutComponent = __decorate([
         MainStateService,
         MrLayoutStateService])
 ], MrTimelineLayoutComponent);
-
-class MrPostsLayoutDS extends LayoutDataSource {
-    onInit(payload) {
-        this.configuration = payload.configuration;
-        this.mainState = payload.mainState;
-        this.configId = payload.configId;
-        this.communication = payload.communication;
-        this.pageConfig = this.configuration.get(this.configId);
-        // config
-        this.all().updateOptions({ config: this.pageConfig });
-        // manual updates
-        this.one('mr-search-page-title').update({});
-        // update head title
-        this.updateHeadTitle();
-        // update translations
-        this.addTranslations(this.pageConfig);
-    }
-    updateSearchTags(params) {
-        if (!this.pageConfig.filters) {
-            return;
-        }
-        const { labels } = this.pageConfig.filters;
-        const tags = [];
-        Object.keys(labels)
-            .filter((key) => !!params[key])
-            .forEach((key) => {
-            tags[key] = params[key];
-        });
-        this.one('mr-advanced-search-tags').updateOptions({ labels });
-        this.one('mr-advanced-search-tags').update(tags);
-    }
-    request$(params, onError) {
-        const { searchId } = this.pageConfig;
-        const searchParams = Object.assign({}, params);
-        Object.keys(searchParams)
-            .filter((key) => ['page', 'limit', 'sort'].includes(key))
-            .forEach((key) => {
-            searchParams.results = searchParams.results || {};
-            searchParams.results[key] = searchParams[key];
-            delete searchParams[key];
-        });
-        // normalize results filters
-        const resultsParams = {};
-        const results = searchParams.results || {};
-        const page = results.page ? +results.page : 1;
-        resultsParams.limit = results.limit ? +results.limit : 12;
-        resultsParams.offset = page === 1 ? 0 : resultsParams.limit * (page - 1);
-        resultsParams.sort = results.sort || 'sort_ASC';
-        return this.communication.request$('posts', {
-            method: 'POST',
-            params: Object.assign(Object.assign({}, searchParams), { searchId, results: Object.assign({}, resultsParams) }),
-            onError
-        });
-    }
-    handleResponse(response) {
-        this.some([
-            'mr-search-results-title',
-            'mr-search-results',
-        ]).update(response);
-        // pagination
-        this.one('n7-smart-pagination').updateOptions({ mode: 'payload' });
-        this.one('n7-smart-pagination').update(this.getPaginationParams(response));
-    }
-    updateHeadTitle() {
-        const appName = this.configuration.get('name');
-        const pageTitle = this.pageConfig.title;
-        this.mainState.update('headTitle', [appName, _t(pageTitle)].join(' > '));
-    }
-    addTranslations(config) {
-        var _a;
-        if ((_a = config === null || config === void 0 ? void 0 : config.sort) === null || _a === void 0 ? void 0 : _a.label) {
-            config.sort.label = _t(config.sort.label);
-            config.sort.options = config.sort.options.map((option) => (Object.assign(Object.assign({}, option), { label: _t(option.label) })));
-        }
-        ['text', 'button'].forEach((key) => {
-            if (config.fallback) {
-                config.fallback[key] = _t(config.fallback[key]);
-            }
-            if (config.ko) {
-                config.ko[key] = _t(config.ko[key]);
-            }
-        });
-        // filters
-        const { filters } = this.pageConfig;
-        if (filters) {
-            filters.title = _t(filters.title);
-            Object.keys(filters.labels).forEach((key) => {
-                filters.labels[key] = _t(filters.labels[key]);
-            });
-        }
-    }
-    getPaginationParams(response) {
-        const { total_count: totalCount, offset, limit } = response;
-        const { pagination: paginationConfig } = this.pageConfig;
-        return {
-            totalPages: Math.ceil(totalCount / limit),
-            currentPage: (offset + limit) / limit,
-            pageLimit: paginationConfig.limit,
-            sizes: {
-                label: paginationConfig.selectLabel ? _t(paginationConfig.selectLabel) : null,
-                list: paginationConfig.options,
-                active: limit,
-            },
-        };
-    }
-}
-
-class MrPostsLayoutEH extends EventHandler {
-    constructor() {
-        super(...arguments);
-        this.destroy$ = new Subject();
-    }
-    listen() {
-        this.innerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case 'mr-posts-layout.init':
-                    this.activatedRoute = payload.activatedRoute;
-                    this.router = payload.router;
-                    this.layoutState = payload.layoutState;
-                    this.dataSource.onInit(payload);
-                    // listen route changes
-                    this.listenToRouterChanges();
-                    // scroll top
-                    window.scrollTo(0, 0);
-                    break;
-                case 'mr-posts-layout.destroy':
-                    this.destroy$.next();
-                    break;
-                default:
-                    console.warn('unhandled inner event of type', type);
-                    break;
-            }
-        });
-        this.outerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case 'n7-smart-pagination.click':
-                    this.updateRouter({ page: payload.page });
-                    break;
-                case 'n7-smart-pagination.change':
-                    this.updateRouter({ limit: payload.value, page: 1 });
-                    break;
-                case 'mr-search-results-title.change':
-                    this.updateRouter({ sort: payload.value, page: 1 });
-                    break;
-                default:
-                    console.warn('unhandled inner event of type', type);
-                    break;
-            }
-        });
-    }
-    /** URL changes */
-    listenToRouterChanges() {
-        this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$), tap(() => {
-            this.layoutState.set('results', LayoutState.LOADING);
-        }), switchMap((params) => {
-            this.dataSource.updateSearchTags(params);
-            return this.dataSource.request$(params, (error) => {
-                console.warn('Posts search error', error);
-                this.layoutState.set('results', LayoutState.ERROR);
-            });
-        })).subscribe((response) => {
-            this.dataSource.handleResponse(response);
-            this.layoutState.set('results', isEmpty(response.results) ? LayoutState.EMPTY : LayoutState.SUCCESS);
-            // scroll to ref element
-            if (!this.scrollRefElement) {
-                this.scrollRefElement = document.querySelector('.scroll-ref');
-            }
-            else if (!helpers.isElementInViewport(this.scrollRefElement)) {
-                this.scrollRefElement.scrollIntoView();
-            }
-        });
-    }
-    updateRouter(queryParams) {
-        this.router.navigate([], {
-            queryParams,
-            queryParamsHandling: 'merge'
-        });
-    }
-}
-
-const MrPostsLayoutConfig = {
-    layoutId: 'mr-posts-layout',
-    widgets: [
-        {
-            id: 'mr-search-page-title'
-        }, {
-            id: 'mr-search-results-title'
-        }, {
-            id: 'mr-search-results'
-        }, {
-            id: 'n7-smart-pagination',
-            dataSource: SmartPaginationDS,
-            eventHandler: SmartPaginationEH,
-        }, {
-            id: 'mr-advanced-search-tags'
-        }
-    ],
-    layoutDS: MrPostsLayoutDS,
-    layoutEH: MrPostsLayoutEH,
-    widgetsDataSources: DS$3,
-    widgetsEventHandlers: EH$3,
-    layoutOptions: {}
-};
-
-let MrPostsLayoutComponent = class MrPostsLayoutComponent extends AbstractLayout {
-    constructor(router, activatedRoute, mainState, configuration, communication, layoutState, layoutsConfiguration) {
-        super(layoutsConfiguration.get('MrPostsLayoutConfig') || MrPostsLayoutConfig);
-        this.router = router;
-        this.activatedRoute = activatedRoute;
-        this.mainState = mainState;
-        this.configuration = configuration;
-        this.communication = communication;
-        this.layoutState = layoutState;
-    }
-    initPayload() {
-        return {
-            configId: this.configId,
-            configuration: this.configuration,
-            communication: this.communication,
-            mainState: this.mainState,
-            router: this.router,
-            activatedRoute: this.activatedRoute,
-            layoutState: this.layoutState,
-            options: this.config.options || {},
-        };
-    }
-    ngOnInit() {
-        this.activatedRoute.data.subscribe((data) => {
-            this.configId = data.configId;
-            // add layout states
-            this.layoutState.add(['results']);
-            this.onInit();
-        });
-    }
-    ngOnDestroy() {
-        this.onDestroy();
-    }
-};
-MrPostsLayoutComponent.ctorParameters = () => [
-    { type: Router },
-    { type: ActivatedRoute },
-    { type: MainStateService },
-    { type: ConfigurationService },
-    { type: CommunicationService },
-    { type: MrLayoutStateService },
-    { type: LayoutsConfigurationService }
-];
-MrPostsLayoutComponent = __decorate([
-    Component({
-        selector: 'mr-posts-layout',
-        template: "<div class=\"mr-search mr-layout\"\r\n     *ngIf=\"lb.dataSource\">\r\n    <section class=\"mr-layout__maxwidth mr-side-margin\">\r\n\r\n        <div class=\"mr-search__title\">\r\n            <div class=\"scroll-ref\">&nbsp;</div>\r\n            <n7-inner-title\r\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['mr-search-page-title'].emit\">\r\n            </n7-inner-title>\r\n        </div>\r\n        \r\n        <div class=\"mr-search__results-content\">\r\n            <div class=\"mr-search__results-wrapper\">\r\n                <div class=\"mr-search__results-info\">\r\n                    <n7-inner-title\r\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\r\n                    </n7-inner-title>\r\n                </div>\r\n                <div *ngIf=\"lb.dataSource.pageConfig['filters']\" class=\"mr-search__results-filters\">\r\n                    <span *ngIf=\"lb.dataSource.pageConfig['filters'].title\" \r\n                    class=\"mr-search__results-filters-title\">{{ lb.dataSource.pageConfig['filters'].title }}</span>\r\n                    <div class=\"mr-search__results-filters-wrapper\">\r\n                        <n7-tag *ngFor=\"let tag of (lb.widgets['mr-advanced-search-tags'].ds.out$ | async)\"\r\n                            [data]=\"tag\">\r\n                        </n7-tag>\r\n                    </div>\r\n                </div>\r\n                <main class=\"mr-search__results\">\r\n                    <!-- SEARCH RESULTS -->\r\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\r\n                        \r\n                        <!-- loading -->\r\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n                            <div class=\"mr-search__results-loading n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\r\n                                    blocks: [\r\n                                        { classes: 'search-result-placeholder-title' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' }\r\n                                    ]\r\n                                }\"></n7-content-placeholder>\r\n                            </div>\r\n                        </ng-container>\r\n                        \r\n                        <!-- success: items > 0 -->\r\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n                            <div class=\"n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\r\n                                [data]=\"item\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- empty: items === 0 -->\r\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\r\n                            <div class=\"mr-search__results-fallback\">\r\n                                <p class=\"mr-search__results-fallback-string\">\r\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\r\n                                </p>\r\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\r\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\r\n                                </button>\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- error: request problem -->\r\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n                            <p class=\"mr-search__results-ko-string\">\r\n                                {{ lb.dataSource.pageConfig.ko.text }}\r\n                            </p>\r\n                            <button class=\"n7-btn mr-search__results-ko-button\"\r\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                {{ lb.dataSource.pageConfig.ko.button }}\r\n                            </button>\r\n                        </ng-container>\r\n                        \r\n                    </ng-container>\r\n                </main>               \r\n                <n7-smart-pagination\r\n                *ngIf=\"(layoutState.get$('results') | async) === 'SUCCESS'\"\r\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\r\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\r\n                </n7-smart-pagination>\r\n            </div>\r\n        </div>\r\n\r\n    </section>\r\n</div>\r\n"
-    }),
-    __metadata("design:paramtypes", [Router,
-        ActivatedRoute,
-        MainStateService,
-        ConfigurationService,
-        CommunicationService,
-        MrLayoutStateService,
-        LayoutsConfigurationService])
-], MrPostsLayoutComponent);
-
-class MrItineraryLayoutDS extends LayoutDataSource {
-    constructor() {
-        super(...arguments);
-        this.errorTitle = _t('global#layout_error_title');
-        this.errorDescription = _t('global#layout_error_description');
-    }
-    onInit(payload) {
-        this.configuration = payload.configuration;
-        this.communication = payload.communication;
-        this.mainState = payload.mainState;
-        this.configId = payload.configId;
-        this.pageConfig = this.configuration.get(this.configId);
-        // add translations
-        this.pageConfig.sections = this.pageConfig.sections.map((section) => (Object.assign(Object.assign({}, section), { title: _t(section.title) })));
-    }
-    pageRequest$(id, onError) {
-        return this.communication.request$('itinerary', {
-            onError,
-            method: 'GET',
-            urlParams: id
-        });
-    }
-    handleResponse(response) {
-        this.updateTitle(response);
-        this.updateContent(response);
-        this.updateMetadata(response);
-        this.initSections(response);
-        this.updateHeadTitle(response);
-    }
-    updateTitle({ title }) {
-        this.title = title;
-    }
-    updateContent({ content }) {
-        this.content = content;
-    }
-    updateMetadata(response) {
-        this.one('mr-static-metadata').update(response);
-    }
-    initSections(response) {
-        const { sections } = this.pageConfig;
-        sections.forEach(({ id }) => {
-            const widgetDataSource = this.getWidgetDataSource(id);
-            if (!widgetDataSource)
-                return;
-            const responseSection = response.sections[id];
-            // set id
-            widgetDataSource.id = id;
-            // update data
-            if (responseSection) {
-                this.one(id).update(responseSection);
-            }
-        });
-    }
-    updateHeadTitle({ title: itineraryTitle }) {
-        const appName = this.configuration.get('name');
-        const pageTitle = this.pageConfig.title;
-        this.mainState.update('headTitle', [appName, _t(pageTitle), itineraryTitle].join(' > '));
-    }
-}
-
-class MrItineraryLayoutEH extends EventHandler {
-    constructor() {
-        super(...arguments);
-        this.destroy$ = new Subject();
-    }
-    listen() {
-        this.innerEvents$.subscribe(({ type, payload }) => {
-            switch (type) {
-                case 'mr-itinerary-layout.init':
-                    this.route = payload.route;
-                    this.router = payload.router;
-                    this.layoutState = payload.layoutState;
-                    this.modalService = payload.modalService;
-                    this.dataSource.onInit(payload);
-                    this.listenRoute();
-                    // scroll top
-                    window.scrollTo(0, 0);
-                    break;
-                case 'mr-resource-layout.destroy':
-                    this.destroy$.next();
-                    break;
-                default:
-                    console.warn('unhandled inner event of type', type);
-                    break;
-            }
-        });
-        this.outerEvents$.subscribe(({ type, payload }) => {
-            if (type.indexOf('openresourcemodal') !== -1) {
-                const { id, type: resourceType } = payload;
-                this.modalService.open(id, resourceType);
-            }
-        });
-    }
-    listenRoute() {
-        this.route.paramMap.pipe(takeUntil(this.destroy$), tap(() => {
-            this.layoutState.set('content', LayoutState.LOADING);
-        }), map((params) => params.get('id')), switchMap((id) => this.dataSource.pageRequest$(id, (err) => {
-            if (err.status === 404) {
-                // getting not found path
-                const { config } = this.router;
-                const route404 = config.find(({ data }) => (data === null || data === void 0 ? void 0 : data.id) === 'page-404');
-                const path404 = (route404 === null || route404 === void 0 ? void 0 : route404.path) || 'page-404';
-                this.router.navigate([path404]);
-            }
-            console.warn(`Error loading resource layout for ${id}`, err.message);
-            this.layoutState.set('content', LayoutState.ERROR);
-        }))).subscribe((response) => {
-            this.layoutState.set('content', LayoutState.SUCCESS);
-            this.dataSource.handleResponse(response);
-            // scroll top
-            window.scrollTo(0, 0);
-        });
-    }
-}
-
-const MrItineraryLayoutConfig = {
-    layoutId: 'mr-itinerary-layout',
-    widgets: [
-        { id: 'mr-static-metadata' }
-    ],
-    layoutDS: MrItineraryLayoutDS,
-    layoutEH: MrItineraryLayoutEH,
-    widgetsDataSources: DS$3,
-    widgetsEventHandlers: EH$3,
-    options: {
-    // TODO
-    },
-};
-
-const DATASOURCE_MAP$3 = {
-    collection: MrCollectionDS,
-    metadata: MrMetadataDS,
-    gallery: MrGalleryDS,
-};
-const EVENTHANDLER_MAP$3 = {
-    collection: MrCollectionEH,
-    gallery: MrGalleryEH,
-};
-let MrItineraryLayoutComponent = class MrItineraryLayoutComponent extends AbstractLayout {
-    constructor(layoutsConfiguration, activatedRoute, configuration, communication, mainState, route, router, layoutState, modalService) {
-        super(layoutsConfiguration.get('MrItineraryLayoutConfig') || MrItineraryLayoutConfig);
-        this.activatedRoute = activatedRoute;
-        this.configuration = configuration;
-        this.communication = communication;
-        this.mainState = mainState;
-        this.route = route;
-        this.router = router;
-        this.layoutState = layoutState;
-        this.modalService = modalService;
-    }
-    initPayload() {
-        return {
-            configId: this.configId,
-            configuration: this.configuration,
-            communication: this.communication,
-            mainState: this.mainState,
-            layoutState: this.layoutState,
-            modalService: this.modalService,
-            options: this.config.options || {},
-            route: this.route,
-            router: this.router
-        };
-    }
-    ngOnInit() {
-        this.activatedRoute.data.subscribe((data) => {
-            this.layoutState.add('content');
-            this.configId = data.configId;
-            this.loadWidgets();
-            this.onInit();
-        });
-    }
-    ngOnDestroy() {
-        this.onDestroy();
-    }
-    loadWidgets() {
-        const { sections } = this.configuration.get(this.configId);
-        if (sections) {
-            sections.forEach(({ id, type, options }) => {
-                this.widgets.push({
-                    id,
-                    options,
-                    dataSource: DATASOURCE_MAP$3[type],
-                    eventHandler: EVENTHANDLER_MAP$3[type]
-                });
-            });
-        }
-    }
-};
-MrItineraryLayoutComponent.ctorParameters = () => [
-    { type: LayoutsConfigurationService },
-    { type: ActivatedRoute },
-    { type: ConfigurationService },
-    { type: CommunicationService },
-    { type: MainStateService },
-    { type: ActivatedRoute },
-    { type: Router },
-    { type: MrLayoutStateService },
-    { type: MrResourceModalService }
-];
-MrItineraryLayoutComponent = __decorate([
-    Component({
-        selector: 'mr-itinerary-layout',
-        template: "<div class=\"mr-itinerary mr-layout\" \r\n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\"\r\n     [ngClass]=\"{\r\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\r\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\r\n      }\">\r\n    <!-- ITINERARY LAYOUT CONTENT -->\r\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\r\n        <!-- loading -->\r\n        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n            <div class=\"mr-layout__loader\">\r\n                <n7-loader></n7-loader>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- error -->\r\n        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n            <div class=\"mr-layout__error\">\r\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\r\n                <p>{{ lb.dataSource.errorDescription }}</p>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- success -->\r\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n            <div class=\"mr-static__top\">\r\n                <h1 class=\"mr-static__title mr-generated-title-WP\">{{lb.dataSource.title}}</h1>\r\n                <div class=\"mr-static__metadata\">\r\n                    <n7-metadata-viewer \r\n                    [data]=\"lb.widgets['mr-static-metadata'].ds.out$ | async\">\r\n                    </n7-metadata-viewer>\r\n                </div>\r\n            </div>\r\n\r\n            <div class=\"mr-resource__content mr-side-margin\">\r\n                <!-- Page content html -->\r\n                <div class=\"mr-wp-content\" [innerHTML]=\"lb.dataSource.content | keepHtml\"></div>\r\n    \r\n                <!-- Pass the list of blocks to render to the block template -->\r\n                <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: lb.dataSource.pageConfig.sections }\"></ng-container>\r\n            </div>\r\n        </ng-container>\r\n\r\n    </ng-container>\r\n</div>\r\n\r\n<ng-template #blocks let-list>\r\n    <ng-container *ngFor=\"let section of list\">\r\n        <section *ngIf=\"lb.widgets[section.id].ds.out$ | async\"\r\n        class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\r\n            <ng-container [ngSwitch]=\"section.type\">\r\n    \r\n                <!-- METADATA VIEWER -->\r\n                <ng-container *ngSwitchCase=\"'metadata'\">\r\n                    \r\n                    <div class=\"mr-content-block mr-content-block-metadata\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <mr-read-more [data]=\"section.readmore\">\r\n                                <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\r\n                                    [emit]=\"lb.widgets[section.id].emit\">\r\n                                </n7-metadata-viewer>\r\n                            </mr-read-more>\r\n                        </div>\r\n                    </div>\r\n\r\n                </ng-container>\r\n    \r\n                <!-- COLLECTION -->\r\n                <ng-container *ngSwitchCase=\"'collection'\">\r\n                    <ng-container *ngIf=\"lb.widgets[section.id].ds.out$ | async as collection$\">\r\n                        \r\n                        <div *ngIf=\"collection$.items?.length > 0\" class=\"mr-content-block mr-content-block-collection\">\r\n                            <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                                {{ section.title }}\r\n                            </h3>\r\n                            <div class=\"mr-content-block__content {{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\r\n                                <n7-item-preview *ngFor=\"let item of collection$?.items\"\r\n                                    [data]=\"item\" [emit]=\"lb.widgets[section.id].emit\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n\r\n                    </ng-container>\r\n                </ng-container>\r\n    \r\n                <!-- GALLERY -->\r\n                <ng-container *ngSwitchCase=\"'gallery'\">\r\n                    <div class=\"mr-content-block mr-content-block-gallery\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <mr-gallery [grid]=\"section.grid\" [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">        \r\n                            </mr-gallery>\r\n                        </div>\r\n                    </div>\r\n                </ng-container>\r\n\r\n            </ng-container>\r\n        </section>\r\n    </ng-container>\r\n</ng-template>\r\n"
-    }),
-    __metadata("design:paramtypes", [LayoutsConfigurationService,
-        ActivatedRoute,
-        ConfigurationService,
-        CommunicationService,
-        MainStateService,
-        ActivatedRoute,
-        Router,
-        MrLayoutStateService,
-        MrResourceModalService])
-], MrItineraryLayoutComponent);
 
 //---------------------------
 const HEIGHT_MARGIN = 50;
@@ -13742,7 +14022,7 @@ __decorate([
 MrAdvancedResultComponent = __decorate([
     Component({
         selector: 'mr-advanced-result',
-        template: "<div *ngIf=\"data\"\r\n     class=\"n7-item-preview {{data.classes || ''}}\"\r\n     [ngClass]=\"{ 'has-image' : !!data.image, 'has-color' : !!data.color }\">\r\n    <n7-anchor-wrapper [data]=\"data.anchor\"\r\n                       (clicked)=\"onClick($event)\"\r\n                       [classes]=\"'n7-item-preview__inner'\">\r\n        <!-- Image, color -->\r\n        <div class=\"n7-item-preview__image n7-item-preview__color\"\r\n             *ngIf=\"data.image || data.color\"\r\n             [style.background-image]=\"data.image ? 'url(' + data.image + ')' : undefined\"\r\n             [style.background-color]=\"data.color\">\r\n        </div>\r\n        <div class=\"n7-item-preview__content\">\r\n            <!-- Title and text -->\r\n            <div class=\"n7-item-preview__title-text\">\r\n                <h1 class=\"n7-item-preview__title\"\r\n                    [innerHTML]=\"data.title\"></h1>\r\n                <p class=\"n7-item-preview__text\"\r\n                   *ngIf=\"data.text\"\r\n                   [innerHTML]=\"data.text\"></p>\r\n            </div>\r\n            <!-- Metadata -->\r\n            <div class=\"n7-item-preview__metadata\"\r\n                 *ngIf=\"data.metadata\">\r\n                <div class=\"n7-item-preview__metadata-group {{ meta.classes || '' }}\"\r\n                     *ngFor=\"let meta of data.metadata\">\r\n                    <h3 class=\"n7-item-preview__metadata-group-title\"\r\n                        *ngIf=\"meta.title\"\r\n                        [innerHTML]=\"meta.title\"></h3>\r\n                    <div class=\"n7-item-preview__metadata-item {{ item.classes || '' }}\"\r\n                         *ngFor=\"let item of meta.items\">\r\n                        <span class=\"n7-item-preview__metadata-item-icon {{item.icon}}\"\r\n                              *ngIf=\"item.icon\">\r\n                        </span>\r\n                        <span class=\"n7-item-preview__metadata-item-label\"\r\n                              *ngIf=\"item.label\"\r\n                              [innerHTML]=\"item.label\">\r\n                        </span>\r\n                        <a *ngIf=\"item.href\"\r\n                           [href]=\"item.href\">\r\n                            <span class=\"n7-item-preview__metadata-item-value\"\r\n                                  *ngIf=\"item.value\"\r\n                                  [innerHTML]=\"item.value\">\r\n                            </span>\r\n                        </a>\r\n                        <span class=\"n7-item-preview__metadata-item-value\"\r\n                              *ngIf=\"item.value && !item.href\"\r\n                              [innerHTML]=\"item.value\">\r\n                        </span>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </n7-anchor-wrapper>\r\n</div>\r\n"
+        template: "<div *ngIf=\"data\"\r\n     class=\"n7-item-preview {{data.classes || ''}}\"\r\n     [ngClass]=\"{ 'has-image' : !!data.image, 'has-color' : !!data.color }\">\r\n    <n7-anchor-wrapper [data]=\"data.anchor\"\r\n                       (clicked)=\"onClick($event)\"\r\n                       [classes]=\"'n7-item-preview__inner'\">\r\n        <!-- Image, color -->\r\n        <div class=\"n7-item-preview__image n7-item-preview__color\"\r\n             *ngIf=\"data.image || data.color\"\r\n             [style.background-image]=\"data.image ? 'url(' + data.image + ')' : undefined\"\r\n             [style.background-color]=\"data.color\">\r\n        </div>\r\n        <div class=\"n7-item-preview__content\">\r\n            <!-- Title and text -->\r\n            <div class=\"n7-item-preview__title-text\">\r\n                <h1 class=\"n7-item-preview__title\"\r\n                    [innerHTML]=\"data.title\"></h1>\r\n                <p class=\"n7-item-preview__text\"\r\n                   *ngIf=\"data.text\"\r\n                   [innerHTML]=\"data.text\"></p>\r\n            </div>\r\n            <!-- Metadata -->\r\n            <div class=\"n7-item-preview__metadata\"\r\n                 *ngIf=\"data.metadata\">\r\n                <div class=\"n7-item-preview__metadata-group {{ meta.classes || '' }}\"\r\n                     *ngFor=\"let meta of data.metadata\">\r\n                    <h3 class=\"n7-item-preview__metadata-group-title\"\r\n                        *ngIf=\"meta.title && meta.items.length\"\r\n                        [innerHTML]=\"meta.title\"></h3>\r\n                    <div class=\"n7-item-preview__metadata-item {{ item.classes || '' }}\"\r\n                         *ngFor=\"let item of meta.items\">\r\n                        <span class=\"n7-item-preview__metadata-item-icon {{item.icon}}\"\r\n                              *ngIf=\"item.icon\">\r\n                        </span>\r\n                        <span class=\"n7-item-preview__metadata-item-label\"\r\n                              *ngIf=\"item.label\"\r\n                              [innerHTML]=\"item.label\">\r\n                        </span>\r\n                        <a *ngIf=\"item.href\"\r\n                           [href]=\"item.href\">\r\n                            <span class=\"n7-item-preview__metadata-item-value\"\r\n                                  *ngIf=\"item.value\"\r\n                                  [innerHTML]=\"item.value\">\r\n                            </span>\r\n                        </a>\r\n                        <span class=\"n7-item-preview__metadata-item-value\"\r\n                              *ngIf=\"item.value && !item.href\"\r\n                              [innerHTML]=\"item.value\">\r\n                        </span>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </n7-anchor-wrapper>\r\n</div>\r\n"
     })
 ], MrAdvancedResultComponent);
 
@@ -13947,17 +14227,18 @@ MrGalleryComponent = __decorate([
 
 const COMPONENTS$3 = [
     // Layout components
+    MrAdvancedResultsLayoutComponent,
+    MrAdvancedSearchLayoutComponent,
     MrGlossaryLayoutComponent,
     MrHomeLayoutComponent,
+    MrItineraryLayoutComponent,
+    MrMapLayoutComponent,
+    MrPostsLayoutComponent,
     MrResourceLayoutComponent,
     MrSearchFacetsLayoutComponent,
     MrSearchLayoutComponent,
     MrStaticLayoutComponent,
-    MrAdvancedSearchLayoutComponent,
-    MrAdvancedResultsLayoutComponent,
     MrTimelineLayoutComponent,
-    MrPostsLayoutComponent,
-    MrItineraryLayoutComponent,
     // Custom components
     ReadMoreComponent,
     MrFormComponent,
@@ -14659,5 +14940,5 @@ DynamicPathGuard = __decorate([
  * Generated bundle index. Do not edit.
  */
 
-export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwCarouselDS, AwChartTippyDS, AwChartTippyEH, AwCollectionLayoutComponent, AwCollectionLayoutConfig, AwCollectionLayoutDS, AwCollectionLayoutEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapEH, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaDropdownDS, AwSchedaDropdownEH, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaPdfDS, AwSchedaPdfEH, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineEH, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, LocalConfigService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrAdvancedResultComponent, MrAdvancedResultsLayoutComponent, MrAdvancedResultsLayoutConfig, MrAdvancedResultsLayoutDS, MrAdvancedResultsLayoutEH, MrAdvancedSearchLayoutComponent, MrAdvancedSearchLayoutConfig, MrAdvancedSearchLayoutDS, MrAdvancedSearchLayoutEH, MrAdvancedSearchTagsDS, MrBreadcrumbsDS, MrCollectionDS, MrCollectionEH, MrContentDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrFooterService, MrFormComponent, MrFormWrapperAccordionComponent, MrFormWrapperAccordionDS, MrFormWrapperAccordionEH, MrGalleryComponent, MrGalleryDS, MrGalleryEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrItineraryLayoutComponent, MrItineraryLayoutConfig, MrItineraryLayoutDS, MrItineraryLayoutEH, MrMapDS, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrPostsLayoutComponent, MrPostsLayoutConfig, MrPostsLayoutDS, MrPostsLayoutEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrResourceModalComponent, MrResourceTabsDS, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageDescriptionComponent, MrSearchPageDescriptionDS, MrSearchPageDescriptionEH, MrSearchPageTitleDS, MrSearchPageTitleEH, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrStaticMetadataDS, MrTextViewerDS, MrTimelineDS, MrTimelineEH, MrTimelineLayoutComponent, MrTimelineLayoutConfig, MrTimelineLayoutDS, MrTimelineLayoutEH, MrTranslationsLoaderService, MrYearHeaderDS, MrYearHeaderEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, N7BoilerplateSandboxModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, PdfViewerComponent, ReadMoreComponent, RestProvider, SbExampleLayoutComponent, SbExampleLayoutConfig, SbExampleLayoutDS, SbExampleLayoutEH, SbImageViewerDS, SbImageViewerEH, SbImageViewerLayoutComponent, SbImageViewerLayoutConfig, SbImageViewerLayoutDS, SbImageViewerLayoutEH, SbImageViewerToolsDS, SbImageViewerToolsEH, SchedaDropdownComponent, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, DatepickerWrapperComponent as ɵba, DvExampleLayoutComponent as ɵbb, EscapeHtmlPipe as ɵbc, MrGlossaryLayoutComponent as ɵbd, MrHomeLayoutComponent as ɵbe, MrLayoutStateService as ɵbf, MrResourceLayoutComponent as ɵbg, MrResourceModalService as ɵbh, MrSearchFacetsLayoutComponent as ɵbi, MrSearchLayoutComponent as ɵbj, MrSearchService as ɵbk, MrStaticLayoutComponent as ɵbl, MrAdvancedSearchLayoutComponent as ɵbm, MrAdvancedResultsLayoutComponent as ɵbn, MrTimelineLayoutComponent as ɵbo, MrPostsLayoutComponent as ɵbp, MrItineraryLayoutComponent as ɵbq, ReadMoreComponent as ɵbr, MrFormComponent as ɵbs, MrFormWrapperAccordionComponent as ɵbt, MrSearchPageDescriptionComponent as ɵbu, MrResourceModalComponent as ɵbv, MrGalleryComponent as ɵbw, MrAdvancedResultComponent as ɵbx, SbExampleLayoutComponent as ɵby, SbImageViewerLayoutComponent as ɵbz, ConfigurationService as ɵc, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwCollectionLayoutComponent as ɵk, AwEntitaLayoutComponent as ɵl, AwFacetsWrapperComponent as ɵm, AwGalleryLayoutComponent as ɵn, AwSearchService as ɵo, AwHomeLayoutComponent as ɵp, AwMapLayoutComponent as ɵq, AwSchedaLayoutComponent as ɵr, AwSearchLayoutComponent as ɵs, AwTimelineLayoutComponent as ɵt, BubbleChartWrapperComponent as ɵu, ChartTippyComponent as ɵv, PdfViewerComponent as ɵw, SchedaDropdownComponent as ɵx, SmartBreadcrumbsComponent as ɵy, DataWidgetWrapperComponent as ɵz };
+export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwCarouselDS, AwChartTippyDS, AwChartTippyEH, AwCollectionLayoutComponent, AwCollectionLayoutConfig, AwCollectionLayoutDS, AwCollectionLayoutEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapEH, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaDropdownDS, AwSchedaDropdownEH, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaPdfDS, AwSchedaPdfEH, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineEH, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, LocalConfigService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrAdvancedResultComponent, MrAdvancedResultsLayoutComponent, MrAdvancedResultsLayoutConfig, MrAdvancedResultsLayoutDS, MrAdvancedResultsLayoutEH, MrAdvancedSearchLayoutComponent, MrAdvancedSearchLayoutConfig, MrAdvancedSearchLayoutDS, MrAdvancedSearchLayoutEH, MrAdvancedSearchTagsDS, MrBreadcrumbsDS, MrCollectionDS, MrCollectionEH, MrContentDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrFooterService, MrFormComponent, MrFormWrapperAccordionComponent, MrFormWrapperAccordionDS, MrFormWrapperAccordionEH, MrGalleryComponent, MrGalleryDS, MrGalleryEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrItineraryLayoutComponent, MrItineraryLayoutConfig, MrItineraryLayoutDS, MrItineraryLayoutEH, MrMapDS, MrMapLayoutComponent, MrMapLayoutConfig, MrMapLayoutDS, MrMapLayoutEH, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrPostsLayoutComponent, MrPostsLayoutConfig, MrPostsLayoutDS, MrPostsLayoutEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrResourceModalComponent, MrResourceTabsDS, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageDescriptionComponent, MrSearchPageDescriptionDS, MrSearchPageDescriptionEH, MrSearchPageTitleDS, MrSearchPageTitleEH, MrSearchResultsDS, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrStaticMetadataDS, MrTextViewerDS, MrTimelineDS, MrTimelineEH, MrTimelineLayoutComponent, MrTimelineLayoutConfig, MrTimelineLayoutDS, MrTimelineLayoutEH, MrTranslationsLoaderService, MrYearHeaderDS, MrYearHeaderEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, N7BoilerplateSandboxModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, PdfViewerComponent, ReadMoreComponent, RestProvider, SbExampleLayoutComponent, SbExampleLayoutConfig, SbExampleLayoutDS, SbExampleLayoutEH, SbImageViewerDS, SbImageViewerEH, SbImageViewerLayoutComponent, SbImageViewerLayoutConfig, SbImageViewerLayoutDS, SbImageViewerLayoutEH, SbImageViewerToolsDS, SbImageViewerToolsEH, SchedaDropdownComponent, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, DatepickerWrapperComponent as ɵba, DvExampleLayoutComponent as ɵbb, EscapeHtmlPipe as ɵbc, MrAdvancedResultsLayoutComponent as ɵbd, MrLayoutStateService as ɵbe, MrAdvancedSearchLayoutComponent as ɵbf, MrGlossaryLayoutComponent as ɵbg, MrHomeLayoutComponent as ɵbh, MrItineraryLayoutComponent as ɵbi, MrResourceModalService as ɵbj, MrMapLayoutComponent as ɵbk, MrPostsLayoutComponent as ɵbl, MrResourceLayoutComponent as ɵbm, MrSearchFacetsLayoutComponent as ɵbn, MrSearchLayoutComponent as ɵbo, MrSearchService as ɵbp, MrStaticLayoutComponent as ɵbq, MrTimelineLayoutComponent as ɵbr, ReadMoreComponent as ɵbs, MrFormComponent as ɵbt, MrFormWrapperAccordionComponent as ɵbu, MrSearchPageDescriptionComponent as ɵbv, MrResourceModalComponent as ɵbw, MrGalleryComponent as ɵbx, MrAdvancedResultComponent as ɵby, SbExampleLayoutComponent as ɵbz, ConfigurationService as ɵc, SbImageViewerLayoutComponent as ɵca, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwCollectionLayoutComponent as ɵk, AwEntitaLayoutComponent as ɵl, AwFacetsWrapperComponent as ɵm, AwGalleryLayoutComponent as ɵn, AwSearchService as ɵo, AwHomeLayoutComponent as ɵp, AwMapLayoutComponent as ɵq, AwSchedaLayoutComponent as ɵr, AwSearchLayoutComponent as ɵs, AwTimelineLayoutComponent as ɵt, BubbleChartWrapperComponent as ɵu, ChartTippyComponent as ɵv, PdfViewerComponent as ɵw, SchedaDropdownComponent as ɵx, SmartBreadcrumbsComponent as ɵy, DataWidgetWrapperComponent as ɵz };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map

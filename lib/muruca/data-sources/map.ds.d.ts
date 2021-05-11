@@ -1,6 +1,8 @@
 import { MapData } from '@n7-frontend/components';
 import { DataSource } from '@n7-frontend/core';
 import 'leaflet.markercluster';
+import { Subject } from 'rxjs';
+import { Map } from 'leaflet';
 interface Coords {
     lat: number;
     lng: number;
@@ -10,6 +12,7 @@ interface Marker extends Coords {
     default_label: string;
 }
 declare type TimelineResponse = {
+    id?: number;
     title: string;
     slug: string;
     zoom: number;
@@ -22,6 +25,7 @@ export declare class MrMapDS extends DataSource {
     mapInstance: any;
     /** Instance of the marker layerGroup */
     markerLayer: any;
+    mapLoaded$: Subject<Map>;
     protected transform(data: TimelineResponse): MapData;
     private fitMapToBounds;
     /**
