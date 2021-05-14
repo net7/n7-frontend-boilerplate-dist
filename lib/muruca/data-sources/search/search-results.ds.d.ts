@@ -23,6 +23,7 @@ interface MrSearchResult extends ItemPreviewData {
 export declare class MrSearchResultsDS extends DataSource {
     protected transform(data: MrSearchResponse): {
         metadata: MetadataGroup[];
+        highlights: any[];
         classes: any;
         anchor: {
             href: string;
@@ -31,8 +32,6 @@ export declare class MrSearchResultsDS extends DataSource {
         };
         /** relative path */
         link: string;
-        /** items that matched the search input */
-        highlights?: HighlightItem[];
         /** unique id for the search result entry */
         id: number;
         image?: string;

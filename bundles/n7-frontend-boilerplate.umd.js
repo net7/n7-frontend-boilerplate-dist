@@ -7601,14 +7601,14 @@
         }
         AwSchedaLayoutDS.prototype.onInit = function (_a) {
             var configuration = _a.configuration, mainState = _a.mainState, router = _a.router, options = _a.options, titleService = _a.titleService, communication = _a.communication;
-            var _b, _c;
+            var _b, _c, _d;
             this.configuration = configuration;
             this.mainState = mainState;
             this.router = router;
             this.titleService = titleService;
             this.communication = communication;
             this.options = options;
-            this.sidebarCollapsed = false;
+            this.sidebarCollapsed = (_b = this.configuration.get('scheda-layout').tree.collapsedByDefault) !== null && _b !== void 0 ? _b : false;
             this.relatedEntitiesHeader = this.configuration.get('scheda-layout')['related-entities'].title;
             this.similarItemsSectionTitle = this.configuration.get('scheda-layout')['related-items'].title;
             this.externalUrlText = this.configuration.get('scheda-layout')['external-url-text'];
@@ -7621,7 +7621,7 @@
             this.emptyStateString = this.configuration.get('scheda-layout')['empty-html'];
             this.one('aw-tree').updateOptions({ config: this.configuration.get('config-keys') });
             // switch the tree query to the slim version
-            if ((_c = (_b = this.configuration.get('scheda-layout')) === null || _b === void 0 ? void 0 : _b.tree) === null || _c === void 0 ? void 0 : _c.lite) {
+            if ((_d = (_c = this.configuration.get('scheda-layout')) === null || _c === void 0 ? void 0 : _c.tree) === null || _d === void 0 ? void 0 : _d.lite) {
                 this.getTreeQuery = 'getTreeLite';
             }
             this.mainState.update('headTitle', 'Arianna4View - Patrimonio');
@@ -10789,6 +10789,7 @@
                 /*
                   Add the highlights to the item's metadata with a custom group
                 */
+                var highlights = [];
                 if (item.highlights) {
                     var highlightGroup_1 = {
                         title: core$1._t('advancedsearch#highlights_title'),
@@ -10813,9 +10814,10 @@
                             });
                         }
                     });
-                    metadata.push(highlightGroup_1);
+                    highlights.push(highlightGroup_1);
                 }
-                return __assign(__assign({}, item), { metadata: metadata, classes: itemPreviewOptions.classes, anchor: item.link ? {
+                return __assign(__assign({}, item), { metadata: metadata,
+                    highlights: highlights, classes: itemPreviewOptions.classes, anchor: item.link ? {
                         href: linksHelper.getRouterLink(item.link),
                         queryParams: linksHelper.getQueryParams(item.link),
                         target: '_blank'
@@ -14877,7 +14879,7 @@
         MrAdvancedResultComponent = __decorate([
             core.Component({
                 selector: 'mr-advanced-result',
-                template: "<div *ngIf=\"data\"\r\n     class=\"n7-item-preview {{data.classes || ''}}\"\r\n     [ngClass]=\"{ 'has-image' : !!data.image, 'has-color' : !!data.color }\">\r\n    <n7-anchor-wrapper [data]=\"data.anchor\"\r\n                       (clicked)=\"onClick($event)\"\r\n                       [classes]=\"'n7-item-preview__inner'\">\r\n        <!-- Image, color -->\r\n        <div class=\"n7-item-preview__image n7-item-preview__color\"\r\n             *ngIf=\"data.image || data.color\"\r\n             [style.background-image]=\"data.image ? 'url(' + data.image + ')' : undefined\"\r\n             [style.background-color]=\"data.color\">\r\n        </div>\r\n        <div class=\"n7-item-preview__content\">\r\n            <!-- Title and text -->\r\n            <div class=\"n7-item-preview__title-text\">\r\n                <h1 class=\"n7-item-preview__title\"\r\n                    [innerHTML]=\"data.title\"></h1>\r\n                <p class=\"n7-item-preview__text\"\r\n                   *ngIf=\"data.text\"\r\n                   [innerHTML]=\"data.text\"></p>\r\n            </div>\r\n            <!-- Metadata -->\r\n            <div class=\"n7-item-preview__metadata\"\r\n                 *ngIf=\"data.metadata\">\r\n                <div class=\"n7-item-preview__metadata-group {{ meta.classes || '' }}\"\r\n                     *ngFor=\"let meta of data.metadata\">\r\n                    <h3 class=\"n7-item-preview__metadata-group-title\"\r\n                        *ngIf=\"meta.title && meta.items.length\"\r\n                        [innerHTML]=\"meta.title\"></h3>\r\n                    <div class=\"n7-item-preview__metadata-item {{ item.classes || '' }}\"\r\n                         *ngFor=\"let item of meta.items\">\r\n                        <span class=\"n7-item-preview__metadata-item-icon {{item.icon}}\"\r\n                              *ngIf=\"item.icon\">\r\n                        </span>\r\n                        <span class=\"n7-item-preview__metadata-item-label\"\r\n                              *ngIf=\"item.label\"\r\n                              [innerHTML]=\"item.label\">\r\n                        </span>\r\n                        <a *ngIf=\"item.href\"\r\n                           [href]=\"item.href\">\r\n                            <span class=\"n7-item-preview__metadata-item-value\"\r\n                                  *ngIf=\"item.value\"\r\n                                  [innerHTML]=\"item.value\">\r\n                            </span>\r\n                        </a>\r\n                        <span class=\"n7-item-preview__metadata-item-value\"\r\n                              *ngIf=\"item.value && !item.href\"\r\n                              [innerHTML]=\"item.value\">\r\n                        </span>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </n7-anchor-wrapper>\r\n</div>\r\n"
+                template: "<div *ngIf=\"data\"\r\n     class=\"mr-advanced-result\">\r\n    <n7-item-preview [data]=\"data\"></n7-item-preview>\r\n    <div class=\"mr-advanced-result__content\"\r\n         *ngFor=\"let highlightGroup of data.highlights\">\r\n        <div class=\"mr-advanced-result__content-group\">\r\n            <!-- METADATA GROUP TITLE -->\r\n            <h3 class=\"mr-advanced-result__title\"\r\n                *ngIf=\"highlightGroup.title\"\r\n                [innerHTML]=\"highlightGroup.title\">\r\n            </h3>\r\n            <!-- METADATA ITEM -->\r\n            <div class=\"mr-advanced-result__item {{ item.classes || '' }}\"\r\n                 *ngFor=\"let item of highlightGroup.items\">\r\n                <!-- ICON -->\r\n                <span class=\"mr-advanced-result__icon {{item.icon}}\"\r\n                      *ngIf=\"item.icon\">\r\n                </span>\r\n                <!-- LABEL -->\r\n                <span class=\"mr-advanced-result__label\"\r\n                      *ngIf=\"item.label\"\r\n                      [innerHTML]=\"item.label\">\r\n                </span>\r\n                <!-- VALUE W/ HREF -->\r\n                <a *ngIf=\"item.href\"\r\n                   [href]=\"item.href\">\r\n                    <span class=\"mr-advanced-result__value\"\r\n                          *ngIf=\"item.value\"\r\n                          [innerHTML]=\"item.value\">\r\n                    </span>\r\n                </a>\r\n                <!-- VALUE W/OUT HREF -->\r\n                <span class=\"mr-advanced-result__value\"\r\n                      *ngIf=\"item.value && !item.href\"\r\n                      [innerHTML]=\"item.value\">\r\n                </span>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>\r\n"
             })
         ], MrAdvancedResultComponent);
         return MrAdvancedResultComponent;
