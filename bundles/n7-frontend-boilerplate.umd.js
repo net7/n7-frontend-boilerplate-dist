@@ -9863,6 +9863,7 @@
                         _this.activatedRoute = payload.activatedRoute;
                         _this.router = payload.router;
                         _this.layoutState = payload.layoutState;
+                        _this.modalService = payload.modalService;
                         _this.dataSource.onInit(payload);
                         // listen route changes
                         _this.listenToRouterChanges();
@@ -9889,6 +9890,11 @@
                     case 'mr-search-results-title.change':
                         _this.updateRouter({ sort: payload.value, page: 1 });
                         break;
+                    case 'mr-search-results.openresourcemodal': {
+                        var id = payload.id, resourceType = payload.type;
+                        _this.modalService.open(id, resourceType);
+                        break;
+                    }
                     default:
                         console.warn('unhandled inner event of type', type);
                         break;
@@ -10816,12 +10822,22 @@
                     });
                     highlights.push(highlightGroup_1);
                 }
-                return __assign(__assign({}, item), { metadata: metadata,
-                    highlights: highlights, classes: itemPreviewOptions.classes, anchor: item.link ? {
+                var anchor = null;
+                if (item.link) {
+                    anchor = {
                         href: linksHelper.getRouterLink(item.link),
                         queryParams: linksHelper.getQueryParams(item.link),
                         target: '_blank'
-                    } : undefined });
+                    };
+                }
+                if (item.payload) {
+                    anchor = {
+                        payload: __assign({}, item.payload)
+                    };
+                }
+                return __assign(__assign({}, item), { metadata: metadata,
+                    anchor: anchor,
+                    highlights: highlights, classes: itemPreviewOptions.classes });
             });
         };
         return MrSearchResultsDS;
@@ -11226,6 +11242,31 @@
         return MrSearchPageDescriptionEH;
     }(core$1.EventHandler));
 
+    var MrSearchResultsEH = /** @class */ (function (_super) {
+        __extends(MrSearchResultsEH, _super);
+        function MrSearchResultsEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        MrSearchResultsEH.prototype.listen = function () {
+            var _this = this;
+            this.innerEvents$.subscribe(function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case 'mr-search-results.click': {
+                        var action = payload.action;
+                        if (action === 'resource-modal') {
+                            _this.emitOuter('openresourcemodal', payload);
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            });
+        };
+        return MrSearchResultsEH;
+    }(core$1.EventHandler));
+
     var MrFormWrapperAccordionEH = /** @class */ (function (_super) {
         __extends(MrFormWrapperAccordionEH, _super);
         function MrFormWrapperAccordionEH() {
@@ -11285,6 +11326,7 @@
         MrSearchResultsTitleEH: MrSearchResultsTitleEH,
         MrSearchPageTitleEH: MrSearchPageTitleEH,
         MrSearchPageDescriptionEH: MrSearchPageDescriptionEH,
+        MrSearchResultsEH: MrSearchResultsEH,
         MrFormWrapperAccordionEH: MrFormWrapperAccordionEH
     });
 
@@ -11314,7 +11356,7 @@
 
     var MrAdvancedResultsLayoutComponent = /** @class */ (function (_super) {
         __extends(MrAdvancedResultsLayoutComponent, _super);
-        function MrAdvancedResultsLayoutComponent(router, activatedRoute, mainState, configuration, communication, layoutState, layoutsConfiguration) {
+        function MrAdvancedResultsLayoutComponent(router, activatedRoute, mainState, configuration, communication, layoutState, modalService, layoutsConfiguration) {
             var _this = _super.call(this, layoutsConfiguration.get('MrAdvancedResultsLayoutConfig') || MrAdvancedResultsLayoutConfig) || this;
             _this.router = router;
             _this.activatedRoute = activatedRoute;
@@ -11322,6 +11364,7 @@
             _this.configuration = configuration;
             _this.communication = communication;
             _this.layoutState = layoutState;
+            _this.modalService = modalService;
             return _this;
         }
         MrAdvancedResultsLayoutComponent.prototype.initPayload = function () {
@@ -11333,6 +11376,7 @@
                 router: this.router,
                 activatedRoute: this.activatedRoute,
                 layoutState: this.layoutState,
+                modalService: this.modalService,
                 options: this.config.options || {},
             };
         };
@@ -11355,12 +11399,13 @@
             { type: ConfigurationService },
             { type: CommunicationService },
             { type: MrLayoutStateService },
+            { type: MrResourceModalService },
             { type: LayoutsConfigurationService }
         ]; };
         MrAdvancedResultsLayoutComponent = __decorate([
             core.Component({
                 selector: 'mr-advanced-results-layout',
-                template: "<div class=\"mr-advanced-results mr-layout\"\r\n     *ngIf=\"lb.dataSource\">\r\n    <section class=\"mr-layout__maxwidth mr-side-margin\">\r\n\r\n        <div class=\"mr-advanced-results__title\">\r\n            <n7-inner-title\r\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['mr-search-page-title'].emit\">\r\n            </n7-inner-title>\r\n        </div>\r\n        \r\n        <div class=\"mr-advanced-results__results-content\">\r\n            <div class=\"scroll-ref\">&nbsp;</div>\r\n            <div class=\"mr-advanced-results__results-wrapper\">\r\n                \r\n                <div class=\"mr-advanced-results__results-info\">\r\n                    <n7-inner-title\r\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\r\n                    </n7-inner-title>\r\n                </div>\r\n                \r\n                <div *ngIf=\"lb.dataSource.pageConfig['filters']\" class=\"mr-active-filters\">\r\n                    <span *ngIf=\"lb.dataSource.pageConfig['filters'].title\" \r\n                    class=\"mr-active-filters__label\">{{ lb.dataSource.pageConfig['filters'].title }}</span>\r\n                    <div class=\"mr-active-filters__tags-wrapper\">\r\n                        <n7-tag *ngFor=\"let tag of (lb.widgets['mr-advanced-search-tags'].ds.out$ | async)\"\r\n                            [data]=\"tag\">\r\n                        </n7-tag>\r\n                    </div>\r\n                </div>\r\n\r\n                <main class=\"mr-advanced-results__results\">\r\n                    \r\n                    <!-- SEARCH RESULTS -->\r\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\r\n                        \r\n                        <!-- loading -->\r\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n                            <div class=\"mr-advanced-results__results-loading n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\r\n                                    blocks: [\r\n                                        { classes: 'search-result-placeholder-title' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' }\r\n                                    ]\r\n                                }\"></n7-content-placeholder>\r\n                            </div>\r\n                        </ng-container>\r\n                        \r\n                        <!-- success: items > 0 -->\r\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n                            <div class=\"n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <!-- Use a custom item preview with clickable metadata items -->\r\n                                <mr-advanced-result\r\n                                    *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\r\n                                    [data]=\"item\">\r\n                                </mr-advanced-result>\r\n                                <!-- ../../components/advanced-result/advanced-result.html -->\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- empty: items === 0 -->\r\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\r\n                            <div *ngIf=\"lb.dataSource.pageConfig?.fallback?.text\" class=\"mr-advanced-results__results-fallback\">\r\n                                <p class=\"mr-advanced-results__feedback-text\">\r\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\r\n                                </p>\r\n                                <!-- <div class=\"mr-advanced-results__buttons\">\r\n                                    <button class=\"n7-btn n7-btn-xl mr-advanced-results__results-fallback-button\"\r\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                        {{ lb.dataSource.pageConfig.fallback.button }}\r\n                                    </button>\r\n                                </div> -->\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- error: request problem -->\r\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n                            <p *ngIf=\"lb.dataSource.pageConfig?.ko?.text\" class=\"mr-advanced-results__feedback-text\">\r\n                                {{ lb.dataSource.pageConfig.ko.text }}\r\n                            </p>\r\n                            <!-- <div class=\"mr-advanced-results__buttons\">\r\n                                <button class=\"n7-btn n7-btn-xl mr-advanced-results__results-ko-button\"\r\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                    {{ lb.dataSource.pageConfig.ko.button }}\r\n                                </button>\r\n                            </div> -->\r\n                        </ng-container>\r\n                        \r\n                    </ng-container>\r\n                </main>               \r\n                \r\n                <n7-smart-pagination\r\n                    *ngIf=\"(layoutState.get$('results') | async) === 'SUCCESS'\"\r\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\r\n                </n7-smart-pagination>\r\n\r\n            </div>\r\n        </div>\r\n    </section>\r\n</div>\r\n"
+                template: "<div class=\"mr-advanced-results mr-layout\"\r\n     *ngIf=\"lb.dataSource\">\r\n    <section class=\"mr-layout__maxwidth mr-side-margin\">\r\n\r\n        <div class=\"mr-advanced-results__title\">\r\n            <n7-inner-title\r\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['mr-search-page-title'].emit\">\r\n            </n7-inner-title>\r\n        </div>\r\n        \r\n        <div class=\"mr-advanced-results__results-content\">\r\n            <div class=\"scroll-ref\">&nbsp;</div>\r\n            <div class=\"mr-advanced-results__results-wrapper\">\r\n                \r\n                <div class=\"mr-advanced-results__results-info\">\r\n                    <n7-inner-title\r\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\r\n                    </n7-inner-title>\r\n                </div>\r\n                \r\n                <div *ngIf=\"lb.dataSource.pageConfig['filters']\" class=\"mr-active-filters\">\r\n                    <span *ngIf=\"lb.dataSource.pageConfig['filters'].title\" \r\n                    class=\"mr-active-filters__label\">{{ lb.dataSource.pageConfig['filters'].title }}</span>\r\n                    <div class=\"mr-active-filters__tags-wrapper\">\r\n                        <n7-tag *ngFor=\"let tag of (lb.widgets['mr-advanced-search-tags'].ds.out$ | async)\"\r\n                            [data]=\"tag\">\r\n                        </n7-tag>\r\n                    </div>\r\n                </div>\r\n\r\n                <main class=\"mr-advanced-results__results\">\r\n                    \r\n                    <!-- SEARCH RESULTS -->\r\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\r\n                        \r\n                        <!-- loading -->\r\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n                            <div class=\"mr-advanced-results__results-loading n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\r\n                                    blocks: [\r\n                                        { classes: 'search-result-placeholder-title' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' }\r\n                                    ]\r\n                                }\"></n7-content-placeholder>\r\n                            </div>\r\n                        </ng-container>\r\n                        \r\n                        <!-- success: items > 0 -->\r\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n                            <div class=\"n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <!-- Use a custom item preview with clickable metadata items -->\r\n                                <mr-advanced-result\r\n                                    *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\r\n                                    [data]=\"item\" [emit]=\"lb.widgets['mr-search-results'].emit\">\r\n                                </mr-advanced-result>\r\n                                <!-- ../../components/advanced-result/advanced-result.html -->\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- empty: items === 0 -->\r\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\r\n                            <div *ngIf=\"lb.dataSource.pageConfig?.fallback?.text\" class=\"mr-advanced-results__results-fallback\">\r\n                                <p class=\"mr-advanced-results__feedback-text\">\r\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\r\n                                </p>\r\n                                <!-- <div class=\"mr-advanced-results__buttons\">\r\n                                    <button class=\"n7-btn n7-btn-xl mr-advanced-results__results-fallback-button\"\r\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                        {{ lb.dataSource.pageConfig.fallback.button }}\r\n                                    </button>\r\n                                </div> -->\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- error: request problem -->\r\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n                            <p *ngIf=\"lb.dataSource.pageConfig?.ko?.text\" class=\"mr-advanced-results__feedback-text\">\r\n                                {{ lb.dataSource.pageConfig.ko.text }}\r\n                            </p>\r\n                            <!-- <div class=\"mr-advanced-results__buttons\">\r\n                                <button class=\"n7-btn n7-btn-xl mr-advanced-results__results-ko-button\"\r\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                    {{ lb.dataSource.pageConfig.ko.button }}\r\n                                </button>\r\n                            </div> -->\r\n                        </ng-container>\r\n                        \r\n                    </ng-container>\r\n                </main>               \r\n                \r\n                <n7-smart-pagination\r\n                    *ngIf=\"(layoutState.get$('results') | async) === 'SUCCESS'\"\r\n                    [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\r\n                </n7-smart-pagination>\r\n\r\n            </div>\r\n        </div>\r\n    </section>\r\n</div>\r\n"
             }),
             __metadata("design:paramtypes", [router.Router,
                 router.ActivatedRoute,
@@ -11368,6 +11413,7 @@
                 ConfigurationService,
                 CommunicationService,
                 MrLayoutStateService,
+                MrResourceModalService,
                 LayoutsConfigurationService])
         ], MrAdvancedResultsLayoutComponent);
         return MrAdvancedResultsLayoutComponent;
@@ -14095,6 +14141,7 @@
                     case 'mr-search-layout.init':
                         _this.searchService = payload.searchService;
                         _this.layoutState = payload.layoutState;
+                        _this.modalService = payload.modalService;
                         _this.dataSource.onInit(payload);
                         // listeners
                         _this.initStateListener();
@@ -14138,6 +14185,11 @@
                             newValue = stateValue.filter(function (value) { return value !== payload.value; });
                         }
                         _this.searchService.setState('input', payload.id, newValue);
+                        break;
+                    }
+                    case 'mr-search-results.openresourcemodal': {
+                        var id = payload.id, resourceType = payload.type;
+                        _this.modalService.open(id, resourceType);
                         break;
                     }
                     default:
@@ -14271,7 +14323,7 @@
 
     var MrSearchLayoutComponent = /** @class */ (function (_super) {
         __extends(MrSearchLayoutComponent, _super);
-        function MrSearchLayoutComponent(layoutsConfiguration, router, activatedRoute, communication, configuration, searchService, layoutState, mainState) {
+        function MrSearchLayoutComponent(layoutsConfiguration, router, activatedRoute, communication, configuration, searchService, layoutState, mainState, modalService) {
             var _this = _super.call(this, layoutsConfiguration.get('MrSearchLayoutConfig') || MrSearchLayoutConfig) || this;
             _this.router = router;
             _this.activatedRoute = activatedRoute;
@@ -14280,6 +14332,7 @@
             _this.searchService = searchService;
             _this.layoutState = layoutState;
             _this.mainState = mainState;
+            _this.modalService = modalService;
             return _this;
         }
         MrSearchLayoutComponent.prototype.initPayload = function () {
@@ -14292,6 +14345,7 @@
                 communication: this.communication,
                 searchService: this.searchService,
                 layoutState: this.layoutState,
+                modalService: this.modalService,
                 options: this.config.options || {},
             };
         };
@@ -14317,12 +14371,13 @@
             { type: ConfigurationService },
             { type: MrSearchService },
             { type: MrLayoutStateService },
-            { type: MainStateService }
+            { type: MainStateService },
+            { type: MrResourceModalService }
         ]; };
         MrSearchLayoutComponent = __decorate([
             core.Component({
                 selector: 'mr-search-layout',
-                template: "<div class=\"mr-search mr-layout\"\r\n     *ngIf=\"lb.dataSource\">\r\n    <section class=\"mr-layout__maxwidth mr-side-margin\">\r\n\r\n        <div class=\"mr-search__title\">\r\n            <n7-inner-title\r\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['mr-search-page-title'].emit\">\r\n            </n7-inner-title>\r\n        </div>\r\n\r\n        <div *ngIf=\"lb.dataSource.showDescription\" class=\"mr-search__description\">\r\n            <mr-search-page-description\r\n            [data]=\"lb.widgets['mr-search-page-description'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['mr-search-page-description'].emit\">\r\n            </mr-search-page-description>\r\n        </div>\r\n        \r\n        <div class=\"mr-search__results-content\">\r\n            <aside class=\"mr-facets\">\r\n                <div class=\"scroll-ref\">&nbsp;</div>\r\n                <div class=\"mr-facets__contents\">\r\n                    <h2 class=\"mr-facets__title\" \r\n                        *ngIf=\"lb.dataSource.pageConfig['facetsTitle']\">\r\n                        {{ lb.dataSource.pageConfig['facetsTitle'] }}\r\n                    </h2>\r\n                    <mr-search-facets-layout \r\n                    [searchService]=\"lb.dataSource.searchService\">\r\n                    </mr-search-facets-layout>\r\n                </div>\r\n            </aside>\r\n            <div class=\"mr-search__results-wrapper\">\r\n                <div class=\"mr-search__results-info\">\r\n                    <n7-inner-title\r\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\r\n                    </n7-inner-title>\r\n                </div>\r\n                \r\n                <div *ngIf=\"(\r\n                    lb.dataSource.pageConfig['filtersTitle'] && \r\n                    lb.widgets['mr-search-tags'].ds.hasFilters\r\n                )\" \r\n                class=\"mr-active-filters\">\r\n                    <span class=\"mr-active-filters__label\">{{ lb.dataSource.pageConfig['filtersTitle'] }}</span>\r\n                    <div class=\"mr-active-filters__tags-wrapper\">\r\n                        <n7-tag *ngFor=\"let tag of (lb.widgets['mr-search-tags'].ds.out$ | async)\"\r\n                        [data]=\"tag\"\r\n                        [emit]=\"lb.widgets['mr-search-tags'].emit\">\r\n                        </n7-tag>\r\n                    </div>\r\n                </div>\r\n\r\n                <main class=\"mr-search__results\">\r\n                    <!-- SEARCH RESULTS -->\r\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\r\n                        \r\n                        <!-- loading -->\r\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n                            <div class=\"mr-search__results-loading n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\r\n                                    blocks: [\r\n                                        { classes: 'search-result-placeholder-title' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' }\r\n                                    ]\r\n                                }\"></n7-content-placeholder>\r\n                            </div>\r\n                        </ng-container>\r\n                        \r\n                        <!-- success: items > 0 -->\r\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n                            <div class=\"n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\r\n                                [data]=\"item\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- empty: items === 0 -->\r\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\r\n                            <div class=\"mr-search__results-fallback\">\r\n                                <p class=\"mr-search__results-fallback-string\">\r\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\r\n                                </p>\r\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\r\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\r\n                                </button>\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- error: request problem -->\r\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n                            <p class=\"mr-search__results-ko-string\">\r\n                                {{ lb.dataSource.pageConfig.ko.text }}\r\n                            </p>\r\n                            <button class=\"n7-btn mr-search__results-ko-button\"\r\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                {{ lb.dataSource.pageConfig.ko.button }}\r\n                            </button>\r\n                        </ng-container>\r\n                        \r\n                    </ng-container>\r\n                </main>               \r\n                <n7-smart-pagination\r\n                *ngIf=\"(layoutState.get$('results') | async) === 'SUCCESS'\"\r\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\r\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\r\n                </n7-smart-pagination>\r\n            </div>\r\n        </div>\r\n\r\n    </section>\r\n</div>"
+                template: "<div class=\"mr-search mr-layout\"\r\n     *ngIf=\"lb.dataSource\">\r\n    <section class=\"mr-layout__maxwidth mr-side-margin\">\r\n\r\n        <div class=\"mr-search__title\">\r\n            <n7-inner-title\r\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['mr-search-page-title'].emit\">\r\n            </n7-inner-title>\r\n        </div>\r\n\r\n        <div *ngIf=\"lb.dataSource.showDescription\" class=\"mr-search__description\">\r\n            <mr-search-page-description\r\n            [data]=\"lb.widgets['mr-search-page-description'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['mr-search-page-description'].emit\">\r\n            </mr-search-page-description>\r\n        </div>\r\n        \r\n        <div class=\"mr-search__results-content\">\r\n            <aside class=\"mr-facets\">\r\n                <div class=\"scroll-ref\">&nbsp;</div>\r\n                <div class=\"mr-facets__contents\">\r\n                    <h2 class=\"mr-facets__title\" \r\n                        *ngIf=\"lb.dataSource.pageConfig['facetsTitle']\">\r\n                        {{ lb.dataSource.pageConfig['facetsTitle'] }}\r\n                    </h2>\r\n                    <mr-search-facets-layout \r\n                    [searchService]=\"lb.dataSource.searchService\">\r\n                    </mr-search-facets-layout>\r\n                </div>\r\n            </aside>\r\n            <div class=\"mr-search__results-wrapper\">\r\n                <div class=\"mr-search__results-info\">\r\n                    <n7-inner-title\r\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\r\n                    </n7-inner-title>\r\n                </div>\r\n                \r\n                <div *ngIf=\"(\r\n                    lb.dataSource.pageConfig['filtersTitle'] && \r\n                    lb.widgets['mr-search-tags'].ds.hasFilters\r\n                )\" \r\n                class=\"mr-active-filters\">\r\n                    <span class=\"mr-active-filters__label\">{{ lb.dataSource.pageConfig['filtersTitle'] }}</span>\r\n                    <div class=\"mr-active-filters__tags-wrapper\">\r\n                        <n7-tag *ngFor=\"let tag of (lb.widgets['mr-search-tags'].ds.out$ | async)\"\r\n                        [data]=\"tag\"\r\n                        [emit]=\"lb.widgets['mr-search-tags'].emit\">\r\n                        </n7-tag>\r\n                    </div>\r\n                </div>\r\n\r\n                <main class=\"mr-search__results\">\r\n                    <!-- SEARCH RESULTS -->\r\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\r\n                        \r\n                        <!-- loading -->\r\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n                            <div class=\"mr-search__results-loading n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\r\n                                    blocks: [\r\n                                        { classes: 'search-result-placeholder-title' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' }\r\n                                    ]\r\n                                }\"></n7-content-placeholder>\r\n                            </div>\r\n                        </ng-container>\r\n                        \r\n                        <!-- success: items > 0 -->\r\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n                            <div class=\"n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\r\n                                [data]=\"item\" [emit]=\"lb.widgets['mr-search-results'].emit\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- empty: items === 0 -->\r\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\r\n                            <div class=\"mr-search__results-fallback\">\r\n                                <p class=\"mr-search__results-fallback-string\">\r\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\r\n                                </p>\r\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\r\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\r\n                                </button>\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- error: request problem -->\r\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n                            <p class=\"mr-search__results-ko-string\">\r\n                                {{ lb.dataSource.pageConfig.ko.text }}\r\n                            </p>\r\n                            <button class=\"n7-btn mr-search__results-ko-button\"\r\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                {{ lb.dataSource.pageConfig.ko.button }}\r\n                            </button>\r\n                        </ng-container>\r\n                        \r\n                    </ng-container>\r\n                </main>               \r\n                <n7-smart-pagination\r\n                *ngIf=\"(layoutState.get$('results') | async) === 'SUCCESS'\"\r\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\r\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\r\n                </n7-smart-pagination>\r\n            </div>\r\n        </div>\r\n\r\n    </section>\r\n</div>"
             }),
             __metadata("design:paramtypes", [LayoutsConfigurationService,
                 router.Router,
@@ -14331,7 +14386,8 @@
                 ConfigurationService,
                 MrSearchService,
                 MrLayoutStateService,
-                MainStateService])
+                MainStateService,
+                MrResourceModalService])
         ], MrSearchLayoutComponent);
         return MrSearchLayoutComponent;
     }(AbstractLayout));
@@ -14879,7 +14935,7 @@
         MrAdvancedResultComponent = __decorate([
             core.Component({
                 selector: 'mr-advanced-result',
-                template: "<div *ngIf=\"data\"\r\n     class=\"mr-advanced-result\">\r\n    <n7-item-preview [data]=\"data\"></n7-item-preview>\r\n    <div class=\"mr-advanced-result__content\"\r\n         *ngFor=\"let highlightGroup of data.highlights\">\r\n        <div class=\"mr-advanced-result__content-group\">\r\n            <!-- METADATA GROUP TITLE -->\r\n            <h3 class=\"mr-advanced-result__title\"\r\n                *ngIf=\"highlightGroup.title\"\r\n                [innerHTML]=\"highlightGroup.title\">\r\n            </h3>\r\n            <!-- METADATA ITEM -->\r\n            <div class=\"mr-advanced-result__item {{ item.classes || '' }}\"\r\n                 *ngFor=\"let item of highlightGroup.items\">\r\n                <!-- ICON -->\r\n                <span class=\"mr-advanced-result__icon {{item.icon}}\"\r\n                      *ngIf=\"item.icon\">\r\n                </span>\r\n                <!-- LABEL -->\r\n                <span class=\"mr-advanced-result__label\"\r\n                      *ngIf=\"item.label\"\r\n                      [innerHTML]=\"item.label\">\r\n                </span>\r\n                <!-- VALUE W/ HREF -->\r\n                <a *ngIf=\"item.href\"\r\n                   [href]=\"item.href\">\r\n                    <span class=\"mr-advanced-result__value\"\r\n                          *ngIf=\"item.value\"\r\n                          [innerHTML]=\"item.value\">\r\n                    </span>\r\n                </a>\r\n                <!-- VALUE W/OUT HREF -->\r\n                <span class=\"mr-advanced-result__value\"\r\n                      *ngIf=\"item.value && !item.href\"\r\n                      [innerHTML]=\"item.value\">\r\n                </span>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>\r\n"
+                template: "<div *ngIf=\"data\"\r\n     class=\"mr-advanced-result\">\r\n    <n7-item-preview [data]=\"data\"></n7-item-preview>\r\n    <div class=\"mr-advanced-result__content\"\r\n         *ngFor=\"let highlightGroup of data.highlights\">\r\n        <div class=\"mr-advanced-result__content-group\">\r\n            <!-- METADATA GROUP TITLE -->\r\n            <!--\r\n            <h3 class=\"mr-advanced-result__title\"\r\n                *ngIf=\"highlightGroup.title\"\r\n                [innerHTML]=\"highlightGroup.title\">\r\n            </h3>\r\n            -->\r\n            <!-- METADATA ITEM -->\r\n            <div class=\"mr-advanced-result__item {{ item.classes || '' }}\"\r\n                 *ngFor=\"let item of highlightGroup.items\">\r\n                <!-- ICON -->\r\n                <span class=\"mr-advanced-result__icon {{item.icon}}\"\r\n                      *ngIf=\"item.icon\">\r\n                </span>\r\n                <!-- LABEL -->\r\n                <span class=\"mr-advanced-result__label\"\r\n                      *ngIf=\"item.label\"\r\n                      [innerHTML]=\"item.label\">\r\n                </span>\r\n                <!-- VALUE W/ HREF -->\r\n                <a *ngIf=\"item.href\"\r\n                   [href]=\"item.href\">\r\n                    <span class=\"mr-advanced-result__value\"\r\n                          *ngIf=\"item.value\"\r\n                          [innerHTML]=\"item.value\">\r\n                    </span>\r\n                </a>\r\n                <!-- VALUE W/OUT HREF -->\r\n                <span class=\"mr-advanced-result__value\"\r\n                      *ngIf=\"item.value && !item.href\"\r\n                      [innerHTML]=\"item.value\">\r\n                </span>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>\r\n"
             })
         ], MrAdvancedResultComponent);
         return MrAdvancedResultComponent;
@@ -16077,6 +16133,7 @@
     exports.MrSearchPageTitleDS = MrSearchPageTitleDS;
     exports.MrSearchPageTitleEH = MrSearchPageTitleEH;
     exports.MrSearchResultsDS = MrSearchResultsDS;
+    exports.MrSearchResultsEH = MrSearchResultsEH;
     exports.MrSearchResultsTitleDS = MrSearchResultsTitleDS;
     exports.MrSearchResultsTitleEH = MrSearchResultsTitleEH;
     exports.MrSearchTagsDS = MrSearchTagsDS;
@@ -16138,11 +16195,11 @@
     exports.ɵbc = EscapeHtmlPipe;
     exports.ɵbd = MrAdvancedResultsLayoutComponent;
     exports.ɵbe = MrLayoutStateService;
-    exports.ɵbf = MrAdvancedSearchLayoutComponent;
-    exports.ɵbg = MrGlossaryLayoutComponent;
-    exports.ɵbh = MrHomeLayoutComponent;
-    exports.ɵbi = MrItineraryLayoutComponent;
-    exports.ɵbj = MrResourceModalService;
+    exports.ɵbf = MrResourceModalService;
+    exports.ɵbg = MrAdvancedSearchLayoutComponent;
+    exports.ɵbh = MrGlossaryLayoutComponent;
+    exports.ɵbi = MrHomeLayoutComponent;
+    exports.ɵbj = MrItineraryLayoutComponent;
     exports.ɵbk = MrMapLayoutComponent;
     exports.ɵbl = MrPostsLayoutComponent;
     exports.ɵbm = MrResourceLayoutComponent;

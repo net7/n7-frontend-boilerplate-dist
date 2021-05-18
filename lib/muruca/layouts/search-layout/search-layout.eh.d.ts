@@ -5,6 +5,7 @@ export declare class MrSearchLayoutEH extends EventHandler {
     private destroyed$;
     private searchService;
     private layoutState;
+    private modalService;
     private searchState;
     private linksResponse;
     private scrollRefElement;

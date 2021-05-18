@@ -7,6 +7,7 @@ import { ConfigurationService } from '../../../common/services/configuration.ser
 import { MainStateService } from '../../../common/services/main-state.service';
 import { MrSearchService } from '../../services/search.service';
 import { MrLayoutStateService } from '../../services/layout-state.service';
+import { MrResourceModalService } from '../../services/resource-modal.service';
 export declare class MrSearchLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private router;
     private activatedRoute;
@@ -15,8 +16,9 @@ export declare class MrSearchLayoutComponent extends AbstractLayout implements O
     private searchService;
     layoutState: MrLayoutStateService;
     private mainState;
+    modalService: MrResourceModalService;
     private configId;
-    constructor(layoutsConfiguration: LayoutsConfigurationService, router: Router, activatedRoute: ActivatedRoute, communication: CommunicationService, configuration: ConfigurationService, searchService: MrSearchService, layoutState: MrLayoutStateService, mainState: MainStateService);
+    constructor(layoutsConfiguration: LayoutsConfigurationService, router: Router, activatedRoute: ActivatedRoute, communication: CommunicationService, configuration: ConfigurationService, searchService: MrSearchService, layoutState: MrLayoutStateService, mainState: MainStateService, modalService: MrResourceModalService);
     protected initPayload(): {
         configId: string;
         configuration: ConfigurationService;
@@ -26,6 +28,7 @@ export declare class MrSearchLayoutComponent extends AbstractLayout implements O
         communication: CommunicationService;
         searchService: MrSearchService;
         layoutState: MrLayoutStateService;
+        modalService: MrResourceModalService;
         options: any;
     };
     ngOnInit(): void;

@@ -38,10 +38,10 @@ export { ReadMoreComponent as ɵbs } from './lib/muruca/components/read-more/rea
 export { MrResourceModalComponent as ɵbw } from './lib/muruca/components/resource-modal/resource-modal';
 export { MrSearchPageDescriptionComponent as ɵbv } from './lib/muruca/components/search-page-description/search-page-description';
 export { MrAdvancedResultsLayoutComponent as ɵbd } from './lib/muruca/layouts/advanced-results-layout/advanced-results-layout';
-export { MrAdvancedSearchLayoutComponent as ɵbf } from './lib/muruca/layouts/advanced-search-layout/advanced-search-layout';
-export { MrGlossaryLayoutComponent as ɵbg } from './lib/muruca/layouts/glossary-layout/glossary-layout';
-export { MrHomeLayoutComponent as ɵbh } from './lib/muruca/layouts/home-layout/home-layout';
-export { MrItineraryLayoutComponent as ɵbi } from './lib/muruca/layouts/itinerary-layout/itinerary-layout';
+export { MrAdvancedSearchLayoutComponent as ɵbg } from './lib/muruca/layouts/advanced-search-layout/advanced-search-layout';
+export { MrGlossaryLayoutComponent as ɵbh } from './lib/muruca/layouts/glossary-layout/glossary-layout';
+export { MrHomeLayoutComponent as ɵbi } from './lib/muruca/layouts/home-layout/home-layout';
+export { MrItineraryLayoutComponent as ɵbj } from './lib/muruca/layouts/itinerary-layout/itinerary-layout';
 export { MrMapLayoutComponent as ɵbk } from './lib/muruca/layouts/map-layout/map-layout';
 export { MrPostsLayoutComponent as ɵbl } from './lib/muruca/layouts/posts-layout/posts-layout';
 export { MrResourceLayoutComponent as ɵbm } from './lib/muruca/layouts/resource-layout/resource-layout';
@@ -51,7 +51,7 @@ export { MrStaticLayoutComponent as ɵbq } from './lib/muruca/layouts/static-lay
 export { MrTimelineLayoutComponent as ɵbr } from './lib/muruca/layouts/timeline-layout/timeline-layout';
 export { EscapeHtmlPipe as ɵbc } from './lib/muruca/pipes/keep-html.pipe';
 export { MrLayoutStateService as ɵbe } from './lib/muruca/services/layout-state.service';
-export { MrResourceModalService as ɵbj } from './lib/muruca/services/resource-modal.service';
+export { MrResourceModalService as ɵbf } from './lib/muruca/services/resource-modal.service';
 export { MrSearchService as ɵbp } from './lib/muruca/services/search.service';
 export { SbExampleLayoutComponent as ɵbz } from './lib/sandbox/layout/example-layout/example-layout';
 export { SbImageViewerLayoutComponent as ɵca } from './lib/sandbox/layout/image-viewer-layout/image-viewer-layout';

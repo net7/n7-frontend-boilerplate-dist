@@ -6,6 +6,7 @@ export declare class MrAdvancedResultsLayoutEH extends EventHandler {
     protected activatedRoute: ActivatedRoute;
     protected router: Router;
     private layoutState;
+    private modalService;
     protected destroy$: Subject<void>;
     protected scrollRefElement: HTMLElement;
     dataSource: MrAdvancedResultsLayoutDS;

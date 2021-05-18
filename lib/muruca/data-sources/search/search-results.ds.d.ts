@@ -13,27 +13,35 @@ declare type HighlightItem = [string, [string]] | {
     label?: string;
 };
 interface MrSearchResult extends ItemPreviewData {
-    /** relative path */
-    link: string;
-    /** items that matched the search input */
-    highlights?: HighlightItem[];
     /** unique id for the search result entry */
     id: number;
+    /** relative path */
+    link?: string;
+    /** items that matched the search input */
+    highlights?: HighlightItem[];
+    /** payload for item anchor */
+    payload?: {
+        action: string;
+        id: string | number;
+        type: string;
+    };
 }
 export declare class MrSearchResultsDS extends DataSource {
     protected transform(data: MrSearchResponse): {
         metadata: MetadataGroup[];
+        anchor: any;
         highlights: any[];
         classes: any;
-        anchor: {
-            href: string;
-            queryParams: {};
-            target: string;
-        };
-        /** relative path */
-        link: string;
         /** unique id for the search result entry */
         id: number;
+        /** relative path */
+        link?: string;
+        /** payload for item anchor */
+        payload?: {
+            action: string;
+            id: string | number;
+            type: string;
+        };
         image?: string;
         color?: string;
         title: string;
