@@ -1,4 +1,4 @@
-import { ElementRef, AfterViewInit } from '@angular/core';
+import { ElementRef, AfterViewChecked } from '@angular/core';
 /**
  * Interface for a single BreadcrumbsComponent's "Item"
  *
@@ -43,20 +43,26 @@ export interface SmartBreadcrumbsData {
      */
     classes?: any;
 }
-export declare class SmartBreadcrumbsComponent implements AfterViewInit {
+export declare class SmartBreadcrumbsComponent implements AfterViewChecked {
     data: SmartBreadcrumbsData;
     emit: any;
     bcol: ElementRef;
     bcdiv: ElementRef;
-    ngAfterViewInit(): void;
+    ngAfterViewChecked(): void;
     onClick(payload: any): void;
     /**
      * Builds tippy data for a node.
      */
     tippyBuilder: (node: any, content: any) => import("tippy.js").Instance<import("tippy.js").Props>[];
+    /** Calculate the width of an HTML Element and it's child */
     getWidths: (parent: ElementRef<any>, child: ElementRef<any>) => {
         parentWidth: number;
         childWidth: any;
     };
     getSidePadding: (node: any) => number;
+    /**
+     * Checks if the smart ellipsis functionality should be enabled,
+     * if the children elements are too wide, it enables it.
+     */
+    triggerSmartEllipsis: () => void;
 }

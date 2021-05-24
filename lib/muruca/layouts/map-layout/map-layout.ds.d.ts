@@ -15,7 +15,6 @@ export declare class MrMapLayoutDS extends LayoutDataSource {
         resourceDetails: boolean;
         timeline: boolean;
     };
-    defaultDescription: string;
     eventHeader: string;
     eventDescription: string;
     route: any;

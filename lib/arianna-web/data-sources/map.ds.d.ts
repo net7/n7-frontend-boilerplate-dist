@@ -6,4 +6,12 @@ export declare class AwMapDS extends DataSource {
     markerOpen$: Subject<object>;
     markerClose$: Subject<void>;
     protected transform: (data: any) => MapData;
+    /**
+     * Performs validation for a leaflet marker data.
+     * If the data is invalid displays an error.
+     *
+     * @param marker data for a leaflet marker
+     * @returns true if the marker data is valid
+     */
+    private isValidMarker;
 }

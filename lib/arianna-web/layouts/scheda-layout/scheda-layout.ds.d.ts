@@ -9,6 +9,7 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
     protected router: any;
     protected titleService: any;
     options: any;
+    private layoutConfig;
     pageTitle: string;
     hasBreadcrumb: boolean;
     contentParts: any;
@@ -53,7 +54,14 @@ export declare class AwSchedaLayoutDS extends LayoutDataSource {
     getTree: () => any;
     updateNavigation(text: any): void;
     loadItem(id: any): any;
+    /**
+     * Loads the content of the selected tree item in the right portion of the view.
+     * @param response http response for the tree item
+     */
     loadContent(response: any): void;
+    /**
+     * Toggle between the tree's collapsed or expanded state.
+     */
     collapseSidebar(): void;
     private _sidebarStickyControl;
     getFields(response: any): {
