@@ -3,7 +3,7 @@ import { ɵɵdefineInjectable, Injectable, Inject, ɵɵinject, Component, Input,
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK, IMAGE_VIEWER_MOCK, IMAGE_VIEWER_TOOLS_MOCK } from '@n7-frontend/components';
-import { ReplaySubject, empty, Subject, interval, merge as merge$1, fromEvent, BehaviorSubject, of, forkJoin } from 'rxjs';
+import { ReplaySubject, empty, Subject, interval, merge as merge$1, fromEvent, BehaviorSubject, of, forkJoin, from } from 'rxjs';
 import { map, catchError, takeUntil, filter, first, mapTo, debounceTime, switchMap, withLatestFrom, tap, delay } from 'rxjs/operators';
 import { NavigationStart, Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Title, DomSanitizer } from '@angular/platform-browser';
@@ -2566,16 +2566,25 @@ class AwSchedaImageDS extends DataSource {
         this.instance.world.removeAll();
     }
     getTileSources(images) {
-        return images.map(({ type, url }) => {
+        const tileSources = [];
+        images.forEach(({ type, url, iiifImages }) => {
             if (type === 'images-simple') {
-                return {
+                tileSources.push({
                     url,
                     type: 'image'
-                };
+                });
             }
-            // FIXME: togliere replace
-            return url.replace('FIF', 'Deepzoom').replace('.tif', '.tif.dzi');
+            else if (type === 'images-iip') {
+                // FIXME: togliere replace
+                tileSources.push(url.replace('FIF', 'Deepzoom').replace('.tif', '.tif.dzi'));
+            }
+            else if (type === 'images-iiif') {
+                iiifImages.forEach((iiifUrl) => {
+                    tileSources.push(iiifUrl);
+                });
+            }
         });
+        return tileSources;
     }
 }
 
@@ -7042,8 +7051,9 @@ class AwSchedaLayoutDS extends LayoutDataSource {
                     type: $do.type,
                     label: $do.label,
                     hasNavigation: $do.items.length > 1,
-                    items: $do.items.map(({ url }) => ({
+                    items: $do.items.map(({ url, iiifImages }) => ({
                         url,
+                        iiifImages,
                         type: $do.type,
                     }))
                 };
@@ -7112,7 +7122,7 @@ class AwSchedaLayoutEH extends EventHandler {
                     this.emitOuter('routechanged', paramId);
                 }
                 this.dataSource.contentIsLoading = true;
-                this.dataSource.loadItem(paramId).subscribe((response) => {
+                this.dataSource.loadItem(paramId).pipe(switchMap((response) => this.parseDigitalObjects$(response))).subscribe((response) => {
                     this.dataSource.contentIsLoading = false;
                     if (response)
                         this.dataSource.loadContent(response);
@@ -7135,6 +7145,54 @@ class AwSchedaLayoutEH extends EventHandler {
                 });
             }
         });
+    }
+    parseDigitalObjects$(response) {
+        const iiifManifest$ = {};
+        if (Array.isArray(response === null || response === void 0 ? void 0 : response.digitalObjects)) {
+            response.digitalObjects.forEach((digitalObject) => {
+                if (digitalObject.type === 'images-iiif') {
+                    digitalObject.items.forEach(({ url }) => {
+                        iiifManifest$[url] = from(fetch(url)
+                            .then((data) => {
+                            if (!data.ok) {
+                                throw Error(data.statusText);
+                            }
+                            return data.json();
+                        })
+                            .catch((err) => {
+                            console.warn(`Error loading iiif manifest ${url}`, err);
+                            return null;
+                        }));
+                    });
+                }
+            });
+        }
+        if (!isEmpty(iiifManifest$)) {
+            return forkJoin(iiifManifest$).pipe(switchMap((data) => {
+                response.digitalObjects.forEach((digitalObject) => {
+                    if (digitalObject.type === 'images-iiif') {
+                        digitalObject.items.forEach((itemImages, index) => {
+                            digitalObject.items[index].iiifImages = this.getManifestImages(data[itemImages.url]);
+                        });
+                    }
+                });
+                return of(response);
+            }));
+        }
+        return of(response);
+    }
+    getManifestImages(manifest) {
+        const iiifImages = [];
+        if (manifest === null || manifest === void 0 ? void 0 : manifest.sequences) {
+            manifest.sequences.forEach(({ canvases }) => {
+                canvases.forEach(({ images }) => {
+                    images.forEach(({ resource }) => {
+                        iiifImages.push(resource['@id']);
+                    });
+                });
+            });
+        }
+        return iiifImages;
     }
 }
 

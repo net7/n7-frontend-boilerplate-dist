@@ -3032,17 +3032,26 @@
             this.instance.world.removeAll();
         };
         AwSchedaImageDS.prototype.getTileSources = function (images) {
-            return images.map(function (_a) {
-                var type = _a.type, url = _a.url;
+            var tileSources = [];
+            images.forEach(function (_a) {
+                var type = _a.type, url = _a.url, iiifImages = _a.iiifImages;
                 if (type === 'images-simple') {
-                    return {
+                    tileSources.push({
                         url: url,
                         type: 'image'
-                    };
+                    });
                 }
-                // FIXME: togliere replace
-                return url.replace('FIF', 'Deepzoom').replace('.tif', '.tif.dzi');
+                else if (type === 'images-iip') {
+                    // FIXME: togliere replace
+                    tileSources.push(url.replace('FIF', 'Deepzoom').replace('.tif', '.tif.dzi'));
+                }
+                else if (type === 'images-iiif') {
+                    iiifImages.forEach(function (iiifUrl) {
+                        tileSources.push(iiifUrl);
+                    });
+                }
             });
+            return tileSources;
         };
         return AwSchedaImageDS;
     }(core$1.DataSource));
@@ -7873,9 +7882,10 @@
                         label: $do.label,
                         hasNavigation: $do.items.length > 1,
                         items: $do.items.map(function (_a) {
-                            var url = _a.url;
+                            var url = _a.url, iiifImages = _a.iiifImages;
                             return ({
                                 url: url,
+                                iiifImages: iiifImages,
                                 type: $do.type,
                             });
                         })
@@ -7952,7 +7962,7 @@
                         _this.emitOuter('routechanged', paramId);
                     }
                     _this.dataSource.contentIsLoading = true;
-                    _this.dataSource.loadItem(paramId).subscribe(function (response) {
+                    _this.dataSource.loadItem(paramId).pipe(operators.switchMap(function (response) { return _this.parseDigitalObjects$(response); })).subscribe(function (response) {
                         _this.dataSource.contentIsLoading = false;
                         if (response)
                             _this.dataSource.loadContent(response);
@@ -7976,6 +7986,59 @@
                     });
                 }
             });
+        };
+        AwSchedaLayoutEH.prototype.parseDigitalObjects$ = function (response) {
+            var _this = this;
+            var iiifManifest$ = {};
+            if (Array.isArray(response === null || response === void 0 ? void 0 : response.digitalObjects)) {
+                response.digitalObjects.forEach(function (digitalObject) {
+                    if (digitalObject.type === 'images-iiif') {
+                        digitalObject.items.forEach(function (_a) {
+                            var url = _a.url;
+                            iiifManifest$[url] = rxjs.from(fetch(url)
+                                .then(function (data) {
+                                if (!data.ok) {
+                                    throw Error(data.statusText);
+                                }
+                                return data.json();
+                            })
+                                .catch(function (err) {
+                                console.warn("Error loading iiif manifest " + url, err);
+                                return null;
+                            }));
+                        });
+                    }
+                });
+            }
+            if (!lodash.isEmpty(iiifManifest$)) {
+                return rxjs.forkJoin(iiifManifest$).pipe(operators.switchMap(function (data) {
+                    response.digitalObjects.forEach(function (digitalObject) {
+                        if (digitalObject.type === 'images-iiif') {
+                            digitalObject.items.forEach(function (itemImages, index) {
+                                digitalObject.items[index].iiifImages = _this.getManifestImages(data[itemImages.url]);
+                            });
+                        }
+                    });
+                    return rxjs.of(response);
+                }));
+            }
+            return rxjs.of(response);
+        };
+        AwSchedaLayoutEH.prototype.getManifestImages = function (manifest) {
+            var iiifImages = [];
+            if (manifest === null || manifest === void 0 ? void 0 : manifest.sequences) {
+                manifest.sequences.forEach(function (_a) {
+                    var canvases = _a.canvases;
+                    canvases.forEach(function (_a) {
+                        var images = _a.images;
+                        images.forEach(function (_a) {
+                            var resource = _a.resource;
+                            iiifImages.push(resource['@id']);
+                        });
+                    });
+                });
+            }
+            return iiifImages;
         };
         return AwSchedaLayoutEH;
     }(core$1.EventHandler));

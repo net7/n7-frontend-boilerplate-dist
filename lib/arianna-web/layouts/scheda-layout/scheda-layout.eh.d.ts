@@ -6,4 +6,6 @@ export declare class AwSchedaLayoutEH extends EventHandler {
     listen(): void;
     private listenRoute;
     private loadNavigation;
+    private parseDigitalObjects$;
+    private getManifestImages;
 }
