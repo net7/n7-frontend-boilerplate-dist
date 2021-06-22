@@ -9,5 +9,7 @@ declare const _default: {
     unescapeDoubleQuotes(str: any): any;
     striptags(str: any): string;
     isElementInViewport(el: HTMLElement): boolean;
+    /** Return true if an object is empty */
+    isEmpty: (obj: any) => boolean;
 };
 export default _default;

@@ -887,6 +887,9 @@
                 && rect.left < (window.innerWidth || document.documentElement.clientWidth)
                 && rect.top < (window.innerHeight || document.documentElement.clientHeight);
         },
+        /** Return true if an object is empty */
+        isEmpty: function (obj) { return (typeof obj === 'object'
+            && Object.keys(obj).length === 0); }
     };
 
     var AwFacetInputText = /** @class */ (function (_super) {
@@ -1576,7 +1579,7 @@
                 last: last,
                 links: links,
                 select: sizes ? {
-                    label: sizes.label || 'Numero di risultati',
+                    label: sizes.label || core$1._t('search#resultsamount'),
                     options: sizes.list.map(function (s) { return ({
                         text: s,
                         selected: s === sizes.active,
@@ -10060,6 +10063,8 @@
             return _super !== null && _super.apply(this, arguments) || this;
         }
         MrBreadcrumbsDS.prototype.transform = function (data) {
+            if (!data)
+                return null;
             var items = [];
             if (Array.isArray(data) && data.length) {
                 var base = (this.options || {}).base;
@@ -10237,6 +10242,8 @@
             return _super !== null && _super.apply(this, arguments) || this;
         }
         MrImageViewerDS.prototype.transform = function (data) {
+            if (!data)
+                return null;
             var images = data.images, thumbs = data.thumbs;
             return {
                 images: images,
@@ -10264,6 +10271,45 @@
         return MrImageViewerDS;
     }(core$1.DataSource));
 
+    var MrImageViewerToolsDS = /** @class */ (function (_super) {
+        __extends(MrImageViewerToolsDS, _super);
+        function MrImageViewerToolsDS() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        MrImageViewerToolsDS.prototype.transform = function () {
+            var data = components.IMAGE_VIEWER_TOOLS_MOCK;
+            data.images = [
+                { thumb: 'http://placekitten.com/200/130', payload: { thumbindex: 0 }, caption: 'Test caption <b>#1</b>' },
+                { thumb: 'http://placekitten.com/90/180', payload: { thumbindex: 1 }, caption: 'Test caption <b>#2</b>' },
+                { thumb: 'http://placekitten.com/90/110', payload: { thumbindex: 2 }, caption: 'Test caption <b>#3</b>' },
+            ];
+            var initialDescription = data.images[data.initial].caption;
+            if (initialDescription !== undefined) {
+                data.description = initialDescription;
+            }
+            return data;
+        };
+        MrImageViewerToolsDS.prototype.toggleDescription = function () {
+            this.output.isVisible.description = !this.output.isVisible.description;
+        };
+        MrImageViewerToolsDS.prototype.toggleThumbs = function () {
+            this.output.isVisible.thumbnails = !this.output.isVisible.thumbnails;
+        };
+        MrImageViewerToolsDS.prototype.handleThumbs = function (index) {
+            this.output.initial = index;
+            this.updateDescription();
+        };
+        MrImageViewerToolsDS.prototype.handlePageChange = function (payload) {
+            this.handleThumbs(payload.page);
+        };
+        MrImageViewerToolsDS.prototype.updateDescription = function () {
+            var index = this.output.initial;
+            var images = this.output.images;
+            this.output.description = images[index].caption;
+        };
+        return MrImageViewerToolsDS;
+    }(core$1.DataSource));
+
     var MrInfoBoxDS = /** @class */ (function (_super) {
         __extends(MrInfoBoxDS, _super);
         function MrInfoBoxDS() {
@@ -10281,6 +10327,8 @@
             return _super !== null && _super.apply(this, arguments) || this;
         }
         MrInnerTitleDS.prototype.transform = function (data) {
+            if (!data)
+                return null;
             var title = data.title, description = data.description, button = data.button;
             return {
                 title: {
@@ -10320,6 +10368,8 @@
             return _super !== null && _super.apply(this, arguments) || this;
         }
         MrItemPreviewDS.prototype.transform = function (data) {
+            if (!data)
+                return null;
             var _a = this.options, classes = _a.classes, itemPreview = _a.itemPreview;
             var itemPreviewOptions = lodash.merge(ITEM_PREVIEW_DEFAULTS$1, (itemPreview || {}));
             // striptags
@@ -10517,9 +10567,7 @@
                     _this.mapLoaded$.next({ map: instance, markers: _this.markerLayer });
                 },
                 containerId: 'map-canvas',
-                libOptions: {
-                    scrollWheelZoom: false,
-                },
+                libOptions: __assign({}, this.options.libOptions),
                 tileLayers: [{
                         url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
                         options: {}
@@ -10683,6 +10731,8 @@
             return _super !== null && _super.apply(this, arguments) || this;
         }
         MrResourceTabsDS.prototype.transform = function (data) {
+            if (!data)
+                return null;
             var _a = this.options, currentTab = _a.currentTab, root = _a.root, slug = _a.slug, resourceId = _a.id;
             return data.map(function (_a) {
                 var id = _a.id, label = _a.label;
@@ -10720,20 +10770,10 @@
             var _this = this;
             return {
                 containerID: 'mr-timeline',
-                libOptions: {
-                    height: '500px',
-                    locale: 'it_IT',
-                    align: 'left',
-                    showTooltips: false,
-                    tooltip: {
+                libOptions: __assign({ height: '500px', locale: 'it_IT', align: 'left', showTooltips: false, tooltip: {
                         followMouse: false,
                         template: function (d, element) { return "<div class=\"tooltip\">" + element.title + "</div>"; }
-                    },
-                    width: '100%',
-                    minHeight: '350px',
-                    maxHeight: '800px',
-                    zoomFriction: 8
-                },
+                    }, width: '100%', minHeight: '350px', maxHeight: '800px', zoomFriction: 8 }, this.options.libOptions),
                 dataSet: data.dataSet.map(function (d) {
                     // Show dates that have identical start and end dates as points
                     if (d.end && d.end === d.start) {
@@ -11114,6 +11154,7 @@
         MrFiltersDS: MrFiltersDS,
         MrHeroDS: MrHeroDS,
         MrImageViewerDS: MrImageViewerDS,
+        MrImageViewerToolsDS: MrImageViewerToolsDS,
         MrInfoBoxDS: MrInfoBoxDS,
         MrInnerTitleDS: MrInnerTitleDS,
         MrItemPreviewDS: MrItemPreviewDS,
@@ -12674,6 +12715,8 @@
             this.location = payload.location;
             this.configId = payload.configId;
             this.pageConfig = this.configuration.get(this.configId) || {};
+            // overwrite leaflet options with configuration.libOptions
+            this.one('mr-map').updateOptions({ libOptions: this.pageConfig.libOptions });
             // update the map
             this.communication.request$('map', {
                 method: 'GET',
@@ -13274,8 +13317,12 @@
                 // set id
                 widgetDataSource.id = id;
                 // update data
-                if (responseSection) {
+                if (responseSection && !helpers.isEmpty(responseSection)) {
                     _this.one(id).update(responseSection);
+                }
+                else {
+                    // unload the component wihout data
+                    _this.one(id).update(undefined);
                 }
             });
             // update tabs
@@ -13408,6 +13455,60 @@
         return MrImageViewerEH;
     }(core$1.EventHandler));
 
+    var MrImageViewerToolsEH = /** @class */ (function (_super) {
+        __extends(MrImageViewerToolsEH, _super);
+        function MrImageViewerToolsEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        MrImageViewerToolsEH.prototype.listen = function () {
+            var _this = this;
+            this.innerEvents$.subscribe(function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case 'sb-image-viewer-tools.click':
+                        if (payload.thumbindex !== undefined) {
+                            var index = payload.thumbindex;
+                            _this.dataSource.handleThumbs(index);
+                            _this.emitOuter('thumbclick', index);
+                            break;
+                        }
+                        if (payload === 'close-description') {
+                            _this.dataSource.toggleDescription();
+                            break;
+                        }
+                        if (payload === 'toggle-description') {
+                            _this.dataSource.toggleDescription();
+                            break;
+                        }
+                        if (payload === 'toggle-thumbs') {
+                            _this.dataSource.toggleThumbs();
+                            break;
+                        }
+                        break;
+                    default:
+                        // console.warn('unhandled event of type', type);
+                        break;
+                }
+            });
+            this.outerEvents$.subscribe(function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case 'sb-image-viewer-layout.init':
+                    case 'sb-image-viewer-layout.thumbclick':
+                        // Silent
+                        break;
+                    case 'sb-image-viewer-layout.pagechange':
+                        _this.dataSource.handlePageChange(payload);
+                        break;
+                    default:
+                        // console.warn('unhandled event of type', type);
+                        break;
+                }
+            });
+        };
+        return MrImageViewerToolsEH;
+    }(core$1.EventHandler));
+
     var DATASOURCE_MAP$2 = {
         breadcrumbs: MrBreadcrumbsDS,
         collection: MrCollectionDS,
@@ -13417,11 +13518,13 @@
         text: MrTextViewerDS,
         title: MrInnerTitleDS,
         viewer: MrImageViewerDS,
+        'viewer-tools': MrImageViewerToolsDS,
         tabs: MrResourceTabsDS,
         'text-viewer': MrTextViewerDS
     };
     var EVENTHANDLER_MAP$2 = {
         viewer: MrImageViewerEH,
+        'viewer-tools': MrImageViewerToolsEH,
         collection: MrCollectionEH,
     };
     var MrResourceLayoutComponent = /** @class */ (function (_super) {
@@ -13494,7 +13597,7 @@
         MrResourceLayoutComponent = __decorate([
             core.Component({
                 selector: 'mr-resource-layout',
-                template: "<div class=\"mr-resource mr-layout\" \r\n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\"\r\n     [ngClass]=\"{\r\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\r\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\r\n      }\">\r\n    <!-- RESOURCE LAYOUT CONTENT -->\r\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\r\n        <!-- loading -->\r\n        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n            <div class=\"mr-layout__loader\">\r\n                <n7-loader></n7-loader>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- error -->\r\n        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n            <div class=\"mr-layout__error\">\r\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\r\n                <p>{{ lb.dataSource.errorDescription }}</p>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- success -->\r\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n            <ng-container *ngIf=\"lb.dataSource.pageConfig.sections as sections\">\r\n                <!-- Pass the list of blocks to render to the block template -->\r\n                <div class=\"mr-resource__top\">\r\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\r\n                </div>\r\n                <div class=\"mr-resource__content mr-side-margin\">\r\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\r\n                </div>\r\n            </ng-container>\r\n        </ng-container>\r\n\r\n    </ng-container>\r\n</div>\r\n\r\n<ng-template #blocks let-list>\r\n    <ng-container *ngFor=\"let section of list\">\r\n        <section *ngIf=\"lb.widgets[section.id].ds.out$ | async\"\r\n        class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\r\n            <ng-container [ngSwitch]=\"section.type\">\r\n    \r\n                <!-- TABS -->\r\n                <ng-container *ngSwitchCase=\"'tabs'\">\r\n                    <ng-container *ngFor=\"let tab of lb.widgets[section.id].ds.out$ | async\">\r\n                        <n7-anchor-wrapper [data]=\"tab.anchor\" [classes]=\"tab.classes\">\r\n                            <span class=\"mr-resource__tabs-item\">{{ tab.label }}</span>\r\n                        </n7-anchor-wrapper>\r\n                    </ng-container>\r\n                </ng-container>\r\n    \r\n                <!-- INNER TITLE -->\r\n                <ng-container *ngSwitchCase=\"'title'\">\r\n                    <div class=\"mr-resource__title-content mr-side-margin\">\r\n                        <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\r\n                            [emit]=\"lb.widgets[section.id].emit\">\r\n                        </n7-inner-title>\r\n                    </div>\r\n                </ng-container>\r\n    \r\n                <!-- IMAGE VIEWER -->\r\n                <ng-container *ngSwitchCase=\"'viewer'\">\r\n                    <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\r\n                    </n7-image-viewer>\r\n                </ng-container>\r\n    \r\n                <!-- METADATA VIEWER -->\r\n                <ng-container *ngSwitchCase=\"'metadata'\">\r\n                    \r\n                    <div class=\"mr-content-block mr-content-block-metadata\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <mr-read-more [data]=\"section.readmore\">\r\n                                <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\r\n                                    [emit]=\"lb.widgets[section.id].emit\">\r\n                                </n7-metadata-viewer>\r\n                            </mr-read-more>\r\n                        </div>\r\n                    </div>\r\n\r\n                </ng-container>\r\n    \r\n                <!-- COLLECTION -->\r\n                <ng-container *ngSwitchCase=\"'collection'\">\r\n                    <ng-container *ngIf=\"lb.widgets[section.id].ds.out$ | async as collection$\">\r\n                        \r\n                        <div *ngIf=\"collection$.items?.length > 0\" class=\"mr-content-block mr-content-block-collection\">\r\n                            <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                                {{ section.title }}\r\n                            </h3>\r\n                            <div class=\"mr-content-block__content {{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\r\n                                <n7-item-preview *ngFor=\"let item of collection$?.items\"\r\n                                    [data]=\"item\" [emit]=\"lb.widgets[section.id].emit\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n\r\n                    </ng-container>\r\n                </ng-container>\r\n    \r\n                <!-- ITEM PREVIEW -->\r\n                <ng-container *ngSwitchCase=\"'preview'\">\r\n                    <div class=\"mr-content-block mr-content-block-item-preview\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">        \r\n                            </n7-item-preview>\r\n                        </div>\r\n                    </div>\r\n                </ng-container>\r\n    \r\n                <!-- TEXT VIEWER -->\r\n                <ng-container *ngSwitchCase=\"'text-viewer'\">\r\n                  <div class=\"mr-content-block mr-content-block-text-viewer\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                          <n7-text-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\r\n                          </n7-text-viewer>\r\n                    </div>\r\n                  </div>\r\n                  \r\n                </ng-container>\r\n    \r\n                <!-- INFO BOX -->\r\n                <ng-container *ngSwitchCase=\"'info-box'\">\r\n                    <div class=\"mr-content-block mr-content-block-info-box\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <div class=\"info-box__mock\">info-box</div>    \r\n                        </div>\r\n                    </div>\r\n                </ng-container>\r\n    \r\n                <!-- BREADCRUMBS -->\r\n                <ng-container *ngSwitchCase=\"'breadcrumbs'\">\r\n                    <n7-breadcrumbs [data]=\"lb.widgets[section.id].ds.out$ | async\">\r\n                    </n7-breadcrumbs>\r\n                </ng-container>\r\n\r\n            </ng-container>\r\n        </section>\r\n    </ng-container>\r\n</ng-template>\r\n"
+                template: "<div class=\"mr-resource mr-layout\" \r\n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\"\r\n     [ngClass]=\"{\r\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\r\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\r\n      }\">\r\n    <!-- RESOURCE LAYOUT CONTENT -->\r\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\r\n        <!-- loading -->\r\n        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n            <div class=\"mr-layout__loader\">\r\n                <n7-loader></n7-loader>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- error -->\r\n        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n            <div class=\"mr-layout__error\">\r\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\r\n                <p>{{ lb.dataSource.errorDescription }}</p>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- success -->\r\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n            <ng-container *ngIf=\"lb.dataSource.pageConfig.sections as sections\">\r\n                <!-- Pass the list of blocks to render to the block template -->\r\n                <div class=\"mr-resource__top\">\r\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\r\n                </div>\r\n                <div class=\"mr-resource__content mr-side-margin\">\r\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\r\n                </div>\r\n            </ng-container>\r\n        </ng-container>\r\n\r\n    </ng-container>\r\n</div>\r\n\r\n<ng-template #blocks let-list>\r\n    <ng-container *ngFor=\"let section of list\">\r\n        <section *ngIf=\"lb.widgets[section.id].ds.out$ | async\"\r\n        class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\r\n            <ng-container [ngSwitch]=\"section.type\">\r\n    \r\n                <!-- TABS -->\r\n                <ng-container *ngSwitchCase=\"'tabs'\">\r\n                    <ng-container *ngFor=\"let tab of lb.widgets[section.id].ds.out$ | async\">\r\n                        <n7-anchor-wrapper [data]=\"tab.anchor\" [classes]=\"tab.classes\">\r\n                            <span class=\"mr-resource__tabs-item\">{{ tab.label }}</span>\r\n                        </n7-anchor-wrapper>\r\n                    </ng-container>\r\n                </ng-container>\r\n    \r\n                <!-- INNER TITLE -->\r\n                <ng-container *ngSwitchCase=\"'title'\">\r\n                    <div class=\"mr-resource__title-content mr-side-margin\">\r\n                        <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\r\n                            [emit]=\"lb.widgets[section.id].emit\">\r\n                        </n7-inner-title>\r\n                    </div>\r\n                </ng-container>\r\n    \r\n                <!-- IMAGE VIEWER -->\r\n                <ng-container *ngSwitchCase=\"'viewer'\">\r\n                    <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\r\n                    </n7-image-viewer>\r\n                        <n7-image-viewer-tools [data]=\"lb.widgets[section.id + '-tools'].ds.out$ | async\" [emit]=\"lb.widgets[section.id + '-tools'].emit\">\r\n                        </n7-image-viewer-tools>\r\n                </ng-container>\r\n\r\n                <!-- IMAGE VIEWER TOOLS -->\r\n                \r\n    \r\n                <!-- METADATA VIEWER -->\r\n                <ng-container *ngSwitchCase=\"'metadata'\">\r\n                    \r\n                    <div class=\"mr-content-block mr-content-block-metadata\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <mr-read-more [data]=\"section.readmore\">\r\n                                <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\r\n                                    [emit]=\"lb.widgets[section.id].emit\">\r\n                                </n7-metadata-viewer>\r\n                            </mr-read-more>\r\n                        </div>\r\n                    </div>\r\n\r\n                </ng-container>\r\n    \r\n                <!-- COLLECTION -->\r\n                <ng-container *ngSwitchCase=\"'collection'\">\r\n                    <ng-container *ngIf=\"lb.widgets[section.id].ds.out$ | async as collection$\">\r\n                        <div *ngIf=\"collection$.items?.length > 0\" class=\"mr-content-block mr-content-block-collection\">\r\n                            <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                                {{ section.title }}\r\n                            </h3>\r\n                            <div class=\"mr-content-block__content {{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\r\n                                <n7-item-preview *ngFor=\"let item of collection$?.items\"\r\n                                    [data]=\"item\" [emit]=\"lb.widgets[section.id].emit\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n    \r\n                <!-- ITEM PREVIEW -->\r\n                <ng-container *ngSwitchCase=\"'preview'\">\r\n                    <div class=\"mr-content-block mr-content-block-item-preview\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">        \r\n                            </n7-item-preview>\r\n                        </div>\r\n                    </div>\r\n                </ng-container>\r\n    \r\n                <!-- TEXT VIEWER -->\r\n                <ng-container *ngSwitchCase=\"'text-viewer'\">\r\n                  <div class=\"mr-content-block mr-content-block-text-viewer\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                          <n7-text-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\r\n                          </n7-text-viewer>\r\n                    </div>\r\n                  </div>\r\n                  \r\n                </ng-container>\r\n    \r\n                <!-- INFO BOX -->\r\n                <ng-container *ngSwitchCase=\"'info-box'\">\r\n                    <div class=\"mr-content-block mr-content-block-info-box\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <div class=\"info-box__mock\">info-box</div>    \r\n                        </div>\r\n                    </div>\r\n                </ng-container>\r\n    \r\n                <!-- BREADCRUMBS -->\r\n                <ng-container *ngSwitchCase=\"'breadcrumbs'\">\r\n                    <n7-breadcrumbs [data]=\"lb.widgets[section.id].ds.out$ | async\">\r\n                    </n7-breadcrumbs>\r\n                </ng-container>\r\n\r\n            </ng-container>\r\n        </section>\r\n    </ng-container>\r\n</ng-template>\r\n"
             }),
             __metadata("design:paramtypes", [LayoutsConfigurationService,
                 router.ActivatedRoute,
@@ -14689,7 +14792,6 @@
             _this.defaultDescription = '';
             _this.eventDescription = '';
             _this.hasMap = false;
-            _this.mapHeader = core$1._t('timeline#mapheader');
             _this.timelineListener$ = new rxjs.Subject();
             return _this;
         }
@@ -14708,6 +14810,7 @@
             }).subscribe(function (d) {
                 _this.timelineData = d;
                 _this.loading.timeline = false;
+                _this.one('mr-timeline').updateOptions({ libOptions: _this.pageConfig.libOptions });
                 _this.one('mr-timeline').update(d);
             });
             this.getWidgetDataSource('mr-timeline').timelineLoaded$
@@ -14723,6 +14826,8 @@
                 _this.defaultDescription = d.text;
                 _this.loadDefaults(false);
             });
+            // set map header
+            this.mapHeader = core$1._t(this.pageConfig.mapHeader);
         };
         MrTimelineLayoutDS.prototype.loadDefaults = function (navigate) {
             var timelineInstance = this.getWidgetDataSource('mr-timeline').timeline;
@@ -16215,6 +16320,7 @@
     exports.MrHomeLayoutDS = MrHomeLayoutDS;
     exports.MrHomeLayoutEH = MrHomeLayoutEH;
     exports.MrImageViewerDS = MrImageViewerDS;
+    exports.MrImageViewerToolsDS = MrImageViewerToolsDS;
     exports.MrInfoBoxDS = MrInfoBoxDS;
     exports.MrInnerTitleDS = MrInnerTitleDS;
     exports.MrItemPreviewDS = MrItemPreviewDS;

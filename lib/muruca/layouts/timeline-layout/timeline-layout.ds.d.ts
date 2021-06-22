@@ -21,7 +21,7 @@ export declare class MrTimelineLayoutDS extends LayoutDataSource {
     timelineData: TimelineData;
     hasMap: boolean;
     route: any;
-    mapHeader: string;
+    mapHeader: any;
     timelineListener$: Subject<Timeline>;
     bibliographyData: {
         header: {

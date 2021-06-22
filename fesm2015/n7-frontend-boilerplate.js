@@ -2,7 +2,7 @@ import { __decorate, __param, __metadata } from 'tslib';
 import { ɵɵdefineInjectable, Injectable, Inject, ɵɵinject, Component, Input, NgModule, ViewChild, ElementRef, ApplicationInitStatus, Pipe, ContentChild, TemplateRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK, IMAGE_VIEWER_MOCK, IMAGE_VIEWER_TOOLS_MOCK } from '@n7-frontend/components';
+import { DvComponentsLibModule, TABLE_MOCK, DATA_WIDGET_MOCK, IMAGE_VIEWER_TOOLS_MOCK, IMAGE_VIEWER_MOCK } from '@n7-frontend/components';
 import { ReplaySubject, empty, Subject, interval, merge as merge$1, fromEvent, BehaviorSubject, of, forkJoin, from } from 'rxjs';
 import { map, catchError, takeUntil, filter, first, mapTo, debounceTime, switchMap, withLatestFrom, tap, delay } from 'rxjs/operators';
 import { NavigationStart, Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -627,6 +627,9 @@ var helpers = {
             && rect.left < (window.innerWidth || document.documentElement.clientWidth)
             && rect.top < (window.innerHeight || document.documentElement.clientHeight);
     },
+    /** Return true if an object is empty */
+    isEmpty: (obj) => (typeof obj === 'object'
+        && Object.keys(obj).length === 0)
 };
 
 class AwFacetInputText extends AwFacetInput {
@@ -1250,7 +1253,7 @@ class SmartPaginationDS extends DataSource {
             last,
             links,
             select: sizes ? {
-                label: sizes.label || 'Numero di risultati',
+                label: sizes.label || _t('search#resultsamount'),
                 options: sizes.list.map((s) => ({
                     text: s,
                     selected: s === sizes.active,
@@ -9788,6 +9791,8 @@ class MrAdvancedResultsLayoutEH extends EventHandler {
 
 class MrBreadcrumbsDS extends DataSource {
     transform(data) {
+        if (!data)
+            return null;
         let items = [];
         if (Array.isArray(data) && data.length) {
             let { base } = this.options || {};
@@ -9937,6 +9942,8 @@ class MrHeroDS extends DataSource {
 
 class MrImageViewerDS extends DataSource {
     transform(data) {
+        if (!data)
+            return null;
         const { images, thumbs } = data;
         return {
             images,
@@ -9963,6 +9970,40 @@ class MrImageViewerDS extends DataSource {
     }
 }
 
+class MrImageViewerToolsDS extends DataSource {
+    transform() {
+        const data = IMAGE_VIEWER_TOOLS_MOCK;
+        data.images = [
+            { thumb: 'http://placekitten.com/200/130', payload: { thumbindex: 0 }, caption: 'Test caption <b>#1</b>' },
+            { thumb: 'http://placekitten.com/90/180', payload: { thumbindex: 1 }, caption: 'Test caption <b>#2</b>' },
+            { thumb: 'http://placekitten.com/90/110', payload: { thumbindex: 2 }, caption: 'Test caption <b>#3</b>' },
+        ];
+        const initialDescription = data.images[data.initial].caption;
+        if (initialDescription !== undefined) {
+            data.description = initialDescription;
+        }
+        return data;
+    }
+    toggleDescription() {
+        this.output.isVisible.description = !this.output.isVisible.description;
+    }
+    toggleThumbs() {
+        this.output.isVisible.thumbnails = !this.output.isVisible.thumbnails;
+    }
+    handleThumbs(index) {
+        this.output.initial = index;
+        this.updateDescription();
+    }
+    handlePageChange(payload) {
+        this.handleThumbs(payload.page);
+    }
+    updateDescription() {
+        const index = this.output.initial;
+        const { images } = this.output;
+        this.output.description = images[index].caption;
+    }
+}
+
 class MrInfoBoxDS extends DataSource {
     transform(data) {
         return data;
@@ -9971,6 +10012,8 @@ class MrInfoBoxDS extends DataSource {
 
 class MrInnerTitleDS extends DataSource {
     transform(data) {
+        if (!data)
+            return null;
         const { title, description, button } = data;
         return {
             title: {
@@ -10005,6 +10048,8 @@ const ITEM_PREVIEW_DEFAULTS$1 = {
 };
 class MrItemPreviewDS extends DataSource {
     transform(data) {
+        if (!data)
+            return null;
         const { classes, itemPreview } = this.options;
         const itemPreviewOptions = merge(ITEM_PREVIEW_DEFAULTS$1, (itemPreview || {}));
         // striptags
@@ -10195,9 +10240,7 @@ class MrMapDS extends DataSource {
                 this.mapLoaded$.next({ map: instance, markers: this.markerLayer });
             },
             containerId: 'map-canvas',
-            libOptions: {
-                scrollWheelZoom: false,
-            },
+            libOptions: Object.assign({}, this.options.libOptions),
             tileLayers: [{
                     url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
                     options: {}
@@ -10338,6 +10381,8 @@ class MrNavDS extends DataSource {
 
 class MrResourceTabsDS extends DataSource {
     transform(data) {
+        if (!data)
+            return null;
         const { currentTab, root, slug, id: resourceId } = this.options;
         return data.map(({ id, label }) => ({
             label: _t(label),
@@ -10363,20 +10408,10 @@ class MrTimelineDS extends DataSource {
     transform(data) {
         return {
             containerID: 'mr-timeline',
-            libOptions: {
-                height: '500px',
-                locale: 'it_IT',
-                align: 'left',
-                showTooltips: false,
-                tooltip: {
+            libOptions: Object.assign({ height: '500px', locale: 'it_IT', align: 'left', showTooltips: false, tooltip: {
                     followMouse: false,
                     template: (d, element) => `<div class="tooltip">${element.title}</div>`
-                },
-                width: '100%',
-                minHeight: '350px',
-                maxHeight: '800px',
-                zoomFriction: 8
-            },
+                }, width: '100%', minHeight: '350px', maxHeight: '800px', zoomFriction: 8 }, this.options.libOptions),
             dataSet: data.dataSet.map((d) => {
                 // Show dates that have identical start and end dates as points
                 if (d.end && d.end === d.start) {
@@ -10690,6 +10725,7 @@ var DS$3 = /*#__PURE__*/Object.freeze({
     MrFiltersDS: MrFiltersDS,
     MrHeroDS: MrHeroDS,
     MrImageViewerDS: MrImageViewerDS,
+    MrImageViewerToolsDS: MrImageViewerToolsDS,
     MrInfoBoxDS: MrInfoBoxDS,
     MrInnerTitleDS: MrInnerTitleDS,
     MrItemPreviewDS: MrItemPreviewDS,
@@ -12027,6 +12063,8 @@ class MrMapLayoutDS extends LayoutDataSource {
         this.location = payload.location;
         this.configId = payload.configId;
         this.pageConfig = this.configuration.get(this.configId) || {};
+        // overwrite leaflet options with configuration.libOptions
+        this.one('mr-map').updateOptions({ libOptions: this.pageConfig.libOptions });
         // update the map
         this.communication.request$('map', {
             method: 'GET',
@@ -12587,8 +12625,12 @@ class MrResourceLayoutDS extends LayoutDataSource {
             // set id
             widgetDataSource.id = id;
             // update data
-            if (responseSection) {
+            if (responseSection && !helpers.isEmpty(responseSection)) {
                 this.one(id).update(responseSection);
+            }
+            else {
+                // unload the component wihout data
+                this.one(id).update(undefined);
             }
         });
         // update tabs
@@ -12701,6 +12743,52 @@ class MrImageViewerEH extends EventHandler {
     }
 }
 
+class MrImageViewerToolsEH extends EventHandler {
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'sb-image-viewer-tools.click':
+                    if (payload.thumbindex !== undefined) {
+                        const index = payload.thumbindex;
+                        this.dataSource.handleThumbs(index);
+                        this.emitOuter('thumbclick', index);
+                        break;
+                    }
+                    if (payload === 'close-description') {
+                        this.dataSource.toggleDescription();
+                        break;
+                    }
+                    if (payload === 'toggle-description') {
+                        this.dataSource.toggleDescription();
+                        break;
+                    }
+                    if (payload === 'toggle-thumbs') {
+                        this.dataSource.toggleThumbs();
+                        break;
+                    }
+                    break;
+                default:
+                    // console.warn('unhandled event of type', type);
+                    break;
+            }
+        });
+        this.outerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case 'sb-image-viewer-layout.init':
+                case 'sb-image-viewer-layout.thumbclick':
+                    // Silent
+                    break;
+                case 'sb-image-viewer-layout.pagechange':
+                    this.dataSource.handlePageChange(payload);
+                    break;
+                default:
+                    // console.warn('unhandled event of type', type);
+                    break;
+            }
+        });
+    }
+}
+
 const DATASOURCE_MAP$2 = {
     breadcrumbs: MrBreadcrumbsDS,
     collection: MrCollectionDS,
@@ -12710,11 +12798,13 @@ const DATASOURCE_MAP$2 = {
     text: MrTextViewerDS,
     title: MrInnerTitleDS,
     viewer: MrImageViewerDS,
+    'viewer-tools': MrImageViewerToolsDS,
     tabs: MrResourceTabsDS,
     'text-viewer': MrTextViewerDS
 };
 const EVENTHANDLER_MAP$2 = {
     viewer: MrImageViewerEH,
+    'viewer-tools': MrImageViewerToolsEH,
     collection: MrCollectionEH,
 };
 let MrResourceLayoutComponent = class MrResourceLayoutComponent extends AbstractLayout {
@@ -12783,7 +12873,7 @@ MrResourceLayoutComponent.ctorParameters = () => [
 MrResourceLayoutComponent = __decorate([
     Component({
         selector: 'mr-resource-layout',
-        template: "<div class=\"mr-resource mr-layout\" \r\n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\"\r\n     [ngClass]=\"{\r\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\r\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\r\n      }\">\r\n    <!-- RESOURCE LAYOUT CONTENT -->\r\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\r\n        <!-- loading -->\r\n        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n            <div class=\"mr-layout__loader\">\r\n                <n7-loader></n7-loader>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- error -->\r\n        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n            <div class=\"mr-layout__error\">\r\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\r\n                <p>{{ lb.dataSource.errorDescription }}</p>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- success -->\r\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n            <ng-container *ngIf=\"lb.dataSource.pageConfig.sections as sections\">\r\n                <!-- Pass the list of blocks to render to the block template -->\r\n                <div class=\"mr-resource__top\">\r\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\r\n                </div>\r\n                <div class=\"mr-resource__content mr-side-margin\">\r\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\r\n                </div>\r\n            </ng-container>\r\n        </ng-container>\r\n\r\n    </ng-container>\r\n</div>\r\n\r\n<ng-template #blocks let-list>\r\n    <ng-container *ngFor=\"let section of list\">\r\n        <section *ngIf=\"lb.widgets[section.id].ds.out$ | async\"\r\n        class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\r\n            <ng-container [ngSwitch]=\"section.type\">\r\n    \r\n                <!-- TABS -->\r\n                <ng-container *ngSwitchCase=\"'tabs'\">\r\n                    <ng-container *ngFor=\"let tab of lb.widgets[section.id].ds.out$ | async\">\r\n                        <n7-anchor-wrapper [data]=\"tab.anchor\" [classes]=\"tab.classes\">\r\n                            <span class=\"mr-resource__tabs-item\">{{ tab.label }}</span>\r\n                        </n7-anchor-wrapper>\r\n                    </ng-container>\r\n                </ng-container>\r\n    \r\n                <!-- INNER TITLE -->\r\n                <ng-container *ngSwitchCase=\"'title'\">\r\n                    <div class=\"mr-resource__title-content mr-side-margin\">\r\n                        <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\r\n                            [emit]=\"lb.widgets[section.id].emit\">\r\n                        </n7-inner-title>\r\n                    </div>\r\n                </ng-container>\r\n    \r\n                <!-- IMAGE VIEWER -->\r\n                <ng-container *ngSwitchCase=\"'viewer'\">\r\n                    <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\r\n                    </n7-image-viewer>\r\n                </ng-container>\r\n    \r\n                <!-- METADATA VIEWER -->\r\n                <ng-container *ngSwitchCase=\"'metadata'\">\r\n                    \r\n                    <div class=\"mr-content-block mr-content-block-metadata\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <mr-read-more [data]=\"section.readmore\">\r\n                                <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\r\n                                    [emit]=\"lb.widgets[section.id].emit\">\r\n                                </n7-metadata-viewer>\r\n                            </mr-read-more>\r\n                        </div>\r\n                    </div>\r\n\r\n                </ng-container>\r\n    \r\n                <!-- COLLECTION -->\r\n                <ng-container *ngSwitchCase=\"'collection'\">\r\n                    <ng-container *ngIf=\"lb.widgets[section.id].ds.out$ | async as collection$\">\r\n                        \r\n                        <div *ngIf=\"collection$.items?.length > 0\" class=\"mr-content-block mr-content-block-collection\">\r\n                            <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                                {{ section.title }}\r\n                            </h3>\r\n                            <div class=\"mr-content-block__content {{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\r\n                                <n7-item-preview *ngFor=\"let item of collection$?.items\"\r\n                                    [data]=\"item\" [emit]=\"lb.widgets[section.id].emit\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n\r\n                    </ng-container>\r\n                </ng-container>\r\n    \r\n                <!-- ITEM PREVIEW -->\r\n                <ng-container *ngSwitchCase=\"'preview'\">\r\n                    <div class=\"mr-content-block mr-content-block-item-preview\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">        \r\n                            </n7-item-preview>\r\n                        </div>\r\n                    </div>\r\n                </ng-container>\r\n    \r\n                <!-- TEXT VIEWER -->\r\n                <ng-container *ngSwitchCase=\"'text-viewer'\">\r\n                  <div class=\"mr-content-block mr-content-block-text-viewer\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                          <n7-text-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\r\n                          </n7-text-viewer>\r\n                    </div>\r\n                  </div>\r\n                  \r\n                </ng-container>\r\n    \r\n                <!-- INFO BOX -->\r\n                <ng-container *ngSwitchCase=\"'info-box'\">\r\n                    <div class=\"mr-content-block mr-content-block-info-box\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <div class=\"info-box__mock\">info-box</div>    \r\n                        </div>\r\n                    </div>\r\n                </ng-container>\r\n    \r\n                <!-- BREADCRUMBS -->\r\n                <ng-container *ngSwitchCase=\"'breadcrumbs'\">\r\n                    <n7-breadcrumbs [data]=\"lb.widgets[section.id].ds.out$ | async\">\r\n                    </n7-breadcrumbs>\r\n                </ng-container>\r\n\r\n            </ng-container>\r\n        </section>\r\n    </ng-container>\r\n</ng-template>\r\n"
+        template: "<div class=\"mr-resource mr-layout\" \r\n     *ngIf=\"lb.dataSource && lb.dataSource.pageConfig\"\r\n     [ngClass]=\"{\r\n        'is-loading': ( layoutState.get$('content') | async ) == 'LOADING',\r\n        'is-error': ( layoutState.get$('content') | async ) == 'ERROR'\r\n      }\">\r\n    <!-- RESOURCE LAYOUT CONTENT -->\r\n    <ng-container [ngSwitch]=\"layoutState.get$('content') | async\">\r\n        <!-- loading -->\r\n        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n            <div class=\"mr-layout__loader\">\r\n                <n7-loader></n7-loader>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- error -->\r\n        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n            <div class=\"mr-layout__error\">\r\n                <h2>{{ lb.dataSource.errorTitle }}</h2>\r\n                <p>{{ lb.dataSource.errorDescription }}</p>\r\n            </div>\r\n        </ng-container>\r\n\r\n        <!-- success -->\r\n        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n            <ng-container *ngIf=\"lb.dataSource.pageConfig.sections as sections\">\r\n                <!-- Pass the list of blocks to render to the block template -->\r\n                <div class=\"mr-resource__top\">\r\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.top }\"></ng-container>\r\n                </div>\r\n                <div class=\"mr-resource__content mr-side-margin\">\r\n                    <ng-container *ngTemplateOutlet=\"blocks; context: { $implicit: sections.content }\"></ng-container>\r\n                </div>\r\n            </ng-container>\r\n        </ng-container>\r\n\r\n    </ng-container>\r\n</div>\r\n\r\n<ng-template #blocks let-list>\r\n    <ng-container *ngFor=\"let section of list\">\r\n        <section *ngIf=\"lb.widgets[section.id].ds.out$ | async\"\r\n        class=\"{{ 'mr-resource__section mr-resource__' + section.type }}\">\r\n            <ng-container [ngSwitch]=\"section.type\">\r\n    \r\n                <!-- TABS -->\r\n                <ng-container *ngSwitchCase=\"'tabs'\">\r\n                    <ng-container *ngFor=\"let tab of lb.widgets[section.id].ds.out$ | async\">\r\n                        <n7-anchor-wrapper [data]=\"tab.anchor\" [classes]=\"tab.classes\">\r\n                            <span class=\"mr-resource__tabs-item\">{{ tab.label }}</span>\r\n                        </n7-anchor-wrapper>\r\n                    </ng-container>\r\n                </ng-container>\r\n    \r\n                <!-- INNER TITLE -->\r\n                <ng-container *ngSwitchCase=\"'title'\">\r\n                    <div class=\"mr-resource__title-content mr-side-margin\">\r\n                        <n7-inner-title [data]=\"lb.widgets[section.id].ds.out$ | async\"\r\n                            [emit]=\"lb.widgets[section.id].emit\">\r\n                        </n7-inner-title>\r\n                    </div>\r\n                </ng-container>\r\n    \r\n                <!-- IMAGE VIEWER -->\r\n                <ng-container *ngSwitchCase=\"'viewer'\">\r\n                    <n7-image-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\r\n                    </n7-image-viewer>\r\n                        <n7-image-viewer-tools [data]=\"lb.widgets[section.id + '-tools'].ds.out$ | async\" [emit]=\"lb.widgets[section.id + '-tools'].emit\">\r\n                        </n7-image-viewer-tools>\r\n                </ng-container>\r\n\r\n                <!-- IMAGE VIEWER TOOLS -->\r\n                \r\n    \r\n                <!-- METADATA VIEWER -->\r\n                <ng-container *ngSwitchCase=\"'metadata'\">\r\n                    \r\n                    <div class=\"mr-content-block mr-content-block-metadata\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <mr-read-more [data]=\"section.readmore\">\r\n                                <n7-metadata-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\"\r\n                                    [emit]=\"lb.widgets[section.id].emit\">\r\n                                </n7-metadata-viewer>\r\n                            </mr-read-more>\r\n                        </div>\r\n                    </div>\r\n\r\n                </ng-container>\r\n    \r\n                <!-- COLLECTION -->\r\n                <ng-container *ngSwitchCase=\"'collection'\">\r\n                    <ng-container *ngIf=\"lb.widgets[section.id].ds.out$ | async as collection$\">\r\n                        <div *ngIf=\"collection$.items?.length > 0\" class=\"mr-content-block mr-content-block-collection\">\r\n                            <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                                {{ section.title }}\r\n                            </h3>\r\n                            <div class=\"mr-content-block__content {{ section.grid ? 'n7-grid-' + section.grid : '' }}\">\r\n                                <n7-item-preview *ngFor=\"let item of collection$?.items\"\r\n                                    [data]=\"item\" [emit]=\"lb.widgets[section.id].emit\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n    \r\n                <!-- ITEM PREVIEW -->\r\n                <ng-container *ngSwitchCase=\"'preview'\">\r\n                    <div class=\"mr-content-block mr-content-block-item-preview\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <n7-item-preview [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">        \r\n                            </n7-item-preview>\r\n                        </div>\r\n                    </div>\r\n                </ng-container>\r\n    \r\n                <!-- TEXT VIEWER -->\r\n                <ng-container *ngSwitchCase=\"'text-viewer'\">\r\n                  <div class=\"mr-content-block mr-content-block-text-viewer\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                          <n7-text-viewer [data]=\"lb.widgets[section.id].ds.out$ | async\" [emit]=\"lb.widgets[section.id].emit\">\r\n                          </n7-text-viewer>\r\n                    </div>\r\n                  </div>\r\n                  \r\n                </ng-container>\r\n    \r\n                <!-- INFO BOX -->\r\n                <ng-container *ngSwitchCase=\"'info-box'\">\r\n                    <div class=\"mr-content-block mr-content-block-info-box\">\r\n                        <h3 *ngIf=\"section.title\" class=\"mr-content-block__title\">\r\n                            {{ section.title }}\r\n                        </h3>\r\n                        <div class=\"mr-content-block__content\">\r\n                            <div class=\"info-box__mock\">info-box</div>    \r\n                        </div>\r\n                    </div>\r\n                </ng-container>\r\n    \r\n                <!-- BREADCRUMBS -->\r\n                <ng-container *ngSwitchCase=\"'breadcrumbs'\">\r\n                    <n7-breadcrumbs [data]=\"lb.widgets[section.id].ds.out$ | async\">\r\n                    </n7-breadcrumbs>\r\n                </ng-container>\r\n\r\n            </ng-container>\r\n        </section>\r\n    </ng-container>\r\n</ng-template>\r\n"
     }),
     __metadata("design:paramtypes", [LayoutsConfigurationService,
         ActivatedRoute,
@@ -13841,7 +13931,6 @@ class MrTimelineLayoutDS extends LayoutDataSource {
         this.defaultDescription = '';
         this.eventDescription = '';
         this.hasMap = false;
-        this.mapHeader = _t('timeline#mapheader');
         this.timelineListener$ = new Subject();
     }
     onInit(payload) {
@@ -13858,6 +13947,7 @@ class MrTimelineLayoutDS extends LayoutDataSource {
         }).subscribe((d) => {
             this.timelineData = d;
             this.loading.timeline = false;
+            this.one('mr-timeline').updateOptions({ libOptions: this.pageConfig.libOptions });
             this.one('mr-timeline').update(d);
         });
         this.getWidgetDataSource('mr-timeline').timelineLoaded$
@@ -13873,6 +13963,8 @@ class MrTimelineLayoutDS extends LayoutDataSource {
             this.defaultDescription = d.text;
             this.loadDefaults(false);
         });
+        // set map header
+        this.mapHeader = _t(this.pageConfig.mapHeader);
     }
     loadDefaults(navigate) {
         const timelineInstance = this.getWidgetDataSource('mr-timeline').timeline;
@@ -15105,5 +15197,5 @@ DynamicPathGuard = __decorate([
  * Generated bundle index. Do not edit.
  */
 
-export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwCarouselDS, AwChartTippyDS, AwChartTippyEH, AwCollectionLayoutComponent, AwCollectionLayoutConfig, AwCollectionLayoutDS, AwCollectionLayoutEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapEH, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaDropdownDS, AwSchedaDropdownEH, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaPdfDS, AwSchedaPdfEH, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineEH, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, LocalConfigService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrAdvancedResultComponent, MrAdvancedResultsLayoutComponent, MrAdvancedResultsLayoutConfig, MrAdvancedResultsLayoutDS, MrAdvancedResultsLayoutEH, MrAdvancedSearchLayoutComponent, MrAdvancedSearchLayoutConfig, MrAdvancedSearchLayoutDS, MrAdvancedSearchLayoutEH, MrAdvancedSearchTagsDS, MrBreadcrumbsDS, MrCollectionDS, MrCollectionEH, MrContentDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrFooterService, MrFormComponent, MrFormWrapperAccordionComponent, MrFormWrapperAccordionDS, MrFormWrapperAccordionEH, MrGalleryComponent, MrGalleryDS, MrGalleryEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrItineraryLayoutComponent, MrItineraryLayoutConfig, MrItineraryLayoutDS, MrItineraryLayoutEH, MrMapDS, MrMapLayoutComponent, MrMapLayoutConfig, MrMapLayoutDS, MrMapLayoutEH, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrPostsLayoutComponent, MrPostsLayoutConfig, MrPostsLayoutDS, MrPostsLayoutEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrResourceModalComponent, MrResourceTabsDS, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageDescriptionComponent, MrSearchPageDescriptionDS, MrSearchPageDescriptionEH, MrSearchPageTitleDS, MrSearchPageTitleEH, MrSearchResultsDS, MrSearchResultsEH, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrStaticMetadataDS, MrTextViewerDS, MrTimelineDS, MrTimelineEH, MrTimelineLayoutComponent, MrTimelineLayoutConfig, MrTimelineLayoutDS, MrTimelineLayoutEH, MrTranslationsLoaderService, MrYearHeaderDS, MrYearHeaderEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, N7BoilerplateSandboxModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, PdfViewerComponent, ReadMoreComponent, RestProvider, SbExampleLayoutComponent, SbExampleLayoutConfig, SbExampleLayoutDS, SbExampleLayoutEH, SbImageViewerDS, SbImageViewerEH, SbImageViewerLayoutComponent, SbImageViewerLayoutConfig, SbImageViewerLayoutDS, SbImageViewerLayoutEH, SbImageViewerToolsDS, SbImageViewerToolsEH, SchedaDropdownComponent, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, DatepickerWrapperComponent as ɵba, DvExampleLayoutComponent as ɵbb, EscapeHtmlPipe as ɵbc, MrAdvancedResultsLayoutComponent as ɵbd, MrLayoutStateService as ɵbe, MrResourceModalService as ɵbf, MrAdvancedSearchLayoutComponent as ɵbg, MrGlossaryLayoutComponent as ɵbh, MrHomeLayoutComponent as ɵbi, MrItineraryLayoutComponent as ɵbj, MrMapLayoutComponent as ɵbk, MrPostsLayoutComponent as ɵbl, MrResourceLayoutComponent as ɵbm, MrSearchFacetsLayoutComponent as ɵbn, MrSearchLayoutComponent as ɵbo, MrSearchService as ɵbp, MrStaticLayoutComponent as ɵbq, MrTimelineLayoutComponent as ɵbr, ReadMoreComponent as ɵbs, MrFormComponent as ɵbt, MrFormWrapperAccordionComponent as ɵbu, MrSearchPageDescriptionComponent as ɵbv, MrResourceModalComponent as ɵbw, MrGalleryComponent as ɵbx, MrAdvancedResultComponent as ɵby, SbExampleLayoutComponent as ɵbz, ConfigurationService as ɵc, SbImageViewerLayoutComponent as ɵca, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwCollectionLayoutComponent as ɵk, AwEntitaLayoutComponent as ɵl, AwFacetsWrapperComponent as ɵm, AwGalleryLayoutComponent as ɵn, AwSearchService as ɵo, AwHomeLayoutComponent as ɵp, AwMapLayoutComponent as ɵq, AwSchedaLayoutComponent as ɵr, AwSearchLayoutComponent as ɵs, AwTimelineLayoutComponent as ɵt, BubbleChartWrapperComponent as ɵu, ChartTippyComponent as ɵv, PdfViewerComponent as ɵw, SchedaDropdownComponent as ɵx, SmartBreadcrumbsComponent as ɵy, DataWidgetWrapperComponent as ɵz };
+export { AbstractLayout, ApolloProvider, AwAutocompleteWrapperDS, AwAutocompleteWrapperEH, AwBubbleChartDS, AwBubbleChartEH, AwCarouselDS, AwChartTippyDS, AwChartTippyEH, AwCollectionLayoutComponent, AwCollectionLayoutConfig, AwCollectionLayoutDS, AwCollectionLayoutEH, AwEntitaLayoutComponent, AwEntitaLayoutConfig, AwEntitaLayoutDS, AwEntitaLayoutEH, AwEntitaMetadataViewerDS, AwEntitaNavDS, AwEntitaNavEH, AwFacetsWrapperComponent, AwFacetsWrapperDS, AwFacetsWrapperEH, AwGalleryLayoutComponent, AwGalleryLayoutConfig, AwGalleryLayoutDS, AwGalleryLayoutEH, AwGalleryResultsDS, AwGalleryResultsEH, AwHeroDS, AwHeroEH, AwHomeAutocompleteDS, AwHomeAutocompleteEH, AwHomeFacetsWrapperDS, AwHomeFacetsWrapperEH, AwHomeHeroPatrimonioDS, AwHomeHeroPatrimonioEH, AwHomeItemTagsWrapperDS, AwHomeItemTagsWrapperEH, AwHomeLayoutComponent, AwHomeLayoutConfig, AwHomeLayoutDS, AwHomeLayoutEH, AwLinkedObjectsDS, AwLinkedObjectsEH, AwMapDS, AwMapEH, AwMapLayoutComponent, AwMapLayoutConfig, AwMapLayoutDS, AwMapLayoutEH, AwPatrimonioLayoutConfig, AwRelatedEntitiesDS, AwSchedaBreadcrumbsDS, AwSchedaDropdownDS, AwSchedaDropdownEH, AwSchedaImageDS, AwSchedaInnerTitleDS, AwSchedaLayoutComponent, AwSchedaLayoutDS, AwSchedaLayoutEH, AwSchedaMetadataDS, AwSchedaPdfDS, AwSchedaPdfEH, AwSchedaSidebarEH, AwSearchLayoutComponent, AwSearchLayoutConfig, AwSearchLayoutDS, AwSearchLayoutEH, AwSearchLayoutTabsDS, AwSearchLayoutTabsEH, AwSidebarHeaderDS, AwSidebarHeaderEH, AwTableDS, AwTableEH, AwTimelineDS, AwTimelineEH, AwTimelineLayoutComponent, AwTimelineLayoutConfig, AwTimelineLayoutDS, AwTimelineLayoutEH, AwTreeDS, AwTreeEH, BreadcrumbsDS, BreadcrumbsEH, BubbleChartWrapperComponent, ChartTippyComponent, CommunicationService, ConfigurationService, DataWidgetWrapperComponent, DatepickerWrapperComponent, DvDataWidgetDS, DvDatepickerWrapperDS, DvDatepickerWrapperEH, DvExampleLayoutComponent, DvExampleLayoutConfig, DvExampleLayoutDS, DvExampleLayoutEH, DvGraphDS, DvInnerTitleDS, DvWidgetDS, DynamicPathGuard, FacetsDS, FooterDS, FooterEH, HeaderDS, HeaderEH, JsonConfigService, LayoutsConfigurationService, LocalConfigService, MainLayoutComponent, MainLayoutConfig, MainLayoutDS, MainLayoutEH, MainStateService, MrAdvancedResultComponent, MrAdvancedResultsLayoutComponent, MrAdvancedResultsLayoutConfig, MrAdvancedResultsLayoutDS, MrAdvancedResultsLayoutEH, MrAdvancedSearchLayoutComponent, MrAdvancedSearchLayoutConfig, MrAdvancedSearchLayoutDS, MrAdvancedSearchLayoutEH, MrAdvancedSearchTagsDS, MrBreadcrumbsDS, MrCollectionDS, MrCollectionEH, MrContentDS, MrDummyEH, MrFiltersDS, MrFiltersEH, MrFooterService, MrFormComponent, MrFormWrapperAccordionComponent, MrFormWrapperAccordionDS, MrFormWrapperAccordionEH, MrGalleryComponent, MrGalleryDS, MrGalleryEH, MrGlossaryLayoutComponent, MrGlossaryLayoutConfig, MrGlossaryLayoutDS, MrGlossaryLayoutEH, MrHeroDS, MrHomeLayoutComponent, MrHomeLayoutConfig, MrHomeLayoutDS, MrHomeLayoutEH, MrImageViewerDS, MrImageViewerToolsDS, MrInfoBoxDS, MrInnerTitleDS, MrItemPreviewDS, MrItemPreviewsDS, MrItineraryLayoutComponent, MrItineraryLayoutConfig, MrItineraryLayoutDS, MrItineraryLayoutEH, MrMapDS, MrMapLayoutComponent, MrMapLayoutConfig, MrMapLayoutDS, MrMapLayoutEH, MrMenuService, MrMetadataDS, MrNavDS, MrNavEH, MrPostsLayoutComponent, MrPostsLayoutConfig, MrPostsLayoutDS, MrPostsLayoutEH, MrResourceLayoutComponent, MrResourceLayoutConfig, MrResourceLayoutDS, MrResourceLayoutEH, MrResourceModalComponent, MrResourceTabsDS, MrSearchFacetsLayoutComponent, MrSearchLayoutComponent, MrSearchLayoutConfig, MrSearchLayoutDS, MrSearchLayoutEH, MrSearchPageDescriptionComponent, MrSearchPageDescriptionDS, MrSearchPageDescriptionEH, MrSearchPageTitleDS, MrSearchPageTitleEH, MrSearchResultsDS, MrSearchResultsEH, MrSearchResultsTitleDS, MrSearchResultsTitleEH, MrSearchTagsDS, MrSearchTagsEH, MrStaticLayoutComponent, MrStaticLayoutConfig, MrStaticLayoutDS, MrStaticLayoutEH, MrStaticMetadataDS, MrTextViewerDS, MrTimelineDS, MrTimelineEH, MrTimelineLayoutComponent, MrTimelineLayoutConfig, MrTimelineLayoutDS, MrTimelineLayoutEH, MrTranslationsLoaderService, MrYearHeaderDS, MrYearHeaderEH, N7BoilerplateAriannaWebModule, N7BoilerplateCommonModule, N7BoilerplateDataVizModule, N7BoilerplateLibModule, N7BoilerplateMurucaModule, N7BoilerplateSandboxModule, Page404LayoutComponent, Page404LayoutConfig, Page404LayoutDS, Page404LayoutEH, PdfViewerComponent, ReadMoreComponent, RestProvider, SbExampleLayoutComponent, SbExampleLayoutConfig, SbExampleLayoutDS, SbExampleLayoutEH, SbImageViewerDS, SbImageViewerEH, SbImageViewerLayoutComponent, SbImageViewerLayoutConfig, SbImageViewerLayoutDS, SbImageViewerLayoutEH, SbImageViewerToolsDS, SbImageViewerToolsEH, SchedaDropdownComponent, SearchFacetsLayoutConfig, SearchFacetsLayoutDS, SearchFacetsLayoutEH, SmartBreadcrumbsComponent, SmartPaginationComponent, SmartPaginationDS, SmartPaginationEH, SubnavDS, SubnavEH, MainLayoutComponent as ɵa, AbstractLayout as ɵb, DatepickerWrapperComponent as ɵba, DvExampleLayoutComponent as ɵbb, EscapeHtmlPipe as ɵbc, MrAdvancedResultsLayoutComponent as ɵbd, MrLayoutStateService as ɵbe, MrResourceModalService as ɵbf, MrAdvancedSearchLayoutComponent as ɵbg, MrGlossaryLayoutComponent as ɵbh, MrHomeLayoutComponent as ɵbi, MrItineraryLayoutComponent as ɵbj, MrMapLayoutComponent as ɵbk, MrPostsLayoutComponent as ɵbl, MrResourceLayoutComponent as ɵbm, MrSearchFacetsLayoutComponent as ɵbn, MrSearchLayoutComponent as ɵbo, MrSearchService as ɵbp, MrStaticLayoutComponent as ɵbq, MrTimelineLayoutComponent as ɵbr, ReadMoreComponent as ɵbs, MrFormComponent as ɵbt, MrFormWrapperAccordionComponent as ɵbu, MrSearchPageDescriptionComponent as ɵbv, MrResourceModalComponent as ɵbw, MrGalleryComponent as ɵbx, MrAdvancedResultComponent as ɵby, SbExampleLayoutComponent as ɵbz, ConfigurationService as ɵc, SbImageViewerLayoutComponent as ɵca, LayoutsConfigurationService as ɵd, MainStateService as ɵe, Page404LayoutComponent as ɵf, SmartPaginationComponent as ɵg, CommunicationService as ɵh, ApolloProvider as ɵi, RestProvider as ɵj, AwCollectionLayoutComponent as ɵk, AwEntitaLayoutComponent as ɵl, AwFacetsWrapperComponent as ɵm, AwGalleryLayoutComponent as ɵn, AwSearchService as ɵo, AwHomeLayoutComponent as ɵp, AwMapLayoutComponent as ɵq, AwSchedaLayoutComponent as ɵr, AwSearchLayoutComponent as ɵs, AwTimelineLayoutComponent as ɵt, BubbleChartWrapperComponent as ɵu, ChartTippyComponent as ɵv, PdfViewerComponent as ɵw, SchedaDropdownComponent as ɵx, SmartBreadcrumbsComponent as ɵy, DataWidgetWrapperComponent as ɵz };
 //# sourceMappingURL=n7-frontend-boilerplate.js.map
