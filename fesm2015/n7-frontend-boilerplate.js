@@ -102,15 +102,19 @@ MainStateService = __decorate([
     })
 ], MainStateService);
 
+const DEFAULT_TREE_DEPTH = 15;
 let ApolloProvider = class ApolloProvider {
-    constructor(http) {
+    constructor(http, configuration) {
         this.http = http;
+        this.configuration = configuration;
     }
     request$(providerConfig, requestId, options) {
         const { params, method, httpOptions } = options;
+        const treeDepth = this.configuration.get('treeDepth') || DEFAULT_TREE_DEPTH;
+        const config = providerConfig.config ? providerConfig.config(treeDepth) : {};
         let query;
-        if (providerConfig.config && providerConfig.config[requestId]) {
-            query = providerConfig.config[requestId];
+        if (config && config[requestId]) {
+            query = config[requestId];
         }
         query = query || {};
         const { queryName } = query;
@@ -172,14 +176,16 @@ let ApolloProvider = class ApolloProvider {
     }
 };
 ApolloProvider.ctorParameters = () => [
-    { type: HttpClient }
+    { type: HttpClient },
+    { type: ConfigurationService }
 ];
-ApolloProvider.ɵprov = ɵɵdefineInjectable({ factory: function ApolloProvider_Factory() { return new ApolloProvider(ɵɵinject(HttpClient)); }, token: ApolloProvider, providedIn: "root" });
+ApolloProvider.ɵprov = ɵɵdefineInjectable({ factory: function ApolloProvider_Factory() { return new ApolloProvider(ɵɵinject(HttpClient), ɵɵinject(ConfigurationService)); }, token: ApolloProvider, providedIn: "root" });
 ApolloProvider = __decorate([
     Injectable({
         providedIn: 'root',
     }),
-    __metadata("design:paramtypes", [HttpClient])
+    __metadata("design:paramtypes", [HttpClient,
+        ConfigurationService])
 ], ApolloProvider);
 
 let RestProvider = class RestProvider {
@@ -4631,6 +4637,7 @@ class AwEntitaLayoutDS extends LayoutDataSource {
                 currentPage: +this.currentPage || 1,
                 pageLimit: 5,
                 sizes: {
+                    label: 'Numero di risultati',
                     list: [10, 25, 50],
                     active: +this.pageSize,
                 },
@@ -5344,6 +5351,7 @@ class AwSearchLayoutDS extends LayoutDataSource {
                 currentPage: this.currentPage,
                 pageLimit: 5,
                 sizes: {
+                    label: 'Numero di risultati',
                     list: this.paginationList,
                     active: this.pageSize,
                 },
@@ -6671,6 +6679,7 @@ class AwMapLayoutDS extends LayoutDataSource {
             currentPage: this.currentPage,
             pageLimit: 5,
             sizes: {
+                label: 'Numero di risultati',
                 list: [10, 25, 50],
                 active: this.pageSize,
             },
@@ -7480,6 +7489,7 @@ class AwTimelineLayoutDS extends LayoutDataSource {
             currentPage: this.currentPage,
             pageLimit: 5,
             sizes: {
+                label: 'Numero di risultati',
                 list: [10, 25, 50],
                 active: this.pageSize,
             },
@@ -7808,7 +7818,39 @@ SmartBreadcrumbsComponent = __decorate([
     })
 ], SmartBreadcrumbsComponent);
 
-var apolloConfig = {
+const getTreeBranches = (depth, hasImage = true) => {
+    let branchConfig = `
+    label
+    id
+    document_type
+    document_classification
+  `;
+    if (hasImage) {
+        branchConfig = `
+      label
+      id
+      img
+      document_type
+      document_classification
+    `;
+    }
+    const output = [];
+    let i;
+    let j;
+    // open config
+    for (i = 0; i < depth; i += 1) {
+        output.push(i === 0
+            ? branchConfig
+            : `branches {${branchConfig}`);
+    }
+    // close config
+    for (j = 0; j < depth; j += 1) {
+        output.push(j === 0 ? '' : '}');
+    }
+    return output.join('');
+};
+const ɵ0$1 = getTreeBranches;
+var apolloConfig = (treeDepth) => ({
     getLastPosts: {
         queryName: 'getLastPosts',
         queryBody: `
@@ -7845,58 +7887,7 @@ var apolloConfig = {
         queryBody: `
       {
         getTreeOfItems{
-          label
-          id
-          document_type
-          document_classification
-          branches {
-            label
-            id
-            document_type
-            document_classification
-            branches {
-              label
-              id
-              document_type
-              document_classification
-              branches {
-                label
-                id
-                document_type
-                document_classification
-                branches {
-                  label
-                  id
-                  document_type
-                  document_classification
-                  branches {
-                    label
-                    id
-                    document_type
-                    document_classification
-                    branches {
-                      label
-                      id
-                      document_type
-                      document_classification
-                      branches {
-                        label
-                        id
-                        document_type
-                        document_classification
-                        branches {
-                          label
-                          id
-                          document_type
-                          document_classification
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          ${getTreeBranches(treeDepth, false)}
         }
       }
       `,
@@ -7906,67 +7897,7 @@ var apolloConfig = {
         queryBody: `
       {
         getTreeOfItems{
-          label
-          id
-          img
-          document_type
-          document_classification
-          branches {
-            label
-            id
-            img
-            document_type
-            document_classification
-            branches {
-              label
-              id
-              img
-              document_type
-              document_classification
-              branches {
-                label
-                id
-                img
-                document_type
-                document_classification
-                branches {
-                  label
-                  id
-                  img
-                  document_type
-                  document_classification
-                  branches {
-                    label
-                    id
-                    img
-                    document_type
-                    document_classification
-                    branches {
-                      label
-                      id
-                      img
-                      document_type
-                      document_classification
-                      branches {
-                        label
-                        id
-                        img
-                        document_type
-                        document_classification
-                        branches {
-                          label
-                          id
-                          img
-                          document_type
-                          document_classification
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          ${getTreeBranches(treeDepth)}
         }
       }
       `,
@@ -8592,7 +8523,7 @@ var apolloConfig = {
       }
     }`
     }
-};
+});
 
 const COMPONENTS$1 = [
     AwCollectionLayoutComponent,
@@ -9018,7 +8949,7 @@ const hasValue = (value) => {
     }
     return !!value;
 };
-const ɵ0$1 = hasValue;
+const ɵ0$2 = hasValue;
 var searchHelper = {
     stateToQueryParams(state, schemas) {
         const queryParams = {};
@@ -9824,7 +9755,7 @@ const extractQueryParams = (queryParams) => {
     });
     return params;
 };
-const ɵ0$2 = extractQueryParams;
+const ɵ0$3 = extractQueryParams;
 var linksHelper = {
     getQueryParams(href) {
         const queryParams = href.split('?')[1] ? extractQueryParams(href.split('?')[1]) : null;
@@ -14120,7 +14051,12 @@ class MrTimelineLayoutDS extends LayoutDataSource {
                 this.hasMap = false;
             }
             if (bibData) {
-                this.bibliographyData = bibData;
+                this.bibliographyData = {
+                    header: bibData.header,
+                    items: bibData.items.map((item) => (Object.assign(Object.assign({}, item), { anchor: {
+                            payload: item.payload
+                        }, classes: 'mr-item-preview-bibliography' })))
+                };
             }
             else {
                 this.bibliographyData = undefined;
@@ -14183,11 +14119,21 @@ class MrTimelineLayoutDS extends LayoutDataSource {
 }
 
 class MrTimelineLayoutEH extends EventHandler {
+    constructor() {
+        super(...arguments);
+        this.itemPreviewEmit = (type, payload) => {
+            if (type === 'click' && (payload === null || payload === void 0 ? void 0 : payload.action) === 'resource-modal') {
+                const { id, type: resourceType } = payload;
+                this.modalService.open(id, resourceType);
+            }
+        };
+    }
     listen() {
         this.innerEvents$.subscribe(({ type, payload }) => {
             switch (type) {
                 case 'mr-timeline-layout.init':
                     this.dataSource.onInit(payload);
+                    this.modalService = payload.modalService;
                     this.route = payload.route;
                     this.router = payload.router;
                     this.location = payload.location;
@@ -14257,7 +14203,7 @@ const MrTimelineLayoutConfig = {
 };
 
 let MrTimelineLayoutComponent = class MrTimelineLayoutComponent extends AbstractLayout {
-    constructor(layoutsConfiguration, route, router, location, configuration, communication, mainState, layoutState) {
+    constructor(layoutsConfiguration, route, router, location, configuration, communication, mainState, layoutState, modalService) {
         super(layoutsConfiguration.get('MrTimelineLayoutConfig') || MrTimelineLayoutConfig);
         this.route = route;
         this.router = router;
@@ -14266,6 +14212,7 @@ let MrTimelineLayoutComponent = class MrTimelineLayoutComponent extends Abstract
         this.communication = communication;
         this.mainState = mainState;
         this.layoutState = layoutState;
+        this.modalService = modalService;
     }
     initPayload() {
         return {
@@ -14274,6 +14221,7 @@ let MrTimelineLayoutComponent = class MrTimelineLayoutComponent extends Abstract
             configuration: this.configuration,
             communication: this.communication,
             layoutState: this.layoutState,
+            modalService: this.modalService,
             route: this.route,
             router: this.router,
             location: this.location,
@@ -14299,12 +14247,13 @@ MrTimelineLayoutComponent.ctorParameters = () => [
     { type: ConfigurationService },
     { type: CommunicationService },
     { type: MainStateService },
-    { type: MrLayoutStateService }
+    { type: MrLayoutStateService },
+    { type: MrResourceModalService }
 ];
 MrTimelineLayoutComponent = __decorate([
     Component({
         selector: 'mr-timeline-layout',
-        template: "<div class=\"mr-timeline mr-layout\"\r\n     *ngIf=\"lb.dataSource\">\r\n    <div class=\"mr-timeline__timeline\">\r\n        <div class=\"mr-timeline__timeline-loading\"\r\n             *ngIf=\"lb.dataSource.loading.timeline\">\r\n        </div>\r\n        <n7-timeline [data]=\"lb.widgets['mr-timeline'].ds.out$ | async\"\r\n                     *ngIf=\"!lb.dataSource.loading.timeline\">\r\n        </n7-timeline>\r\n    </div>\r\n\r\n    <div class=\"mr-timeline__page mr-side-margin\">\r\n        <div class=\"mr-timeline__date\">\r\n            <n7-inner-title [data]=\"lb.widgets['mr-year-header'].ds.out$ | async\"\r\n                            [emit]=\"lb.widgets['mr-year-header'].emit\">\r\n            </n7-inner-title>\r\n        </div>\r\n        <h1 class=\"mr-timeline__title\"\r\n            *ngIf=\"!lb.dataSource.loading.resourceDetails\">\r\n            {{lb.dataSource.eventHeader}}\r\n        </h1>\r\n        <div class=\"mr-timeline__content\">\r\n            <!-- DESCRIZIONE -->\r\n            <div class=\"mr-content-block mr-content-block-description\">\r\n                <p [innerHTML]=\"lb.dataSource.eventDescription\">\r\n                <p>\r\n            </div>\r\n            <ng-container *ngIf=\"!lb.dataSource.loading.resourceDetails\">\r\n\r\n                <!-- GALLERIA -->\r\n                <div class=\"mr-content-block n7-grid-6\">\r\n                    <ng-container *ngFor=\"let image of lb.dataSource.collectionGalleryData\">\r\n                        <a [href]=\"image.image\" class=\"mr-gallery__image\">\r\n                            <img [src]=\"image.thumbnail\" alt=\"image.title\">\r\n                        </a>\r\n                    </ng-container>\r\n                </div>\r\n                \r\n\r\n                <!-- MAPPA -->\r\n                <div class=\"mr-content-block mr-content-block-map\" *ngIf=\"lb.dataSource.hasMap\">\r\n                    <h3 class=\"mr-content-block__title\" *ngIf=\"lb.dataSource.mapHeader\">{{ lb.dataSource.mapHeader }}</h3>\r\n                    <div class=\"mr-content-block__content\">\r\n                        <n7-map [data]=\"lb.widgets['mr-map'].ds.out$ | async\"></n7-map>\r\n                    </div>\r\n                </div>\r\n\r\n                <!-- BIBLIOGRAFIA -->\r\n                <ng-container *ngIf=\"lb.dataSource.bibliographyData as biblio\">\r\n                    <ng-container *ngIf=\"biblio.items && biblio.items.length > 0\">\r\n                        <div class=\"mr-content-block mr-content-block-collection\">\r\n                            <h3 class=\"mr-content-block__title\">{{ biblio.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-1\">\r\n                                <ng-container *ngFor=\"let item of biblio.items\">\r\n                                    <div class=\"mr-timeline__collection-content\">\r\n                                        <n7-item-preview [data]=\"item\"></n7-item-preview>\r\n                                    </div>\r\n                                </ng-container>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n                <!-- TESTIMONI -->\r\n                <ng-container *ngIf=\"lb.dataSource.collectionWitnessData as wit\">\r\n                    <ng-container *ngIf=\"wit.items && wit.items.length > 0\">\r\n                        <div class=\"mr-content-block-collection mr-content-block\">\r\n                            <h3 class=\"mr-content-block__title\">{{ wit.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-3\">\r\n                                <n7-item-preview *ngFor=\"let item of wit.items\"\r\n                                                 [data]=\"item\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n                <!-- OPERE -->\r\n                <ng-container *ngIf=\"lb.dataSource.collectionWorksData as works\">\r\n                    <ng-container *ngIf=\"works.items && works.items.length > 0\">\r\n                        <div class=\"mr-content-block-collection mr-content-block\">\r\n                            <h3 class=\"mr-content-block__title\">{{ works.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-3\">\r\n                                <n7-item-preview *ngFor=\"let item of works.items\"\r\n                                                 [data]=\"item\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n            </ng-container>\r\n        </div>\r\n    </div>\r\n</div>\r\n"
+        template: "<div class=\"mr-timeline mr-layout\"\r\n     *ngIf=\"lb.dataSource\">\r\n    <div class=\"mr-timeline__timeline\">\r\n        <div class=\"mr-timeline__timeline-loading\"\r\n             *ngIf=\"lb.dataSource.loading.timeline\">\r\n        </div>\r\n        <n7-timeline [data]=\"lb.widgets['mr-timeline'].ds.out$ | async\"\r\n                     *ngIf=\"!lb.dataSource.loading.timeline\">\r\n        </n7-timeline>\r\n    </div>\r\n\r\n    <div class=\"mr-timeline__page mr-side-margin\">\r\n        <div class=\"mr-timeline__date\">\r\n            <n7-inner-title [data]=\"lb.widgets['mr-year-header'].ds.out$ | async\"\r\n                            [emit]=\"lb.widgets['mr-year-header'].emit\">\r\n            </n7-inner-title>\r\n        </div>\r\n        <h1 class=\"mr-timeline__title\"\r\n            *ngIf=\"!lb.dataSource.loading.resourceDetails\">\r\n            {{lb.dataSource.eventHeader}}\r\n        </h1>\r\n        <div class=\"mr-timeline__content\">\r\n            <!-- DESCRIZIONE -->\r\n            <div class=\"mr-content-block mr-content-block-description\">\r\n                <p [innerHTML]=\"lb.dataSource.eventDescription\">\r\n                <p>\r\n            </div>\r\n            <ng-container *ngIf=\"!lb.dataSource.loading.resourceDetails\">\r\n\r\n                <!-- GALLERIA -->\r\n                <div class=\"mr-content-block n7-grid-6\">\r\n                    <ng-container *ngFor=\"let image of lb.dataSource.collectionGalleryData\">\r\n                        <a [href]=\"image.image\" class=\"mr-gallery__image\">\r\n                            <img [src]=\"image.thumbnail\" alt=\"image.title\">\r\n                        </a>\r\n                    </ng-container>\r\n                </div>\r\n                \r\n\r\n                <!-- MAPPA -->\r\n                <div class=\"mr-content-block mr-content-block-map\" *ngIf=\"lb.dataSource.hasMap\">\r\n                    <h3 class=\"mr-content-block__title\" *ngIf=\"lb.dataSource.mapHeader\">{{ lb.dataSource.mapHeader }}</h3>\r\n                    <div class=\"mr-content-block__content\">\r\n                        <n7-map [data]=\"lb.widgets['mr-map'].ds.out$ | async\"></n7-map>\r\n                    </div>\r\n                </div>\r\n\r\n                <!-- BIBLIOGRAFIA -->\r\n                <ng-container *ngIf=\"lb.dataSource.bibliographyData as biblio\">\r\n                    <ng-container *ngIf=\"biblio.items && biblio.items.length > 0\">\r\n                        <div class=\"mr-content-block mr-content-block-collection\">\r\n                            <h3 class=\"mr-content-block__title\">{{ biblio.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-1\">\r\n                                <ng-container *ngFor=\"let item of biblio.items\">\r\n                                    <div class=\"mr-timeline__collection-content\">\r\n                                        <n7-item-preview \r\n                                            [emit]=\"lb.eventHandler.itemPreviewEmit\"    \r\n                                            [data]=\"item\">\r\n                                        </n7-item-preview>\r\n                                    </div>\r\n                                </ng-container>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n                <!-- TESTIMONI -->\r\n                <ng-container *ngIf=\"lb.dataSource.collectionWitnessData as wit\">\r\n                    <ng-container *ngIf=\"wit.items && wit.items.length > 0\">\r\n                        <div class=\"mr-content-block-collection mr-content-block\">\r\n                            <h3 class=\"mr-content-block__title\">{{ wit.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-3\">\r\n                                <n7-item-preview *ngFor=\"let item of wit.items\"\r\n                                                 [data]=\"item\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n                <!-- OPERE -->\r\n                <ng-container *ngIf=\"lb.dataSource.collectionWorksData as works\">\r\n                    <ng-container *ngIf=\"works.items && works.items.length > 0\">\r\n                        <div class=\"mr-content-block-collection mr-content-block\">\r\n                            <h3 class=\"mr-content-block__title\">{{ works.header.title }}</h3>\r\n                            <div class=\"mr-content-block__content n7-grid-3\">\r\n                                <n7-item-preview *ngFor=\"let item of works.items\"\r\n                                                 [data]=\"item\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </div>\r\n                    </ng-container>\r\n                </ng-container>\r\n\r\n            </ng-container>\r\n        </div>\r\n    </div>\r\n</div>\r\n"
     }),
     __metadata("design:paramtypes", [LayoutsConfigurationService,
         ActivatedRoute,
@@ -14313,7 +14262,8 @@ MrTimelineLayoutComponent = __decorate([
         ConfigurationService,
         CommunicationService,
         MainStateService,
-        MrLayoutStateService])
+        MrLayoutStateService,
+        MrResourceModalService])
 ], MrTimelineLayoutComponent);
 
 //---------------------------
@@ -15159,7 +15109,10 @@ let MrMenuService = class MrMenuService {
                 const item = {
                     classes,
                     text: label,
-                    anchor: slug ? { href } : null,
+                    anchor: href ? {
+                        href: linksHelper.getRouterLink(href),
+                        queryParams: linksHelper.getQueryParams(href)
+                    } : null,
                     _meta: {
                         id: href
                     }
@@ -15174,7 +15127,10 @@ let MrMenuService = class MrMenuService {
                         item.subnav.push({
                             classes: el.classes || null,
                             text: el.label,
-                            anchor: { href: subHref },
+                            anchor: subHref ? {
+                                href: linksHelper.getRouterLink(subHref),
+                                queryParams: linksHelper.getQueryParams(subHref)
+                            } : null,
                             _meta: {
                                 id: subHref
                             }

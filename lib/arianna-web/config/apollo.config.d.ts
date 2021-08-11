@@ -1,4 +1,4 @@
-declare const _default: {
+declare const _default: (treeDepth: any) => {
     getLastPosts: {
         queryName: string;
         queryBody: string;
