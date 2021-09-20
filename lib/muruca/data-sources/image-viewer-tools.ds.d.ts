@@ -14,6 +14,8 @@ export declare class MrImageViewerToolsDS extends DataSource {
     toggleDescription(): void;
     toggleThumbs(): void;
     handleThumbs(index: any): void;
+    scrollRight(): void;
+    scrollLeft(): void;
     handlePageChange(payload: any): void;
     updateDescription(): void;
 }

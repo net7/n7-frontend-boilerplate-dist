@@ -9887,10 +9887,12 @@ class MrImageViewerDS extends DataSource {
             images,
             thumbs,
             viewerId: this.id,
+            hideNavigation: !(data.images.length > 1),
             libOptions: {
                 /* SHOW GROUP */
                 showNavigator: false,
                 autoHideControls: false,
+                // showNavigationControl: false,
                 /* SHOW BUTTONS */
                 showRotationControl: false,
                 showSequenceControl: true,
@@ -9924,14 +9926,27 @@ class MrImageViewerToolsDS extends DataSource {
         }));
         return {
             images,
-            controls: {
-                description: {
-                    icon: 'n7-icon-info1',
-                    anchor: { payload: 'toggle-description' }
+            classes: '',
+            navigation: data.images.length > 7 ? {
+                prev: {
+                    payload: 'prev',
+                    classes: 'n7-image-viewer-tools__thumbs-scroll-left'
                 },
+                next: {
+                    payload: 'next',
+                    classes: 'n7-image-viewer-tools__thumbs-scroll-right'
+                },
+            } : null,
+            controls: {
+                description: images[0].caption ? {
+                    icon: 'n7-icon-info1',
+                    anchor: { payload: 'toggle-description' },
+                    isActive: false,
+                } : null,
                 thumbs: {
                     icon: 'n7-icon-images',
-                    anchor: { payload: 'toggle-thumbs' }
+                    anchor: { payload: 'toggle-thumbs' },
+                    isActive: false,
                 },
                 closedescription: {
                     icon: 'n7-icon-close-circle',
@@ -9948,14 +9963,74 @@ class MrImageViewerToolsDS extends DataSource {
     }
     toggleDescription() {
         this.output.isVisible.description = !this.output.isVisible.description;
+        this.output.isVisible.thumbnails = false;
+        this.output.controls.description.isActive = !this.output.controls.description.isActive;
+        this.output.controls.thumbs.isActive = false;
     }
     toggleThumbs() {
         this.output.isVisible.thumbnails = !this.output.isVisible.thumbnails;
+        this.output.isVisible.description = false;
+        this.output.controls.thumbs.isActive = !this.output.controls.thumbs.isActive;
+        if (this.output.controls.description) {
+            this.output.controls.description.isActive = false;
+        }
     }
     handleThumbs(index) {
         this.output.initial = index;
         this.updateDescription();
     }
+    //
+    scrollRight() {
+        const thumbsStrip = document.querySelectorAll('div.n7-image-viewer-tools__thumbs-strip')[0];
+        const rightArrow = document.querySelectorAll(`div.${this.output.navigation.next.classes}`)[0];
+        const leftArrow = document.querySelectorAll(`div.${this.output.navigation.prev.classes}`)[0];
+        const maxStrip = thumbsStrip.scrollWidth - thumbsStrip.clientWidth;
+        const { scrollLeft } = thumbsStrip;
+        if ((scrollLeft + 400) >= maxStrip) { // mettere value da config e.g. scrollStrength
+            thumbsStrip.scrollBy({
+                top: 0,
+                left: +400,
+                behavior: 'smooth'
+            });
+            rightArrow.style.opacity = '0.5';
+        }
+        else {
+            thumbsStrip.scrollBy({
+                top: 0,
+                left: +400,
+                behavior: 'smooth'
+            });
+        }
+        if (((scrollLeft + 400) > 0)) {
+            leftArrow.style.opacity = '1.0';
+        }
+    }
+    scrollLeft() {
+        const thumbsStrip = document.querySelectorAll('div.n7-image-viewer-tools__thumbs-strip')[0];
+        const rightArrow = document.querySelectorAll(`div.${this.output.navigation.next.classes}`)[0];
+        const leftArrow = document.querySelectorAll(`div.${this.output.navigation.prev.classes}`)[0];
+        const maxStrip = thumbsStrip.scrollWidth - thumbsStrip.clientWidth;
+        const { scrollLeft } = thumbsStrip;
+        if ((scrollLeft - 400) <= 0) { // mettere value da config e.g. scrollStrength
+            thumbsStrip.scrollBy({
+                top: 0,
+                left: -400,
+                behavior: 'smooth'
+            });
+            leftArrow.style.opacity = '0.5';
+        }
+        else {
+            thumbsStrip.scrollBy({
+                top: 0,
+                left: -400,
+                behavior: 'smooth'
+            });
+        }
+        if (((scrollLeft - 400) < maxStrip)) {
+            rightArrow.style.opacity = '1.0';
+        }
+    }
+    //
     handlePageChange(payload) {
         this.handleThumbs(payload.page);
     }
@@ -9963,6 +10038,15 @@ class MrImageViewerToolsDS extends DataSource {
         const index = this.output.initial;
         const { images } = this.output;
         this.output.description = images[index].caption;
+        if (!this.output.description) {
+            this.output.controls.description = null;
+        }
+        else {
+            this.output.controls.description = {
+                icon: 'n7-icon-info1',
+                anchor: { payload: 'toggle-description' }
+            };
+        }
     }
 }
 
@@ -12802,6 +12886,22 @@ class MrImageViewerToolsEH extends EventHandler {
                         this.dataSource.toggleThumbs();
                         break;
                     }
+                    if (payload === 'next') {
+                        // let index = this.dataSource.retrieveIndex();
+                        // this.dataSource.handleThumbsNext(index);
+                        // let updatedIndex = this.dataSource.retrieveIndex();
+                        // this.emitOuter('thumbclick', updatedIndex);
+                        this.dataSource.scrollRight();
+                        break;
+                    }
+                    if (payload === 'prev') {
+                        // let index = this.dataSource.retrieveIndex();
+                        // this.dataSource.handleThumbsPrev(index);
+                        // let updatedIndex = this.dataSource.retrieveIndex();
+                        // this.emitOuter('thumbclick', updatedIndex);
+                        this.dataSource.scrollLeft();
+                        break;
+                    }
                     break;
                 default:
                     // console.warn('unhandled event of type', type);
@@ -12809,6 +12909,7 @@ class MrImageViewerToolsEH extends EventHandler {
             }
         });
         this.outerEvents$.subscribe(({ type, payload }) => {
+            // console.log(payload);
             switch (type) {
                 case 'mr-resource-layout.init':
                 case 'mr-resource-layout.thumbclick':
@@ -13803,7 +13904,7 @@ MrSearchLayoutComponent.ctorParameters = () => [
 MrSearchLayoutComponent = __decorate([
     Component({
         selector: 'mr-search-layout',
-        template: "<div class=\"mr-search mr-layout\"\r\n     *ngIf=\"lb.dataSource\">\r\n    <section class=\"mr-layout__maxwidth mr-side-margin\">\r\n\r\n        <div class=\"mr-search__title\">\r\n            <n7-inner-title\r\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['mr-search-page-title'].emit\">\r\n            </n7-inner-title>\r\n        </div>\r\n\r\n        <div *ngIf=\"lb.dataSource.showDescription\" class=\"mr-search__description\">\r\n            <mr-search-page-description\r\n            [data]=\"lb.widgets['mr-search-page-description'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['mr-search-page-description'].emit\">\r\n            </mr-search-page-description>\r\n        </div>\r\n        \r\n        <div class=\"mr-search__results-content\">\r\n            <aside class=\"mr-facets\">\r\n                <div class=\"scroll-ref\">&nbsp;</div>\r\n                <div class=\"mr-facets__contents\">\r\n                    <h2 class=\"mr-facets__title\" \r\n                        *ngIf=\"lb.dataSource.pageConfig['facetsTitle']\">\r\n                        {{ lb.dataSource.pageConfig['facetsTitle'] }}\r\n                    </h2>\r\n                    <mr-search-facets-layout \r\n                    [searchService]=\"lb.dataSource.searchService\">\r\n                    </mr-search-facets-layout>\r\n                </div>\r\n            </aside>\r\n            <div class=\"mr-search__results-wrapper\">\r\n                <div class=\"mr-search__results-info\">\r\n                    <n7-inner-title\r\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\r\n                    </n7-inner-title>\r\n                </div>\r\n                \r\n                <div *ngIf=\"(\r\n                    lb.dataSource.pageConfig['filtersTitle'] && \r\n                    lb.widgets['mr-search-tags'].ds.hasFilters\r\n                )\" \r\n                class=\"mr-active-filters\">\r\n                    <span class=\"mr-active-filters__label\">{{ lb.dataSource.pageConfig['filtersTitle'] }}</span>\r\n                    <div class=\"mr-active-filters__tags-wrapper\">\r\n                        <n7-tag *ngFor=\"let tag of (lb.widgets['mr-search-tags'].ds.out$ | async)\"\r\n                        [data]=\"tag\"\r\n                        [emit]=\"lb.widgets['mr-search-tags'].emit\">\r\n                        </n7-tag>\r\n                    </div>\r\n                </div>\r\n\r\n                <main class=\"mr-search__results\">\r\n                    <!-- SEARCH RESULTS -->\r\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\r\n                        \r\n                        <!-- loading -->\r\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n                            <div class=\"mr-search__results-loading n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\r\n                                    blocks: [\r\n                                        { classes: 'search-result-placeholder-title' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' }\r\n                                    ]\r\n                                }\"></n7-content-placeholder>\r\n                            </div>\r\n                        </ng-container>\r\n                        \r\n                        <!-- success: items > 0 -->\r\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n                            <div class=\"n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\r\n                                [data]=\"item\" [emit]=\"lb.widgets['mr-search-results'].emit\">\r\n                                </n7-item-preview>\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- empty: items === 0 -->\r\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\r\n                            <div class=\"mr-search__results-fallback\">\r\n                                <p class=\"mr-search__results-fallback-string\">\r\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\r\n                                </p>\r\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\r\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\r\n                                </button>\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- error: request problem -->\r\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n                            <p class=\"mr-search__results-ko-string\">\r\n                                {{ lb.dataSource.pageConfig.ko.text }}\r\n                            </p>\r\n                            <button class=\"n7-btn mr-search__results-ko-button\"\r\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                {{ lb.dataSource.pageConfig.ko.button }}\r\n                            </button>\r\n                        </ng-container>\r\n                        \r\n                    </ng-container>\r\n                </main>               \r\n                <n7-smart-pagination\r\n                *ngIf=\"(layoutState.get$('results') | async) === 'SUCCESS'\"\r\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\r\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\r\n                </n7-smart-pagination>\r\n            </div>\r\n        </div>\r\n\r\n    </section>\r\n</div>"
+        template: "<div class=\"mr-search mr-layout\"\r\n     *ngIf=\"lb.dataSource\">\r\n    <section class=\"mr-layout__maxwidth mr-side-margin\">\r\n\r\n        <div class=\"mr-search__title\">\r\n            <n7-inner-title\r\n            [data]=\"lb.widgets['mr-search-page-title'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['mr-search-page-title'].emit\">\r\n            </n7-inner-title>\r\n        </div>\r\n\r\n        <div *ngIf=\"lb.dataSource.showDescription\" class=\"mr-search__description\">\r\n            <mr-search-page-description\r\n            [data]=\"lb.widgets['mr-search-page-description'].ds.out$ | async\"\r\n            [emit]=\"lb.widgets['mr-search-page-description'].emit\">\r\n            </mr-search-page-description>\r\n        </div>\r\n        \r\n        <div class=\"mr-search__results-content\">\r\n            <aside class=\"mr-facets\">\r\n                <div class=\"scroll-ref\">&nbsp;</div>\r\n                <div class=\"mr-facets__contents\">\r\n                    <h2 class=\"mr-facets__title\" \r\n                        *ngIf=\"lb.dataSource.pageConfig['facetsTitle']\">\r\n                        {{ lb.dataSource.pageConfig['facetsTitle'] }}\r\n                    </h2>\r\n                    <mr-search-facets-layout \r\n                    [searchService]=\"lb.dataSource.searchService\">\r\n                    </mr-search-facets-layout>\r\n                </div>\r\n            </aside>\r\n            <div class=\"mr-search__results-wrapper\">\r\n                <div class=\"mr-search__results-info\">\r\n                    <n7-inner-title\r\n                    [data]=\"lb.widgets['mr-search-results-title'].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets['mr-search-results-title'].emit\">\r\n                    </n7-inner-title>\r\n                </div>\r\n                \r\n                <div *ngIf=\"(\r\n                    lb.dataSource.pageConfig['filtersTitle'] && \r\n                    lb.widgets['mr-search-tags'].ds.hasFilters\r\n                )\" \r\n                class=\"mr-active-filters\">\r\n                    <span class=\"mr-active-filters__label\">{{ lb.dataSource.pageConfig['filtersTitle'] }}</span>\r\n                    <div class=\"mr-active-filters__tags-wrapper\">\r\n                        <n7-tag *ngFor=\"let tag of (lb.widgets['mr-search-tags'].ds.out$ | async)\"\r\n                        [data]=\"tag\"\r\n                        [emit]=\"lb.widgets['mr-search-tags'].emit\">\r\n                        </n7-tag>\r\n                    </div>\r\n                </div>\r\n\r\n                <main class=\"mr-search__results\">\r\n                    <!-- SEARCH RESULTS -->\r\n                    <ng-container [ngSwitch]=\"layoutState.get$('results') | async\">\r\n                        \r\n                        <!-- loading -->\r\n                        <ng-container *ngSwitchCase=\"'LOADING'\">\r\n                            <div class=\"mr-search__results-loading n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <n7-content-placeholder *ngFor=\"let n of [0,1,2,3,4,5,6,7,8,9]\" [data]=\"{\r\n                                    blocks: [\r\n                                        { classes: 'search-result-placeholder-title' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' },\r\n                                        { classes: 'search-result-placeholder-metadata' }\r\n                                    ]\r\n                                }\"></n7-content-placeholder>\r\n                            </div>\r\n                        </ng-container>\r\n                        \r\n                        <!-- success: items > 0 -->\r\n                        <ng-container *ngSwitchCase=\"'SUCCESS'\">\r\n                            <div class=\"n7-grid-{{ lb.dataSource.pageConfig.grid || 3 }}\">\r\n                                <ng-container *ngIf=\"!lb.dataSource.pageConfig?.advancedResults\">\r\n                                    <n7-item-preview *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\r\n                                    [data]=\"item\" [emit]=\"lb.widgets['mr-search-results'].emit\">\r\n                                    </n7-item-preview>\r\n                                </ng-container>\r\n                                <ng-container *ngIf=\"lb.dataSource.pageConfig?.advancedResults\">\r\n                                    <mr-advanced-result\r\n                                        *ngFor=\"let item of (lb.widgets['mr-search-results'].ds.out$ | async)\"\r\n                                        [data]=\"item\" [emit]=\"lb.widgets['mr-search-results'].emit\">\r\n                                    </mr-advanced-result>\r\n                                </ng-container>\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- empty: items === 0 -->\r\n                        <ng-container *ngSwitchCase=\"'EMPTY'\">\r\n                            <div class=\"mr-search__results-fallback\">\r\n                                <p class=\"mr-search__results-fallback-string\">\r\n                                    {{ lb.dataSource.pageConfig.fallback.text }}\r\n                                </p>\r\n                                <button class=\"n7-btn mr-search__results-fallback-button\"\r\n                                    (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                    {{ lb.dataSource.pageConfig.fallback.button }}\r\n                                </button>\r\n                            </div>\r\n                        </ng-container>\r\n\r\n                        <!-- error: request problem -->\r\n                        <ng-container *ngSwitchCase=\"'ERROR'\">\r\n                            <p class=\"mr-search__results-ko-string\">\r\n                                {{ lb.dataSource.pageConfig.ko.text }}\r\n                            </p>\r\n                            <button class=\"n7-btn mr-search__results-ko-button\"\r\n                                (click)=\"lb.eventHandler.emitInner('searchreset')\">\r\n                                {{ lb.dataSource.pageConfig.ko.button }}\r\n                            </button>\r\n                        </ng-container>\r\n                        \r\n                    </ng-container>\r\n                </main>               \r\n                <n7-smart-pagination\r\n                *ngIf=\"(layoutState.get$('results') | async) === 'SUCCESS'\"\r\n                [data]=\"lb.widgets['n7-smart-pagination'].ds.out$ | async\"\r\n                [emit]=\"lb.widgets['n7-smart-pagination'].emit\">\r\n                </n7-smart-pagination>\r\n            </div>\r\n        </div>\r\n\r\n    </section>\r\n</div>"
     }),
     __metadata("design:paramtypes", [LayoutsConfigurationService,
         Router,
