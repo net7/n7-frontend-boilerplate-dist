@@ -1,4 +1,5 @@
 export * from './lib/n7-boilerplate-lib.module';
+export * from './lib/config-types';
 export * from './lib/common/n7-boilerplate-common.module';
 export * from './lib/common/services';
 export * from './lib/common/models';
