@@ -2664,17 +2664,22 @@ var AwRelatedEntitiesDS = /** @class */ (function (_super) {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.transform = function (data) {
             var basePath = _this.options.config.get('paths').entitaBasePath;
+            var configKeys = _this.options.config.get('config-keys');
             var title = _this.options.title;
             var previews = data ? data.map(function (d) { return ({
                 title: d.entity.label,
                 anchor: {
                     href: "" + basePath + d.entity.id + "/" + d.entity.label,
                 },
-                classes: "is-" + d.entity.typeOfEntity,
+                classes: (configKeys[d.entity.typeOfEntity])
+                    ? "is-" + configKeys[d.entity.typeOfEntity]['class-name']
+                    : null,
                 metadata: [{
                         items: [{
                                 label: 'Tipo di entità',
-                                value: d.entity.typeOfEntity,
+                                value: (configKeys[d.entity.typeOfEntity])
+                                    ? configKeys[d.entity.typeOfEntity].label
+                                    : d.entity.typeOfEntity,
                             }],
                     }],
                 // A special kind of metadata, not to be viewed as other metadata
