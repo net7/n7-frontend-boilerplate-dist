@@ -8953,7 +8953,7 @@ const hasValue = (value) => {
     if (Array.isArray(value)) {
         return value.length > 0;
     }
-    return !!value;
+    return !!(value || value === 0);
 };
 const ɵ0$2 = hasValue;
 var searchHelper = {
@@ -9227,7 +9227,9 @@ let MrSearchService = class MrSearchService {
                         .filter((inputId) => this.queryParamKeys.includes(inputId))
                         .filter((inputId) => this.notEquals(inputContext[inputId], params[inputId]))
                         .forEach((inputId) => {
-                        this.setState(INPUT_STATE_CONTEXT, inputId, params[inputId] || null);
+                        this.setState(INPUT_STATE_CONTEXT, inputId, (params[inputId] || params[inputId] === 0)
+                            ? params[inputId]
+                            : null);
                     });
                 }
             }
@@ -10674,11 +10676,11 @@ class MrSearchTagsDS extends DataSource {
             inputs
                 .filter(({ queryParam }) => queryParam)
                 .forEach(({ id }) => {
-                if (state[id]) {
+                if (state[id] || state[id] === 0) {
                     const values = Array.isArray(state[id]) ? state[id] : [state[id]];
                     values
                         .forEach((value) => {
-                        let text = value;
+                        let text = `${value}`;
                         if (facets[id]) {
                             const selectedFacet = facets[id].values.find(({ payload }) => payload === value);
                             if (selectedFacet) {
@@ -13187,11 +13189,11 @@ class FacetTextDS extends DataSource {
     setValue(value, update = false) {
         this.value = value;
         if (update) {
-            this.update(Object.assign(Object.assign({}, this.input), { value }));
+            this.update(Object.assign(Object.assign({}, this.input), { value: value || value === 0 ? `${value}` : null }));
             // fix element update
             const el = document.getElementById(this.output.id);
             if (el) {
-                el.value = value;
+                el.value = value || value === 0 ? `${value}` : null;
             }
         }
     }
@@ -15208,7 +15210,7 @@ let MrMenuService = class MrMenuService {
         if (response) {
             const headerConfig = this.configuration.get('header');
             headerConfig.nav.items = response.map(({ label, slug, isStatic, subpages, classes }) => {
-                const href = `/${slug}`;
+                const href = slug ? `/${slug}` : null;
                 // dynamic path control
                 if (!isStatic) {
                     this.dynamicPaths.push(href);
@@ -15227,7 +15229,7 @@ let MrMenuService = class MrMenuService {
                 if (subpages !== undefined) {
                     item.subnav = [];
                     subpages.forEach((el) => {
-                        const subHref = `/${el.slug}`;
+                        const subHref = el.slug ? `/${el.slug}` : null;
                         if (!el.isStatic) {
                             this.dynamicPaths.push(subHref);
                         }

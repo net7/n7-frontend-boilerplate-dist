@@ -9069,7 +9069,7 @@ var hasValue = function (value) {
     if (Array.isArray(value)) {
         return value.length > 0;
     }
-    return !!value;
+    return !!(value || value === 0);
 };
 var ɵ0$2 = hasValue;
 var searchHelper = {
@@ -9350,7 +9350,9 @@ var MrSearchService = /** @class */ (function () {
                         .filter(function (inputId) { return _this.queryParamKeys.includes(inputId); })
                         .filter(function (inputId) { return _this.notEquals(inputContext_1[inputId], params[inputId]); })
                         .forEach(function (inputId) {
-                        _this.setState(INPUT_STATE_CONTEXT, inputId, params[inputId] || null);
+                        _this.setState(INPUT_STATE_CONTEXT, inputId, (params[inputId] || params[inputId] === 0)
+                            ? params[inputId]
+                            : null);
                     });
                 }
             }
@@ -10972,11 +10974,11 @@ var MrSearchTagsDS = /** @class */ (function (_super) {
             })
                 .forEach(function (_a) {
                 var id = _a.id;
-                if (state[id]) {
+                if (state[id] || state[id] === 0) {
                     var values = Array.isArray(state[id]) ? state[id] : [state[id]];
                     values
                         .forEach(function (value) {
-                        var text = value;
+                        var text = "" + value;
                         if (facets[id]) {
                             var selectedFacet = facets[id].values.find(function (_a) {
                                 var payload = _a.payload;
@@ -13837,11 +13839,11 @@ var FacetTextDS = /** @class */ (function (_super) {
         if (update === void 0) { update = false; }
         this.value = value;
         if (update) {
-            this.update(__assign(__assign({}, this.input), { value: value }));
+            this.update(__assign(__assign({}, this.input), { value: value || value === 0 ? "" + value : null }));
             // fix element update
             var el = document.getElementById(this.output.id);
             if (el) {
-                el.value = value;
+                el.value = value || value === 0 ? "" + value : null;
             }
         }
     };
@@ -16080,7 +16082,7 @@ var MrMenuService = /** @class */ (function () {
             var headerConfig = this.configuration.get('header');
             headerConfig.nav.items = response.map(function (_a) {
                 var label = _a.label, slug = _a.slug, isStatic = _a.isStatic, subpages = _a.subpages, classes = _a.classes;
-                var href = "/" + slug;
+                var href = slug ? "/" + slug : null;
                 // dynamic path control
                 if (!isStatic) {
                     _this.dynamicPaths.push(href);
@@ -16099,7 +16101,7 @@ var MrMenuService = /** @class */ (function () {
                 if (subpages !== undefined) {
                     item.subnav = [];
                     subpages.forEach(function (el) {
-                        var subHref = "/" + el.slug;
+                        var subHref = el.slug ? "/" + el.slug : null;
                         if (!el.isStatic) {
                             _this.dynamicPaths.push(subHref);
                         }
