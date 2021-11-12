@@ -14,6 +14,8 @@ export declare class MrSearchService {
     private searchId;
     private config;
     private queryParamKeys;
+    private initializeKeys;
+    private initializeValues;
     private inputSchemas;
     private contextState;
     private internalFilterKeys;

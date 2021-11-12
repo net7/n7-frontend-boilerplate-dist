@@ -1,4 +1,4 @@
-import { InputCheckboxData, InputLinkData, InputTextData, InputSelectData, FacetHeaderData } from '@n7-frontend/components';
+import { InputCheckboxData, InputLinkData, InputTextData, InputSelectData, FacetHeaderData, MapData } from '@n7-frontend/components';
 export interface MrInputSchema {
     /** allowed schema value types */
     valueType: 'string' | 'number' | 'boolean';
@@ -33,6 +33,8 @@ export interface MrSearchFacetsInput {
     delay?: number;
     /** allowed value types */
     value?: string | string[] | boolean | null;
+    /** facet has a request for initial values */
+    initialize?: boolean;
 }
 export interface MrSearchInputText extends MrSearchFacetsInput {
     type: 'text';
@@ -52,13 +54,17 @@ export interface MrSearchInputLink extends MrSearchFacetsInput {
     /** how many facet links to show (paginated results)  */
     limit?: number;
 }
+export interface MrSearchInputMap extends MrSearchFacetsInput {
+    type: 'map';
+    data: MapData;
+}
 export interface MrSearchFacetsSection {
     /** Section id (must be unique) */
     id: string;
     /** Section header */
     header?: MrInputHeaderData;
     /** Section inputs (allowed types: text, checkbox, select, link) */
-    inputs: (MrSearchInputText | MrSearchInputCheckbox | MrSearchInputSelect | MrSearchInputLink)[];
+    inputs: (MrSearchInputText | MrSearchInputCheckbox | MrSearchInputSelect | MrSearchInputLink | MrSearchInputMap)[];
     /** Section aditional css classes */
     classes?: string;
 }

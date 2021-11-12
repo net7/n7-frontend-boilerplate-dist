@@ -1,4 +1,4 @@
-import { InputCheckboxData, InputSelectData, InputTextData } from '@n7-frontend/components';
+import { InputCheckboxData, InputSelectData, InputTextData, MapData } from '@n7-frontend/components';
 import { ConfigMurucaLayout } from './layouts';
 export interface ConfigMurucaAdvancedSearchLayout extends ConfigMurucaLayout {
     /** results page url */
@@ -43,7 +43,7 @@ export interface ConfigMurucaAdvancedSearchSection {
     /** is advanced? for css purposes */
     advancedSection?: boolean;
     /** section inputs */
-    inputs: (ConfigMurucaAdvancedSearchInputText<unknown> | ConfigMurucaAdvancedSearchInputCheckbox<unknown> | ConfigMurucaAdvancedSearchInputSelect<unknown>)[];
+    inputs: (ConfigMurucaAdvancedSearchInputText<unknown> | ConfigMurucaAdvancedSearchInputCheckbox<unknown> | ConfigMurucaAdvancedSearchInputSelect<unknown> | ConfigMurucaAdvancedSearchInputMap<unknown>)[];
 }
 export interface ConfigMurucaAdvancedSearchInput<T> {
     id: string;
@@ -68,4 +68,8 @@ export interface ConfigMurucaAdvancedSearchInputCheckbox<T> extends ConfigMuruca
 export interface ConfigMurucaAdvancedSearchInputSelect<T> extends ConfigMurucaAdvancedSearchInput<T> {
     type: 'select';
     data: InputSelectData;
+}
+export interface ConfigMurucaAdvancedSearchInputMap<T> extends ConfigMurucaAdvancedSearchInput<T> {
+    type: 'map';
+    data: MapData;
 }

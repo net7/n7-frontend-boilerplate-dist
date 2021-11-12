@@ -8,7 +8,12 @@ declare type MrSearchResponse = {
     total_count: number;
 };
 declare type HighlightItem = [string, [string]] | {
-    link?: string;
+    link?: {
+        /** from the baseUrl of the application */
+        absolute: string;
+        /** path relative to the item preview url */
+        relative: string;
+    };
     text?: string;
     label?: string;
 };
@@ -45,7 +50,7 @@ export declare class MrSearchResultsDS extends DataSource {
         image?: string;
         color?: string;
         title: string;
-        text?: string;
+        text?: string; /** path relative to the item preview url */
     }[];
 }
 export {};

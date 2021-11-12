@@ -1,3 +1,4 @@
+import { ReadMoreData } from '../../muruca/components/read-more/read-more';
 export interface ConfigMurucaSection {
     /** id (unique) */
     id: string;
@@ -75,6 +76,8 @@ export interface ConfigMurucaItemPreviewSection extends ConfigMurucaSection {
 }
 export interface ConfigMurucaMetadataSection extends ConfigMurucaSection {
     type: 'metadata';
+    /** read more toggle data */
+    readmore?: ReadMoreData;
     options?: {
         /** hide metadata labels? */
         hideLabels: boolean;

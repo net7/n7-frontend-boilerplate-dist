@@ -1,7 +1,13 @@
 import { AfterViewChecked, ElementRef } from '@angular/core';
+export declare type ReadMoreData = {
+    height: number;
+    labels: {
+        more: string;
+        less: string;
+    };
+};
 export declare class ReadMoreComponent implements AfterViewChecked {
-    data: any;
-    emit: any;
+    data: ReadMoreData;
     root: ElementRef;
     collapsed: boolean;
     hasReadmore: boolean;

@@ -21,7 +21,7 @@
 
     .mr-facets {
         flex-shrink: 0;
-        width: calc( ( (100% - 4px) - ( 1px * 3) ) / 4 );
+        width: 25%;
         margin-right: $grid-gutter-h;
     }
 
@@ -76,7 +76,7 @@
 /* ------------------------------------ *\
     NO-RESULTS
 \* ------------------------------------ */
-.mr-search{
+.mr-search {
     &__results-ko-string {
         margin-bottom: $space*2;
     }
