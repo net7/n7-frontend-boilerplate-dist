@@ -13646,8 +13646,14 @@ class FacetMapDS extends DataSource {
         this.markerLayer = markerGroup;
     }
     setValue(value, update = false) {
-        this.value = value;
-        this.isUpdate = update;
+        // prevent the search service from assigning a plain string
+        // eslint-disable-next-line no-param-reassign
+        if (typeof value === 'string')
+            value = [value];
+        if (this.value !== value) {
+            this.value = value;
+        }
+        this.isUpdate = update || this.value === [];
         if (update && this.input) {
             const { links } = this.input;
             const updatedLinks = links.map((link) => (Object.assign(Object.assign({}, link), { classes: this.value.includes(link.payload) ? ACTIVE_CLASS$3 : '' })));
@@ -13698,7 +13704,13 @@ class FacetMapEH extends EventHandler {
                                         this.dataSource.toggleValue(event.id);
                                     }
                                     else {
-                                        this.dataSource.setValue([event.id]);
+                                        const currentValue = this.dataSource.value;
+                                        if (currentValue[0] === event.id) {
+                                            this.dataSource.toggleValue(event.id);
+                                        }
+                                        else {
+                                            this.dataSource.setValue([event.id]);
+                                        }
                                     }
                                     // (make request and update component)
                                     this.emitOuter('change', {

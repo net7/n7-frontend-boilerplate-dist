@@ -14591,8 +14591,14 @@
         FacetMapDS.prototype.setValue = function (value, update) {
             var _this = this;
             if (update === void 0) { update = false; }
-            this.value = value;
-            this.isUpdate = update;
+            // prevent the search service from assigning a plain string
+            // eslint-disable-next-line no-param-reassign
+            if (typeof value === 'string')
+                value = [value];
+            if (this.value !== value) {
+                this.value = value;
+            }
+            this.isUpdate = update || this.value === [];
             if (update && this.input) {
                 var links_1 = this.input.links;
                 var updatedLinks = links_1.map(function (link) { return (__assign(__assign({}, link), { classes: _this.value.includes(link.payload) ? ACTIVE_CLASS$3 : '' })); });
@@ -14653,7 +14659,13 @@
                                             _this.dataSource.toggleValue(event.id);
                                         }
                                         else {
-                                            _this.dataSource.setValue([event.id]);
+                                            var currentValue = _this.dataSource.value;
+                                            if (currentValue[0] === event.id) {
+                                                _this.dataSource.toggleValue(event.id);
+                                            }
+                                            else {
+                                                _this.dataSource.setValue([event.id]);
+                                            }
                                         }
                                         // (make request and update component)
                                         _this.emitOuter('change', {
