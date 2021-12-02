@@ -14475,20 +14475,20 @@
     var ACTIVE_CLASS$3 = 'is-active';
     var MARKER_ICON$2 = L.icon({
         iconUrl: '/assets/pin.png',
-        iconSize: [30, 45.5],
-        popupAnchor: [0, -25],
+        iconSize: [16, 25],
+        popupAnchor: [0, -15],
         className: 'marker-icon'
     });
     var MARKER_ICON_UNAVAILABLE = L.icon({
         iconUrl: '/assets/pin-unavailable.png',
-        iconSize: [30, 45.5],
-        popupAnchor: [0, -25],
+        iconSize: [16, 25],
+        popupAnchor: [0, -15],
         className: 'marker-icon'
     });
     var MARKER_ICON_SELECTED$2 = L.icon({
         iconUrl: '/assets/pin-selected.png',
-        iconSize: [30, 45.5],
-        popupAnchor: [0, -25],
+        iconSize: [16, 25],
+        popupAnchor: [0, -15],
         className: 'marker-icon-selected'
     });
     var FacetMapDS = /** @class */ (function (_super) {
@@ -14511,27 +14511,47 @@
         FacetMapDS.prototype.transform = function (_a) {
             var _this = this;
             var links = _a.links;
-            var markers = links
+            var markers = [];
+            links
                 .filter(function (d) { var _a, _b; return ((_a = d.args) === null || _a === void 0 ? void 0 : _a.lat) && ((_b = d.args) === null || _b === void 0 ? void 0 : _b.lon); })
-                .map(function (d) { return ({
-                coords: [+d.args.lat, +d.args.lon],
-                template: d.text,
-                title: d.text,
-                id: d.payload,
-                slug: d.payload,
-                counter: d.counter,
-            }); });
+                .forEach(function (d) {
+                // if a link has more than one corresponding marker
+                if (Array.isArray(d.args.lat)) {
+                    d.args.lat.forEach(function (element, i) {
+                        markers.push({
+                            coords: [+d.args.lat[i], +d.args.lon[i]],
+                            template: d.text,
+                            title: d.text,
+                            id: d.payload,
+                            slug: d.payload,
+                            counter: d.counter,
+                        });
+                    });
+                }
+                else {
+                    // if a link has only one marker
+                    markers.push({
+                        coords: [+d.args.lat, +d.args.lon],
+                        template: d.text,
+                        title: d.text,
+                        id: d.payload,
+                        slug: d.payload,
+                        counter: d.counter,
+                    });
+                }
+            });
             return {
                 containerId: 'map-canvas',
+                libOptions: {
+                    attributionControl: false,
+                },
                 tileLayers: [{
                         url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
-                        options: {
-                            attribution: 'Hello, world',
-                        },
+                        options: null
                     }],
                 initialView: {
-                    center: [46.49, 11.33],
-                    zoom: 8
+                    center: [46.06, 11.21],
+                    zoom: 9
                 },
                 _setInstance: function (map) {
                     _this.mapInstance = map;
@@ -14552,7 +14572,10 @@
                 this.markerLayer.clearLayers();
                 this.mapInstance.removeLayer(this.markerLayer);
             }
-            var markerGroup = L.markerClusterGroup();
+            var markerGroup = L.markerClusterGroup({
+                maxClusterRadius: 10,
+                disableClusteringAtZoom: 8
+            });
             markers.forEach(function (_a) {
                 var coords = _a.coords, template = _a.template, id = _a.id, slug = _a.slug, counter = _a.counter;
                 // create custom icon marker
