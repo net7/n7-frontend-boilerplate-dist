@@ -1,4 +1,4 @@
-import { InputCheckboxData, InputSelectData, InputTextData, MapData } from '@n7-frontend/components';
+import { InputCheckboxData, InputSelectData, InputTextData, MapData, HistogramRangeData } from '@n7-frontend/components';
 import { ConfigMurucaLayout } from './layouts';
 export interface ConfigMurucaAdvancedSearchLayout extends ConfigMurucaLayout {
     /** results page url */
@@ -72,4 +72,8 @@ export interface ConfigMurucaAdvancedSearchInputSelect<T> extends ConfigMurucaAd
 export interface ConfigMurucaAdvancedSearchInputMap<T> extends ConfigMurucaAdvancedSearchInput<T> {
     type: 'map';
     data: MapData;
+}
+export interface ConfigMurucaAdvancedSearchInputHistogram<T> extends ConfigMurucaAdvancedSearchInput<T> {
+    type: 'histogram';
+    data: HistogramRangeData;
 }

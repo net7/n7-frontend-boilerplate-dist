@@ -9150,7 +9150,7 @@ let MrSearchService = class MrSearchService {
                     this.inputSchemas[id] = schema;
                 }
                 // links internal state
-                if (['link', 'map'].includes(type)) {
+                if (['link', 'map', 'histogram'].includes(type)) {
                     this.internalFilterState.facets[id] = {
                         id,
                         limit,
@@ -9333,7 +9333,7 @@ let MrSearchService = class MrSearchService {
         }), debounceTime(facets.delay || 1), map((params) => {
             params.facets = [];
             this.config.facets.sections.forEach(({ inputs }) => {
-                inputs.filter(({ type }) => ['link', 'map'].includes(type))
+                inputs.filter(({ type }) => ['link', 'map', 'histogram'].includes(type))
                     .forEach(({ id }) => {
                     // reset offset
                     this.internalFilterState.facets[id].offset = 0;
@@ -10276,6 +10276,7 @@ const MARKER_ICON$1 = L.icon({
     iconUrl: '/assets/pin.png',
     iconSize: [30, 45.5],
     popupAnchor: [0, -25],
+    iconAnchor: [15, 45.5],
     className: 'marker-icon'
 });
 const MARKER_ICON_SELECTED$1 = L.icon({
@@ -10292,7 +10293,8 @@ class MrMapDS extends DataSource {
     // eslint-disable-next-line consistent-return
     transform(data) {
         let markers;
-        if (data.find((d) => d.markers)) {
+        const d = data.find((z) => z.zoom);
+        if (data.find((a) => a.markers)) {
             markers = data
                 .map((area) => (area.markers
                 .map((m) => {
@@ -10309,23 +10311,25 @@ class MrMapDS extends DataSource {
                 // flatten the list of markers
                 .reduce((acc, val) => acc.concat(val), []);
         }
+        const mapCenter = d.map_center ? [d.map_center.lat, d.map_center.lng]
+            : [54.5260, 15.2551];
         const initialView = {
             // center of europe (only for initial load)
-            center: [54.5260, 15.2551],
-            zoom: 5,
+            center: mapCenter,
+            zoom: d.zoom,
         };
         // if the map and the markers already exist
         // update the already existing layers.
         if (this.mapInstance && this.markerLayer) {
             this.buildMarkers(markers);
-            this.fitMapToBounds(markers.map((m) => m.coords));
+            this.fitMapToBounds(markers.map((m) => m.coords), d.zoom);
         }
         return {
             // only called once, on component init!
             _setInstance: (instance) => {
                 this.mapInstance = instance;
                 // center the map on the markers
-                this.fitMapToBounds(markers.map((m) => m.coords));
+                this.fitMapToBounds(markers.map((m) => m.coords), d.zoom);
                 // load custom markers
                 this.buildMarkers(markers);
                 this.mapLoaded$.next({ map: instance, markers: this.markerLayer });
@@ -10333,17 +10337,20 @@ class MrMapDS extends DataSource {
             containerId: 'map-canvas',
             libOptions: Object.assign({}, this.options.libOptions),
             tileLayers: [{
-                    url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
+                    // url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
+                    // url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png',
                     options: {}
                 }],
             initialView,
         };
     }
-    fitMapToBounds(bounds) {
+    fitMapToBounds(bounds, zoom = 10) {
+        console.log(zoom);
         if (this.mapInstance) {
             this.mapInstance.fitBounds(bounds, {
-                maxZoom: 15,
-                padding: [20, 20],
+                maxZoom: zoom,
+                padding: [20, 20]
             });
         }
         else {
@@ -10362,7 +10369,10 @@ class MrMapDS extends DataSource {
             this.markerLayer.clearLayers();
             this.mapInstance.removeLayer(this.markerLayer);
         }
-        const markerGroup = L.markerClusterGroup();
+        const markerGroup = L.markerClusterGroup({
+            maxClusterRadius: 5,
+            disableClusteringAtZoom: 20
+        });
         markers.forEach(({ coords, template, id, slug }) => {
             // create custom icon marker
             const newMarker = L.marker(coords, { icon: MARKER_ICON$1 });
@@ -13541,19 +13551,19 @@ class FacetLinkMultipleEH extends EventHandler {
 const ACTIVE_CLASS$3 = 'is-active';
 const MARKER_ICON$2 = L.icon({
     iconUrl: '/assets/pin.png',
-    iconSize: [16, 25],
+    iconSize: [13, 20],
     popupAnchor: [0, -15],
     className: 'marker-icon'
 });
 const MARKER_ICON_UNAVAILABLE = L.icon({
     iconUrl: '/assets/pin-unavailable.png',
-    iconSize: [16, 25],
+    iconSize: [13, 20],
     popupAnchor: [0, -15],
     className: 'marker-icon'
 });
 const MARKER_ICON_SELECTED$2 = L.icon({
     iconUrl: '/assets/pin-selected.png',
-    iconSize: [16, 25],
+    iconSize: [13, 20],
     popupAnchor: [0, -15],
     className: 'marker-icon-selected'
 });
@@ -13569,6 +13579,13 @@ class FacetMapDS extends DataSource {
             if (counter > 0)
                 return MARKER_ICON$2;
             return MARKER_ICON_UNAVAILABLE;
+        };
+        this.getZindex = (id, counter) => {
+            if (this.value.includes(id))
+                return 19999;
+            if (counter > 0)
+                return 9999;
+            return null;
         };
         this.getValue = () => this.value;
     }
@@ -13606,9 +13623,13 @@ class FacetMapDS extends DataSource {
             containerId: 'map-canvas',
             libOptions: {
                 attributionControl: false,
+                minZoom: 8,
+                maxBounds: [[46.8505, 10.3393], [45.6635, 12.2429]]
             },
             tileLayers: [{
-                    url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
+                    // url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png',
+                    // url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
                     options: null
                 }],
             initialView: {
@@ -13639,7 +13660,10 @@ class FacetMapDS extends DataSource {
         });
         markers.forEach(({ coords, template, id, slug, counter }) => {
             // create custom icon marker
-            const newMarker = L.marker(coords, { icon: this.getIcon(id, counter) });
+            const newMarker = L.marker(coords, {
+                icon: this.getIcon(id, counter),
+                zIndexOffset: this.getZindex(id, counter)
+            });
             if (id && slug) {
                 newMarker.id = id;
                 newMarker.counter = counter;
@@ -13686,7 +13710,8 @@ class FacetMapDS extends DataSource {
                     var _a;
                     const { id } = marker;
                     const counter = ((_a = links.find(({ payload }) => payload === id)) === null || _a === void 0 ? void 0 : _a.counter) || 0;
-                    marker.getPopup()._source.setIcon(this.getIcon(id, counter));
+                    marker.getPopup()._source.setIcon(this.getIcon(id, counter))
+                        .setZIndexOffset(this.getZindex(id, counter));
                 });
             }
             // ---
@@ -13754,6 +13779,85 @@ class FacetMapEH extends EventHandler {
     }
 }
 
+class FacetHistogramEH extends EventHandler {
+    listen() {
+        this.innerEvents$.subscribe(({ type, payload }) => {
+            switch (type) {
+                case `${this.dataSource.id}.rangeselected`:
+                    if (payload) {
+                        this.dataSource.setValue(payload.join('-'));
+                        this.emitOuter('change', {
+                            value: this.dataSource.getValue(),
+                            id: this.dataSource.id
+                        });
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+}
+
+const ACTIVE_CLASS$4 = 'is-active';
+class FacetHistogramDS extends DataSource {
+    constructor() {
+        super(...arguments);
+        this.value = '';
+        this.isUpdate = false;
+        this.getValue = () => this.value;
+    }
+    transform({ links }) {
+        // Remap the response values in the correct
+        // format for histogram-range-component
+        const items = links.map((link) => ({
+            label: link.text,
+            value: link.counter,
+            payload: link.payload,
+            range: link.range ? {
+                payload: link.range.payload,
+                label: link.range.text
+            } : undefined,
+        })).sort((a, b) => +a.label - b.label);
+        return {
+            containerId: 'container-for-histogram',
+            width: 450,
+            height: 50,
+            colours: {
+                top: '#7091B3',
+                bottom: '#96c2f2',
+                accent: '#2F528B',
+            },
+            margin: {
+                left: 30,
+                right: 0,
+                top: 10,
+                bottom: 45
+            },
+            axis: {
+                yAxis: {
+                    show: true,
+                    // tickAmount: 3
+                    values: [0, 5, 20, 60]
+                }
+            },
+            items,
+        };
+    }
+    setValue(value, update = false) {
+        this.value = value;
+        this.isUpdate = update;
+        if (update) {
+            const { links } = this.input;
+            const updatedLinks = links.map((link) => (Object.assign(Object.assign({}, link), { classes: this.value && (this.value === link.payload) ? ACTIVE_CLASS$4 : '' })));
+            this.update(Object.assign(Object.assign({}, this.input), { links: updatedLinks }));
+        }
+    }
+    clear() {
+        this.value = '';
+    }
+}
+
 const DATASOURCE_MAP$3 = {
     header: FacetHeaderDS,
     text: FacetTextDS,
@@ -13764,6 +13868,7 @@ const DATASOURCE_MAP$3 = {
     // if the facet value is an array you MUST include it in the name
     'map-multiple': FacetMapDS,
     'link-multiple': FacetLinkMultipleDS,
+    histogram: FacetHistogramDS,
 };
 const EVENTHANDLER_MAP$3 = {
     header: FacetHeaderEH,
@@ -13775,6 +13880,7 @@ const EVENTHANDLER_MAP$3 = {
     // if the facet value is an array you MUST include it in the name
     'map-multiple': FacetMapEH,
     'link-multiple': FacetLinkMultipleEH,
+    histogram: FacetHistogramEH,
 };
 let MrSearchFacetsLayoutComponent = class MrSearchFacetsLayoutComponent extends AbstractLayout {
     constructor() {
@@ -13829,7 +13935,7 @@ __decorate([
 MrSearchFacetsLayoutComponent = __decorate([
     Component({
         selector: 'mr-search-facets-layout',
-        template: "<div *ngIf=\"lb.dataSource.facets\" class=\"mr-facets__facets-wrapper {{ lb.dataSource.facets.classes || '' }}\">\r\n    <div *ngFor=\"let section of lb.dataSource.facets.sections\" \r\n    class=\"mr-facets__single-facet {{ section.classes || '' }}\"\r\n    [ngClass]=\"lb.dataSource.searchService.getState$('section', section.id) | async\">\r\n        <n7-facet-header\r\n        *ngIf=\"section.header\"\r\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\r\n        [emit]=\"lb.widgets[section.header.id].emit\"\r\n        ></n7-facet-header>\r\n\r\n        <div [hidden]=\"section.header && !lb.widgets[section.header.id].ds.isOpen()\" class=\"mr-facets__single-facet-content\">\r\n            <div *ngFor=\"let input of section.inputs\" \r\n            [attr.id]=\"'facet-container-' + input.id\"\r\n            class=\"mr-facets__single-facet-inner-content {{ input.classes || '' }}\">\r\n                <ng-container [ngSwitch]=\"input.type\">\r\n    \r\n                    <!-- INPUT TEXT -->\r\n                    <n7-input-text \r\n                    *ngSwitchCase=\"'text'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\r\n    \r\n                    <!-- INPUT CHECKBOX -->\r\n                    <n7-input-checkbox \r\n                    *ngSwitchCase=\"'checkbox'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\r\n                    \r\n                    <!-- INPUT SELECT -->\r\n                    <n7-input-select \r\n                    *ngSwitchCase=\"'select'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\r\n                    \r\n                    <!-- INPUT LINK -->\r\n                    <n7-input-link \r\n                    *ngSwitchCase=\"'link'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\r\n\r\n                    <!-- INPUT LINKMULTI -->\r\n                    <n7-input-link \r\n                    *ngSwitchCase=\"'linkMulti'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\r\n                    \r\n                    <!-- INPUT MAP -->\r\n                    <n7-map \r\n                    *ngSwitchCase=\"'map'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-map>\r\n                \r\n                </ng-container>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>\r\n"
+        template: "<div *ngIf=\"lb.dataSource.facets\" class=\"mr-facets__facets-wrapper {{ lb.dataSource.facets.classes || '' }}\">\r\n    <div *ngFor=\"let section of lb.dataSource.facets.sections\" \r\n    class=\"mr-facets__single-facet {{ section.classes || '' }}\"\r\n    [ngClass]=\"lb.dataSource.searchService.getState$('section', section.id) | async\">\r\n        <n7-facet-header\r\n        *ngIf=\"section.header\"\r\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\r\n        [emit]=\"lb.widgets[section.header.id].emit\"\r\n        ></n7-facet-header>\r\n\r\n        <div [hidden]=\"section.header && !lb.widgets[section.header.id].ds.isOpen()\" class=\"mr-facets__single-facet-content\">\r\n            <div *ngFor=\"let input of section.inputs\" \r\n            [attr.id]=\"'facet-container-' + input.id\"\r\n            class=\"mr-facets__single-facet-inner-content {{ input.classes || '' }}\">\r\n                <ng-container [ngSwitch]=\"input.type\">\r\n    \r\n                    <!-- INPUT TEXT -->\r\n                    <n7-input-text \r\n                    *ngSwitchCase=\"'text'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\r\n    \r\n                    <!-- INPUT CHECKBOX -->\r\n                    <n7-input-checkbox \r\n                    *ngSwitchCase=\"'checkbox'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\r\n                    \r\n                    <!-- INPUT SELECT -->\r\n                    <n7-input-select \r\n                    *ngSwitchCase=\"'select'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\r\n                    \r\n                    <!-- INPUT LINK -->\r\n                    <n7-input-link \r\n                    *ngSwitchCase=\"'link'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\r\n\r\n                    <!-- INPUT LINKMULTI -->\r\n                    <n7-input-link \r\n                    *ngSwitchCase=\"'linkMulti'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\r\n                    \r\n                    <!-- INPUT MAP -->\r\n                    <n7-map \r\n                    *ngSwitchCase=\"'map'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-map>\r\n\r\n                    <!-- INPUT HISTOGRAM -->\r\n                    <n7-histogram-range \r\n                    *ngSwitchCase=\"'histogram'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-histogram-range>\r\n                \r\n                </ng-container>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>\r\n"
     }),
     __metadata("design:paramtypes", [])
 ], MrSearchFacetsLayoutComponent);
@@ -14096,11 +14202,13 @@ class MrSearchLayoutEH extends EventHandler {
             // update layout state
             this.layoutState.set('results', isEmpty(response.results) ? LayoutState.EMPTY : LayoutState.SUCCESS);
             // scroll to ref element
-            if (!this.scrollRefElement) {
-                this.scrollRefElement = document.querySelector('.scroll-ref');
-            }
-            else if (!helpers.isElementInViewport(this.scrollRefElement)) {
-                this.scrollRefElement.scrollIntoView();
+            if (!pageConfig.disableScroll) {
+                if (!this.scrollRefElement) {
+                    this.scrollRefElement = document.querySelector('.scroll-ref');
+                }
+                else if (!helpers.isElementInViewport(this.scrollRefElement)) {
+                    this.scrollRefElement.scrollIntoView();
+                }
             }
         });
         this.searchService.getState$(RESULTS_REQUEST_STATE_CONTEXT, 'error')

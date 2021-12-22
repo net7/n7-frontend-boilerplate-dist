@@ -34,6 +34,7 @@ export declare class FacetMapDS extends DataSource implements FacetDataSource {
     private buildMarkers;
     setValue(value: FACET_VALUE, update?: boolean): void;
     getIcon: (id: string, counter: number) => any;
+    getZindex: (id: string, counter: number) => 19999 | 9999;
     toggleValue(value: string): void;
     getValue: () => FACET_VALUE;
     clear(): void;

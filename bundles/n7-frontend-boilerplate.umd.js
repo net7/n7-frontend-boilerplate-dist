@@ -9478,7 +9478,7 @@
                         _this.inputSchemas[id] = schema;
                     }
                     // links internal state
-                    if (['link', 'map'].includes(type)) {
+                    if (['link', 'map', 'histogram'].includes(type)) {
                         _this.internalFilterState.facets[id] = {
                             id: id,
                             limit: limit,
@@ -9682,7 +9682,7 @@
                     var inputs = _a.inputs;
                     inputs.filter(function (_a) {
                         var type = _a.type;
-                        return ['link', 'map'].includes(type);
+                        return ['link', 'map', 'histogram'].includes(type);
                     })
                         .forEach(function (_a) {
                         var id = _a.id;
@@ -10706,6 +10706,7 @@
         iconUrl: '/assets/pin.png',
         iconSize: [30, 45.5],
         popupAnchor: [0, -25],
+        iconAnchor: [15, 45.5],
         className: 'marker-icon'
     });
     var MARKER_ICON_SELECTED$1 = L.icon({
@@ -10725,7 +10726,8 @@
         MrMapDS.prototype.transform = function (data) {
             var _this = this;
             var markers;
-            if (data.find(function (d) { return d.markers; })) {
+            var d = data.find(function (z) { return z.zoom; });
+            if (data.find(function (a) { return a.markers; })) {
                 markers = data
                     .map(function (area) { return (area.markers
                     .map(function (m) {
@@ -10742,23 +10744,25 @@
                     // flatten the list of markers
                     .reduce(function (acc, val) { return acc.concat(val); }, []);
             }
+            var mapCenter = d.map_center ? [d.map_center.lat, d.map_center.lng]
+                : [54.5260, 15.2551];
             var initialView = {
                 // center of europe (only for initial load)
-                center: [54.5260, 15.2551],
-                zoom: 5,
+                center: mapCenter,
+                zoom: d.zoom,
             };
             // if the map and the markers already exist
             // update the already existing layers.
             if (this.mapInstance && this.markerLayer) {
                 this.buildMarkers(markers);
-                this.fitMapToBounds(markers.map(function (m) { return m.coords; }));
+                this.fitMapToBounds(markers.map(function (m) { return m.coords; }), d.zoom);
             }
             return {
                 // only called once, on component init!
                 _setInstance: function (instance) {
                     _this.mapInstance = instance;
                     // center the map on the markers
-                    _this.fitMapToBounds(markers.map(function (m) { return m.coords; }));
+                    _this.fitMapToBounds(markers.map(function (m) { return m.coords; }), d.zoom);
                     // load custom markers
                     _this.buildMarkers(markers);
                     _this.mapLoaded$.next({ map: instance, markers: _this.markerLayer });
@@ -10766,17 +10770,21 @@
                 containerId: 'map-canvas',
                 libOptions: __assign({}, this.options.libOptions),
                 tileLayers: [{
-                        url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
+                        // url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
+                        // url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png',
                         options: {}
                     }],
                 initialView: initialView,
             };
         };
-        MrMapDS.prototype.fitMapToBounds = function (bounds) {
+        MrMapDS.prototype.fitMapToBounds = function (bounds, zoom) {
+            if (zoom === void 0) { zoom = 10; }
+            console.log(zoom);
             if (this.mapInstance) {
                 this.mapInstance.fitBounds(bounds, {
-                    maxZoom: 15,
-                    padding: [20, 20],
+                    maxZoom: zoom,
+                    padding: [20, 20]
                 });
             }
             else {
@@ -10795,7 +10803,10 @@
                 this.markerLayer.clearLayers();
                 this.mapInstance.removeLayer(this.markerLayer);
             }
-            var markerGroup = L.markerClusterGroup();
+            var markerGroup = L.markerClusterGroup({
+                maxClusterRadius: 5,
+                disableClusteringAtZoom: 20
+            });
             markers.forEach(function (_a) {
                 var coords = _a.coords, template = _a.template, id = _a.id, slug = _a.slug;
                 // create custom icon marker
@@ -14475,19 +14486,19 @@
     var ACTIVE_CLASS$3 = 'is-active';
     var MARKER_ICON$2 = L.icon({
         iconUrl: '/assets/pin.png',
-        iconSize: [16, 25],
+        iconSize: [13, 20],
         popupAnchor: [0, -15],
         className: 'marker-icon'
     });
     var MARKER_ICON_UNAVAILABLE = L.icon({
         iconUrl: '/assets/pin-unavailable.png',
-        iconSize: [16, 25],
+        iconSize: [13, 20],
         popupAnchor: [0, -15],
         className: 'marker-icon'
     });
     var MARKER_ICON_SELECTED$2 = L.icon({
         iconUrl: '/assets/pin-selected.png',
-        iconSize: [16, 25],
+        iconSize: [13, 20],
         popupAnchor: [0, -15],
         className: 'marker-icon-selected'
     });
@@ -14504,6 +14515,13 @@
                 if (counter > 0)
                     return MARKER_ICON$2;
                 return MARKER_ICON_UNAVAILABLE;
+            };
+            _this.getZindex = function (id, counter) {
+                if (_this.value.includes(id))
+                    return 19999;
+                if (counter > 0)
+                    return 9999;
+                return null;
             };
             _this.getValue = function () { return _this.value; };
             return _this;
@@ -14544,9 +14562,13 @@
                 containerId: 'map-canvas',
                 libOptions: {
                     attributionControl: false,
+                    minZoom: 8,
+                    maxBounds: [[46.8505, 10.3393], [45.6635, 12.2429]]
                 },
                 tileLayers: [{
-                        url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
+                        // url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png',
+                        // url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
                         options: null
                     }],
                 initialView: {
@@ -14579,7 +14601,10 @@
             markers.forEach(function (_a) {
                 var coords = _a.coords, template = _a.template, id = _a.id, slug = _a.slug, counter = _a.counter;
                 // create custom icon marker
-                var newMarker = L.marker(coords, { icon: _this.getIcon(id, counter) });
+                var newMarker = L.marker(coords, {
+                    icon: _this.getIcon(id, counter),
+                    zIndexOffset: _this.getZindex(id, counter)
+                });
                 if (id && slug) {
                     newMarker.id = id;
                     newMarker.counter = counter;
@@ -14634,7 +14659,8 @@
                             var payload = _a.payload;
                             return payload === id;
                         })) === null || _a === void 0 ? void 0 : _a.counter) || 0;
-                        marker.getPopup()._source.setIcon(_this.getIcon(id, counter));
+                        marker.getPopup()._source.setIcon(_this.getIcon(id, counter))
+                            .setZIndexOffset(_this.getZindex(id, counter));
                     });
                 }
                 // ---
@@ -14710,6 +14736,98 @@
         return FacetMapEH;
     }(core$1.EventHandler));
 
+    var FacetHistogramEH = /** @class */ (function (_super) {
+        __extends(FacetHistogramEH, _super);
+        function FacetHistogramEH() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        FacetHistogramEH.prototype.listen = function () {
+            var _this = this;
+            this.innerEvents$.subscribe(function (_a) {
+                var type = _a.type, payload = _a.payload;
+                switch (type) {
+                    case _this.dataSource.id + ".rangeselected":
+                        if (payload) {
+                            _this.dataSource.setValue(payload.join('-'));
+                            _this.emitOuter('change', {
+                                value: _this.dataSource.getValue(),
+                                id: _this.dataSource.id
+                            });
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            });
+        };
+        return FacetHistogramEH;
+    }(core$1.EventHandler));
+
+    var ACTIVE_CLASS$4 = 'is-active';
+    var FacetHistogramDS = /** @class */ (function (_super) {
+        __extends(FacetHistogramDS, _super);
+        function FacetHistogramDS() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.value = '';
+            _this.isUpdate = false;
+            _this.getValue = function () { return _this.value; };
+            return _this;
+        }
+        FacetHistogramDS.prototype.transform = function (_a) {
+            var links = _a.links;
+            // Remap the response values in the correct
+            // format for histogram-range-component
+            var items = links.map(function (link) { return ({
+                label: link.text,
+                value: link.counter,
+                payload: link.payload,
+                range: link.range ? {
+                    payload: link.range.payload,
+                    label: link.range.text
+                } : undefined,
+            }); }).sort(function (a, b) { return +a.label - b.label; });
+            return {
+                containerId: 'container-for-histogram',
+                width: 450,
+                height: 50,
+                colours: {
+                    top: '#7091B3',
+                    bottom: '#96c2f2',
+                    accent: '#2F528B',
+                },
+                margin: {
+                    left: 30,
+                    right: 0,
+                    top: 10,
+                    bottom: 45
+                },
+                axis: {
+                    yAxis: {
+                        show: true,
+                        // tickAmount: 3
+                        values: [0, 5, 20, 60]
+                    }
+                },
+                items: items,
+            };
+        };
+        FacetHistogramDS.prototype.setValue = function (value, update) {
+            var _this = this;
+            if (update === void 0) { update = false; }
+            this.value = value;
+            this.isUpdate = update;
+            if (update) {
+                var links = this.input.links;
+                var updatedLinks = links.map(function (link) { return (__assign(__assign({}, link), { classes: _this.value && (_this.value === link.payload) ? ACTIVE_CLASS$4 : '' })); });
+                this.update(__assign(__assign({}, this.input), { links: updatedLinks }));
+            }
+        };
+        FacetHistogramDS.prototype.clear = function () {
+            this.value = '';
+        };
+        return FacetHistogramDS;
+    }(core$1.DataSource));
+
     var DATASOURCE_MAP$3 = {
         header: FacetHeaderDS,
         text: FacetTextDS,
@@ -14720,6 +14838,7 @@
         // if the facet value is an array you MUST include it in the name
         'map-multiple': FacetMapDS,
         'link-multiple': FacetLinkMultipleDS,
+        histogram: FacetHistogramDS,
     };
     var EVENTHANDLER_MAP$3 = {
         header: FacetHeaderEH,
@@ -14731,6 +14850,7 @@
         // if the facet value is an array you MUST include it in the name
         'map-multiple': FacetMapEH,
         'link-multiple': FacetLinkMultipleEH,
+        histogram: FacetHistogramEH,
     };
     var MrSearchFacetsLayoutComponent = /** @class */ (function (_super) {
         __extends(MrSearchFacetsLayoutComponent, _super);
@@ -14787,7 +14907,7 @@
         MrSearchFacetsLayoutComponent = __decorate([
             core.Component({
                 selector: 'mr-search-facets-layout',
-                template: "<div *ngIf=\"lb.dataSource.facets\" class=\"mr-facets__facets-wrapper {{ lb.dataSource.facets.classes || '' }}\">\r\n    <div *ngFor=\"let section of lb.dataSource.facets.sections\" \r\n    class=\"mr-facets__single-facet {{ section.classes || '' }}\"\r\n    [ngClass]=\"lb.dataSource.searchService.getState$('section', section.id) | async\">\r\n        <n7-facet-header\r\n        *ngIf=\"section.header\"\r\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\r\n        [emit]=\"lb.widgets[section.header.id].emit\"\r\n        ></n7-facet-header>\r\n\r\n        <div [hidden]=\"section.header && !lb.widgets[section.header.id].ds.isOpen()\" class=\"mr-facets__single-facet-content\">\r\n            <div *ngFor=\"let input of section.inputs\" \r\n            [attr.id]=\"'facet-container-' + input.id\"\r\n            class=\"mr-facets__single-facet-inner-content {{ input.classes || '' }}\">\r\n                <ng-container [ngSwitch]=\"input.type\">\r\n    \r\n                    <!-- INPUT TEXT -->\r\n                    <n7-input-text \r\n                    *ngSwitchCase=\"'text'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\r\n    \r\n                    <!-- INPUT CHECKBOX -->\r\n                    <n7-input-checkbox \r\n                    *ngSwitchCase=\"'checkbox'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\r\n                    \r\n                    <!-- INPUT SELECT -->\r\n                    <n7-input-select \r\n                    *ngSwitchCase=\"'select'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\r\n                    \r\n                    <!-- INPUT LINK -->\r\n                    <n7-input-link \r\n                    *ngSwitchCase=\"'link'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\r\n\r\n                    <!-- INPUT LINKMULTI -->\r\n                    <n7-input-link \r\n                    *ngSwitchCase=\"'linkMulti'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\r\n                    \r\n                    <!-- INPUT MAP -->\r\n                    <n7-map \r\n                    *ngSwitchCase=\"'map'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-map>\r\n                \r\n                </ng-container>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>\r\n"
+                template: "<div *ngIf=\"lb.dataSource.facets\" class=\"mr-facets__facets-wrapper {{ lb.dataSource.facets.classes || '' }}\">\r\n    <div *ngFor=\"let section of lb.dataSource.facets.sections\" \r\n    class=\"mr-facets__single-facet {{ section.classes || '' }}\"\r\n    [ngClass]=\"lb.dataSource.searchService.getState$('section', section.id) | async\">\r\n        <n7-facet-header\r\n        *ngIf=\"section.header\"\r\n        [data]=\"lb.widgets[section.header.id].ds.out$ | async\"\r\n        [emit]=\"lb.widgets[section.header.id].emit\"\r\n        ></n7-facet-header>\r\n\r\n        <div [hidden]=\"section.header && !lb.widgets[section.header.id].ds.isOpen()\" class=\"mr-facets__single-facet-content\">\r\n            <div *ngFor=\"let input of section.inputs\" \r\n            [attr.id]=\"'facet-container-' + input.id\"\r\n            class=\"mr-facets__single-facet-inner-content {{ input.classes || '' }}\">\r\n                <ng-container [ngSwitch]=\"input.type\">\r\n    \r\n                    <!-- INPUT TEXT -->\r\n                    <n7-input-text \r\n                    *ngSwitchCase=\"'text'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-text>\r\n    \r\n                    <!-- INPUT CHECKBOX -->\r\n                    <n7-input-checkbox \r\n                    *ngSwitchCase=\"'checkbox'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-checkbox>\r\n                    \r\n                    <!-- INPUT SELECT -->\r\n                    <n7-input-select \r\n                    *ngSwitchCase=\"'select'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-select>\r\n                    \r\n                    <!-- INPUT LINK -->\r\n                    <n7-input-link \r\n                    *ngSwitchCase=\"'link'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\r\n\r\n                    <!-- INPUT LINKMULTI -->\r\n                    <n7-input-link \r\n                    *ngSwitchCase=\"'linkMulti'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-input-link>\r\n                    \r\n                    <!-- INPUT MAP -->\r\n                    <n7-map \r\n                    *ngSwitchCase=\"'map'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-map>\r\n\r\n                    <!-- INPUT HISTOGRAM -->\r\n                    <n7-histogram-range \r\n                    *ngSwitchCase=\"'histogram'\"\r\n                    [data]=\"lb.widgets[input.id].ds.out$ | async\"\r\n                    [emit]=\"lb.widgets[input.id].emit\"></n7-histogram-range>\r\n                \r\n                </ng-container>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>\r\n"
             }),
             __metadata("design:paramtypes", [])
         ], MrSearchFacetsLayoutComponent);
@@ -15072,11 +15192,13 @@
                 // update layout state
                 _this.layoutState.set('results', lodash.isEmpty(response.results) ? LayoutState.EMPTY : LayoutState.SUCCESS);
                 // scroll to ref element
-                if (!_this.scrollRefElement) {
-                    _this.scrollRefElement = document.querySelector('.scroll-ref');
-                }
-                else if (!helpers.isElementInViewport(_this.scrollRefElement)) {
-                    _this.scrollRefElement.scrollIntoView();
+                if (!pageConfig.disableScroll) {
+                    if (!_this.scrollRefElement) {
+                        _this.scrollRefElement = document.querySelector('.scroll-ref');
+                    }
+                    else if (!helpers.isElementInViewport(_this.scrollRefElement)) {
+                        _this.scrollRefElement.scrollIntoView();
+                    }
                 }
             });
             this.searchService.getState$(RESULTS_REQUEST_STATE_CONTEXT, 'error')
