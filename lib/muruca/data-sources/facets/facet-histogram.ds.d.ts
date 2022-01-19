@@ -1,5 +1,6 @@
 import { HistogramRangeData } from '@n7-frontend/components';
 import { DataSource } from '@n7-frontend/core';
+import 'tippy.js/dist/tippy.css';
 import { FacetDataSource } from './facet-datasource';
 declare type FACET_VALUE = string;
 export declare class FacetHistogramDS extends DataSource implements FacetDataSource {
@@ -12,5 +13,6 @@ export declare class FacetHistogramDS extends DataSource implements FacetDataSou
     setValue(value: any, update?: boolean): void;
     getValue: () => string;
     clear(): void;
+    loadTooltips(): void;
 }
 export {};

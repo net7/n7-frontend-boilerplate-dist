@@ -50,7 +50,7 @@ export declare class MrSearchResultsDS extends DataSource {
         image?: string;
         color?: string;
         title: string;
-        text?: string;
+        text?: string; /** path relative to the item preview url */
     }[];
 }
 export {};

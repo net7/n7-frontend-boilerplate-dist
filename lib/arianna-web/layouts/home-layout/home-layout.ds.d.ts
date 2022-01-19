@@ -15,6 +15,7 @@ export declare class AwHomeLayoutDS extends LayoutDataSource {
     selectedEntitiesIds: any[];
     outerLinks: any;
     outerLinksTitle: string;
+    outerLinksDescription: string;
     homeAutocompleteQuery: string;
     private destroyed$;
     homeAutocompleteIsLoading: boolean;

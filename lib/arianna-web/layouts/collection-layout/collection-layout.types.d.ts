@@ -10,6 +10,7 @@ export interface GetCollectionParams {
         limit: number;
         offset: number;
     };
+    baseUrl?: string;
 }
 export declare type CollectionItem = {
     /** title for the url slug section */
