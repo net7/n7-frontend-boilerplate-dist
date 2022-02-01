@@ -1,4 +1,5 @@
 import { ReplaySubject } from 'rxjs';
+import * as i0 from "@angular/core";
 export declare class MainStateService {
     private custom;
     private default;
@@ -11,4 +12,6 @@ export declare class MainStateService {
     addCustom(key: string, stream$: ReplaySubject<any>): void;
     private _update;
     private _get;
+    static ɵfac: i0.ɵɵFactoryDeclaration<MainStateService, never>;
+    static ɵprov: i0.ɵɵInjectableDeclaration<MainStateService>;
 }

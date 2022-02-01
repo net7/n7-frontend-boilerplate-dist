@@ -1,5 +1,6 @@
 import { OnInit, OnDestroy } from '@angular/core';
 import { MrFormModel } from '../../models/form.model';
+import * as i0 from "@angular/core";
 export declare type MrFormWrapperAccordionData = {
     form: MrFormModel;
 };
@@ -11,4 +12,6 @@ export declare class MrFormWrapperAccordionComponent implements OnInit, OnDestro
     fakeEmit: (type: any, payload?: any) => void;
     onReset(): void;
     onSubmit(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<MrFormWrapperAccordionComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<MrFormWrapperAccordionComponent, "mr-form-wrapper-accordion", never, { "data": "data"; "emit": "emit"; }, {}, never, never>;
 }

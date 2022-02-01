@@ -1,4 +1,5 @@
 import { ElementRef, AfterViewChecked } from '@angular/core';
+import * as i0 from "@angular/core";
 /**
  * Interface for a single BreadcrumbsComponent's "Item"
  *
@@ -55,7 +56,7 @@ export declare class SmartBreadcrumbsComponent implements AfterViewChecked {
      */
     tippyBuilder: (node: any, content: any) => import("tippy.js").Instance<import("tippy.js").Props>[];
     /** Calculate the width of an HTML Element and it's child */
-    getWidths: (parent: ElementRef<any>, child: ElementRef<any>) => {
+    getWidths: (parent: ElementRef, child: ElementRef) => {
         parentWidth: number;
         childWidth: any;
     };
@@ -65,4 +66,6 @@ export declare class SmartBreadcrumbsComponent implements AfterViewChecked {
      * if the children elements are too wide, it enables it.
      */
     triggerSmartEllipsis: () => void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<SmartBreadcrumbsComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<SmartBreadcrumbsComponent, "n7-smart-breadcrumbs", never, { "data": "data"; "emit": "emit"; }, {}, never, never>;
 }

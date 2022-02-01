@@ -8,6 +8,7 @@ import { MainStateService } from '../../../common/services/main-state.service';
 import { MrSearchService } from '../../services/search.service';
 import { MrLayoutStateService } from '../../services/layout-state.service';
 import { MrResourceModalService } from '../../services/resource-modal.service';
+import * as i0 from "@angular/core";
 export declare class MrSearchLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private router;
     private activatedRoute;
@@ -33,4 +34,6 @@ export declare class MrSearchLayoutComponent extends AbstractLayout implements O
     };
     ngOnInit(): void;
     ngOnDestroy(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<MrSearchLayoutComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<MrSearchLayoutComponent, "mr-search-layout", never, {}, {}, never, never>;
 }

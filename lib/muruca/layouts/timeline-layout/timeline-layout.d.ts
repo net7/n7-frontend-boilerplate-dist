@@ -8,6 +8,7 @@ import { ConfigurationService } from '../../../common/services/configuration.ser
 import { MainStateService } from '../../../common/services/main-state.service';
 import { MrResourceModalService } from '../../services/resource-modal.service';
 import { MrLayoutStateService } from '../../services/layout-state.service';
+import * as i0 from "@angular/core";
 export declare class MrTimelineLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private route;
     private router;
@@ -33,4 +34,6 @@ export declare class MrTimelineLayoutComponent extends AbstractLayout implements
     };
     ngOnInit(): void;
     ngOnDestroy(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<MrTimelineLayoutComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<MrTimelineLayoutComponent, "mr-timeline-layout", never, {}, {}, never, never>;
 }

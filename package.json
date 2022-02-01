@@ -1,26 +1,36 @@
 {
   "name": "@n7-frontend/boilerplate",
-  "version": "2.42.0",
+  "version": "3.0.0",
   "peerDependencies": {
-    "@angular/common": "^9.1.10",
-    "@angular/core": "^9.1.10"
+    "@angular/common": "^13.2.0",
+    "@angular/core": "^13.2.0"
   },
   "dependencies": {
     "lodash": "^4.17.15",
     "moment": "^2.26.0",
     "slugify": "^1.4.0",
     "tippy.js": "^5.1.2",
-    "ngx-extended-pdf-viewer": "^7.3.2",
-    "tslib": "^1.10.0"
+    "ngx-extended-pdf-viewer": "^11.1.2",
+    "tslib": "^2.0.0"
   },
-  "main": "bundles/n7-frontend-boilerplate.umd.js",
-  "module": "fesm5/n7-frontend-boilerplate.js",
-  "es2015": "fesm2015/n7-frontend-boilerplate.js",
-  "esm5": "esm5/n7-frontend-boilerplate.js",
-  "esm2015": "esm2015/n7-frontend-boilerplate.js",
-  "fesm5": "fesm5/n7-frontend-boilerplate.js",
-  "fesm2015": "fesm2015/n7-frontend-boilerplate.js",
+  "module": "fesm2015/n7-frontend-boilerplate.mjs",
+  "es2020": "fesm2020/n7-frontend-boilerplate.mjs",
+  "esm2020": "esm2020/n7-frontend-boilerplate.mjs",
+  "fesm2020": "fesm2020/n7-frontend-boilerplate.mjs",
+  "fesm2015": "fesm2015/n7-frontend-boilerplate.mjs",
   "typings": "n7-frontend-boilerplate.d.ts",
-  "metadata": "n7-frontend-boilerplate.metadata.json",
+  "exports": {
+    "./package.json": {
+      "default": "./package.json"
+    },
+    ".": {
+      "types": "./n7-frontend-boilerplate.d.ts",
+      "esm2020": "./esm2020/n7-frontend-boilerplate.mjs",
+      "es2020": "./fesm2020/n7-frontend-boilerplate.mjs",
+      "es2015": "./fesm2015/n7-frontend-boilerplate.mjs",
+      "node": "./fesm2015/n7-frontend-boilerplate.mjs",
+      "default": "./fesm2020/n7-frontend-boilerplate.mjs"
+    }
+  },
   "sideEffects": false
 }

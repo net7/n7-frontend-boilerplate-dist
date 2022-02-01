@@ -1,3 +1,4 @@
+import * as i0 from "@angular/core";
 export declare type GalleryData = {
     selected: null | GalleryItem;
     items: GalleryItem[];
@@ -15,4 +16,6 @@ export declare class MrGalleryComponent {
     grid: number | null;
     onClick(payload: any): void;
     onClose(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<MrGalleryComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<MrGalleryComponent, "mr-gallery", never, { "data": "data"; "emit": "emit"; "grid": "grid"; }, {}, never, never>;
 }

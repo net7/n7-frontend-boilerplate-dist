@@ -7,6 +7,7 @@ import { LayoutsConfigurationService } from '../../../common/services/layouts-co
 import { ConfigurationService } from '../../../common/services/configuration.service';
 import { MainStateService } from '../../../common/services/main-state.service';
 import { MrLayoutStateService } from '../../services/layout-state.service';
+import * as i0 from "@angular/core";
 export declare class MrMapLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private route;
     private router;
@@ -30,4 +31,6 @@ export declare class MrMapLayoutComponent extends AbstractLayout implements OnIn
     };
     ngOnInit(): void;
     ngOnDestroy(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<MrMapLayoutComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<MrMapLayoutComponent, "mr-map-layout", never, {}, {}, never, never>;
 }

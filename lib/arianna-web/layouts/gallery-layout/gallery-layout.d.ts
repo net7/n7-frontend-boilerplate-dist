@@ -6,6 +6,7 @@ import { LayoutsConfigurationService } from '../../../common/services/layouts-co
 import { MainStateService } from '../../../common/services/main-state.service';
 import { AwSearchService } from '../../search/aw-search.service';
 import { CommunicationService } from '../../../common/services/communication.service';
+import * as i0 from "@angular/core";
 export declare class AwGalleryLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private configuration;
     private layoutsConfiguration;
@@ -24,4 +25,6 @@ export declare class AwGalleryLayoutComponent extends AbstractLayout implements 
     };
     ngOnInit(): void;
     ngOnDestroy(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<AwGalleryLayoutComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<AwGalleryLayoutComponent, "aw-gallery-layout", never, {}, {}, never, never>;
 }

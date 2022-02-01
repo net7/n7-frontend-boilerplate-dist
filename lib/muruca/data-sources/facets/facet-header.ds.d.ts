@@ -7,7 +7,7 @@ export declare class FacetHeaderDS extends DataSource implements FacetDataSource
     value: FACET_VALUE;
     protected transform(data: FacetHeaderData): FacetHeaderData;
     setValue(value: FACET_VALUE, update?: boolean): void;
-    getValue: () => string;
+    getValue: () => FACET_VALUE;
     toggle(): void;
     isOpen(): boolean;
     clear(): void;

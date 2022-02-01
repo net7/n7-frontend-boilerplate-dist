@@ -1,4 +1,5 @@
 import { ItemPreviewData, MetadataData } from '@n7-frontend/components';
+import * as i0 from "@angular/core";
 /**
  * A hyperlinked metadata item
  */
@@ -20,5 +21,7 @@ export declare class MrAdvancedResultComponent {
     /** Returns true if there are some highlights to render */
     hasHighlights: () => boolean;
     onClick(payload: any): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<MrAdvancedResultComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<MrAdvancedResultComponent, "mr-advanced-result", never, { "data": "data"; "emit": "emit"; }, {}, never, never>;
 }
 export {};

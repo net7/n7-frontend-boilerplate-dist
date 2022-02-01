@@ -7,6 +7,7 @@ import { ConfigurationService } from '../../../common/services/configuration.ser
 import { CommunicationService } from '../../../common/services/communication.service';
 import { MrResourceModalService } from '../../services/resource-modal.service';
 import { MrLayoutStateService } from '../../services/layout-state.service';
+import * as i0 from "@angular/core";
 export declare class MrAdvancedResultsLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private router;
     private activatedRoute;
@@ -30,4 +31,6 @@ export declare class MrAdvancedResultsLayoutComponent extends AbstractLayout imp
     };
     ngOnInit(): void;
     ngOnDestroy(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<MrAdvancedResultsLayoutComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<MrAdvancedResultsLayoutComponent, "mr-advanced-results-layout", never, {}, {}, never, never>;
 }

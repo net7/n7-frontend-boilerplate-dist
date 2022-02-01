@@ -1,0 +1,15 @@
+import { AwSearchLayoutDS } from '../search-layout/search-layout.ds';
+import facetsConfig from './gallery-facets.config';
+export class AwGalleryLayoutDS extends AwSearchLayoutDS {
+    constructor() {
+        super(...arguments);
+        this.layoutId = 'aw-gallery-layout';
+        this.configId = 'gallery-layout';
+        this.currentNav = 'galleria';
+        this.headTitle = 'Arianna4View - Galleria';
+        this.facetsConfig = facetsConfig;
+        this.paginationList = [12, 24, 48];
+        this.pageSize = 12; // linked objects page size
+    }
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZ2FsbGVyeS1sYXlvdXQuZHMuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi8uLi9wcm9qZWN0cy9uNy1ib2lsZXJwbGF0ZS1saWIvc3JjL2xpYi9hcmlhbm5hLXdlYi9sYXlvdXRzL2dhbGxlcnktbGF5b3V0L2dhbGxlcnktbGF5b3V0LmRzLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLE9BQU8sRUFBRSxnQkFBZ0IsRUFBRSxNQUFNLG1DQUFtQyxDQUFDO0FBQ3JFLE9BQU8sWUFBWSxNQUFNLHlCQUF5QixDQUFDO0FBRW5ELE1BQU0sT0FBTyxpQkFBa0IsU0FBUSxnQkFBZ0I7SUFBdkQ7O1FBQ1MsYUFBUSxHQUFHLG1CQUFtQixDQUFDO1FBRS9CLGFBQVEsR0FBRyxnQkFBZ0IsQ0FBQztRQUU1QixlQUFVLEdBQUcsVUFBVSxDQUFDO1FBRXhCLGNBQVMsR0FBRyx5QkFBeUIsQ0FBQztRQUV0QyxpQkFBWSxHQUFHLFlBQVksQ0FBQztRQUU1QixtQkFBYyxHQUFHLENBQUMsRUFBRSxFQUFFLEVBQUUsRUFBRSxFQUFFLENBQUMsQ0FBQztRQUU5QixhQUFRLEdBQUcsRUFBRSxDQUFDLENBQUMsMkJBQTJCO0lBQ25ELENBQUM7Q0FBQSIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEF3U2VhcmNoTGF5b3V0RFMgfSBmcm9tICcuLi9zZWFyY2gtbGF5b3V0L3NlYXJjaC1sYXlvdXQuZHMnO1xuaW1wb3J0IGZhY2V0c0NvbmZpZyBmcm9tICcuL2dhbGxlcnktZmFjZXRzLmNvbmZpZyc7XG5cbmV4cG9ydCBjbGFzcyBBd0dhbGxlcnlMYXlvdXREUyBleHRlbmRzIEF3U2VhcmNoTGF5b3V0RFMge1xuICBwdWJsaWMgbGF5b3V0SWQgPSAnYXctZ2FsbGVyeS1sYXlvdXQnO1xuXG4gIHB1YmxpYyBjb25maWdJZCA9ICdnYWxsZXJ5LWxheW91dCc7XG5cbiAgcHVibGljIGN1cnJlbnROYXYgPSAnZ2FsbGVyaWEnO1xuXG4gIHB1YmxpYyBoZWFkVGl0bGUgPSAnQXJpYW5uYTRWaWV3IC0gR2FsbGVyaWEnO1xuXG4gIHB1YmxpYyBmYWNldHNDb25maWcgPSBmYWNldHNDb25maWc7XG5cbiAgcHVibGljIHBhZ2luYXRpb25MaXN0ID0gWzEyLCAyNCwgNDhdO1xuXG4gIHB1YmxpYyBwYWdlU2l6ZSA9IDEyOyAvLyBsaW5rZWQgb2JqZWN0cyBwYWdlIHNpemVcbn1cbiJdfQ==

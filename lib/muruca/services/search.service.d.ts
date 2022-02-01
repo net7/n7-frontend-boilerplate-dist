@@ -1,6 +1,7 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { CommunicationService } from '../../common/services/communication.service';
+import * as i0 from "@angular/core";
 export declare const INPUT_STATE_CONTEXT = "input";
 export declare const FACET_STATE_CONTEXT = "facet";
 export declare const SECTION_STATE_CONTEXT = "section";
@@ -46,4 +47,6 @@ export declare class MrSearchService {
     private onFacetsScroll;
     isQueryParamKey: (input: any) => boolean;
     notEquals(val1: any, val2: any): boolean;
+    static ɵfac: i0.ɵɵFactoryDeclaration<MrSearchService, never>;
+    static ɵprov: i0.ɵɵInjectableDeclaration<MrSearchService>;
 }

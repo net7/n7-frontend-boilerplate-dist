@@ -6,6 +6,7 @@ import { LayoutsConfigurationService } from '../../../common/services/layouts-co
 import { ConfigurationService } from '../../../common/services/configuration.service';
 import { MainStateService } from '../../../common/services/main-state.service';
 import { MrLayoutStateService } from '../../services/layout-state.service';
+import * as i0 from "@angular/core";
 export declare class MrHomeLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private activatedRoute;
     private configuration;
@@ -25,4 +26,6 @@ export declare class MrHomeLayoutComponent extends AbstractLayout implements OnI
     ngOnInit(): void;
     ngOnDestroy(): void;
     loadWidgets(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<MrHomeLayoutComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<MrHomeLayoutComponent, "mr-home-layout", never, {}, {}, never, never>;
 }

@@ -6,6 +6,7 @@ import { LayoutsConfigurationService } from '../../../common/services/layouts-co
 import { MainStateService } from '../../../common/services/main-state.service';
 import { AwSearchService } from '../../search/aw-search.service';
 import { CommunicationService } from '../../../common/services/communication.service';
+import * as i0 from "@angular/core";
 export declare class AwSearchLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private configuration;
     private layoutsConfiguration;
@@ -29,4 +30,6 @@ export declare class AwSearchLayoutComponent extends AbstractLayout implements O
     };
     ngOnInit(): void;
     ngOnDestroy(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<AwSearchLayoutComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<AwSearchLayoutComponent, "aw-search-layout", never, {}, {}, never, never>;
 }

@@ -7,7 +7,7 @@ export declare class FacetSelectDS extends DataSource implements FacetDataSource
     value: FACET_VALUE;
     protected transform(data: InputSelectData): InputSelectData;
     setValue(value: FACET_VALUE, update?: boolean): void;
-    getValue: () => string;
+    getValue: () => FACET_VALUE;
     clear(): void;
 }
 export {};

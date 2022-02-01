@@ -6,6 +6,7 @@ import { ConfigurationService } from '../../../common/services/configuration.ser
 import { MainStateService } from '../../../common/services/main-state.service';
 import { MrLayoutStateService } from '../../services/layout-state.service';
 import { LayoutsConfigurationService } from '../../../common/services/layouts-configuration.service';
+import * as i0 from "@angular/core";
 export declare class MrStaticLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private communication;
     private configuration;
@@ -25,4 +26,6 @@ export declare class MrStaticLayoutComponent extends AbstractLayout implements O
     };
     ngOnInit(): void;
     ngOnDestroy(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<MrStaticLayoutComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<MrStaticLayoutComponent, "mr-static-layout", never, {}, {}, never, never>;
 }

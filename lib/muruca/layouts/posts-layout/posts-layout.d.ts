@@ -6,6 +6,7 @@ import { MainStateService } from '../../../common/services/main-state.service';
 import { ConfigurationService } from '../../../common/services/configuration.service';
 import { CommunicationService } from '../../../common/services/communication.service';
 import { MrLayoutStateService } from '../../services/layout-state.service';
+import * as i0 from "@angular/core";
 export declare class MrPostsLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private router;
     private activatedRoute;
@@ -27,4 +28,6 @@ export declare class MrPostsLayoutComponent extends AbstractLayout implements On
     };
     ngOnInit(): void;
     ngOnDestroy(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<MrPostsLayoutComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<MrPostsLayoutComponent, "mr-posts-layout", never, {}, {}, never, never>;
 }

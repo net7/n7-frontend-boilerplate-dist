@@ -1,0 +1,18 @@
+import { MrItineraryLayoutDS } from './itinerary-layout.ds';
+import { MrItineraryLayoutEH } from './itinerary-layout.eh';
+import * as DS from '../../data-sources';
+import * as EH from '../../event-handlers';
+export const MrItineraryLayoutConfig = {
+    layoutId: 'mr-itinerary-layout',
+    widgets: [
+        { id: 'mr-static-metadata' }
+    ],
+    layoutDS: MrItineraryLayoutDS,
+    layoutEH: MrItineraryLayoutEH,
+    widgetsDataSources: DS,
+    widgetsEventHandlers: EH,
+    options: {
+    // TODO
+    },
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaXRpbmVyYXJ5LWxheW91dC5jb25maWcuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi8uLi9wcm9qZWN0cy9uNy1ib2lsZXJwbGF0ZS1saWIvc3JjL2xpYi9tdXJ1Y2EvbGF5b3V0cy9pdGluZXJhcnktbGF5b3V0L2l0aW5lcmFyeS1sYXlvdXQuY29uZmlnLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLE9BQU8sRUFBRSxtQkFBbUIsRUFBRSxNQUFNLHVCQUF1QixDQUFDO0FBQzVELE9BQU8sRUFBRSxtQkFBbUIsRUFBRSxNQUFNLHVCQUF1QixDQUFDO0FBQzVELE9BQU8sS0FBSyxFQUFFLE1BQU0sb0JBQW9CLENBQUM7QUFDekMsT0FBTyxLQUFLLEVBQUUsTUFBTSxzQkFBc0IsQ0FBQztBQUUzQyxNQUFNLENBQUMsTUFBTSx1QkFBdUIsR0FBRztJQUNyQyxRQUFRLEVBQUUscUJBQXFCO0lBQy9CLE9BQU8sRUFBRTtRQUNQLEVBQUUsRUFBRSxFQUFFLG9CQUFvQixFQUFFO0tBQzdCO0lBQ0QsUUFBUSxFQUFFLG1CQUFtQjtJQUM3QixRQUFRLEVBQUUsbUJBQW1CO0lBQzdCLGtCQUFrQixFQUFFLEVBQUU7SUFDdEIsb0JBQW9CLEVBQUUsRUFBRTtJQUN4QixPQUFPLEVBQUU7SUFDUCxPQUFPO0tBQ1I7Q0FDRixDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgTXJJdGluZXJhcnlMYXlvdXREUyB9IGZyb20gJy4vaXRpbmVyYXJ5LWxheW91dC5kcyc7XG5pbXBvcnQgeyBNckl0aW5lcmFyeUxheW91dEVIIH0gZnJvbSAnLi9pdGluZXJhcnktbGF5b3V0LmVoJztcbmltcG9ydCAqIGFzIERTIGZyb20gJy4uLy4uL2RhdGEtc291cmNlcyc7XG5pbXBvcnQgKiBhcyBFSCBmcm9tICcuLi8uLi9ldmVudC1oYW5kbGVycyc7XG5cbmV4cG9ydCBjb25zdCBNckl0aW5lcmFyeUxheW91dENvbmZpZyA9IHtcbiAgbGF5b3V0SWQ6ICdtci1pdGluZXJhcnktbGF5b3V0JyxcbiAgd2lkZ2V0czogW1xuICAgIHsgaWQ6ICdtci1zdGF0aWMtbWV0YWRhdGEnIH1cbiAgXSxcbiAgbGF5b3V0RFM6IE1ySXRpbmVyYXJ5TGF5b3V0RFMsXG4gIGxheW91dEVIOiBNckl0aW5lcmFyeUxheW91dEVILFxuICB3aWRnZXRzRGF0YVNvdXJjZXM6IERTLFxuICB3aWRnZXRzRXZlbnRIYW5kbGVyczogRUgsXG4gIG9wdGlvbnM6IHtcbiAgICAvLyBUT0RPXG4gIH0sXG59O1xuIl19

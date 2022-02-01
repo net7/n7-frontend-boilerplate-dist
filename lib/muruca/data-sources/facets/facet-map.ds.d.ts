@@ -24,6 +24,10 @@ export declare class FacetMapDS extends DataSource implements FacetDataSource {
     markerLayer: any;
     markerEvents$: Subject<MarkerEvent>;
     isUpdate: boolean;
+    iconSize: any;
+    private MARKER_ICON;
+    private MARKER_ICON_UNAVAILABLE;
+    private MARKER_ICON_SELECTED;
     protected transform({ links }: {
         links: CadastralUnit[];
     }): MapData;

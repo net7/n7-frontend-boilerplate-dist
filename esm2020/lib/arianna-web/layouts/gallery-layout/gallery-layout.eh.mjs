@@ -1,0 +1,8 @@
+import { AwSearchLayoutEH } from '../search-layout/search-layout.eh';
+export class AwGalleryLayoutEH extends AwSearchLayoutEH {
+    constructor() {
+        super(...arguments);
+        this.layoutId = 'aw-gallery-layout';
+    }
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZ2FsbGVyeS1sYXlvdXQuZWguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi8uLi9wcm9qZWN0cy9uNy1ib2lsZXJwbGF0ZS1saWIvc3JjL2xpYi9hcmlhbm5hLXdlYi9sYXlvdXRzL2dhbGxlcnktbGF5b3V0L2dhbGxlcnktbGF5b3V0LmVoLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLE9BQU8sRUFBRSxnQkFBZ0IsRUFBRSxNQUFNLG1DQUFtQyxDQUFDO0FBRXJFLE1BQU0sT0FBTyxpQkFBa0IsU0FBUSxnQkFBZ0I7SUFBdkQ7O1FBQ1MsYUFBUSxHQUFHLG1CQUFtQixDQUFDO0lBQ3hDLENBQUM7Q0FBQSIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEF3U2VhcmNoTGF5b3V0RUggfSBmcm9tICcuLi9zZWFyY2gtbGF5b3V0L3NlYXJjaC1sYXlvdXQuZWgnO1xuXG5leHBvcnQgY2xhc3MgQXdHYWxsZXJ5TGF5b3V0RUggZXh0ZW5kcyBBd1NlYXJjaExheW91dEVIIHtcbiAgcHVibGljIGxheW91dElkID0gJ2F3LWdhbGxlcnktbGF5b3V0Jztcbn1cbiJdfQ==

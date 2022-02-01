@@ -4,6 +4,7 @@ import { ConfigurationService } from '../../../common/services/configuration.ser
 import { AbstractLayout } from '../../../common/models/abstract-layout';
 import { CommunicationService } from '../../../common/services/communication.service';
 import { LayoutsConfigurationService } from '../../../common/services/layouts-configuration.service';
+import * as i0 from "@angular/core";
 export declare class AwCollectionLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private communication;
     private layoutsConfiguration;
@@ -18,4 +19,6 @@ export declare class AwCollectionLayoutComponent extends AbstractLayout implemen
     };
     ngOnInit(): void;
     ngOnDestroy(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<AwCollectionLayoutComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<AwCollectionLayoutComponent, "n7-collection-layout", never, {}, {}, never, never>;
 }

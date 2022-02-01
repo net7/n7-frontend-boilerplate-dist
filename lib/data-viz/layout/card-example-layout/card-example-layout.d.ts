@@ -5,6 +5,7 @@ import { CommunicationService } from '../../../common/services/communication.ser
 import { LayoutsConfigurationService } from '../../../common/services/layouts-configuration.service';
 import { ConfigurationService } from '../../../common/services/configuration.service';
 import { CardLoader } from '../../models/card-loader';
+import * as i0 from "@angular/core";
 export declare class DvCardExampleLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private configuration;
     private communication;
@@ -21,4 +22,6 @@ export declare class DvCardExampleLayoutComponent extends AbstractLayout impleme
     };
     ngOnInit(): void;
     ngOnDestroy(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<DvCardExampleLayoutComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<DvCardExampleLayoutComponent, "dv-card-example-layout", never, {}, {}, never, never>;
 }

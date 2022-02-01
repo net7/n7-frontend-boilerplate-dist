@@ -1,3 +1,4 @@
+import * as i0 from "@angular/core";
 export interface DatepickerWrapperData {
     select: Select;
     datepicker: any;
@@ -21,5 +22,7 @@ export declare class DatepickerWrapperComponent {
     emit: any;
     onClick(payload: any): void;
     toggleDropDown(payload: any): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<DatepickerWrapperComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<DatepickerWrapperComponent, "dv-datepicker-wrapper", never, { "data": "data"; "emit": "emit"; }, {}, never, never>;
 }
 export {};

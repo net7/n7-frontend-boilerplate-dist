@@ -7,7 +7,7 @@ export declare class FacetTextDS extends DataSource implements FacetDataSource {
     value: FACET_VALUE;
     protected transform(data: InputTextData): InputTextData;
     setValue(value: FACET_VALUE, update?: boolean): void;
-    getValue: () => string | number;
+    getValue: () => FACET_VALUE;
     clear(): void;
 }
 export {};

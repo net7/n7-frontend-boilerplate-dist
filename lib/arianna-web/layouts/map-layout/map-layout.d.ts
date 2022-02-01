@@ -5,6 +5,7 @@ import { ConfigurationService } from '../../../common/services/configuration.ser
 import { LayoutsConfigurationService } from '../../../common/services/layouts-configuration.service';
 import { MainStateService } from '../../../common/services/main-state.service';
 import { CommunicationService } from '../../../common/services/communication.service';
+import * as i0 from "@angular/core";
 export declare class AwMapLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private configuration;
     private layoutsConfiguration;
@@ -21,4 +22,6 @@ export declare class AwMapLayoutComponent extends AbstractLayout implements OnIn
     };
     ngOnInit(): void;
     ngOnDestroy(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<AwMapLayoutComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<AwMapLayoutComponent, "aw-map-layout", never, {}, {}, never, never>;
 }

@@ -1,0 +1,20 @@
+import { MrTimelineLayoutDS } from './timeline-layout.ds';
+import { MrTimelineLayoutEH } from './timeline-layout.eh';
+import * as DS from '../../data-sources';
+import * as EH from '../../event-handlers';
+export const MrTimelineLayoutConfig = {
+    layoutId: 'mr-timeline-layout',
+    widgets: [
+        { id: 'mr-timeline' },
+        { id: 'mr-map' },
+        { id: 'mr-year-header' }
+    ],
+    layoutDS: MrTimelineLayoutDS,
+    layoutEH: MrTimelineLayoutEH,
+    widgetsDataSources: DS,
+    widgetsEventHandlers: EH,
+    options: {
+    // TODO
+    },
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGltZWxpbmUtbGF5b3V0LmNvbmZpZy5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uLy4uLy4uL3Byb2plY3RzL243LWJvaWxlcnBsYXRlLWxpYi9zcmMvbGliL211cnVjYS9sYXlvdXRzL3RpbWVsaW5lLWxheW91dC90aW1lbGluZS1sYXlvdXQuY29uZmlnLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLE9BQU8sRUFBRSxrQkFBa0IsRUFBRSxNQUFNLHNCQUFzQixDQUFDO0FBQzFELE9BQU8sRUFBRSxrQkFBa0IsRUFBRSxNQUFNLHNCQUFzQixDQUFDO0FBQzFELE9BQU8sS0FBSyxFQUFFLE1BQU0sb0JBQW9CLENBQUM7QUFDekMsT0FBTyxLQUFLLEVBQUUsTUFBTSxzQkFBc0IsQ0FBQztBQUUzQyxNQUFNLENBQUMsTUFBTSxzQkFBc0IsR0FBRztJQUNwQyxRQUFRLEVBQUUsb0JBQW9CO0lBQzlCLE9BQU8sRUFBRTtRQUNQLEVBQUUsRUFBRSxFQUFFLGFBQWEsRUFBRTtRQUNyQixFQUFFLEVBQUUsRUFBRSxRQUFRLEVBQUU7UUFDaEIsRUFBRSxFQUFFLEVBQUUsZ0JBQWdCLEVBQUU7S0FDekI7SUFDRCxRQUFRLEVBQUUsa0JBQWtCO0lBQzVCLFFBQVEsRUFBRSxrQkFBa0I7SUFDNUIsa0JBQWtCLEVBQUUsRUFBRTtJQUN0QixvQkFBb0IsRUFBRSxFQUFFO0lBQ3hCLE9BQU8sRUFBRTtJQUNQLE9BQU87S0FDUjtDQUNGLENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBNclRpbWVsaW5lTGF5b3V0RFMgfSBmcm9tICcuL3RpbWVsaW5lLWxheW91dC5kcyc7XG5pbXBvcnQgeyBNclRpbWVsaW5lTGF5b3V0RUggfSBmcm9tICcuL3RpbWVsaW5lLWxheW91dC5laCc7XG5pbXBvcnQgKiBhcyBEUyBmcm9tICcuLi8uLi9kYXRhLXNvdXJjZXMnO1xuaW1wb3J0ICogYXMgRUggZnJvbSAnLi4vLi4vZXZlbnQtaGFuZGxlcnMnO1xuXG5leHBvcnQgY29uc3QgTXJUaW1lbGluZUxheW91dENvbmZpZyA9IHtcbiAgbGF5b3V0SWQ6ICdtci10aW1lbGluZS1sYXlvdXQnLFxuICB3aWRnZXRzOiBbXG4gICAgeyBpZDogJ21yLXRpbWVsaW5lJyB9LFxuICAgIHsgaWQ6ICdtci1tYXAnIH0sXG4gICAgeyBpZDogJ21yLXllYXItaGVhZGVyJyB9XG4gIF0sXG4gIGxheW91dERTOiBNclRpbWVsaW5lTGF5b3V0RFMsXG4gIGxheW91dEVIOiBNclRpbWVsaW5lTGF5b3V0RUgsXG4gIHdpZGdldHNEYXRhU291cmNlczogRFMsXG4gIHdpZGdldHNFdmVudEhhbmRsZXJzOiBFSCxcbiAgb3B0aW9uczoge1xuICAgIC8vIFRPRE9cbiAgfSxcbn07XG4iXX0=

@@ -1,4 +1,5 @@
 import { AfterViewChecked, ElementRef } from '@angular/core';
+import * as i0 from "@angular/core";
 export declare type ReadMoreData = {
     height: number;
     labels: {
@@ -21,4 +22,6 @@ export declare class ReadMoreComponent implements AfterViewChecked {
     ngAfterViewChecked(): void;
     handleToggle(): void;
     updateWrapperHeight(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<ReadMoreComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<ReadMoreComponent, "mr-read-more", never, { "data": "data"; }, {}, never, ["*"]>;
 }

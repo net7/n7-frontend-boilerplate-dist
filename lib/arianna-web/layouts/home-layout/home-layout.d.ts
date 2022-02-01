@@ -5,6 +5,7 @@ import { ConfigurationService } from '../../../common/services/configuration.ser
 import { LayoutsConfigurationService } from '../../../common/services/layouts-configuration.service';
 import { MainStateService } from '../../../common/services/main-state.service';
 import { CommunicationService } from '../../../common/services/communication.service';
+import * as i0 from "@angular/core";
 export declare class AwHomeLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private router;
     private configuration;
@@ -21,4 +22,6 @@ export declare class AwHomeLayoutComponent extends AbstractLayout implements OnI
     };
     ngOnInit(): void;
     ngOnDestroy(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<AwHomeLayoutComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<AwHomeLayoutComponent, "aw-home-layout", never, {}, {}, never, never>;
 }

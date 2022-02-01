@@ -5,6 +5,7 @@ import { AbstractLayout } from '../../models/abstract-layout';
 import { ConfigurationService } from '../../services/configuration.service';
 import { LayoutsConfigurationService } from '../../services/layouts-configuration.service';
 import { MainStateService } from '../../services/main-state.service';
+import * as i0 from "@angular/core";
 export declare class MainLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private router;
     private route;
@@ -23,4 +24,6 @@ export declare class MainLayoutComponent extends AbstractLayout implements OnIni
     };
     ngOnInit(): void;
     ngOnDestroy(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<MainLayoutComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<MainLayoutComponent, "main-layout", never, {}, {}, never, ["*"]>;
 }

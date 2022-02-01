@@ -1,3 +1,4 @@
+import * as i0 from "@angular/core";
 export declare type PdfViewerData = {
     items: {
         label: string;
@@ -32,4 +33,6 @@ export declare class PdfViewerComponent {
     emit: (type: string, payload?: any) => void;
     onClick(payload: any): void;
     onLoaded(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<PdfViewerComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<PdfViewerComponent, "aw-pdf-viewer", never, { "data": "data"; "emit": "emit"; }, {}, never, never>;
 }

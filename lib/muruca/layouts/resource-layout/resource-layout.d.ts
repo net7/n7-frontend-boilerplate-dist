@@ -7,6 +7,7 @@ import { ConfigurationService } from '../../../common/services/configuration.ser
 import { MainStateService } from '../../../common/services/main-state.service';
 import { MrLayoutStateService } from '../../services/layout-state.service';
 import { MrResourceModalService } from '../../services/resource-modal.service';
+import * as i0 from "@angular/core";
 export declare class MrResourceLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private activatedRoute;
     private configuration;
@@ -32,4 +33,6 @@ export declare class MrResourceLayoutComponent extends AbstractLayout implements
     ngOnInit(): void;
     ngOnDestroy(): void;
     loadWidgets(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<MrResourceLayoutComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<MrResourceLayoutComponent, "mr-resource-layout", never, {}, {}, never, never>;
 }

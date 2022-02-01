@@ -1,6 +1,7 @@
 import { OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalStatus, MrResourceModalService } from '../../services/resource-modal.service';
+import * as i0 from "@angular/core";
 export declare class MrResourceModalComponent implements OnInit, OnDestroy {
     private router;
     private modalService;
@@ -21,4 +22,6 @@ export declare class MrResourceModalComponent implements OnInit, OnDestroy {
         className: string;
     }): void;
     private loadWidgets;
+    static ɵfac: i0.ɵɵFactoryDeclaration<MrResourceModalComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<MrResourceModalComponent, "mr-resource-modal", never, {}, {}, never, never>;
 }

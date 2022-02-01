@@ -1,0 +1,18 @@
+import { MrResourceLayoutDS } from './resource-layout.ds';
+import { MrResourceLayoutEH } from './resource-layout.eh';
+import * as DS from '../../data-sources';
+import * as EH from '../../event-handlers';
+export const MrResourceLayoutConfig = {
+    layoutId: 'mr-resource-layout',
+    widgets: [
+        { id: 'mr-read-more' }
+    ],
+    layoutDS: MrResourceLayoutDS,
+    layoutEH: MrResourceLayoutEH,
+    widgetsDataSources: DS,
+    widgetsEventHandlers: EH,
+    options: {
+    // TODO
+    },
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicmVzb3VyY2UtbGF5b3V0LmNvbmZpZy5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uLy4uLy4uL3Byb2plY3RzL243LWJvaWxlcnBsYXRlLWxpYi9zcmMvbGliL211cnVjYS9sYXlvdXRzL3Jlc291cmNlLWxheW91dC9yZXNvdXJjZS1sYXlvdXQuY29uZmlnLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLE9BQU8sRUFBRSxrQkFBa0IsRUFBRSxNQUFNLHNCQUFzQixDQUFDO0FBQzFELE9BQU8sRUFBRSxrQkFBa0IsRUFBRSxNQUFNLHNCQUFzQixDQUFDO0FBQzFELE9BQU8sS0FBSyxFQUFFLE1BQU0sb0JBQW9CLENBQUM7QUFDekMsT0FBTyxLQUFLLEVBQUUsTUFBTSxzQkFBc0IsQ0FBQztBQUUzQyxNQUFNLENBQUMsTUFBTSxzQkFBc0IsR0FBRztJQUNwQyxRQUFRLEVBQUUsb0JBQW9CO0lBQzlCLE9BQU8sRUFBRTtRQUNQLEVBQUUsRUFBRSxFQUFFLGNBQWMsRUFBRTtLQUN2QjtJQUNELFFBQVEsRUFBRSxrQkFBa0I7SUFDNUIsUUFBUSxFQUFFLGtCQUFrQjtJQUM1QixrQkFBa0IsRUFBRSxFQUFFO0lBQ3RCLG9CQUFvQixFQUFFLEVBQUU7SUFDeEIsT0FBTyxFQUFFO0lBQ1AsT0FBTztLQUNSO0NBQ0YsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IE1yUmVzb3VyY2VMYXlvdXREUyB9IGZyb20gJy4vcmVzb3VyY2UtbGF5b3V0LmRzJztcbmltcG9ydCB7IE1yUmVzb3VyY2VMYXlvdXRFSCB9IGZyb20gJy4vcmVzb3VyY2UtbGF5b3V0LmVoJztcbmltcG9ydCAqIGFzIERTIGZyb20gJy4uLy4uL2RhdGEtc291cmNlcyc7XG5pbXBvcnQgKiBhcyBFSCBmcm9tICcuLi8uLi9ldmVudC1oYW5kbGVycyc7XG5cbmV4cG9ydCBjb25zdCBNclJlc291cmNlTGF5b3V0Q29uZmlnID0ge1xuICBsYXlvdXRJZDogJ21yLXJlc291cmNlLWxheW91dCcsXG4gIHdpZGdldHM6IFtcbiAgICB7IGlkOiAnbXItcmVhZC1tb3JlJyB9XG4gIF0sXG4gIGxheW91dERTOiBNclJlc291cmNlTGF5b3V0RFMsXG4gIGxheW91dEVIOiBNclJlc291cmNlTGF5b3V0RUgsXG4gIHdpZGdldHNEYXRhU291cmNlczogRFMsXG4gIHdpZGdldHNFdmVudEhhbmRsZXJzOiBFSCxcbiAgb3B0aW9uczoge1xuICAgIC8vIFRPRE9cbiAgfSxcbn07XG4iXX0=

@@ -4,6 +4,7 @@ import { AbstractLayout } from '../../../common/models/abstract-layout';
 import { LayoutsConfigurationService } from '../../../common/services/layouts-configuration.service';
 import { MainStateService } from '../../../common/services/main-state.service';
 import { ConfigurationService } from '../../../common/services/configuration.service';
+import * as i0 from "@angular/core";
 export declare class MrAdvancedSearchLayoutComponent extends AbstractLayout implements OnInit, OnDestroy {
     private router;
     private activatedRoute;
@@ -21,4 +22,6 @@ export declare class MrAdvancedSearchLayoutComponent extends AbstractLayout impl
     };
     ngOnInit(): void;
     ngOnDestroy(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<MrAdvancedSearchLayoutComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<MrAdvancedSearchLayoutComponent, "mr-advanced-search-layout", never, {}, {}, never, never>;
 }
