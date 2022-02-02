@@ -7,7 +7,7 @@ import * as i4 from "@angular/common";
 import * as i5 from "@angular/common/http";
 import * as i6 from "@n7-frontend/components";
 export declare class N7BoilerplateCommonModule {
-    static forRoot(config?: any): ModuleWithProviders<any>;
+    static forRoot(config?: any): ModuleWithProviders<N7BoilerplateCommonModule>;
     static ɵfac: i0.ɵɵFactoryDeclaration<N7BoilerplateCommonModule, never>;
     static ɵmod: i0.ɵɵNgModuleDeclaration<N7BoilerplateCommonModule, [typeof i1.MainLayoutComponent, typeof i2.Page404LayoutComponent, typeof i3.SmartPaginationComponent], [typeof i4.CommonModule, typeof i5.HttpClientModule, typeof i6.DvComponentsLibModule], [typeof i1.MainLayoutComponent, typeof i2.Page404LayoutComponent, typeof i3.SmartPaginationComponent]>;
     static ɵinj: i0.ɵɵInjectorDeclaration<N7BoilerplateCommonModule>;
